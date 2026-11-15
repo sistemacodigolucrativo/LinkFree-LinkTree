@@ -11,7 +11,7 @@
 @stack('installer-head')
 
   <title>{{__('messages.LinkStack setup')}}</title>
-  @include('layouts.fonts') 
+  @include('layouts.fonts')
   <link rel="stylesheet" href="{{ asset('assets/external-dependencies/bootstrap-icons.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/linkstack/css/normalize.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/linkstack/css/brands.css') }}">
@@ -104,7 +104,7 @@ h1 {
   from {
   	transform: rotate(0deg);
   }
-  
+
   to {
   	transform: rotate(359deg);
   }
@@ -189,8 +189,8 @@ button:hover {
 }
 .input-group {
     position: relative;
-    display: --webkit-box;
-    display: --ms-flexbox;
+
+
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     -webkit-box-align: stretch;
@@ -213,7 +213,7 @@ button:hover {
     line-height: 1.5;
     color: #495057;
     text-align: center;
-    dark-space: nowrap;
+    white-space: nowrap;
     background-color: #e9ecef;
     border: 1px solid #ced4da;
     border-top-left-radius: 0.25rem;
@@ -246,3 +246,5 @@ button:hover {
 
 </body>
 </html>
+
+<style>.handle-group{display:flex;min-width:0;flex-wrap:nowrap}.handle-group .input-group-text{margin-bottom:0}.handle-group input{flex:1;min-width:0;padding-left:.75rem!important}</style>

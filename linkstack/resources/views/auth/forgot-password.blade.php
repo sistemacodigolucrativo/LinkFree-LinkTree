@@ -40,7 +40,7 @@ foreach($pages as $page)
               <p class="text-center">{{__('messages.No problem')}}</p>
               <form method="POST" action="{{ route('password.email') }}" class="row">
                 @csrf
-            
+
         <!-- Session Status -->
         <x-auth-session-status class="mb-0 alert alert-success pb-2" role="alert" :status="session('status')" />
 
@@ -50,16 +50,16 @@ foreach($pages as $page)
                 <!-- Email Address -->
                 <div class="col-lg-12 form-group pb-2">
                     <label for="email" class="form-label">{{__('messages.Email')}}</label>
-            
-                    <input id="email" class="form-control" type="email" name="email" :value="old('email')" placeholder=" " required autofocus />
+
+                    <input id="email" class="form-control" type="email" name="email" value="{{ old('email') }}" placeholder=" " required autofocus />
                 </div>
-            
+
                 <div class="col-lg-12 d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">{{__('messages.Email Password Reset Link')}}</button>
                 </div>
             </form>
             </div>
-          </div>            
+          </div>
 
     </x-auth-card>
 </x-guest-layout>

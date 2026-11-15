@@ -19,46 +19,46 @@
       @else
       <link rel="icon" type="image/svg+xml" href="{{ asset('assets/linkstack/images/logo.svg') }}">
       @endif
-      
+
       <script src="{{asset('assets/js/detect-dark-mode.js')}}"></script>
 
       <!-- Library / Plugin Css Build -->
       <link rel="stylesheet" href="{{asset('assets/css/core/libs.min.css')}}" />
-      
+
       <!-- Aos Animation Css -->
       <link rel="stylesheet" href="{{asset('assets/vendor/aos/dist/aos.css')}}" />
-      
+
       @include('layouts.fonts')
-      
+
       <!-- Hope Ui Design System Css -->
       <link rel="stylesheet" href="{{asset('assets/css/hope-ui.min.css?v=2.0.0')}}" />
-      
+
       <!-- Custom Css -->
       <link rel="stylesheet" href="{{asset('assets/css/custom.min.css?v=2.0.0')}}" />
-      
+
       <!-- Dark Css -->
       <link rel="stylesheet" href="{{asset('assets/css/dark.min.css')}}" />
-      
+
       <!-- Customizer Css -->
             @if(file_exists(base_path("assets/dashboard-themes/dashboard.css")))
       <link rel="stylesheet" href="{{asset('assets/dashboard-themes/dashboard.css')}}" />
       @else
       <link rel="stylesheet" href="{{asset('assets/css/customizer.min.css')}}" />
       @endif
-      
+
       <!-- RTL Css -->
       <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}" />
-      
-      
+
+
   </head>
 
 @php
 
-if ($_SERVER['QUERY_STRING'] != '') { 
+if (($_SERVER['QUERY_STRING'] ?? '') != '') {
 
     try {
 
-    $id = $_SERVER['QUERY_STRING'];
+    $id = ($_SERVER['QUERY_STRING'] ?? '');
     $user = \App\Models\User::where('id', $id)->first();
     $name = $user->littlelink_name;
     if ($name != null)$url = url('') . '/@' . $name;
@@ -83,7 +83,7 @@ if ($_SERVER['QUERY_STRING'] != '') {
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    
+
                     @if(session('error'))
                         <div class="alert alert-right alert-warning alert-dismissible fade show mb-3" role="alert">
                             <span> {{ __('messages.report_error') }}</span>
@@ -120,7 +120,7 @@ if ($_SERVER['QUERY_STRING'] != '') {
                                     <option value="{{ __('messages.fraud_scams') }}">{{ __('messages.fraud_scams') }}</option>
                                     <option value="{{ __('messages.privacy_violation') }}">{{ __('messages.privacy_violation') }}</option>
                                     <option value="{{ __('messages.impersonation') }}">{{ __('messages.impersonation') }}</option>
-                                    <option value="{{ __('messages.other_specify') }}">{{ __('messages.other_specify') }}</option>                                    
+                                    <option value="{{ __('messages.other_specify') }}">{{ __('messages.other_specify') }}</option>
                                 </select>
                                 <div class="display-msg"></div>
                             </div>
@@ -143,38 +143,38 @@ if ($_SERVER['QUERY_STRING'] != '') {
 
     <!-- Library Bundle Script -->
     <script src="{{asset('assets/js/core/libs.min.js')}}"></script>
-    
+
     <!-- External Library Bundle Script -->
     <script src="{{asset('assets/js/core/external.min.js')}}"></script>
-    
+
     <!-- Widgetchart Script -->
     <script src="{{asset('assets/js/charts/widgetcharts.js')}}"></script>
-    
+
     <!-- mapchart Script -->
     <script src="{{asset('assets/js/charts/vectore-chart.js')}}"></script>
     <script src="{{asset('assets/js/charts/dashboard.js')}}" ></script>
-    
+
     <!-- fslightbox Script -->
     <script src="{{asset('assets/js/plugins/fslightbox.js')}}"></script>
-    
+
     <!-- Settings Script -->
     <script src="{{asset('assets/js/plugins/setting.js')}}"></script>
-    
+
     <!-- Slider-tab Script -->
     <script src="{{asset('assets/js/plugins/slider-tabs.js')}}"></script>
-    
+
     <!-- Form Wizard Script -->
     <script src="{{asset('assets/js/plugins/form-wizard.js')}}"></script>
-    
+
     <!-- AOS Animation Plugin-->
     <script src="{{asset('assets/vendor/aos/dist/aos.js')}}"></script>
-    
+
     <!-- App Script -->
     <script src="{{asset('assets/js/hope-ui.js')}}" defer></script>
-    
+
     <!-- Flatpickr Script -->
     <script src="{{asset('assets/vendor/flatpickr/dist/flatpickr.min.js')}}"></script>
     <script src="{{asset('assets/js/plugins/flatpickr.js')}}" defer></script>
-    
+
     <script src="{{asset('assets/js/plugins/prism.mini.js')}}"></script>
 </html>

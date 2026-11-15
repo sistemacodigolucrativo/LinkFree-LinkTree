@@ -6,35 +6,32 @@
 
 @section('content')
 <div class="conatiner-fluid content-inner mt-n5 py-0">
-  <div class="row">   
-      
+  <div class="row">
+
    <div class="col-lg-12">
       <div class="card   rounded">
           <div class="card-body">
              <div class="row">
-                 <div class="col-sm-12">  
+                 <div class="col-sm-12">
 
                   @push('sidebar-scripts')
                   <?php function strp($urlStrp){return str_replace(array('http://', 'https://'), '', $urlStrp);} ?>
                     <!-- start button editor -->
                     <script>
                       $(document).ready(function() {
-                        $('#code').click(function() {
-                          var css_text = 'color: ' + button_css.color + ';' + '\nbackground-image: ' + button_css.background_image + ';';
-                          $('#sCode').html(css_text);
-                          Rainbow.color(div, function() {
-                            document.getElementById('output').appendChild(div);
-                          });
-                      
-                          $('.modal-profile').fadeIn("slow");
-                          $('.modal-lightsout').fadeTo("slow", .9);
+                        $('#generate-css').click(function() {
+                          const style = document.createElement('span').style;
+                          style.cssText = $('#sCode').val();
+                          if(button_css.color !== 'inherit') style.color = button_css.color;
+                          if(button_css.background_image !== 'inherit') style.backgroundImage = button_css.background_image;
+                          $('#sCode').val(style.cssText);
                         });
-                      
+
                         $('a.modal-close-profile, .modal-lightsout').click(function() {
                           $('.modal-profile').fadeOut("slow");
                           $('.modal-lightsout').fadeOut("slow");
                         });
-                      
+
                         var $button = $("#sample");
                         $("#ex1").gradientPicker({
                           change: function(points, styles) {
@@ -46,7 +43,7 @@
                           fillDirection: "45deg",
                           controlPoints: ["white 0%", "#888888 100%"]
                         });
-                      
+
                         $('#color').ColorPicker({
                           color: '#000000',
                           onShow: function(colpkr) {
@@ -69,35 +66,35 @@
                         color: 'inherit',
                         background_image: 'inherit'
                       };
-                      </script>                      
-                  
+                      </script>
+
                   <link rel="stylesheet" type="text/css" href="{{asset('assets/button-editor/styles/button-gen.css')}}">
                   <link rel="stylesheet" href="{{asset('assets/button-editor/styles/jquery.gradientPicker.css')}}" type="text/css" />
                   <link rel="stylesheet" href="{{asset('assets/button-editor/styles/colorpicker_1.css')}}" type="text/css" />
                   <link rel="stylesheet" type="text/css" href="{{asset('assets/button-editor/themes/blackboard.css')}}">
                   <link rel="stylesheet" href="{{asset('assets/linkstack/css/animations.css') }}">
                   <link rel="stylesheet" type="text/css" href="{{asset('assets/button-editor/css/style.css')}}">
-                  
+
                     <script src="{{asset('assets/button-editor/js/rainbow.js')}}"></script>
                     <script src="{{asset('assets/button-editor/js/css.js')}}"></script>
-                  
-                    <script src="{{asset('assets/button-editor/js/jquery-1.7.js')}}"></script> 
+
+                    <script src="{{asset('assets/button-editor/js/jquery-1.7.js')}}"></script>
                     <script src="{{asset('assets/button-editor/js/jqueryUI-custom.js')}}"></script>
                     <script src="{{asset('assets/button-editor/js/colorpicker.js')}}"></script>
                     <script src="{{asset('assets/button-editor/js/jquery.gradientPicker.js')}}"></script>
                     <!-- end button editor -->
                   @endpush
                     <script src="{{ asset('assets/external-dependencies/fontawesome.js') }}" crossorigin="anonymous"></script>
-                    
+
                   <div>
                   <section class="shadow text-gray-400">
                   <h2 class="mb-4 card-header"><i class="bi bi-pen">{{__('messages.Button Editor')}}</i></h2>
                           <div class="card-body p-0 p-md-3">
-                  
+
                   <a class="btn btn-primary" href="{{ url('/studio/links') }}"><i class="bi bi-arrow-left-short"></i>{{__('messages.Back')}}</a><br><br>
-                  
+
                           <h2>{{__('messages.Custom Button')}}</h2><br>
-                  
+
                           <!-- start button editor -->
                   <div style="left: 10px;">
                     <div class="modal-profile">
@@ -106,74 +103,76 @@
                        <div id="output">
                        </div>
                    </div>
-                      
-                      
+
+
                       <div class="modal-lightsout"></div>
-                  
-                  
-                  
-                  
-                  
+
+
+
+
+
                   <aside id="panel-right">
-                  
-                  
-                  
+
+
+
                   </br>
-                  
-                  
+
+
                   <div class="tool">
                   <heading>{{__('messages.Color')}} &nbsp;<span>{{__('messages.Text')}}</span></heading>
                   </br>
-                  <input type="button" id="color" style="background-color:#FFFFFF; border:thin solid white;height:50px;width:50px;margin-left:5px;">
-                  
-                  
+                  <input type="color" aria-label="Cor do texto" oninput="button_css.color=this.value;document.getElementById('sample').style.color=this.value">
+                  <input aria-label="Seletor de cor avançado" type="button" id="color" style="background-color:#FFFFFF; border:thin solid white;height:50px;width:50px;margin-left:5px;">
+
+
                   </div>
-                  
-                  
+
+
                   </br>
-                  
-                  
+
+
                   <div class="tool">
                   <heading>{{__('messages.background')}} &nbsp;<span>{{__('messages.gradient')}}</span></heading>
                   </br>
                   <div class="grad_ex" id="ex1"></div>
                   </div>
-                  
-                  
+
+
                   </br>
-                  
-                  
-                  
-                  
+
+
+
+
                   </aside>
-                  
+
                   <section id="preview">
                   @if($buttonId == 1)
                   <center><div id="sample" style="border-radius: 8px !important; max-width: 350px; height: 48px; display: flex; align-items: center; justify-content: center;font-size: 18px;" class="button-demo button"><img class="icon-btn hvr-icon" src="{{ asset('\/assets/linkstack/icons\/') . 'custom' }}.svg">{{ $title }}</div></center>
                   @else
                   <center><div id="sample" style="border-radius: 8px !important; max-width: 350px; height: 48px; display: flex; align-items: center; justify-content: center;font-size: 18px;" class="button-demo button"><img class="wicon hvr-icon" src="@if(file_exists(base_path("assets/favicon/icons/").localIcon($id))){{url('assets/favicon/icons/'.localIcon($id))}}@else{{getFavIcon($id)}}@endif">{{ $title }}</div></center>
                   @endif
-                  
+
                   </section>
                   </div>
                   <!-- end button editor -->
-                  
+
                   <br>
+                  <form action="{{ route('editCSS', $id) }}" method="post">
+                  @csrf
                   <details>
                   <summary>{{__('messages.Show CSS')}}</summary>
                   <div style="padding-left: 15px;">
-                  <form action="{{ route('editCSS', $id) }}" method="post">
-                          @csrf
+
                           <div class="form-group col-lg-8"><br>
                             <p>{{__('messages.Custom CSS')}}</p>
-                  
-                            <textarea name="custom_css" rows="9" id="sCode" type="text" value="{{ $custom_css }}" class="form-control" required>{{ $custom_css }}</textarea>
+
+                            <textarea name="custom_css" rows="9" aria-label="CSS personalizado" id="sCode" type="text" value="{{ $custom_css }}" class="form-control" required>{{ $custom_css }}</textarea>
                           </div>
                   </div>
                   </details>
-                  <br><button id="code" class="btn btn-primary">{{__('messages.Save')}}</button><br>
+                  <br><button type="button" id="generate-css" class="btn btn-secondary">Aplicar cores ao CSS</button> <button type="submit" id="code" class="btn btn-primary">{{__('messages.Save')}}</button><br>
                         </form>
-                  
+
                         <form action="{{ route('editCSS', $id) }}" method="post">
                           @csrf
                           <div class="form-group col-lg-8">
@@ -183,8 +182,8 @@
                           </div>
                           <button type="submit" class="btn btn-danger">{{__('messages.Reset to default')}}</button>
                         </form>
-                  
-                  <br><br><div id="result" style="left: 1%; position: relative; background-color:#2c2d3a; border-radius: 25px; min-width:300px; max-width:950px; height:300px; box-shadow: 0 10px 20px -10px rgba(0,0,0, 0.6);">
+
+                  <br><br><div id="result" style="left: auto; position: relative; background-color:#2c2d3a; border-radius: 25px; width:100%; min-width:0; box-sizing:border-box; margin-inline:auto; max-width:950px; height:300px; box-shadow: 0 10px 20px -10px rgba(0,0,0, 0.6);">
                     <div style="position: relative; top: 50%; transform: translateY(-50%);">
                       <h2 align="center" style="color:white">{{__('messages.Result')}}</h2>
                         @if($custom_css === "" or $custom_css === "NULL" and $buttonId == 1)
@@ -204,7 +203,7 @@
                           @csrf
                           <div class="form-group col-lg-8">
                             <h2>{{__('messages.Custom Icon')}}</h2>
-                            <textarea id="textareabox" type="text" name="custom_icon" value="{{ $custom_icon }}" class="form-control" required>{{ $custom_icon }}</textarea>
+                            <textarea aria-label="Ícone personalizado" id="textareabox" type="text" name="custom_icon" value="{{ $custom_icon }}" class="form-control" required>{{ $custom_icon }}</textarea>
                           </div>
                           <script type="text/javascript">
                           // Displays alert if custom icon doesn't contain string "fa-"
@@ -213,10 +212,10 @@
                           var textValue=textarea.value;
                           if (textValue.indexOf(word)==-1)
                             {
-                             alert({{__('messages.Custom Alert')}})
-                            } 
+                             alert(@json(__('messages.Custom Alert')))
+                            }
                             </script>
-                  
+
                           <details>
                           <p>{!!__('messages.cb.description.1-4')!!}</p>
                           <p>{!!__('messages.cb.description.2-4')!!}</p>
@@ -262,27 +261,28 @@
                           </table>
                         </div>
                           </details>
-                  
+
                           <br>
                           <button type="submit" class="btn btn-primary">{{__('messages.Update icon')}}</button>
                           <a class="btn btn-primary" href="https://fontawesome.com/search?m=free" target="_blank">{{__('messages.See all icons')}}</a>
-                          
+
                         </form><br><br><br><br>
                         @endif
-                  
+
                   </div>
-                  
+
                   <a class="btn btn-primary" href="{{ url('/studio/links') }}"><i class="bi bi-arrow-left-short"></i>{{__('messages.Back')}}</a>
-                  
+
                             </div>
                   </section>
+<style>@media(max-width:600px){#color,.colorpicker{display:none!important}} #result .button{max-width:100%;white-space:normal;height:auto;min-height:48px}</style>
 
                  </div>
              </div>
           </div>
        </div>
       </div>
-      
+
     </div>
   </div>
 @endsection

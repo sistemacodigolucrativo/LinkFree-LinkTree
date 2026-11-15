@@ -4,7 +4,7 @@
 
 <div class='card'>
     <div class='card-header'>
-        <h4 class='card-title'>Create New Link Type</h1>
+        <h4 class='card-title'>Create New Link Type</h4>
     </div>
     <div class='card-body'>
 
@@ -28,8 +28,8 @@
 
 
             <div class="form-group">
-                <label for="icon">Icon</label>
-                <input type='text' value="{{@old('icon')}}" name='icon' class="form-control @error('icon') is-invalid @enderror">
+                <label for="field-icon">Icon</label>
+                <input type='text' value="{{@old('icon')}}" name='icon' class="form-control @error('icon') is-invalid @enderror" id="field-icon">
                 <a href="https://icons.getbootstrap.com/" target="_blank">View Icons Here</a>
 
                 @error('icon')
@@ -39,8 +39,8 @@
 
 
             <div class="form-group">
-                <label for="typename">Short Name</label>
-                <input type='text' value="{{@old('typename')}}" name='typename' class="form-control @error('typename') is-invalid @enderror">
+                <label for="field-typename">Short Name</label>
+                <input type='text' value="{{@old('typename')}}" name='typename' class="form-control @error('typename') is-invalid @enderror" id="field-typename">
 
                 @error('typename')
                     <span class="text-danger">{{ $message }}</span>
@@ -49,8 +49,8 @@
             </div>
 
             <div class="form-group">
-                <label for="title">Title</label>
-                <input type='text' name='title' value="{{@old('title')}}" class='form-control @error("title") is-invalid @enderror'>
+                <label for="field-title">Title</label>
+                <input type='text' name='title' value="{{@old('title')}}" class='form-control @error("title") is-invalid @enderror' id="field-title">
                 @error('title')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -58,8 +58,8 @@
             </div>
 
             <div class="form-group">
-                <label for="description">Description</label>
-                <textarea name='description'  class="form-control @error('description') is-invalid @enderror" rows='3'>{{@old('description')}}</textarea>
+                <label for="field-description">Description</label>
+                <textarea name='description'  class="form-control @error('description') is-invalid @enderror" rows='3' id="field-description">{{@old('description')}}</textarea>
 
 
                 @error('description')
@@ -69,8 +69,8 @@
             </div>
 
             <div class="form-group">
-                <label for="params">Parms</label>
-                <textarea name='params' class="form-control  @error('params') is-invalid @enderror" rows='20'>{{@old('params')}}</textarea>
+                <label for="field-params">Parms</label>
+                <textarea name='params' class="form-control  @error('params') is-invalid @enderror" rows='20' id="field-params">{{@old('params')}}</textarea>
 
 
                 @error('params')

@@ -7,28 +7,28 @@
 @endpush
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
-    <div class="row">   
-        
+    <div class="row">
+
      <div class="col-lg-12">
         <div class="card rounded">
             <div class="card-body">
                <div class="row">
-                   <div class="col-sm-12">  
-  
+                   <div class="col-sm-12">
+
                     @push('sidebar-stylesheets')
                     <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
                     @endpush
-                    
-                    <section class='text-gray-400'>
-                    
+
+                    <section class='text-gray-400 link-editor'>
+
                         <h3 class="card-header"><i class="bi bi-journal-plus"> @if($LinkID !== 0) {{__('messages.Edit')}} @else {{__('messages.Add')}} @endif {{__('messages.Block')}}</i></h3>
-                    
+
                         <div class='card-body'>
                             <form action="{{ route('addLink') }}" method="post" id="my-form">
                                 @method('POST')
                                 @csrf
                                 <input type='hidden' name='linkid' value="{{ $LinkID }}" />
-                    
+
                                 <div class="form-group col-lg-8 flex justify-around">
                                     <div class="btn-group shadow m-2">
                                         <button type="button" id='btnLinkType' class="btn btn-primary rounded-pill" title='{{__('messages.Click to change link blocks')}}' data-toggle="modal" data-target="#SelectLinkType">{{__('messages.Select Block')}}
@@ -36,36 +36,33 @@
                                                 <i class="bi bi-window-plus"></i>
                                             </span>
                                         </button>{{infoIcon(__('messages.Click for a list of available link blocks'))}}
-                                          
+
                                         <input type='hidden' name='typename' value='{{$typename}}'>
-                    
+
                                     </div>
                                 </div>
-                    
+
                                 <div id='link_params' class='col-lg-8'></div>
-                    
-                                <div class="d-flex align-items-center pt-4">
-                                    <a class="btn btn-danger me-3" href="{{ url('studio/links') }}">{{__('messages.Cancel')}}</a>
-                                    <button type="submit" class="btn btn-primary me-3">{{__('messages.Save')}}</button>
-                                    <button type="button" class="btn btn-soft-primary me-3" onclick="submitFormWithParam('add_more')">{{__('messages.Save and Add More')}}</button>
+
+                                <div class="d-flex flex-wrap align-items-center gap-2 pt-4 link-editor-actions">
+                                    <a class="btn btn-danger" href="{{ url('studio/links') }}">{{__('messages.Cancel')}}</a>
+                                    <button type="submit" onclick="this.form.querySelector('input[name=param]')?.remove()" class="btn btn-primary">{{__('messages.Save')}}</button>
+                                    <button type="button" class="btn btn-soft-primary" onclick="submitFormWithParam('add_more')">{{__('messages.Save and Add More')}}</button>
                                     <script>
                                         function submitFormWithParam(paramValue) {
-                                            // get the form element
-                                            var form = document.getElementById("my-form");
-                                            
-                                            // create a hidden input field with the parameter value
-                                            var paramField = document.createElement("input");
-                                            paramField.setAttribute("type", "hidden");
-                                            paramField.setAttribute("name", "param");
-                                            paramField.setAttribute("value", paramValue);
-                                            // append the hidden input field to the form
-                                            form.appendChild(paramField);
-                                            // submit the form
-                                            form.submit();
+                                            const form = document.getElementById('my-form');
+                                            if (!form.reportValidity()) return;
+                                            let field = form.querySelector('input[name="param"]');
+                                            if (!field) {
+                                                field = document.createElement('input');
+                                                field.type = 'hidden'; field.name = 'param'; form.appendChild(field);
+                                            }
+                                            field.value = paramValue;
+                                            form.requestSubmit();
                                         }
                                         </script>
-                                </div>                                
-                    
+                                </div>
+
                             </form>
                         </div>
                     </section>
@@ -74,12 +71,12 @@
                     <!-- Modal -->
                     <style>.modal-title{color:#000!important;}</style>
                     <x-modal title="{{__('messages.Select Block')}}" id="SelectLinkType">
-                    
+
                         <div class="d-flex flex-row  flex-wrap p-3">
                             @foreach ($LinkTypes as $lt)
-                            @php 
+                            @php
                             if(block_text_translation_check($lt['title'])) {$title = bt($lt['title']);} else {$title = __('messages.block.title.'.$lt['typename']);}
-                            $description = bt($lt['description']) ?? __('messages.block.description.'.$lt['typename']); 
+                            $description = bt($lt['description']) ?? __('messages.block.description.'.$lt['typename']);
                             @endphp
                             <a href="#" data-dismiss="modal" data-typeid="{{$lt['typename']}}" data-typename="{{$title}}" class="hvr-grow m-2 w-100 d-block doSelectLinkType">
                                 <div class="rounded mb-3 shadow-lg">
@@ -94,27 +91,35 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>      
-                            </a>                     
+                                </div>
+                            </a>
                             @endforeach
-                    
+
                         </div>
-                    
+
                         <x-slot name="buttons">
                             <button type="button" class="btn btn-gray" data-dismiss="modal">{{__('messages.Close')}}</button>
                         </x-slot>
-                    
+
                     </x-modal>
-  
+
                    </div>
                </div>
             </div>
          </div>
         </div>
-        
+
       </div>
     </div>
 
+<style>
+.link-editor,.link-editor #link_params{min-width:0}
+.link-editor-actions>*{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.link-editor #link_params input,.link-editor #link_params select,.link-editor #link_params textarea{max-width:100%;min-width:0}
+#SelectLinkType .doSelectLinkType{min-width:0;margin-inline:0!important}
+#SelectLinkType .col{min-width:0;overflow-wrap:anywhere}
+@media(max-width:575px){.link-editor>.card-body{padding-inline:0}.link-editor-actions>*{flex:1 1 100%}.link-editor #btnLinkType{white-space:normal}.link-editor #link_params .row{margin-inline:0}}
+</style>
 @endsection
 
 @push("sidebar-scripts")

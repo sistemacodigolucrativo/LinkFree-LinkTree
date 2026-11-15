@@ -581,7 +581,15 @@ class AdminController extends Controller
   //Shows config file editor page
   public function showBackups(request $request)
   {
-    return view("/panel/backups");
+    if ($request->has('file')) {
+      $filename = $request->query('file');
+      abort_unless(is_string($filename) && preg_match('/^[A-Za-z0-9._-]+$/', $filename), 400);
+      $base = realpath(base_path('backups/updater-backups'));
+      $path = $base ? realpath($base . DIRECTORY_SEPARATOR . $filename) : false;
+      abort_unless($path && is_file($path) && str_starts_with($path, $base . DIRECTORY_SEPARATOR), 404);
+      return response()->download($path);
+    }
+    return view('panel.backups');
   }
 
   //Delete custom theme

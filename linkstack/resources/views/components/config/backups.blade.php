@@ -1,35 +1,35 @@
+<div class="backup-list">
 <style>
-    button {
+    .backup-list button {
         border-style: none;
         background-color: #0085ff;
         color: #fff;
         border-radius: 5px;
     }
 
-    button:hover {
+    .backup-list button:hover {
         background-color: #0065c1;
         color: #FFF;
         box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.6);
     }
 
-    .buttondm {
+    .backup-list .buttondm {
         display: inline-block;
         text-decoration: none;
-        height: 48px;
+        min-height:48px; height:auto; padding:12px;
         text-align: center;
         vertical-align: middle;
         font-size: 18px;
-        width: 300px;
+        width:100%; max-width:300px; box-sizing:border-box; overflow-wrap:anywhere;
         font-weight: 700;
-        line-height: 48px;
+        line-min-height:48px; height:auto; padding:12px;
         letter-spacing: .1px;
         white-space: wrap;
         border-radius: 8px;
         cursor: pointer
     }
 
-    .button-hover,
-    .credit-hover {
+    .backup-list .button-hover, .backup-list .credit-hover {
         display: inline-block;
         -webkit-transform: perspective(1px) translateZ(0);
         transform: perspective(1px) translateZ(0);
@@ -40,68 +40,24 @@
         transition-property: transform
     }
 
-    .button-hover:active,
-    .credit-hover:active,
-    .button-hover:focus,
-    .credit-hover:focus,
-    .button-hover:hover,
-    .credit-hover:hover {
-        -webkit-transform: scale(1.06);
-        transform: scale(1.06)
+    .backup-list .button-hover:active, .backup-list .credit-hover:active, .backup-list .button-hover:focus, .backup-list .credit-hover:focus, .backup-list .button-hover:hover, .backup-list .credit-hover:hover {
+        -webkit-transform: scale(1);
+        transform: scale(1)
     }
 
-    .container {
+    .backup-list .container {
         align-items: center;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        height: 50%;
+        height: auto;
         width: 100%
     }
 </style>
 <!-- Custom icons font-awesome -->
 <script src="{{ asset('assets/external-dependencies/fontawesome.js') }}" crossorigin="anonymous"></script>
 @if (file_exists(base_path('backups/updater-backups/')) and is_dir(base_path('backups/updater-backups/')))
-    @if ($_SERVER['QUERY_STRING'] != '')
-        <?php
-        
-        if (isset($_GET['file'])) {
-            $filename = $_GET['file'];
-        
-            if (str_contains($filename, '/') || str_contains($filename, '\\') || !preg_match('/^[A-Za-z0-9._-]+$/', $filename)) {
-                http_response_code(400);
-                exit('Invalid filename.');
-            }
-        
-            $baseDir = base_path('backups/updater-backups');
-            $filepath = $baseDir . DIRECTORY_SEPARATOR . $filename;
-        
-            $realBaseDir = realpath($baseDir);
-            $realPath = realpath($filepath);
-        
-            if ($realBaseDir === false || $realPath === false || !is_file($realPath)) {
-                http_response_code(404);
-                exit('File not found.');
-            }
-        
-            if (strpos($realPath, $realBaseDir . DIRECTORY_SEPARATOR) !== 0) {
-                http_response_code(403);
-                exit('Access denied.');
-            }
-        
-            while (ob_get_level()) {
-                ob_end_clean();
-            }
-        
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
-            header('Content-Length: ' . filesize($realPath));
-        
-            readfile($realPath);
-            exit();
-        }
-        ?>
-    @endif
+
 
     <div class="container">
         <br><br>
@@ -125,5 +81,7 @@
         <h3>{{ __('messages.No backups found') }}</h3>
     </div>
 @endif
-<center><a data-toggle="tab" href="#3"><button class="btn btn-primary" style="padding:10px"><i
-                class="fa-solid fa-floppy-disk"></i> {{ __('messages.Backup your instance') }}</button></a></center>
+<center><a data-toggle="tab" href="#3" class="btn btn-primary"><i
+                class="fa-solid fa-floppy-disk"></i> {{ __('messages.Backup your instance') }}</a></center>
+
+</div>

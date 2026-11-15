@@ -65,14 +65,14 @@
     }
   </style>
   <div class="report-pill-container">
-    <div class="report-icon-container">
+    <button type="button" aria-label="Denunciar abuso" aria-expanded="false" class="report-icon-container">
       <div class="report-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-info-circle" viewBox="0 0 16 16">
   <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
   <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
 </svg></div>
-    </div>
+    </button>
     <div class="report-expanding-pill">
-      <a href="{{url('report?'.$userinfo->id)}}" target="_blank" class="report-text">Report abuse</a>
+      <a href="{{url('report?'.$userinfo->id)}}" target="_blank" class="report-text" hidden>Report abuse</a>
     </div>
   </div>
 
@@ -84,7 +84,8 @@
     icon.addEventListener('click', function() {
       expandingPill.classList.toggle('report-show');
       text.classList.toggle('report-show-text');
-      notification.classList.add('report-hide')
+      text.hidden = !text.classList.contains('report-show-text');
+      icon.setAttribute('aria-expanded', String(!text.hidden));
     });
   </script>
 @endif

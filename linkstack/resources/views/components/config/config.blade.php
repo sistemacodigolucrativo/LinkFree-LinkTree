@@ -214,7 +214,7 @@ function text($key){
 	<h5 style="margin-top:50px">'; echo __('messages.'.$key.'.title'); echo '</h5>
     <p class="text-muted">'; echo __('messages.'.$key.'.description'); echo '</p>
     <div class="input-group">
-    <input type="text" class="form-control form-control-lg" style="border-radius:.25rem;max-width:600px" class="form-control" name="value" value="'.$configValue.'" required>';  echo '
+    <input type="text" class="form-control form-control-lg" style="border-radius:.25rem;max-width:600px" class="form-control" aria-label="'.e(__('messages.'.$key.'.title')).'" name="value" value="'.e($configValue).'" required>';  echo '
     <input type="hidden" name="_token" value="'.csrf_token().'">
 	<button  type="submit" class="btn btn-primary">'.__('messages.Apply').'</button>
     </div></div>
@@ -248,7 +248,7 @@ function text($key){
 <p class="text-muted">{{__('messages.HOME_URL.description')}}</p>
 <div class="input-group">
 
-<select style="max-width:600px" class="form-control" name="value">
+<select aria-label="Página inicial" style="max-width:600px" class="form-control" name="value">
 @if($configValue2 != '')<option>{{$configValue2}}</option>@endif
 @if($configValue2 != 'default')<option value="default">{{__('messages.default')}}</option>@endif
 <?php $users = DB::table('users')->where('littlelink_name', '!=', '')->get();
@@ -393,7 +393,7 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
   </div>
 @endif
 </div>
-<a href="{{route('SendTestMail')}}"><button class="btn btn-gray">{{__('messages.Send Test E-Mail')}}</button></a>
+<a href="{{route('SendTestMail')}}" class="btn btn-gray">{{__('messages.Send Test E-Mail')}}</a>
 {{-- end SMTP settings --}}
 
 
@@ -419,7 +419,7 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 	<h5 style="margin-top:50px">@php echo __('messages.HOME_FOOTER_LINK.title'); @endphp</h5>
     <p class="text-muted">@php echo __('messages.HOME_FOOTER_LINK.description'); @endphp</p>
     <div class="input-group">
-    <input type="url" style="border-radius:.25rem;max-width:600px" class="form-control" name="value" value="{{$configValue}}">
+    <input type="url" style="border-radius:.25rem;max-width:600px" class="form-control" aria-label="Link do rodapé" name="value" value="{{$configValue}}">
     <input type="hidden" name="_token" value="{{csrf_token()}}">
 	<button  type="submit" class="btn btn-primary">{{__('messages.Apply')}}</button>
     </div></div>
@@ -462,7 +462,7 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
         <h5 style="margin-top:50px">{{__('messages.LOCALE.title')}}</h5>
         <p class="text-muted">{{__('messages.LOCALE.description')}}</p>
         <div class="input-group">
-            <select style="max-width:600px" class="form-control" name="value">
+            <select aria-label="Idioma" style="max-width:600px" class="form-control" name="value">
                 @if($configValue2 != '')
                     <option>{{$configValue2}}</option>
                 @endif

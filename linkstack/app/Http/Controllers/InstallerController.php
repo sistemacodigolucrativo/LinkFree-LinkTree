@@ -105,10 +105,10 @@ class InstallerController extends Controller
 
     public function mysqlTest(request $request)
     {
-        try {Artisan::call('migrate');} catch (exception $e) {$failed = "true";}
+        try {Artisan::call('migrate', ['--force' => true]);} catch (exception $e) {$failed = "true";}
         try {Artisan::call('db:seed --force');} catch (exception $e) {$failed = "true";}
-        try {Artisan::call('db:seed --class="PageSeeder" --force');} catch (exception $e) {$failed = "true";}
-        try {Artisan::call('db:seed --class="ButtonSeeder" --force');} catch (exception $e) {$failed = "true";}
+        try {if (DB::table('pages')->count() === 0) Artisan::call('db:seed --class="PageSeeder" --force');} catch (exception $e) {$failed = "true";}
+        try {if (DB::table('buttons')->count() === 0) Artisan::call('db:seed --class="ButtonSeeder" --force');} catch (exception $e) {$failed = "true";}
 
         try {$users = DB::table('buttons')->count(); $failed = false;} catch (exception $e) {$failed = true;}
 

@@ -4,7 +4,7 @@
 @Push('installer-body')
 <div class="container">
 
-@if($_SERVER['QUERY_STRING'] === '')
+@if(($_SERVER['QUERY_STRING'] ?? '') === '')
 {{-- Landing page --}}
 
 @if(!DB::table('users')->get()->isEmpty())
@@ -25,8 +25,8 @@
         {{__('messages.Setup the database')}}<br>
         {{__('messages.Create the admin user')}}<br>
         {{__('messages.Configure the app')}}<br>
-        </div></p>  
-        
+        </div></p>
+
 {{-- start language --}}
 <?php $configValue2 = str_replace('"', "", EnvEditor::getKey('LOCALE')); ?>
 <form id="language-form" action="{{route('editConfigInstaller')}}" enctype="multipart/form-data" method="post">
@@ -67,35 +67,35 @@
 
 <p style="margin:25px;max-width:350px;">{{__('messages.setup.disclaimer')}} <a href="https://linkstack.org/terms-and-conditions/" target="_blank">{{__('messages.Terms and Conditions')}}</a>.</p>
 
-        &ensp;<a class="btn" href="{{url('?2')}}"><button>{{__('messages.Next')}}</button></a>&ensp;
-@endif
-      
+        &ensp;<a class="btn" href="{{url('?2')}}">{{__('messages.Next')}}</a>&ensp;
 @endif
 
-@if($_SERVER['QUERY_STRING'] === 'error')
+@endif
+
+@if(($_SERVER['QUERY_STRING'] ?? '') === 'error')
 {{-- Landing page --}}
-        
+
         <div class="logo-container fadein">
            <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
         </div>
         <h1>{{__('messages.Setup failed')}}</h1>
         <p class="inst-txt">{{__('messages.An error has occured. Please try again')}}</p>
         <div class="row">
-        &ensp;<a class="btn" href="{{url('')}}"><button>{{__('messages.Try again')}}</button></a>&ensp;
+        &ensp;<a class="btn" href="{{url('')}}">{{__('messages.Try again')}}</a>&ensp;
         </div>
-      
+
 @endif
 
-@if($_SERVER['QUERY_STRING'] === '2')
+@if(($_SERVER['QUERY_STRING'] ?? '') === '2')
 {{-- Landing page --}}
-        
+
         <div class="logo-container fadein">
            <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
         </div>
         <h1>{{__('messages.Dependency check')}}</h1>
         <p class="inst-txt">{{__('messages.Required PHP modules:')}}</p>
         <div class="left-txt glass-container">
-        <table style="width:115%">
+        <table style="width:100%">
         <style>.bi-x-lg{color:tomato}</style>
         <tr><td>BCMath: </td><td>@if(extension_loaded('bcmath'))<i class="bi bi-check-lg"></i>@else<i class="bi bi-x-lg"></i>@endif</td></tr>
         <tr><td>Ctype: </td><td>@if(extension_loaded('Ctype'))<i class="bi bi-check-lg"></i>@else<i class="bi bi-x-lg"></i>@endif</td></tr>
@@ -113,20 +113,20 @@
         </table>
         <br>
         <b style="font-size:90%;margin-bottom:5px;display:flex;">{{__('messages.Depending on your database type:')}}</b>
-        <table style="width:123%">
+        <table style="width:100%">
         <tr><td>SQLite: </td><td>@if(extension_loaded('PDO_SQLite'))<i class="bi bi-check-lg"></i>@else<i class="bi bi-x-lg"></i>@endif</td></tr>
         <tr><td>MySQL: </td><td>@if(extension_loaded('PDO_MySQL'))<i class="bi bi-check-lg"></i>@else<i class="bi bi-x-lg"></i>@endif</td></tr>
         </table>
         </div><br>
         <div class="row">
-        &ensp;<a class="btn" href="?3"><button>{{__('messages.Next')}}</button></a>&ensp;
+        &ensp;<a class="btn" href="?3">{{__('messages.Next')}}</a>&ensp;
         </div>
-      
+
 @endif
 
-@if($_SERVER['QUERY_STRING'] === '3')
+@if(($_SERVER['QUERY_STRING'] ?? '') === '3')
 {{-- Landing page --}}
-        
+
         <div class="logo-container fadein">
            <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
         </div>
@@ -138,8 +138,8 @@
 <form id="home-url-form" action="{{route('db')}}" enctype="multipart/form-data" method="post">
 <div class="form-group col-lg-8">
 <div class="input-group">
-<label>{{__('messages.Database type:')}}</label>
-<select style="max-width:300px" class="form-control" name="database">
+<label for="field-database">{{__('messages.Database type:')}}</label>
+<select style="max-width:300px" class="form-control" name="database" id="field-database">
 <option>SQLite</option>
 <option>MySQL</option>
 </select>
@@ -147,12 +147,12 @@
 <input type="hidden" name="_token" value="{{csrf_token()}}">
 <button type="submit" class="mt-3 ml-3 btn btn-info">{{__('messages.Next')}}</button>
 </form>
-      
+
 @endif
 
-@if($_SERVER['QUERY_STRING'] === 'mysql')
+@if(($_SERVER['QUERY_STRING'] ?? '') === 'mysql')
 {{-- Landing page --}}
-        
+
         <div class="logo-container fadein">
            <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
         </div>
@@ -161,16 +161,16 @@
 
 <form id="home-url-form" action="{{route('mysql')}}" enctype="multipart/form-data" method="post">
 <div class="form-group col-lg-8">
-<label>{{__('messages.Database host:')}}</label>
-<input style="max-width:275px;" class="form-control" name="host" type="text" required>
-<label>{{__('messages.Database port:')}}</label>
-<input style="max-width:275px;" class="form-control" name="port" type="text" required>
-<label>{{__('messages.Database name:')}}</label>
-<input style="max-width:275px;" class="form-control" name="name" type="text" required>
-<label>{{__('messages.Database username:')}}</label>
-<input style="max-width:275px;" class="form-control" name="username" type="text" required>
-<label>{{__('messages.Database password:')}}</label>
-<input style="max-width:275px;" class="form-control" name="password" type="password" />
+<label for="field-host">{{__('messages.Database host:')}}</label>
+<input style="max-width:275px;" class="form-control" name="host" type="text" required id="field-host">
+<label for="field-port">{{__('messages.Database port:')}}</label>
+<input style="max-width:275px;" class="form-control" name="port" type="text" required id="field-port">
+<label for="field-name">{{__('messages.Database name:')}}</label>
+<input style="max-width:275px;" class="form-control" name="name" type="text" required id="field-name">
+<label for="field-username">{{__('messages.Database username:')}}</label>
+<input style="max-width:275px;" class="form-control" name="username" type="text" required id="field-username">
+<label for="field-password">{{__('messages.Database password:')}}</label>
+<input style="max-width:275px;" class="form-control" name="password" type="password" id="field-password" />
 <div class="input-group">
 </div></div><br>
 <input type="hidden" name="_token" value="{{csrf_token()}}">
@@ -179,12 +179,12 @@
 
         <div class="row">
         </div>
-      
+
 @endif
 
-@if($_SERVER['QUERY_STRING'] === '4')
+@if(($_SERVER['QUERY_STRING'] ?? '') === '4')
 {{-- Landing page --}}
-        
+
         <div class="logo-container fadein">
            <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
         </div>
@@ -193,28 +193,28 @@
 
 <form id="home-url-form" action="{{route('createAdmin')}}" enctype="multipart/form-data" method="post">
 <div class="form-group col-lg-8">
-<label>{{__('messages.Admin email:')}}</label>
-<input style="max-width:275px;" class="form-control" placeholder="admin@admin.com" name="email" type="email" required>
-<label>{{__('messages.Admin password:')}}</label>
-<input style="max-width:275px;" class="form-control" placeholder="12345678" name="password" type="password" required>
-<label>{{__('messages.Handle:')}}</label>
-<div class="input-group">
+<label for="field-email">{{__('messages.Admin email:')}}</label>
+<input style="max-width:275px;" class="form-control" placeholder="admin@admin.com" name="email" type="email" required id="field-email">
+<label for="field-password">{{__('messages.Admin password:')}}</label>
+<input style="max-width:275px;" class="form-control" placeholder="12345678" name="password" type="password" required id="field-password">
+<label for="field-name">{{__('messages.Handle:')}}</label>
+<div class="input-group handle-group">
 <div class="input-group-prepend"><div class="input-group-text">@</div></div>
 <input style="max-width:237px; padding-left:50px;" class="form-control" name="handle" type="text" required>
 </div>
 <label>{{__('messages.Name:')}}</label>
-<input style="max-width:275px;" class="form-control" name="name" type="text" required>
+<input style="max-width:275px;" class="form-control" name="name" type="text" required id="field-name">
 <div class="input-group">
 </div></div><br>
 <input type="hidden" name="_token" value="{{csrf_token()}}">
 <button type="submit" class="mt-3 ml-3 btn btn-info">{{__('messages.Next')}}</button>
 </form>
-      
+
 @endif
 
-@if($_SERVER['QUERY_STRING'] === '5')
+@if(($_SERVER['QUERY_STRING'] ?? '') === '5')
 {{-- Landing page --}}
-        
+
         <div class="logo-container fadein">
            <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
         </div>
@@ -224,19 +224,19 @@
 <div class="form-group col-lg-8">
 <div class="input-group">
 
-<label>{{__('messages.Enable registration:')}}</label>
-<select style="max-width:300px" class="form-control" name="register">
+<label for="field-register">{{__('messages.Enable registration:')}}</label>
+<select style="max-width:300px" class="form-control" name="register" id="field-register">
 <option value="Yes">{{__('messages.Yes')}}</option>
 <option value="No">{{__('messages.No')}}</option>
 </select>
 
-<label>{{__('messages.Enable email verification:')}}</label>
-<select style="max-width:300px" class="form-control" name="verify">
+<label for="field-verify">{{__('messages.Enable email verification:')}}</label>
+<select style="max-width:300px" class="form-control" name="verify" id="field-verify">
 <option value="Yes">{{__('messages.Yes')}}</option>
 <option value="No">{{__('messages.No')}}</option>
 </select>
 
-<label>{{__('messages.Set your page as Home Page')}}</label>
+<label for="select">{{__('messages.Set your page as Home Page')}}</label>
 <select id="select" style="max-width:300px" class="form-control" name="page">
 <option value="No">{{__('messages.No')}}</option>
 <option value="Yes">{{__('messages.Yes')}}</option>
@@ -260,14 +260,14 @@ $("#select").change(function(){
 });
 </script>
 
-<label>{{__('messages.App Name:')}}</label>
-<input style="max-width:275px;" class="form-control" value="LinkStack" name="app" type="text" required>
+<label for="field-app">{{__('messages.App Name:')}}</label>
+<input style="max-width:275px;" class="form-control" value="LinkStack" name="app" type="text" required id="field-app">
 
 </div></div><br>
 <input type="hidden" name="_token" value="{{csrf_token()}}">
 <button type="submit" class="mt-3 ml-3 btn btn-info">{{__('messages.Finish setup')}}</button>
 </form>
-      
+
 @endif
 
 

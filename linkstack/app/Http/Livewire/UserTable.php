@@ -77,9 +77,9 @@ class UserTable extends DataTableComponent
                                 'id' => $row->id
                             ]);
                             if ($row->email_verified_at == '') {
-                                return '<div class="text-center"><a style="cursor:pointer" data-id="'.$verifyLink.'" class="user-email text-danger"><span class="badge bg-danger">' . __('messages.Pending') . '</span></a></div>';
+                                return '<div class="text-center"><button type="button" style="cursor:pointer;border:0;background:transparent" data-id="'.$verifyLink.'" class="user-email text-danger"><span class="badge bg-danger">' . __('messages.Pending') . '</span></button></div>';
                             } else {
-                                return '<div class="text-center"><a style="cursor:pointer" data-id="'.$verifyLink.'" class="user-email text-danger"><span class="badge bg-success">' . __('messages.Verified') . '</span></a></div>';
+                                return '<div class="text-center"><button type="button" style="cursor:pointer;border:0;background:transparent" data-id="'.$verifyLink.'" class="user-email text-danger"><span class="badge bg-success">' . __('messages.Verified') . '</span></button></div>';
                             }
                         }
                     } else {
@@ -95,11 +95,11 @@ class UserTable extends DataTableComponent
                     } else {
                         $route = route('blockUser', ['block' => $row->block, 'id' => $row->id]);
                         if ($row->block === 'yes') {
-                            $badge = '<div class="text-center"><a style="cursor:pointer" data-id="'.$route.'" class="user-block text-danger"><span class="badge bg-danger">'.__('messages.Pending').'</span></a></div>';
+                            $badge = '<div class="text-center"><button type="button" style="cursor:pointer;border:0;background:transparent" data-id="'.$route.'" class="user-block text-danger"><span class="badge bg-danger">'.__('messages.Pending').'</span></button></div>';
                         } elseif ($row->block === 'no') {
-                            $badge = '<div class="text-center"><a style="cursor:pointer" data-id="'.$route.'" class="user-block text-danger"><span class="badge bg-success">'.__('messages.Approved').'</span></a></div>';
+                            $badge = '<div class="text-center"><button type="button" style="cursor:pointer;border:0;background:transparent" data-id="'.$route.'" class="user-block text-danger"><span class="badge bg-success">'.__('messages.Approved').'</span></button></div>';
                         }
-                        return "<a href=\"$route\">$badge</a>";
+                        return $badge;
                     }
                 })
                 ->html(),
@@ -117,7 +117,7 @@ class UserTable extends DataTableComponent
                 ->format(function ($value) {
                     $now = now();
                     $diff = $now->diff($value);
-            
+
                     if ($diff->d < 1 && $diff->h < 1) {
                         return 'Now';
                     } elseif ($diff->d < 1 && $diff->h < 24) {

@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 @include('layouts.lang')
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="utf-8">
 
   @php $GLOBALS['themeName'] = config('advanced-config.home_theme'); @endphp
@@ -17,7 +18,7 @@
       return $config[$key];
   }}
   return null;}
-  
+
   // Theme Custom Asset
   function themeAsset($path){
   $path = url('themes/' . $GLOBALS['themeName'] . '/extra/custom-assets/' . $path);
@@ -28,7 +29,7 @@
   <script>{!! file_get_contents(base_path("assets/external-dependencies/fontawesome.js")) !!}</script>
   <style>{!! str_replace('../', 'studio/', file_get_contents(base_path("assets/external-dependencies/fontawesome.css"))) !!}</style>
 
-  @include('layouts.fonts') 
+  @include('layouts.fonts')
 
   @if(theme('enable_custom_code') == "true" and theme('enable_custom_head') == "true" and env('ALLOW_CUSTOM_CODE_IN_THEMES') == 'true')@include($GLOBALS['themeName'] . '.extra.custom-head')@endif
 
@@ -100,7 +101,7 @@
 
         <style>.description-parent * {margin-bottom: 1em;}.description-parent {padding-bottom: 30px;}</style>
         <center><div class="fadein description-parent"><p class="fadein">{{__('messages.Example page')}}</p></div></center>
-        
+
         {{-- <!-- Icons -->
         @php $icons = DB::table('links')->where('user_id', $userinfo->id)->where('button_id', 94)->get(); @endphp
         <div class="row fadein social-icon-div">
@@ -127,7 +128,7 @@
                  @elseif($button['button'] === "custom_website" and $button['custom_css'] != "")
                  <div style="--delay: {{ $initial++ }}s" class="button-entrance"><a class="button button-hover icon-hover" style="{{ $button['custom_css'] }}" rel="noopener noreferrer nofollow" href="{{ $button['link'] }}" @if(theme('open_links_in_same_tab') != "true")target="_blank"@endif ><img alt="button-icon" class="icon hvr-icon" src="@if(file_exists(base_path("assets/favicon/icons/").localIcon($button['id']))){{url('assets/favicon/icons/'.localIcon($button['id']))}}@else{{getFavIcon($button['id'])}}@endif">{{ $button['title'] }}</a></div>
                  @elseif($button['button'] === "space")
-                 <?php 
+                 <?php
                   if (is_numeric($button['title']) and $button['title'] < 10)
                   echo str_repeat("<br>",$button['title']);
                   elseif (is_numeric($button['title']) and $button['title'] >= 10)
@@ -146,7 +147,7 @@
                 <div style="--delay: {{ $initial++ }}s" class="button-entrance"><div class="button button-twitter button button-hover icon-hover"><img alt="button-icon" class="icon hvr-icon" src="{{ asset('assets/linkstack/icons/twitter.svg') }}">Twitter</div></div>
                 <div style="--delay: {{ $initial++ }}s" class="button-entrance"><div class="button button-instagram button button-hover icon-hover"><img alt="button-icon" class="icon hvr-icon" src="{{ asset('assets/linkstack/icons/instagram.svg') }}">Instagram</div></div>
         @endif
-          
+
       </div>
     </div>
   </div>

@@ -2,21 +2,18 @@
 @foreach($information as $info)
 
 @Push('updater-head')
-<title>{{ $userinfo->name }} 🌇 {{ ucfirst(trans($info->theme)) }} </title>
+<title>{{ $userinfo->name }} 🌇 {{ ucfirst($info->theme ?: 'default') }} </title>
 <meta name="robots" content="noindex">
 <style>
 .container-theme {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
- }
-
+  width:100%; max-width:960px; box-sizing:border-box;
+  margin:0 auto; padding:24px; min-width:0;
+}
 .container-theme pre {
-  display: inline-block;
-  text-align: left;
- }
+  display:block; max-width:100%; white-space:pre-wrap;
+  overflow-wrap:anywhere; text-align:left;
+}
+.container-theme h1 {overflow-wrap:anywhere}
 </style>
 @endpush
 
@@ -27,11 +24,11 @@
 
 
 <div class="container-theme">
-<h1>Theme: {{ ucfirst(trans($info->theme)) }}</h1>
+<h1>Theme: {{ ucfirst($info->theme ?: 'default') }}</h1>
 
 <?php
 $str = file_get_contents('themes/' . $info->theme . '/readme.md');
-$url_pattern = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';   
+$url_pattern = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
 $str= preg_replace($url_pattern, '<a href="$0">$0</a>', $str);
 $txtspc = '<pre>' . $str . '</pre>';
 echo preg_replace('/[ \t]+/', ' ', preg_replace('/\s\S*$^\s\S*/m', "\n", $txtspc));

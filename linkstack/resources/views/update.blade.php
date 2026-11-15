@@ -29,7 +29,7 @@
 
     <div class="container">
         @if ((auth()->user()->role == 'admin' && $Vgit > $Vlocal) || $isBeta)
-            @if (empty($_SERVER['QUERY_STRING']))
+            @if (empty(($_SERVER['QUERY_STRING'] ?? '')))
                 <div class="logo-container fadein">
                     <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
                 </div>
@@ -55,13 +55,11 @@
                         <button><i class="fa-solid fa-user-gear btn"></i>
                             {{ __('messages.Update automatically') }}</button>
                     </a>
-                    <a class="btn" href="https://linkstack.org/update" target="_blank">
-                        <button><i class="fa-solid fa-download btn"></i> {{ __('messages.Update manually') }}</button>
-                    </a>
+                    <a class="btn" href="https://linkstack.org/update" target="_blank"><i class="fa-solid fa-download btn"></i> {{ __('messages.Update manually') }}</a>
                 </div>
             @endif
 
-            @if ($_SERVER['QUERY_STRING'] === 'updating')
+            @if (($_SERVER['QUERY_STRING'] ?? '') === 'updating')
                 <div class="logo-container fadein">
                     <img class="logo-img" src="{{ asset('assets/linkstack/images/logo-loading.svg') }}" alt="Logo">
                 </div>
@@ -118,7 +116,7 @@
 
             @endif
 
-            @if ($_SERVER['QUERY_STRING'] === 'backup')
+            @if (($_SERVER['QUERY_STRING'] ?? '') === 'backup')
                 @push('updater-head')
                     <meta http-equiv="refresh" content="2; URL={{ url()->current() }}/?backups" />
                 @endpush
@@ -128,7 +126,7 @@
                 <h1 class="loadingtxt">{{ __('messages.Creating backup') }}</h1>
             @endif
 
-            @if ($_SERVER['QUERY_STRING'] === 'backups')
+            @if (($_SERVER['QUERY_STRING'] ?? '') === 'backups')
                 @php
                     set_time_limit(0);
                     // Test if the Artisan command is available
@@ -163,7 +161,7 @@
                 @endif
             @endif
 
-            @if ($_SERVER['QUERY_STRING'] === 'preparing')
+            @if (($_SERVER['QUERY_STRING'] ?? '') === 'preparing')
                 <div class="logo-container fadein">
                     <img class="logo-img" src="{{ asset('assets/linkstack/images/logo-loading.svg') }}" alt="Logo">
                 </div>
@@ -194,7 +192,7 @@
                 @endif
             @endif
 
-        @elseif(empty($_SERVER['QUERY_STRING']))
+        @elseif(empty(($_SERVER['QUERY_STRING'] ?? '')))
             <div class="logo-container fadein">
                 <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
             </div>
@@ -202,13 +200,11 @@
             <h4>{{ __('messages.There is no new version available') }}</h4>
             <br>
             <div class="row">
-                <a class="btn" href="{{ url('dashboard') }}">
-                    <button><i class="fa-solid fa-house-laptop btn"></i> {{ __('messages.Admin Panel') }}</button>
-                </a>
+                <a class="btn" href="{{ url('dashboard') }}"><i class="fa-solid fa-house-laptop btn"></i> {{ __('messages.Admin Panel') }}</a>
             </div>
         @endif
 
-        @if ($_SERVER['QUERY_STRING'] === 'finishing')
+        @if (($_SERVER['QUERY_STRING'] ?? '') === 'finishing')
             @php
                 set_time_limit(0);
                 $debug = null;
@@ -256,7 +252,7 @@
             @endif
         @endif
 
-        @if ($_SERVER['QUERY_STRING'] === 'success')
+        @if (($_SERVER['QUERY_STRING'] ?? '') === 'success')
             <div class="logo-container fadein">
                 <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
             </div>
@@ -278,9 +274,7 @@
             @endif
             <br>
             <div class="row">
-                <a class="btn" href="{{ url('dashboard') }}">
-                    <button><i class="fa-solid fa-house-laptop btn"></i> {{ __('messages.Admin Panel') }}</button>
-                </a>
+                <a class="btn" href="{{ url('dashboard') }}"><i class="fa-solid fa-house-laptop btn"></i> {{ __('messages.Admin Panel') }}</a>
                 @if ($isBeta)
                     <a class="btn" href="{{ url()->current() }}/">
                         <button><i class="fa-solid fa-arrow-rotate-right btn"></i> {{ __('messages.Run again') }}</button>
@@ -289,7 +283,7 @@
             </div>
         @endif
 
-        @if ($_SERVER['QUERY_STRING'] === 'error')
+        @if (($_SERVER['QUERY_STRING'] ?? '') === 'error')
             <?php EnvEditor::editKey('MAINTENANCE_MODE', false); ?>
 
             <div class="logo-container fadein">
@@ -315,8 +309,8 @@
 
             <br>
             <div class="row">
-                &ensp;<a class="btn" href="{{ url('dashboard') }}"><button><i class="fa-solid fa-house-laptop btn"></i>
-                        {{ __('messages.Admin Panel') }}</button></a>&ensp;
+                &ensp;<a class="btn" href="{{ url('dashboard') }}"><i class="fa-solid fa-house-laptop btn"></i>
+                        {{ __('messages.Admin Panel') }}</a>&ensp;
             </div>
         @endif
 

@@ -1,54 +1,51 @@
+<div class="backup-create">
 
 <style>
 
-  html,
-  body {
-    height: 100%;
-    width: 100%;
-  }
-  
-  .container {
+
+
+  .backup-create .container {
     align-items: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 100%;
+    height: auto;
     width: 100%;
   }
-  
+
   @media (min-width:700px) {
-  .row {
+  .backup-create .row {
     display: flex;
     flex-direction: row;
     }
   }
-  
-  .logo-centered {
+
+  .backup-create .logo-centered {
     /* top: 44vh; */
     font-size: 130px;
   }
-  
-  .logo-img{
+
+  .backup-create .logo-img {
       /* position: relative; */
       width: 250px;
       height: auto;
   }
-  
-  .loading {
+
+  .backup-create .loading {
     animation: loading 3s linear infinite;
   }
-  
+
   @keyframes loading {
     from {
       transform: rotate(0deg);
     }
-    
+
     to {
       transform: rotate(359deg);
     }
   }
-  
-  .generic {
+
+  .backup-create .generic {
     margin: auto;
     width: 2.5em;
     height: 2.5em;
@@ -58,17 +55,17 @@
     border-radius: 50%;
     animation: loadingspin 1s linear infinite;
   }
-  
+
   @keyframes loadingspin {
     100% {
         transform: rotate(360deg)
     }
   }
-  
-  .loadingtxt:after {
+
+  .backup-create .loadingtxt:after {
     content: '.';
     animation: dots 1.5s steps(5, end) infinite;}
-  
+
   @keyframes dots {
     0%, 20% {
       color: rgba(0,0,0,0);
@@ -89,12 +86,12 @@
         .25em 0 0 white,
         .5em 0 0 white;}}
   </style>
-  
+
   <div class="container">
-  
-  
+
+
   <?php //landing page ?>
-          
+
   <div class="logo-container fadein">
     <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
   </div>
@@ -104,22 +101,19 @@
   <div class="d-flex justify-content-center">
     <div class="row">
       <div class="col-12 col-md-auto">
-        <a href="{{url('backup/?backup')}}">
-          <button class="btn btn-primary mt-3">
+        <a href="{{url('backup/?backup')}}" class="btn btn-primary mt-3">
             <i class="fa-solid fa-floppy-disk me-2"></i> {{__('messages.Backup Instance')}}
-          </button>
-        </a>
+          </a>
       </div>
       <div class="col-12 col-md-auto">
-        <a href="#4" data-toggle="tab">
-          <button class="btn btn-primary mt-3">
+        <a href="#4" data-toggle="tab" class="btn btn-primary mt-3">
             <i class="fa-solid fa-box-archive me-2"></i> {{__('messages.All Backups')}}
-          </button>
-        </a>
+          </a>
       </div>
     </div>
   </div>
-  
-  
+
+
   </div>
-  
+
+</div>

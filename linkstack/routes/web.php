@@ -26,7 +26,7 @@ use App\Models\User;
 if(file_exists(base_path('storage/app/ISINSTALLED'))){
   // generates new APP KEY if no one is set
   if(EnvEditor::getKey('APP_KEY')==''){try{Artisan::call('key:generate');} catch (exception $e) {}}
- 
+
   // copies template meta config if none is present
   if(!file_exists(base_path("config/advanced-config.php"))){copy(base_path('storage/templates/advanced-config.php'), base_path('config/advanced-config.php'));}
  }
@@ -65,8 +65,8 @@ Route::get('/@', function () {
 
 //Show diagnose page
 Route::get('/panel/diagnose', function () {
-        return view('panel/diagnose', []);
-});
+        return redirect('/admin/config#5');
+})->middleware(['auth', 'blocked', 'impersonate', 'admin']);
 
 //Public route
 $custom_prefix = config('advanced-config.custom_url_prefix');
@@ -119,6 +119,8 @@ Route::post('/studio/background', [UserController::class, 'themeBackground'])->n
 Route::get('/studio/rem-background', [UserController::class, 'removeBackground'])->name('removeBackground');
 Route::get('/studio/profile', [UserController::class, 'showProfile'])->name('showProfile');
 Route::post('/studio/profile', [UserController::class, 'editProfile'])->name('editProfile');
+// Returning to the form URL with GET must not resubmit changes.
+Route::get('/edit-icons', fn () => redirect('/studio/links'));
 Route::post('/edit-icons', [UserController::class, 'editIcons'])->name('editIcons');
 Route::get('/clearIcon/{id}', [UserController::class, 'clearIcon'])->name('clearIcon')->middleware('link-id');
 Route::get('/studio/page/delprofilepicture', [UserController::class, 'delProfilePicture'])->name('delProfilePicture');

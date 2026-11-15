@@ -17,7 +17,7 @@
 <div class=''>
     @foreach($linktype as $key => $value)
 
-    <div class='row mb-2 border  shdadow'>
+    <div class='row mx-0 mb-2 border shadow'>
         <div class='col-12 h5'><i class='{{ $value->icon }}'></i> {{ $value->title }} <span class='small text-muted'>[{{ $value->typename }}]</span></div>
 
 
@@ -31,7 +31,7 @@
             <a class="btn btn-link btn-sm" href="{{ URL::to('admin/linktype/' . $value->id . '/edit') }}"><i class='bi bi-pencil'></i> Edit</a>
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-link p-2 text-danger" href="{{ URL::to('admin/linktype/' . $value->id . '/edit') }}" onclick="return confirm('Are you sure?')"><i class='bi bi-trash'></i> Delete</a>
+                <button type="submit" class="btn btn-sm btn-link p-2 text-danger" href="{{ URL::to('admin/linktype/' . $value->id . '/edit') }}" onclick="return confirm('Are you sure?')"><i class='bi bi-trash'></i> Delete</button>
 
             </form>
         </div>

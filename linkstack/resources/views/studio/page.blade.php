@@ -4,26 +4,26 @@
 @section('content')
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
-  <div class="row">   
-      
+  <div class="row">
+
    <div class="col-lg-12">
       <div class="card   rounded">
           <div class="card-body">
              <div class="row">
-                 <div class="col-sm-12">  
+                 <div class="col-sm-12">
 
                   <style>
                     .ck-editor__editable[role="textbox"] {
                         /* editing area */
                         min-height: 200px;
                     }
-                
+
                     .ck-content .image {
                         /* block images */
                         max-width: 80%;
                         margin: 20px auto;
                     }
-                
+
                 </style>
                 <style>
                     @supports (-webkit-appearance: none) or (-moz-appearance: none) {
@@ -111,7 +111,7 @@
                         cursor: pointer;
                         margin-left: 4px;
                       }
-                    
+
                       input[type=checkbox]:not(.switch) {
                         border-radius: 7px;
                       }
@@ -148,7 +148,7 @@
                       input[type=checkbox].switch:disabled:not(:checked):after {
                         opacity: 0.6;
                       }
-                    
+
                       input[type=radio] {
                         border-radius: 50%;
                       }
@@ -191,7 +191,7 @@
                     <input class="file-upload" type="file" accept="image/*">
                   </div>
                   @endif
-                </div>                
+                </div>
                 <section class='text-gray-400'>
                 <h3 class="mb-4 card-header"><i class="bi bi-file-earmark-break"> {{__('messages.My Profile')}}</i></h3>
                 @if($errors->any())
@@ -207,36 +207,36 @@
                 </div>
                 @endif
                 <div>
-                
+
                 <div></div>
                 @foreach($pages as $page)
                 <form action="{{ route('editPage') }}" enctype="multipart/form-data" method="post">
                     @csrf
                     @if($page->littlelink_name != '')
                     <div class="form-group col-lg-8">
-                      <label class="form-label" for="customFile">{{__('messages.Profile Picture')}}</label>
+                      <label for="customFile" class="form-label">{{__('messages.Profile Picture')}}</label>
                       <input type="file" accept="image/jpeg,image/jpg,image/png,image/webp" name="image" class="form-control" id="customFile">
                   </div>
                     @endif
-                
+
                     <!--<div class="form-group col-lg-8">
-                            <label>Path name</label>
+                            <label for="field-pageDescription">Path name</label>
                             @<input type="text" class="form-control" name="pageName" value="{{ $page->littlelink_name ?? '' }}">
                           </div>-->
-                
+
                     <div class="form-group col-lg-8">
                         <?php
                             $url = $_SERVER['REQUEST_URI'];
                              if( strpos( $url, "no_page_name" ) == true ) echo '<span style="color:#FF0000; font-size:120%;">You do not have a Page URL</span>'; ?>
                         <br>
-                        <label for="littlelink_name" class="form-label">{{__('messages.Page URL')}}</label>
+                        <label class="form-label">{{__('messages.Page URL')}}</label>
                         <div class="input-group mb-3 has-validation">
                           <span class="input-group-text" id="basic-addon3">{{str_replace(['http://', 'https://'], '', url(''))}}/@</span>
                           <input type="littlelink_name" class="form-control" id="littlelink_name" name="littlelink_name" aria-describedby="littlelink_name" value="{{ $page->littlelink_name ?? '' }}" :value="old('littlelink_name')" required autofocus >
                         </div>
                         <script>var exceptionvar = " value="{{ $page->littlelink_name }}";</script>
                         @include('auth.url-validation')
-                
+
                          <label style="margin-top:15px">{{__('messages.Display name')}}</label>
                         <div class="input-group">
                             {{-- <div class="input-group-prepend">
@@ -245,12 +245,12 @@
                             <input type="text" class="form-control" name="name" value="{{ $page->name }}" required>
                         </div>
                     </div>
-                
+
                     <div class="form-group col-lg-8">
                         <label>{{__('messages.Page Description')}}</label>
-                        <textarea class="form-control @if(env('ALLOW_USER_HTML') === true) ckeditor @endif" name="pageDescription" rows="3">{{ $page->littlelink_description ?? '' }}</textarea>
+                        <textarea class="form-control @if(env('ALLOW_USER_HTML') === true) ckeditor @endif" name="pageDescription" rows="3" id="field-pageDescription">{{ $page->littlelink_description ?? '' }}</textarea>
                     </div>
-                
+
                     @if(auth()->user()->role == 'admin' || auth()->user()->role == 'vip')
                         <div class="form-group col-lg-8">
                         <h5 style="margin-top:50px"> {{__('messages.Show checkmark')}}</h5>
@@ -341,10 +341,10 @@
                           console.error(error);
                       });
               </script>
-                
+
                 @endif
                 </div>
-                
+
                 </div>
                 </section>
 

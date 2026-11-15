@@ -4,7 +4,7 @@
 
 <div class='card'>
     <div class='card-header'>
-        <h4 class='card-title'>Edit Link Type</h1>
+        <h4 class='card-title'>Edit Link Type</h4>
     </div>
     <div class='card-body'>
 
@@ -51,7 +51,7 @@
             </div>
 
             <div class="form-group">
-                <label for="title">Title</label>
+                <label for="field-title">Title</label>
                 <input type='text' name='title' value="{{$linktype->title}}" class='form-control @error("title") is-invalid @enderror'>
 
                 @error('title')
@@ -61,8 +61,8 @@
             </div>
 
             <div class="form-group">
-                <label for="description">Description</label>
-                <textarea name='description' class="form-control @error('description') is-invalid @enderror" rows='3'>{{$linktype->description}}</textarea>
+                <label for="field-description">Description</label>
+                <textarea name='description' class="form-control @error('description') is-invalid @enderror" rows='3' id="field-description">{{$linktype->description}}</textarea>
 
 
 
@@ -73,8 +73,8 @@
             </div>
 
             <div class="form-group">
-                <label for="params">Parms</label>
-                <textarea name='params' class="form-control  @error('params') is-invalid @enderror" rows='20'>{{$linktype->params}}</textarea>
+                <label for="field-params">Parms</label>
+                <textarea name='params' class="form-control  @error('params') is-invalid @enderror" rows='20' id="field-params">{{$linktype->params}}</textarea>
 
 
 

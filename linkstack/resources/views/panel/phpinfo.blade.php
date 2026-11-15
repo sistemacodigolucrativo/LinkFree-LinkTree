@@ -2,6 +2,7 @@
 @include('layouts.lang')
 @if(auth()->user()->role == 'admin')
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- begin dark mode detection -->
 	<script src="{{ asset('assets/linkstack/js/js.cookie.min.js') }}"></script>
 	<script>
@@ -28,7 +29,7 @@
 		}
 	</script>
 		<?php // loads dark mode CSS if dark mode detected
-		     $color_scheme = isset($_COOKIE["color_scheme"]) ? $_COOKIE["color_scheme"] : false; 
+		     $color_scheme = isset($_COOKIE["color_scheme"]) ? $_COOKIE["color_scheme"] : false;
 			 $color_scheme_override = isset($_COOKIE["color_scheme_override"]) ? $_COOKIE["color_scheme_override"] : false; ?>
 		@if ($color_scheme == 'dark' and $color_scheme_override != 'light' or $color_scheme_override == 'dark')
 					<!-- switch the two <link> Tags below to default to dark mode if cookie detection fails -->
@@ -38,17 +39,17 @@
 					<link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
 					<link rel="stylesheet" href="{{ asset('assets/css/style-dashboard.css') }}">
 					@endif
-					
+
     <style>
-@if($color_scheme == 'dark') 
+@if($color_scheme == 'dark')
         body { background-color: #31363b; margin: 0 0 0 0;}
 
         #zPHP { background-color: #31363b; }
 
         #presentation
         {
-            width:500px;
-            height: 140px;
+            width:100%; max-width:500px; box-sizing:border-box;
+            height:auto; min-height:140px;
             text-align: center;
             color: lightGray;
             margin: auto;
@@ -62,8 +63,8 @@
 
         #presentation
         {
-            width:500px;
-            height: 140px;
+            width:100%; max-width:500px; box-sizing:border-box;
+            height:auto; min-height:140px;
             text-align: center;
             color: lightGray;
             margin: auto;
@@ -82,18 +83,19 @@
 <body>
     <div id='zPHP'>
 <div style="position: relative; top: 50px; z-index: 2;"><a href="{{ url('admin/config') }}" style="font-size: 40px;" >&nbsp; &nbsp; &nbsp; Back</a></div>
-<div style="position: relative; bottom: 60px; right: 15px; z-index: 1;" align="right"><a onclick="this.href='data:text/html;charset=UTF-8,'+encodeURIComponent(document.documentElement.outerHTML)" href="#" download="phpinfo.html"><button class="btn btn-primary">Download</button></a></div>
+<div style="position: relative; bottom: 60px; right: 15px; z-index: 1;" align="right"><a onclick="this.href='data:text/html;charset=UTF-8,'+encodeURIComponent(document.documentElement.outerHTML)" href="#" download="phpinfo.html" class="btn btn-primary">Download</a></div>
         <div id='presentation'>
             <h1>{{__('messages.Information about PHP’s configuration')}}</h1>
             <h2>{{__('messages.Outputs information about the current state of PHP')}}</h2>
         </div>
-        
-<?php
-phpinfo();
-phpinfo(INFO_MODULES);
 
+<?php
+ob_start();
+phpinfo();
+$phpInfoDocument = ob_get_clean();
 ?>
-    </div>  
+<iframe title="Informações técnicas do PHP" srcdoc="{{ $phpInfoDocument }}" style="display:block;width:100%;height:75vh;min-height:320px;border:0"></iframe>
+    </div>
 </body>
 @endif
 </html>

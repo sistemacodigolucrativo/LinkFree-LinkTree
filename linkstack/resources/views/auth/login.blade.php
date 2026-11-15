@@ -50,7 +50,7 @@ foreach($pages as $page)
                   <div class="col-lg-12">
                     <div class="form-group">
                       <label for="email" class="form-label">{{__('messages.Email')}}</label>
-                      <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder=" " :value="old('email')" required autofocus >
+                      <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder=" " value="{{ old('email') }}" required autofocus >
                     </div>
                   </div>
                   <div class="col-lg-12">
@@ -114,7 +114,7 @@ foreach($pages as $page)
                 @endif
               </form>
             </div>
-          </div>          
+          </div>
 
     </x-auth-card>
 </x-guest-layout>

@@ -1,3 +1,4 @@
+<div class="diagnose-content">
 
 <?php
 use Illuminate\Support\Facades\Http;
@@ -13,9 +14,9 @@ function getUrlSatusCode($url, $timeout = 3)
  {
  $ch = curl_init();
  $opts = array(CURLOPT_RETURNTRANSFER => true, // do not output to browser
- CURLOPT_URL => $url, 
+ CURLOPT_URL => $url,
  CURLOPT_NOBODY => true, // do a HEAD request only
- CURLOPT_TIMEOUT => $timeout); 
+ CURLOPT_TIMEOUT => $timeout);
  curl_setopt_array($ch, $opts);
  curl_exec($ch);
  $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -103,3 +104,4 @@ $url2 = getUrlSatusCode(url('database/database.sqlite'));
         <tr><td>SQLite {{__('messages.PHP Extension')}}</td><td id="dp">@if(extension_loaded('PDO_SQLite'))<i class='bi bi-check-lg'></i>@else<i class='bi bi-x'></i>@endif</td></tr>
         <tr><td>MySQL {{__('messages.PHP Extension')}}</td><td id="dp">@if(extension_loaded('PDO_MySQL'))<i class='bi bi-check-lg'></i>@else<i class='bi bi-x'></i>@endif</td></tr>
         </table>
+</div><style>.diagnose-content{min-width:0}.diagnose-content table{width:100%;table-layout:fixed}.diagnose-content td,.diagnose-content th{overflow-wrap:anywhere}</style>

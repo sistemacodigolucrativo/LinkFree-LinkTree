@@ -1,4 +1,4 @@
-@if($_SERVER['QUERY_STRING'] === '')
+@if(($_SERVER['QUERY_STRING'] ?? '') === '')
 <!DOCTYPE html>
 @include('layouts.lang')
 <head>
@@ -13,7 +13,7 @@
   @endif
 
   @if(env('CUSTOM_META_TAGS') == 'true')
-  @include('layouts.meta') 
+  @include('layouts.meta')
   @else
   <meta name="viewport" content="width=device-width, initial-scale=1">
   @endif
@@ -22,7 +22,7 @@
   <script src="{{ asset('assets/external-dependencies/fontawesome.js') }}" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="{{ asset('assets/external-dependencies/fontawesome.css') }}" />
 
-  @include('layouts.fonts') 
+  @include('layouts.fonts')
   <link rel="stylesheet" href="{{ asset('assets/linkstack/css/normalize.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/linkstack/css/animate.css') }}">
   @if(file_exists(base_path("assets/linkstack/images/").findFile('favicon')))
@@ -104,7 +104,7 @@ body {
   </div>
 </body>
 </html>
-@elseif($_SERVER['QUERY_STRING'] === 'maintenance=off')
+@elseif(($_SERVER['QUERY_STRING'] ?? '') === 'maintenance=off')
 @php
 EnvEditor::editKey('MAINTENANCE_MODE', false);
 ob_clean();

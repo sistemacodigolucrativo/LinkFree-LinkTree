@@ -3,16 +3,16 @@
 @section('content')
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
-  <div class="row">   
-      
+  <div class="row">
+
    <div class="col-lg-12">
       <div class="card   rounded">
           <div class="card-body">
              <div class="row">
-                 <div class="col-sm-12">  
+                 <div class="col-sm-12">
 
-                  @if($_SERVER['QUERY_STRING'] == '')
-                  
+                  @if(($_SERVER['QUERY_STRING'] ?? '') == '')
+
                   <div id="exTab2" class="">
                       <ul id="myTab" class="nav nav-tabs">
                         <li class="nav-item"><a class="nav-link active" href="#1" data-toggle="tab" id="home-tab">{{__('messages.Config')}}</a></li>
@@ -21,20 +21,20 @@
                         <li class="nav-item"><a class="nav-link" href="#4" data-toggle="tab" id="backups4-tab">{{__('messages.All Backups')}}</a></li>
                         <li class="nav-item"><a class="nav-link" href="#5" data-toggle="tab" id="diagnose5-tab">{{__('messages.Diagnosis')}}</a></li>
                       </ul>
-                  
+
                   <div class="tab-content ">
-                  
-                  
+
+
                   <div class="tab-pane fade show active" role="tabpanel" style="scroll-margin-top: 1000px;" aria-labelledby="home-tab" id="1">
                       <section class="text-gray-400">
                         <h2 class="mb-4 card-header"><i class="bi bi-pencil-square"> {{__('messages.Config')}}</i></h2>
                       <div class="card-body p-0 p-md-3">
-                  
+
                   <style>
                   /* Temporary fix for the unintended scrolling bug when applying settings */
                   html {scroll-behavior: unset !important;}
                   </style>
-                  
+
                   <style>
                     .option{
                       -webkit-transition-duration: 0.3s;
@@ -55,7 +55,7 @@
                     </style>
 
                   @if(!config('linkstack.single_user_mode'))
-                  <div class="tab-pane fade show active" role="tabpanel" style="scroll-margin-top: 1000px;" aria-labelledby="home-tab" id="1">
+                  <div class="config-general">
                     <section class="text-gray-400">
                       <div class="card-body p-0 p-md-3 d-flex flex-column">
                         <a href="?alternative-config" class="mb-1">
@@ -87,9 +87,9 @@
                       </div>
                     </section>
                   </div>
-                  
+
                   @endif
-                  
+
                       <label class="mb-2">{{__('messages.Jump directly to:')}}</label>
                       <div class="col-md-12 col-lg-12">
                         <div class="row row-cols-1">
@@ -117,7 +117,7 @@
                                 <a href="#Debug" class="btn btn-primary">{{__('messages.Debug')}}</a>
                               </li>
                               <li class="swiper-slide card card-slide aos-init aos-animate swiper-slide-next">
-                                <a href="#Debug" class="btn btn-primary">{{__('messages.Language')}}</a>
+                                <a href="#Language" class="btn btn-primary">{{__('messages.Language')}}</a>
                               </li>
                             </ul>
                             <div class="swiper-button swiper-button-next" tabindex="0" role="button" aria-label="Next slide" aria-controls="swiper-wrapper-a3b63471782f110100" aria-disabled="false"></div>
@@ -126,14 +126,14 @@
                           </div>
                         </div>
                       </div>
-                  
+
                       @include('components.config.config')
-                  
+
                       </div>
                       </section>
                   </div>
-                  
-                  
+
+
                   <div class="tab-pane" role="tabpanel" style="scroll-margin-top: 1000px;" aria-labelledby="advanced-tab" id="2">
                       <section class="text-gray-400">
                       <h2 class="mb-4 card-header"><i class="bi bi-pencil-square"> {{__('messages.Advanced Config')}}</i></h2>
@@ -142,8 +142,8 @@
                       </div>
                       </section>
                   </div>
-                  
-                  
+
+
                   <div class="tab-pane" role="tabpanel" style="scroll-margin-top: 1000px;" aria-labelledby="backup-tab" id="3">
                       <section class="text-gray-400">
                       <h2 class="mb-4 card-header"><i class="bi bi-link-45deg"> {{__('messages.Backup')}}</i></h2>
@@ -152,8 +152,8 @@
                       </div>
                       </section>
                   </div>
-                  
-                  
+
+
                   <div class="tab-pane" role="tabpanel" style="scroll-margin-top: 1000px;" aria-labelledby="backups4-tab" id="4">
                       <section class="text-gray-400">
                       <h2 class="mb-4 card-header"><i class="bi bi-link-45deg"> {{__('messages.All Backups')}}</i></h2>
@@ -162,8 +162,8 @@
                       </div>
                       </section>
                   </div>
-                  
-                  
+
+
                   <div class="tab-pane" role="tabpanel" style="scroll-margin-top: 1000px;" aria-labelledby="diagnose5-tab" id="5">
                       <section class="text-gray-400">
                       <h2 class="mb-4 card-header"><i class="bi bi-braces-asterisk"> {{__('messages.Debugging information')}}</i> <span class="text-muted" style="font-size:60%;vertical-align: middle;">v{{file_get_contents(base_path("version.json"))}}</span></h2>
@@ -172,19 +172,19 @@
                       </div>
                       </section>
                   </div>
-                  
-                  
+
+
                   </div>
                   </div>
-                  
+
                   <!-- Back to top button -->
-                  <a id="button-top"></a>
-                  
-                  @elseif($_SERVER['QUERY_STRING'] == 'alternative-config' && !config('linkstack.single_user_mode'))
+                  <button type="button" id="button-top" aria-label="Voltar ao topo" hidden></button>
+
+                  @elseif(($_SERVER['QUERY_STRING'] ?? '') == 'alternative-config' && !config('linkstack.single_user_mode'))
                   @include('components.config.alternative-config')
                   @include('components.config.back-button')
                   @endif
-                  
+
                   @push("sidebar-scripts")
                   <script src="{{ asset('assets/external-dependencies/jquery-1.11.1.min.js') }}"></script>
                   <script src="{{ asset('assets/external-dependencies/bootstrap.min.js') }}"></script>
@@ -194,27 +194,27 @@
                   // $(this).tab('show');
                   //});
                   // store the currently selected tab in the hash value
-                  
+
                   $("ul.nav-tabs > li > a").on("shown.bs.tab", function(e) {
                     var id = $(e.target).attr("href").substr(1);
                     window.location.hash = id;
                   });
-                  
+
                   // on load of the page: switch to the currently selected tab
                   var hash = window.location.hash;
-                  
+
                   $('#myTab a[href="' + hash + '"]').tab('show');
-                  
+
                   var btn = $('#button-top');
-                  
+
                   $(window).scroll(function() {
                     if ($(window).scrollTop() > 300) {
-                      btn.addClass('show');
+                      btn.prop('hidden',false).addClass('show');
                     } else {
-                      btn.removeClass('show');
+                      btn.prop('hidden',true).removeClass('show');
                     }
                   });
-                  
+
                   btn.on('click', function(e) {
                     e.preventDefault();
                     $('html, body').animate({scrollTop:280}, '300');

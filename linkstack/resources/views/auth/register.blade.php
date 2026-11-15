@@ -50,23 +50,23 @@ foreach($pages as $page)
                     <div class="col-lg-12">
                       <div class="form-group">
                         <label for="name" class="form-label">{{__('messages.Display Name')}}</label>
-                        <input type="text" class="form-control" id="name" name="name" aria-describedby="name" placeholder=" " :value="old('name')" required autofocus >
+                        <input type="text" class="form-control" id="name" name="name" aria-describedby="name" placeholder=" " value="{{ old('name') }}" required autofocus >
                       </div>
                     </div>
                     <div class="col-lg-12">
                       <div class="form-group">
-                        <label for="littlelink_name" class="form-label">{{__('messages.Page URL')}}</label>
+                        <label for="email" class="form-label">{{__('messages.Page URL')}}</label>
                         <div class="input-group mb-3 has-validation">
                           <span class="input-group-text" id="basic-addon3">{{str_replace(['http://', 'https://'], '', url(''))}}/@</span>
-                          <input type="littlelink_name" class="form-control" id="littlelink_name" name="littlelink_name" aria-describedby="littlelink_name" placeholder=" " :value="old('littlelink_name')" required autofocus >
+                          <input type="littlelink_name" class="form-control" id="littlelink_name" name="littlelink_name" aria-describedby="littlelink_name" placeholder=" " value="{{ old('littlelink_name') }}" required autofocus >
                         </div>
                       </div>
                     </div>
-                    @include('auth.url-validation')           
+                    @include('auth.url-validation')
                     <div class="col-lg-12">
                       <div class="form-group">
-                        <label for="email" class="form-label">{{__('messages.Email')}}</label>
-                        <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder=" " :value="old('email')" required autofocus >
+                        <label class="form-label">{{__('messages.Email')}}</label>
+                        <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder=" " value="{{ old('email') }}" required autofocus >
                       </div>
                     </div>
                     <div class="col-lg-12">
@@ -81,7 +81,7 @@ foreach($pages as $page)
                         <label class="form-check-label" for="remember_me">{{__('messages.Remember Me')}}</label>
                       </div>
                     </div>
-                  </div>                  
+                  </div>
                 <div class="d-flex justify-content-center">
                   <button id="submit-btn" type="submit" class="btn btn-primary">{{__('messages.Sign Up')}}</button>
                 </div>
@@ -127,7 +127,7 @@ foreach($pages as $page)
                 </p>
               </form>
             </div>
-          </div>          
+          </div>
 
     </x-auth-card>
 </x-guest-layout>
