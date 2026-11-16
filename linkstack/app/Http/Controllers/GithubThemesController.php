@@ -15,6 +15,7 @@ class GithubThemesController extends Controller
         $category = $request->query('category', 'Free');
         $themes = []; $updates = []; $error = null;
         try {
+            if ($request->boolean('updates')) $service->refresh($s);
             $themes = $service->catalogue($s, $category);
             if ($request->boolean('updates')) $updates = $service->updates($s);
         }
@@ -58,7 +59,10 @@ class GithubThemesController extends Controller
         try {
             $s = $service->state();
             $theme = $service->theme($s, $category, $name);
-            $bytes = $service->download($s, $theme['thumbnail'], $theme['revision']);
+            $cacheKey = 'github-theme-thumbnail:'.hash('sha256', $s['repository'].$theme['thumbnail']['sha']);
+            $bytes = Cache::remember($cacheKey, now()->addHours(6), function () use ($service, $s, $theme) {
+                return $service->download($s, $theme['thumbnail'], $theme['revision']);
+            });
             $info = @getimagesizefromstring($bytes);
             if (!$info || !in_array($info['mime'], ['image/png','image/jpeg'], true)) abort(422);
             return response($bytes)->header('Content-Type', $info['mime'])->header('Cache-Control', 'private, max-age=300')->header('X-Content-Type-Options', 'nosniff');
