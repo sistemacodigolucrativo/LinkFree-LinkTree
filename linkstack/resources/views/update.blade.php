@@ -52,8 +52,7 @@
                 <div class="row">
                     <a class="btn"
                         href="{{ url()->current() }}/?{{ env('SKIP_UPDATE_BACKUP') == true ? 'preparing' : 'backup' }}">
-                        <button><i class="fa-solid fa-user-gear btn"></i>
-                            {{ __('messages.Update automatically') }}</button>
+                        <i class="fa-solid fa-user-gear btn"></i> {{ __('messages.Update automatically') }}
                     </a>
                     <a class="btn" href="https://linkstack.org/update" target="_blank"><i class="fa-solid fa-download btn"></i> {{ __('messages.Update manually') }}</a>
                 </div>

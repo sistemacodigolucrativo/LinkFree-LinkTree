@@ -48,7 +48,7 @@
                                 @if(env('USE_THEME_PREVIEW_IFRAME') === false or $page->littlelink_name == '')
                                 <center><img style="width:95%;max-width:700px;argin-left:1rem!important;" src="@if(file_exists(base_path() . '/themes/' . $page->theme . '/preview.png')){{url('/themes/' . $page->theme . '/preview.png')}}@elseif($page->theme === 'default' or empty($page->theme)){{url('/assets/linkstack/images/themes/default.png')}}@else{{url('/assets/linkstack/images/themes/no-preview.png')}}@endif"></img></center>
                                  @else
-                                <iframe frameborder="0" allowtransparency="true" id="frPreview" style="background: #FFFFFF;height:400px;" class='w-100' src="{{ url('') }}/@<?= Auth::user()->littlelink_name ?>">{{__('messages.No compatible browser')}}</iframe>
+                                <iframe frameborder="0" allowtransparency="true" id="frPreview" title="{{ __('messages.Preview') }} — {{ __('messages.Profile') }}" style="background: #FFFFFF;height:400px;" class='w-100' src="{{ url('') }}/@<?= Auth::user()->littlelink_name ?>">{{__('messages.No compatible browser')}}</iframe>
                                 @endif
                               </div>
                             </div>
@@ -81,7 +81,7 @@
                             <figure style="max-width:1000px;max-height:562.5px;" class="figure">
                             @if(!file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<p><i>{{__('messages.No image selected')}}</i></p>@endif
                             <img class="bd-placeholder-img figure-img img-fluid rounded" src="@if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id)))){{url('assets//img/background-img/'.findBackground(Auth::user()->id))}}@else{{url('/assets/linkstack/images/themes/no-preview.png')}}@endif"><br>
-                            @if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<button class="mt-3 ml-3 btn btn-primary" style="background-color:tomato!important;border-color:tomato!important;transform: scale(.9);" title="Delete background image"><a href="{{ url('/studio/rem-background') }}" style="color:#FFFFFF;"><i class="bi bi-trash-fill"></i>{{__('messages.Remove background')}}</a></button><br>@endif
+                            @if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<a class="mt-3 ml-3 btn btn-primary" style="background-color:tomato!important;border-color:tomato!important;transform: scale(.9);" title="Delete background image" href="{{ url('/studio/rem-background') }}"><i class="bi bi-trash-fill"></i>{{__('messages.Remove background')}}</a><br>@endif
                             {{-- <figcaption class="figure-caption">A caption for the above image.</figcaption> --}}
                         </figure>
                             <br>
@@ -197,7 +197,7 @@ $(window).on('load', function() {
                     <div class="col-lg-3">
                         <div class="card shadow-lg @if($page->theme == "" or $page->theme == "default") bg-primary @else bg-soft-primary @endif">
                            <div class="card-body pb-0">
-                            <button type="button" style="cursor:pointer;border:0;background:transparent;color:inherit;font:inherit;padding:0" onclick="setTheme('default')">
+                            <button type="button" aria-label="Default Theme" aria-pressed="{{ ($page->theme == '' || $page->theme == 'default') ? 'true' : 'false' }}" style="cursor:pointer;border:0;background:transparent;color:inherit;font:inherit;padding:0" onclick="setTheme('default')">
                               <div class="d-flex justify-content-between">
                                  <div>
                                     <img draggable="false" class="bd-placeholder-img bd-placeholder-img-lg img-fluid" src="{{url('assets/linkstack/images/themes/default.png')}}">
@@ -230,7 +230,7 @@ $(window).on('load', function() {
                                                         <div class="col-lg-3">
                                                             <div class="card shadow-lg @if($page->theme == $entry) bg-primary @else bg-soft-primary @endif">
                                                                <div class="card-body pb-0">
-                                                                <button type="button" style="cursor:pointer;border:0;background:transparent;color:inherit;font:inherit;padding:0" onclick="setTheme('{{$entry}}')">
+                                                                <button type="button" aria-label="{{ $themeName }}" aria-pressed="{{ $page->theme == $entry ? 'true' : 'false' }}" style="cursor:pointer;border:0;background:transparent;color:inherit;font:inherit;padding:0" onclick="setTheme('{{$entry}}')">
                                                                   <div class="d-flex justify-content-between">
                                                                      <div>
                                                                         <img draggable="false" class="bd-placeholder-img bd-placeholder-img-lg img-fluid" src="{{url('themes/'.$entry.'/preview.png')}}">

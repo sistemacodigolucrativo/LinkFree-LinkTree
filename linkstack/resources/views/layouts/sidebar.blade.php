@@ -102,14 +102,14 @@ $usrhandl = Auth::user()->littlelink_name;
 
                 <h4 class="logo-title">{{env('APP_NAME')}}</h4>
             </a>
-            <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
+            <button type="button" class="sidebar-toggle" data-toggle="sidebar" data-active="true" aria-label="Recolher menu lateral" aria-expanded="true" data-label-expanded="Recolher menu lateral" data-label-collapsed="Expandir menu lateral" style="border:0;background:transparent;padding:0;">
                 <i class="icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4.25 12.2744L19.25 12.2744" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                         <path d="M10.2998 18.2988L4.2498 12.2748L10.2998 6.24976" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                     </svg>
                 </i>
-            </div>
+            </button>
         </div>
         <div class="sidebar-body pt-0 data-scrollbar">
             <div class="sidebar-list">
@@ -261,13 +261,13 @@ $usrhandl = Auth::user()->littlelink_name;
 
                 <h4 class="logo-title">{{env('APP_NAME')}}</h4>
             </a>
-            <div class="sidebar-toggle" data-toggle="sidebar" data-active="true">
+            <button type="button" class="sidebar-toggle" data-toggle="sidebar" data-active="true" aria-label="Recolher menu lateral" aria-expanded="true" data-label-expanded="Recolher menu lateral" data-label-collapsed="Expandir menu lateral" style="border:0;background:transparent;padding:0;">
                 <i class="icon">
                  <svg  width="20px" class="icon-20" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
                 </svg>
                 </i>
-            </div>
+            </button>
             {{-- <div class="input-group search-input">
               <span class="input-group-text" id="search-input">
                 <svg class="icon-18" width="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

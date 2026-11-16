@@ -31,7 +31,7 @@
             <a class="btn btn-link btn-sm" href="{{ URL::to('admin/linktype/' . $value->id . '/edit') }}"><i class='bi bi-pencil'></i> Edit</a>
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-link p-2 text-danger" href="{{ URL::to('admin/linktype/' . $value->id . '/edit') }}" onclick="return confirm('Are you sure?')"><i class='bi bi-trash'></i> Delete</button>
+                <button type="submit" class="btn btn-sm btn-link p-2 text-danger" onclick="return confirm('Are you sure?')"><i class='bi bi-trash'></i> Delete</button>
 
             </form>
         </div>

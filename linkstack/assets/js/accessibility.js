@@ -1,7 +1,11 @@
 (() => {
  const updateStates=()=>{
  document.querySelectorAll('[data-setting]').forEach(el=>el.setAttribute('aria-pressed',String(el.classList.contains('active'))));
- document.querySelectorAll('[data-toggle="sidebar"]').forEach(el=>el.setAttribute('aria-expanded',String(!document.querySelector('.sidebar')?.classList.contains('sidebar-mini'))));
+ const sidebarCollapsed=document.querySelector('.sidebar')?.classList.contains('sidebar-mini');
+ document.querySelectorAll('[data-toggle="sidebar"]').forEach(el=>{
+  el.setAttribute('aria-expanded',String(!sidebarCollapsed));
+  el.setAttribute('aria-label',sidebarCollapsed?(el.dataset.labelCollapsed||'Expandir menu lateral'):(el.dataset.labelExpanded||'Recolher menu lateral'));
+ });
 };
  document.addEventListener('click',()=>setTimeout(updateStates,0));
  const enhance=()=>{

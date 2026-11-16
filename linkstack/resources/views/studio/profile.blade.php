@@ -37,7 +37,7 @@
                           <h4>Email</h4>
                           <input type="email" class="form-control" name="email" value="{{ $profile->email }}" required>
                         </div>
-                        <button type="Change " class="mt-3 ml-3 btn btn-primary">{{__('messages.Change email')}}</button>
+                        <button type="submit" class="mt-3 ml-3 btn btn-primary">{{__('messages.Change email')}}</button>
                       </form>
               @endif
 
@@ -47,7 +47,7 @@
                     <h4>{{__('messages.Password')}}</h4>
                     <input type="password" name="password" class="form-control" placeholder="At least 8 characters" required>
                   </div>
-                  <button type="Change " class="mt-3 ml-3 btn btn-primary">{{__('messages.Change password')}}</button>
+                  <button type="submit" class="mt-3 ml-3 btn btn-primary">{{__('messages.Change password')}}</button>
                 </form>
 
                 @csrf
@@ -62,16 +62,12 @@
                 <p>{{__('messages.Export your user data')}}</p>
                 <div class="row">
                   <div class="col-lg-8">
-                    <button class="btn btn-outline-secondary">
-                      <a href="{{ route('exportAll') }}">
-                        <i class="bi bi-layer-backward"></i> {{__('messages.Export all data')}}
-                      </a>
-                    </button>
-                    <button class="btn btn-outline-secondary">
-                      <a href="{{ route('exportLinks') }}">
-                        <i class="bi bi-layer-backward"></i> {{__('messages.Export links only')}}
-                      </a>
-                    </button>
+                    <a class="btn btn-outline-secondary" href="{{ route('exportAll') }}">
+                      <i class="bi bi-layer-backward"></i> {{__('messages.Export all data')}}
+                    </a>
+                    <a class="btn btn-outline-secondary" href="{{ route('exportLinks') }}">
+                      <i class="bi bi-layer-backward"></i> {{__('messages.Export links only')}}
+                    </a>
                   </div>
                 </div>
               </div>
@@ -92,9 +88,8 @@
 
               <br>
 
-                        <br><button class="btn btn-danger"><a
-                            href="{{ url('/studio/profile/?delete') }}" style="color:#FFFFFF;"><i class="bi bi-exclamation-octagon-fill"></i>
-                            {{__('messages.Delete your account')}}</a></button>
+                        <br><a class="btn btn-danger" href="{{ url('/studio/profile/?delete') }}"><i class="bi bi-exclamation-octagon-fill"></i>
+                            {{__('messages.Delete your account')}}</a>
                         </div>
               </section>
                         @endforeach
@@ -107,7 +102,7 @@
                   <p>{{__('messages.You are about to delete This action cannot be undone')}}</p>
                   <div>
                     <button class="redButton btn btn-danger" style="filter: grayscale(100%);" disabled onclick="window.location.href = '{{ url('/studio/delete-user/') . "/" . Auth::id() }}';"><i class="bi bi-exclamation-diamond-fill"></i></button>
-                    <button type="submit" class="btn btn-primary"><a style="color:#fff;" href="{{ url('/studio/profile') }}">{{__('messages.Cancel')}}</a></button>
+                    <a class="btn btn-primary" href="{{ url('/studio/profile') }}">{{__('messages.Cancel')}}</a>
                   </div>
                 </div>
               </div>

@@ -76,29 +76,29 @@ foreach($pages as $page)
                   <ul class="list-group list-group-horizontal list-group-flush">
                     @if(!empty(env('FACEBOOK_CLIENT_ID')))
                     <li class="list-group-item border-0 pb-0">
-                      <a href="{{ route('social.redirect','facebook') }}">
-                        <i class="bi bi-facebook"></i>
+                      <a href="{{ route('social.redirect','facebook') }}" aria-label="Entrar com Facebook">
+                        <i class="bi bi-facebook" aria-hidden="true"></i>
                       </a>
                     </li>
                     @endif
                     @if(!empty(env('TWITTER_CLIENT_ID')))
                     <li class="list-group-item border-0 pb-0">
-                      <a href="{{ route('social.redirect','twitter') }}">
-                        <i class="bi bi-twitter"></i>
+                      <a href="{{ route('social.redirect','twitter') }}" aria-label="Entrar com Twitter">
+                        <i class="bi bi-twitter" aria-hidden="true"></i>
                       </a>
                     </li>
                     @endif
                     @if(!empty(env('GOOGLE_CLIENT_ID')))
                     <li class="list-group-item border-0 pb-0">
-                      <a href="{{ route('social.redirect','google') }}">
-                        <i class="bi bi-google"></i>
+                      <a href="{{ route('social.redirect','google') }}" aria-label="Entrar com Google">
+                        <i class="bi bi-google" aria-hidden="true"></i>
                       </a>
                     </li>
                     @endif
                     @if(!empty(env('GITHUB_CLIENT_ID')))
                     <li class="list-group-item border-0 pb-0">
-                      <a href="{{ route('social.redirect','github') }}">
-                        <i class="bi bi-github"></i>
+                      <a href="{{ route('social.redirect','github') }}" aria-label="Entrar com GitHub">
+                        <i class="bi bi-github" aria-hidden="true"></i>
                       </a>
                     </li>
                     @endif

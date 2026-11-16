@@ -16,7 +16,7 @@
         <h4 class="">{{__('messages.You can back up your entire instance:')}}</h4>
         <h5 class="">{{__('messages.The backup system won’t save more than two backups at a time')}}</h5>
         <br><div class="row">
-        &ensp;<a class="btn" href="{{url()->current()}}/?backup"><button><i class="fa-solid fa-floppy-disk"></i> {{__('messages.Backup Instance')}}</button></a>&ensp;
+        &ensp;<a class="btn" href="{{url()->current()}}/?backup"><i class="fa-solid fa-floppy-disk"></i> {{__('messages.Backup Instance')}}</a>&ensp;
         &ensp;<a class="btn" href="{{ route('showBackups') }}"><i class="fa-solid fa-box-archive"></i> {{__('messages.All Backups')}}</a>&ensp;
         </div>
         @endif

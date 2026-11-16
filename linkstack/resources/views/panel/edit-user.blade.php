@@ -21,11 +21,11 @@
                           @csrf
                               <div class="form-group col-lg-8">
                               <label for="field-name">{{__('messages.Name')}}</label>
-                              <input type="text" class="form-control" name="name" value="{{ $user->name }}">
+                              <input type="text" class="form-control" id="field-name" name="name" value="{{ $user->name }}">
                             </div>
                             <div class="form-group col-lg-8">
                               <label for="field-email">{{__('messages.Email')}}</label>
-                              <input type="email" class="form-control" name="email" value="{{ $user->email }}">
+                              <input type="email" class="form-control" id="field-email" name="email" value="{{ $user->email }}">
                             </div>
                             <div class="form-group col-lg-8">
                               <label for="field-password">{{__('messages.Password')}}</label>
@@ -33,9 +33,9 @@
                             </div>
 
                             <div class="form-group col-lg-8">
-                              <label for="field-littlelink_description">{{__('messages.Logo')}}</label>
+                              <label for="field-user-logo">{{__('messages.Logo')}}</label>
                               <div class="mb-3">
-                                <input type="file" class="form-control form-control-lg" name="image">
+                                <input type="file" class="form-control form-control-lg" id="field-user-logo" name="image">
                             </div>
                             </div>
 
@@ -105,17 +105,17 @@
                               </div>
 
                             <div class="form-group col-lg-8">
-                              <label>{{__('messages.Page URL')}}</label>
+                              <label for="field-littlelink-name">{{__('messages.Page URL')}}</label>
                               <div class="input-group">
                             <div class="input-group-prepend">
                             <div class="input-group-text">{{ url('') }}/@</div>
                             </div>
-                            <input type="text" class="form-control" name="littlelink_name" value="{{ $user->littlelink_name }}">
+                            <input type="text" class="form-control" id="field-littlelink-name" name="littlelink_name" value="{{ $user->littlelink_name }}">
                           </div>
                         </div>
 
                             <div class="form-group col-lg-8">
-                              <label> {{__('messages.Page description')}}</label>
+                              <label for="field-littlelink_description"> {{__('messages.Page description')}}</label>
                               <textarea class="form-control" name="littlelink_description" rows="3" id="field-littlelink_description">{{ $user->littlelink_description }}</textarea>
                             </div>
                             <div class="form-group col-lg-8">

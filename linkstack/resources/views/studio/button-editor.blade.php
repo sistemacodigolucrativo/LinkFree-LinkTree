@@ -18,6 +18,33 @@
                   <?php function strp($urlStrp){return str_replace(array('http://', 'https://'), '', $urlStrp);} ?>
                     <!-- start button editor -->
                     <script>
+                      var button_css = {
+                        color: 'inherit',
+                        background_image: 'inherit'
+                      };
+
+                      function setButtonTextColor(value) {
+                        var match = /^#?([0-9a-f]{6})$/i.exec(String(value).trim());
+                        var hexInput = document.getElementById('button-color-hex');
+                        if (!match) {
+                          if (hexInput) hexInput.setAttribute('aria-invalid', 'true');
+                          return false;
+                        }
+
+                        var color = '#' + match[1].toUpperCase();
+                        button_css.color = color;
+                        var sample = document.getElementById('sample');
+                        var nativeInput = document.getElementById('button-color-native');
+                        if (sample) sample.style.color = color;
+                        if (hexInput) {
+                          hexInput.value = color;
+                          hexInput.removeAttribute('aria-invalid');
+                        }
+                        if (nativeInput) nativeInput.value = color;
+                        if (window.jQuery) jQuery('#color').css('background-color', color);
+                        return true;
+                      }
+
                       $(document).ready(function() {
                         $('#generate-css').click(function() {
                           const style = document.createElement('span').style;
@@ -55,17 +82,14 @@
                             return false;
                           },
                           onChange: function(hsb, hex, rgb) {
-                            $('#color').css('background-color', '#' + hex);
-                            document.getElementById("sample").style.color = '#' + hex;
-                            button_css.color = '#' + hex;
+                            setButtonTextColor('#' + hex);
                           }
                         });
+
+                        $('#button-color-hex').on('input change', function() {
+                          setButtonTextColor(this.value);
+                        });
                       });
-                      // Only include the necessary properties
-                      var button_css = {
-                        color: 'inherit',
-                        background_image: 'inherit'
-                      };
                       </script>
 
                   <link rel="stylesheet" type="text/css" href="{{asset('assets/button-editor/styles/button-gen.css')}}">
@@ -121,7 +145,11 @@
                   <div class="tool">
                   <heading>{{__('messages.Color')}} &nbsp;<span>{{__('messages.Text')}}</span></heading>
                   </br>
-                  <input type="color" aria-label="Cor do texto" oninput="button_css.color=this.value;document.getElementById('sample').style.color=this.value">
+                  <label for="button-color-native" class="form-label">Cor do texto</label>
+                  <input id="button-color-native" type="color" aria-label="Cor do texto" value="#000000" oninput="setButtonTextColor(this.value)">
+                  <label for="button-color-hex" class="form-label ms-2">Cor em hexadecimal</label>
+                  <input id="button-color-hex" class="form-control d-inline-block" style="width:8rem" type="text" inputmode="text" autocomplete="off" maxlength="7" pattern="#[0-9A-Fa-f]{6}" value="#000000" aria-describedby="button-color-hex-help">
+                  <small id="button-color-hex-help" class="d-block">Use o formato #RRGGBB.</small>
                   <input aria-label="Seletor de cor avançado" type="button" id="color" style="background-color:#FFFFFF; border:thin solid white;height:50px;width:50px;margin-left:5px;">
 
 
@@ -275,7 +303,7 @@
 
                             </div>
                   </section>
-<style>@media(max-width:600px){#color,.colorpicker{display:none!important}} #result .button{max-width:100%;white-space:normal;height:auto;min-height:48px}</style>
+<style>@media(max-width:600px){#color,.colorpicker{display:none!important}#button-color-hex{max-width:100%;margin-top:.35rem}} #result .button{max-width:100%;white-space:normal;height:auto;min-height:48px}</style>
 
                  </div>
              </div>
