@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -51,16 +52,29 @@ class GithubThemes
         return $raw ? $response->body() : $response->json();
     }
 
+    private function treeCacheKey(array $state): string
+    {
+        return 'github-theme-tree:'.hash('sha256', $state['repository'].($state['token'] ?? ''));
+    }
+
+    public function refresh(array $state): void
+    {
+        Cache::forget($this->treeCacheKey($state));
+        $this->trees = [];
+        $this->catalogues = [];
+    }
+
     private function tree(array $state): array
     {
-        $key = hash('sha256', $state['repository'].($state['token'] ?? ''));
+        $key = $this->treeCacheKey($state);
         if (isset($this->trees[$key])) return $this->trees[$key];
-        $repo = $this->api($state, '');
-        $commit = $this->api($state, '/commits/'.rawurlencode($repo['default_branch']));
-        $sha = $commit['sha'];
-        $tree = $this->api($state, '/git/trees/'.$commit['commit']['tree']['sha'].'?recursive=1');
-        if (!empty($tree['truncated'])) throw new RuntimeException('Catálogo muito grande para listar com segurança.');
-        return $this->trees[$key] = ['revision' => $sha, 'files' => $tree['tree'] ?? []];
+        return $this->trees[$key] = Cache::remember($key, now()->addMinutes(3), function () use ($state) {
+            $repo = $this->api($state, '');
+            $commit = $this->api($state, '/commits/'.rawurlencode($repo['default_branch']));
+            $tree = $this->api($state, '/git/trees/'.$commit['commit']['tree']['sha'].'?recursive=1');
+            if (!empty($tree['truncated'])) throw new RuntimeException('Catálogo muito grande para listar com segurança.');
+            return ['revision' => $commit['sha'], 'files' => $tree['tree'] ?? []];
+        });
     }
 
     public function catalogue(array $state, string $category): array
