@@ -13,11 +13,26 @@ class GithubThemesController extends Controller
     {
         $s = $service->state();
         $category = $request->query('category', 'Free');
-        $themes = []; $error = null;
-        try { $themes = $service->catalogue($s, $category); }
+        $themes = []; $updates = []; $error = null;
+        try {
+            $themes = $service->catalogue($s, $category);
+            if ($request->boolean('updates')) $updates = $service->updates($s);
+        }
         catch (\Throwable $e) { $error = 'Não foi possível consultar o catálogo. Confira o repositório, as permissões e o limite de acesso do GitHub.'; }
-        return view('panel.github-themes', ['repository' => $s['repository'], 'private' => $s['private'], 'hasToken' => !empty($s['token']), 'category' => $category, 'themes' => $themes, 'catalogueError' => $error]);
+        return view('panel.github-themes', ['repository' => $s['repository'], 'private' => $s['private'], 'hasToken' => !empty($s['token']), 'category' => $category, 'themes' => $themes, 'updates' => $updates, 'checkingUpdates' => $request->boolean('updates'), 'catalogueError' => $error]);
     }
+    public function status(GithubThemes $service)
+    {
+        try {
+            $updates = $service->updates($service->state());
+            return response()->json(['count' => count($updates), 'updates' => $updates])
+                ->header('Cache-Control', 'private, no-store');
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Não foi possível verificar as atualizações.'], 503)
+                ->header('Cache-Control', 'private, no-store');
+        }
+    }
+
     public function configure(Request $request, GithubThemes $service)
     {
         $data = $request->validate(['repository' => ['required','regex:~^https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?$~'], 'private' => 'required|boolean', 'token' => 'nullable|string|max:512']);
@@ -64,6 +79,7 @@ class GithubThemesController extends Controller
                     file_put_contents($temp, $bytes);
                     $directory = $installer->install($temp, $directory);
                     $s['installed'][$s['repository'].'/'.$category.'/'.$name] = ['sha' => $theme['zip']['sha'], 'revision' => $theme['revision'], 'directory' => $directory, 'category' => $category];
+                    unset($s['uploaded'][$directory]);
                     $service->save($s);
                 } finally { @unlink($temp); }
                 return back()->with('success', 'Tema instalado e revisão registrada.');
