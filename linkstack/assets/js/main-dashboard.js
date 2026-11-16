@@ -3,6 +3,53 @@
 
     "use strict";
 
+    document.addEventListener('click', async function (event) {
+        const control = event.target.closest('[data-delete-link]');
+        if (!control) return;
+        event.preventDefault();
+        if (control.dataset.pending === 'true') return;
+        if (!window.confirm(control.dataset.confirm || 'Excluir este link?')) return;
+        control.dataset.pending = 'true';
+        control.setAttribute('aria-disabled', 'true');
+        const row = control.closest('[data-id]');
+        let feedback = document.getElementById('link-delete-feedback');
+        if (!feedback) {
+            feedback = document.createElement('p');
+            feedback.id = 'link-delete-feedback';
+            feedback.setAttribute('role', 'status');
+            document.getElementById('links-table-body').before(feedback);
+        }
+        feedback.textContent = 'Excluindo link…';
+        const abort = new AbortController();
+        const timer = setTimeout(() => abort.abort(), 20000);
+        try {
+            const response = await fetch(control.href, {
+                method: 'DELETE', credentials: 'same-origin', signal: abort.signal,
+                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+            });
+            if (!response.ok) throw new Error('delete failed');
+            const result = await response.json();
+            if (!result.deleted || !row || String(result.id) !== row.dataset.id) throw new Error('invalid response');
+            const next = row.nextElementSibling || row.previousElementSibling;
+            // Tooltip versions differ between layouts; cleanup must not prevent removal.
+            try {
+                if (typeof window.bootstrap?.Tooltip?.getInstance === 'function') {
+                    window.bootstrap.Tooltip.getInstance(control)?.dispose();
+                } else if ($.fn.tooltip) { $(control).tooltip('dispose'); }
+            } catch (_) { /* The persisted deletion remains successful. */ }
+            row.remove();
+            feedback.textContent = document.querySelector('#links-table-body [data-id]')
+                ? 'Link excluído e alteração salva.' : 'Link excluído e alteração salva. Não há mais links nesta página.';
+            if (next) next.querySelector('a,button')?.focus();
+            else { feedback.tabIndex = -1; feedback.focus(); }
+            document.querySelectorAll('#frPreview1,#frPreview2').forEach(frame => { frame.src = frame.src; });
+        } catch (error) {
+            feedback.textContent = 'Não foi possível confirmar a exclusão. Verifique sua conexão e tente novamente.';
+            control.removeAttribute('aria-disabled');
+            delete control.dataset.pending;
+        } finally { clearTimeout(timer); }
+    });
+
     var fullHeight = function () {
 
         $('.js-fullheight').css('height', $(window).height());

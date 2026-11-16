@@ -461,6 +461,9 @@ class UserController extends Controller
         try{File::delete(base_path("assets/favicon/icons")."/".$linkId.".".$pathinfo);} catch (exception $e) {}
         }
 
+        if ($request->expectsJson()) {
+            return response()->json(['deleted' => true, 'id' => (string) $linkId]);
+        }
         return redirect('/studio/links');
     }
 

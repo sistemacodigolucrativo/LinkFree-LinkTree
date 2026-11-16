@@ -811,7 +811,7 @@ $usrhandl = Auth::user()->littlelink_name;
 <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('assets/js/Sortable.min.js') }}"></script>
 <script src="{{ asset('assets/js/jquery-block-ui.js') }}"></script>
-<script src="{{ asset('assets/js/main-dashboard.js') }}"></script>
+<script src="{{ asset('assets/js/main-dashboard.js') }}?v={{ filemtime(base_path('assets/js/main-dashboard.js')) }}"></script>
 
 @stack('sidebar-scripts')
 

@@ -108,6 +108,7 @@ Route::get('/studio/links', [UserController::class, $LinkPage])->name($LinkPage)
 Route::get('/studio/theme', [UserController::class, 'showTheme'])->name('showTheme');
 Route::post('/studio/theme', [UserController::class, 'editTheme'])->name('editTheme');
 Route::get('/deleteLink/{id}', [UserController::class, 'deleteLink'])->name('deleteLink')->middleware('link-id');
+Route::delete('/deleteLink/{id}', [UserController::class, 'deleteLink'])->middleware('link-id');
 Route::get('/upLink/{up}/{id}', [UserController::class, 'upLink'])->name('upLink')->middleware('link-id');
 Route::post('/studio/edit-link/{id}', [UserController::class, 'editLink'])->name('editLink')->middleware('link-id');
 Route::get('/studio/button-editor/{id}', [UserController::class, 'showCSS'])->name('showCSS')->middleware('link-id');
