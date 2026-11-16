@@ -94,7 +94,7 @@ Route::get('/block-asset/{type}', [LinkTypeViewController::class, 'blockAsset'])
 Route::middleware(['auth', 'blocked', 'impersonate'])->group(function () {
 //User route
 Route::group([
-    'middleware' => env('REGISTER_AUTH'),
+    'middleware' => array_values(array_filter([env('REGISTER_AUTH')])),
 ], function () {
 if(env('FORCE_ROUTE_HTTPS') == 'true'){URL::forceScheme('https');}
 if(isset($_COOKIE['LinkCount'])){if($_COOKIE['LinkCount'] == '20'){$LinkPage = 'showLinks20';}elseif($_COOKIE['LinkCount'] == '30'){$LinkPage = 'showLinks30';}elseif($_COOKIE['LinkCount'] == 'all'){$LinkPage = 'showLinksAll';} else {$LinkPage = 'showLinks';}} else {$LinkPage = 'showLinks';} //Shows correct link number
