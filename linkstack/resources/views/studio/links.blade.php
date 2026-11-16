@@ -40,6 +40,20 @@ if (isset($_COOKIE['LinkCount'])) {
 }
 </style>
 <style>.delete{position:relative; color:transparent; background-color:tomato; border-radius:5px; left:5px; padding:5px 12px; cursor: pointer;}.delete:hover{color:transparent;background-color:#f13d1d;}html,body{max-width:100%;overflow-x:hidden;}</style>
+<style>
+@media(max-width:767px){
+ .pre-left{min-width:0}
+ .pre-left>.card-header{display:flex;flex-wrap:wrap;gap:.75rem;align-items:center}
+ .pre-left .col.ms-3{margin-left:0!important;width:100%;min-width:0}
+ #links-table-body .row{margin-inline:0}
+ #links-table-body .col{min-width:0;overflow-wrap:anywhere}
+ #links-table-body [data-id]>.d-flex{padding-inline:0}
+ #links-table-body .col-12.p-2{max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere}
+ #links-table-body .col-12.py-1{display:flex;flex-wrap:wrap;gap:.35rem;padding-inline:.25rem!important}
+ #links-table-body .col-12.py-1>a,#links-table-body .col-12.py-1>button{float:none!important;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+ #links-table-body img{max-width:100%}
+}
+</style>
 @endpush
 
 @include('components.favicon')
