@@ -164,9 +164,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       file.setCustomValidity('');
       document.getElementById('theme-upload-status').textContent = 'Enviando e instalando tema...';
-      file.disabled = true;
-      // A disabled file input is not submitted; re-enable before sending.
-      file.disabled = false;
       if (form.requestSubmit) form.requestSubmit();
       else form.submit();
     });
@@ -298,9 +295,19 @@ document.addEventListener('DOMContentLoaded', function () {
   const modalElement = document.getElementById('themePreviewModal');
   const selectionElement = document.getElementById('exampleModal');
   const frame = document.getElementById('theme-demo-frame');
-  if (!modalElement || !window.bootstrap || !window.bootstrap.Modal) return;
-  const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-  const selector = bootstrap.Modal.getOrCreateInstance(selectionElement);
+  const Modal = window.bootstrap && window.bootstrap.Modal;
+  const hasBootstrap5 = typeof Modal === 'function';
+  const hasJqueryModal = window.jQuery && typeof jQuery.fn.modal === 'function';
+  if (!modalElement || (!hasBootstrap5 && !hasJqueryModal)) return;
+  function getModal(element) {
+    if (hasBootstrap5) return Modal.getOrCreateInstance ? Modal.getOrCreateInstance(element) : new Modal(element);
+    return {
+      show: function () { jQuery(element).modal('show'); },
+      hide: function () { jQuery(element).modal('hide'); }
+    };
+  }
+  const modal = getModal(modalElement);
+  const selector = getModal(selectionElement);
   const variantButtons = modalElement.querySelectorAll('[data-demo-variant]');
   let selectedUrl = '';
   let returnToSelection = false;
