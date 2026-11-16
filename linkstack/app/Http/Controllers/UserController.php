@@ -760,52 +760,17 @@ class UserController extends Controller
         $theme = $request->theme;
         $message = "";
 
-        User::where('id', $userId)->update(['theme' => $theme]);
-
-
-
         if (!empty($zipfile) && Auth::user()->role == 'admin') {
-
-            $themesPath = base_path('themes');
-            $tmpPath = base_path() . '/themes/temp.zip';
-            $zipfile->move($themesPath, "temp.zip");
-
-            $zip = new ZipArchive;
-            $zip->open($tmpPath);
-            $zip->extractTo($themesPath);
-            $zip->close();
-            unlink($tmpPath);
-
-            // Removes version numbers from folder.
-
-            $regex = '/[0-9.-]/';
-            $files = scandir($themesPath);
-            $files = array_diff($files, array('.', '..'));
-
-            foreach ($files as $file) {
-
-                $basename = basename($file);
-                $filePath = $themesPath . '/' . $basename;
-
-                if (!is_dir($filePath)) {
-                        
-                    try {
-                        File::delete($filePath);
-                    } catch (exception $e) {}
-
-                }
-
-                if (preg_match($regex, $basename)) {
-
-                    $newBasename = preg_replace($regex, '', $basename);
-                    $newPath = $themesPath . '/' . $newBasename;
-                    File::copyDirectory($filePath, $newPath);
-                    File::deleteDirectory($filePath);
-
-                }
-
+            try {
+                \Illuminate\Support\Facades\Cache::lock('github-themes-write', 180)->block(5, function () use ($zipfile) {
+                    app(\App\Services\ThemeInstaller::class)->install($zipfile->getRealPath());
+                });
+                $message = 'Tema importado com sucesso.';
+            } catch (\Throwable $e) {
+                return back()->withErrors(['zip' => 'Não foi possível instalar. Verifique a estrutura e a integridade do ZIP.']);
             }
-
+        } elseif (empty($zipfile)) {
+            User::where('id', $userId)->update(['theme' => $theme]);
         }
 
 

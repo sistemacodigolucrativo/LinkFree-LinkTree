@@ -624,8 +624,10 @@ class AdminController extends Controller
   // Update themes
   public function updateThemes()
   {
+    $githubDirectories = array_column(app(\App\Services\GithubThemes::class)->state()['installed'] ?? [], 'directory');
     if ($handle = opendir("themes")) {
       while (false !== ($entry = readdir($handle))) {
+        if (in_array($entry, $githubDirectories, true)) continue;
         if (file_exists(base_path("themes") . "/" . $entry . "/readme.md")) {
           $text = file_get_contents(
             base_path("themes") . "/" . $entry . "/readme.md",
@@ -700,34 +702,14 @@ class AdminController extends Controller
                     fopen($fileUrl, "r"),
                   );
 
-                  $zip = new ZipArchive();
-                  $zip->open(base_path() . "/themes/theme.zip");
-                  $zip->extractTo(base_path("themes"));
-                  $zip->close();
-                  unlink(base_path() . "/themes/theme.zip");
-
-                  $folder = base_path("themes");
-                  $regex = "/[0-9.-]/";
-                  $files = scandir($folder);
-
-                  foreach ($files as $file) {
-                    if ($file !== "." && $file !== "..") {
-                      if (preg_match($regex, $file)) {
-                        $new_file = preg_replace($regex, "", $file);
-                        File::copyDirectory(
-                          $folder . "/" . $file,
-                          $folder . "/" . $new_file,
-                        );
-                        $dirname = $folder . "/" . $file;
-                        if (strtoupper(substr(PHP_OS, 0, 3)) === "WIN") {
-                          system(
-                            "rmdir " . escapeshellarg($dirname) . " /s /q",
-                          );
-                        } else {
-                          system("rm -rf " . escapeshellarg($dirname));
-                        }
-                      }
-                    }
+                  try {
+                    \Illuminate\Support\Facades\Cache::lock('github-themes-write', 180)->block(5, function () use ($entry) {
+                      app(\App\Services\ThemeInstaller::class)->install(base_path('themes/theme.zip'), $entry);
+                    });
+                  } catch (\Throwable $e) {
+                    return Redirect('/studio/theme')->withErrors(['theme' => 'Não foi possível validar ou instalar a atualização.']);
+                  } finally {
+                    @unlink(base_path('themes/theme.zip'));
                   }
                 }
               }

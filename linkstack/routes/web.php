@@ -181,6 +181,10 @@ Route::group([
     Route::get('/admin/backups', [AdminController::class, 'showBackups'])->name('showBackups');
     Route::post('/admin/theme', [AdminController::class, 'deleteTheme'])->name('deleteTheme');
     Route::get('/admin/theme', [AdminController::class, 'showThemes'])->name('showThemes');
+    Route::get('/admin/github-themes', [\App\Http\Controllers\GithubThemesController::class, 'index'])->name('githubThemes');
+    Route::post('/admin/github-themes/configure', [\App\Http\Controllers\GithubThemesController::class, 'configure'])->name('githubThemes.configure');
+    Route::get('/admin/github-themes/{category}/{name}/thumbnail', [\App\Http\Controllers\GithubThemesController::class, 'thumbnail'])->name('githubThemes.thumbnail');
+    Route::post('/admin/github-themes/{category}/{name}/install', [\App\Http\Controllers\GithubThemesController::class, 'install'])->name('githubThemes.install');
     Route::get('/update/theme', [AdminController::class, 'updateThemes'])->name('updateThemes');
     Route::get('/admin/config', [AdminController::class, 'showConfig'])->name('showConfig');
     Route::post('/admin/config', [AdminController::class, 'editConfig'])->name('editConfig');

@@ -13,6 +13,7 @@
                     <div class="col-sm-12">  
   
                       <h2 class="mb-4"><i class="bi bi-brush"> {{__('messages.Delete a theme')}}</i></h2>
+                      <a class="btn btn-primary mb-3" href="{{ route('githubThemes') }}">Meus Temas Privados</a>
 
                       <form action="{{ route('deleteTheme') }}" enctype="multipart/form-data" method="post">
                       @csrf

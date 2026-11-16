@@ -1,4 +1,5 @@
 @if(auth()->user()->role == 'admin')
+<a class="btn btn-outline-primary my-3" href="{{ route('githubThemes') }}">Verificar atualizações — Meus Temas Privados (Free / Premium / VIP)</a>
 @if(env('ENABLE_THEME_UPDATER') == 'true')
 
 <br><br><br>
@@ -18,8 +19,13 @@
                         <th>{{__('messages.Version')}}&nbsp;</th>
                     </tr>
                     <?php
+                    $githubDirectories = array_column(app(\App\Services\GithubThemes::class)->state()['installed'] ?? [], 'directory');
                     if ($handle = opendir('themes')) {
                      while (false !== ($entry = readdir($handle))) {
+                            if (in_array($entry, $githubDirectories, true)) {
+                                echo '<tr><th>'.e($entry).'</th><td colspan="2"><a href="'.e(route('githubThemes')).'">Verificar revisão no GitHub</a></td></tr>';
+                                continue;
+                            }
                             if(file_exists(base_path('themes') . '/' . $entry . '/readme.md')){
                             $text = file_get_contents(base_path('themes') . '/' . $entry . '/readme.md');
                             $pattern = '/Theme Version:.*/';

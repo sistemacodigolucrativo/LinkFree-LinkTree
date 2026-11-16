@@ -106,6 +106,7 @@
               <div class="row">
                   <div class="col-sm-12">
                     <h3 class="mb-4 card-header">{{__('messages.Manage themes')}}</h3>
+                    <a class="btn btn-primary mb-3" href="{{ route('githubThemes') }}">Meus Temas Privados</a>
                     @if(env('ENABLE_THEME_UPDATER') == 'true')
 
                     <div id="ajax-container">
