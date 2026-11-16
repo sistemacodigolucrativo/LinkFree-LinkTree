@@ -45,11 +45,11 @@
                                 </div>
                               </div>
                               <div class="card-body">
-                                @if(env('USE_THEME_PREVIEW_IFRAME') === false or $page->littlelink_name == '')
-                                <center><img style="width:95%;max-width:700px;argin-left:1rem!important;" src="@if(file_exists(base_path() . '/themes/' . $page->theme . '/preview.png')){{url('/themes/' . $page->theme . '/preview.png')}}@elseif($page->theme === 'default' or empty($page->theme)){{url('/assets/linkstack/images/themes/default.png')}}@else{{url('/assets/linkstack/images/themes/no-preview.png')}}@endif"></img></center>
-                                 @else
-                                <iframe frameborder="0" allowtransparency="true" id="frPreview" title="{{ __('messages.Preview') }} — {{ __('messages.Profile') }}" style="background: #FFFFFF;height:400px;" class='w-100' src="{{ url('') }}/@<?= Auth::user()->littlelink_name ?>">{{__('messages.No compatible browser')}}</iframe>
-                                @endif
+                                <button type="button" class="btn btn-outline-primary w-100" data-theme-preview-url="{{ route('themePreview', ['theme' => $page->theme ?: 'default']) }}">
+                                  <i class="bi bi-eye"></i> Pré-visualizar tema atual
+                                </button>
+                                <p class="small text-muted mt-2 mb-0">Duas demonstrações com links, botões, vídeos e outros componentes, sem alterar sua página.</p>
+
                               </div>
                             </div>
                           </div>
@@ -106,52 +106,38 @@
               <div class="row">
                   <div class="col-sm-12">
                     <h3 class="mb-4 card-header">{{__('messages.Manage themes')}}</h3>
-                    <a class="btn btn-primary mb-3" href="{{ route('githubThemes') }}">Meus Temas Privados</a>
-                    @if(env('ENABLE_THEME_UPDATER') == 'true')
-
-                    <div id="ajax-container">
-
-                        <br><br><br>
-                        <div class="accordion">
-                            <div class="accordion-item">
-                              <h2 class="accordion-header" id="details-header">
-                                <button class="accordion-button collapsed disabled" type="button" aria-expanded="false" aria-controls="details-collapse">
-                                    <div style="max-height:20px;max-width:20px;" class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">{{__('messages.Loading...')}}</span>
-                                    </div>
-                                </button>
-                              </h2>
-                              <div id="details-collapse" class="accordion-collapse collapse" aria-labelledby="details-header">
-                                <div class="accordion-body"></div>
-                              </div>
-                            </div>
+                    @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
+                    <div class="row g-3">
+                      <div class="col-12 col-lg-6">
+                        <section class="border rounded p-3 h-100" aria-label="Temas GitHub">
+                          <h4 class="h5">Temas GitHub</h4>
+                          <p class="small text-muted">Instale temas Free e Premium/VIP ou consulte novas versões pelo repositório configurado.</p>
+                          <div class="d-flex flex-wrap gap-2">
+                            <a class="btn btn-primary" href="{{ route('githubThemes') }}">Selecionar temas GitHub</a>
+                            <a id="github-theme-updates" class="btn btn-outline-primary" href="{{ route('githubThemes', ['updates' => 1]) }}">Verificar atualizações</a>
                           </div>
-
+                          <p id="github-theme-status" class="small mt-2 mb-0" aria-live="polite"></p>
+                        </section>
+                      </div>
+                      <div class="col-12 col-lg-6">
+                        <section class="border rounded p-3 h-100" aria-label="Enviar temas">
+                          <h4 class="h5">Enviar temas</h4>
+                          <p class="small text-muted">Escolha um ZIP. O upload e a instalação começarão automaticamente.</p>
+                          <form action="{{ route('editTheme') }}" method="post" enctype="multipart/form-data" id="theme-upload-form">
+                            @csrf
+                            <label for="field-zip" class="form-label">Arquivo ZIP do tema</label>
+                            <input type="file" accept=".zip,application/zip" name="zip" class="form-control" id="field-zip" required>
+                            <span id="theme-upload-status" class="small" role="status"></span>
+                            <noscript><button type="submit" class="btn btn-primary mt-2">Enviar tema</button></noscript>
+                          </form>
+                        </section>
+                      </div>
                     </div>
-                    <div id="my-lazy-element"></div>
-                    @endif
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                      <a href="{{ route('showThemes') }}" class="btn btn-outline-danger">{{__('messages.Delete themes')}}</a>
+                      <a href="https://linkstack.org/themes/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary">{{__('messages.Download themes')}}</a>
+                    </div>
 
-                    <br><br><br>
-                    <form action="{{ route('editTheme') }}" enctype="multipart/form-data" method="post">
-                        @csrf
-                        {{-- <h3>{{__('messages.Upload themes')}}</h3> --}}
-                        <div style="display: none;" class="form-group col-lg-8">
-                            <select class="form-control" name="theme">
-                                <option>{{ $page->theme }}</option>
-                            </select>
-                            <br>
-                        </div>
-                        <div class="mb-3">
-                            <label for="field-zip">{{__('messages.Upload themes')}}</label>
-                            <input type="file" accept=".zip" name="zip" class="form-control form-control-lg" id="field-zip">
-                        </div><br><br>
-                        <div class="d-flex flex-column flex-md-row align-items-md-center">
-                            <button type="submit" class="btn btn-primary me-md-3 mb-3 mb-md-0">{{__('messages.Upload themes')}}</button>
-                            <a href="{{ url('/admin/theme') }}" class="btn btn-danger me-md-3 mb-3 mb-md-0 delete-themes text-white">{{__('messages.Delete themes')}}</a>
-                            <a href="https://linkstack.org/themes/" target="_blank" class="btn btn-info download-themes text-white">{{__('messages.Download themes')}}</a>
-                          </div>
-                    </form>
-                    </details>
                     </div>
                   </div>
               </div>
@@ -165,21 +151,44 @@
 <script src="{{ asset('assets/external-dependencies/jquery-1.12.4.min.js') }}"></script>
 </section>
 <script>
-$(window).on('load', function() {
-    var placeholder = $('#ajax-container');
-    var lazyElement = $('#my-lazy-element');
-
-    $.ajax({
-        url: '../theme-updater',
-        success: function(response) {
-            placeholder.replaceWith(lazyElement);
-
-            lazyElement.html(response);
-        }
+document.addEventListener('DOMContentLoaded', function () {
+  const file = document.getElementById('field-zip');
+  const form = document.getElementById('theme-upload-form');
+  if (file && form) {
+    file.addEventListener('change', function () {
+      if (!file.files || !file.files.length) return;
+      if (!/\.zip$/i.test(file.files[0].name)) {
+        file.setCustomValidity('Selecione um arquivo ZIP.');
+        file.reportValidity();
+        return;
+      }
+      file.setCustomValidity('');
+      document.getElementById('theme-upload-status').textContent = 'Enviando e instalando tema...';
+      file.disabled = true;
+      // A disabled file input is not submitted; re-enable before sending.
+      file.disabled = false;
+      if (form.requestSubmit) form.requestSubmit();
+      else form.submit();
     });
+  }
+  const updateLink = document.getElementById('github-theme-updates');
+  const status = document.getElementById('github-theme-status');
+  if (updateLink) {
+    fetch(@json(route('githubThemes.status')), { credentials: 'same-origin' })
+      .then(function (response) { if (!response.ok) throw new Error(); return response.json(); })
+      .then(function (result) {
+        if (result.count > 0) {
+          updateLink.classList.remove('btn-outline-primary');
+          updateLink.classList.add('btn-success');
+          updateLink.textContent = 'Verificar atualizações (' + result.count + ')';
+          status.textContent = result.count + ' tema(s) com atualização disponível.';
+        } else {
+          status.textContent = 'Nenhuma atualização disponível.';
+        }
+      }).catch(function () { status.textContent = 'Não foi possível consultar as atualizações agora.'; });
+  }
 });
 </script>
-<script type="text/javascript">$("iframe").load(function() { $("iframe").contents().find("a").each(function(index) { $(this).on("click", function(event) { event.preventDefault(); event.stopPropagation(); }); }); });</script>
 
 @push('sidebar-scripts')
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -210,13 +219,15 @@ $(window).on('load', function() {
                                  </div>
                               </div>
                             </button>
+                            <button type="button" class="btn btn-outline-primary mb-3 w-100" data-theme-preview-url="{{ route('themePreview', ['theme' => 'default']) }}"><i class="bi bi-eye"></i> Pré-visualizar</button>
                            </div>
                         </div>
                     </div>
                                     <?php
                                         if ($handle = opendir('themes')) {
                                             while (false !== ($entry = readdir($handle))) {
-                                                if ($entry != "." && $entry != "..") {
+                                                if ($entry != "." && $entry != ".." && preg_match('/^[A-Za-z][A-Za-z0-9_-]*$/D', $entry) && is_dir(base_path('themes/'.$entry))) {
+                                                    unset($themeName);
                                                     if(file_exists(base_path('themes') . '/' . $entry . '/readme.md')){
                                                         $text = file_get_contents(base_path('themes') . '/' . $entry . '/readme.md');
                                                         $pattern = '/Theme Name:.*/';
@@ -243,6 +254,7 @@ $(window).on('load', function() {
                                                                      </div>
                                                                   </div>
                                                                 </button>
+                                                                <button type="button" class="btn btn-outline-primary mb-3 w-100" data-theme-preview-url="{{ route('themePreview', ['theme' => $entry]) }}"><i class="bi bi-eye"></i> Pré-visualizar</button>
                                                                </div>
                                                             </div>
                                                         </div>
@@ -263,6 +275,63 @@ $(window).on('load', function() {
         </div>
     </div>
     </div>
+<div class="modal fade" id="themePreviewModal" tabindex="-1" aria-labelledby="themePreviewModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-fullscreen-sm-down">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="themePreviewModalTitle">Pré-visualização do tema</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex flex-wrap gap-2 mb-3" role="group" aria-label="Versões da demonstração">
+          <button class="btn btn-primary" type="button" data-demo-variant="links">1. Links e botões</button>
+          <button class="btn btn-outline-primary" type="button" data-demo-variant="media">2. Vídeos e mídias</button>
+        </div>
+        <iframe id="theme-demo-frame" title="Demonstração renderizada do tema" class="w-100 border rounded" style="height:min(72vh,760px);min-height:420px" loading="lazy" sandbox="allow-same-origin"></iframe>
+        <p class="small text-muted">A demonstração usa conteúdo fictício. Componentes incompatíveis são apresentados em telas diferentes.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const modalElement = document.getElementById('themePreviewModal');
+  const selectionElement = document.getElementById('exampleModal');
+  const frame = document.getElementById('theme-demo-frame');
+  if (!modalElement || !window.bootstrap || !window.bootstrap.Modal) return;
+  const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+  const selector = bootstrap.Modal.getOrCreateInstance(selectionElement);
+  const variantButtons = modalElement.querySelectorAll('[data-demo-variant]');
+  let selectedUrl = '';
+  let returnToSelection = false;
+  function variant(value) {
+    frame.src = selectedUrl + (selectedUrl.indexOf('?') === -1 ? '?' : '&') + 'variant=' + value;
+    variantButtons.forEach(function (button) {
+      button.classList.toggle('btn-primary', button.dataset.demoVariant === value);
+      button.classList.toggle('btn-outline-primary', button.dataset.demoVariant !== value);
+    });
+  }
+  document.querySelectorAll('[data-theme-preview-url]').forEach(function (button) {
+    button.addEventListener('click', function () {
+      selectedUrl = button.dataset.themePreviewUrl;
+      returnToSelection = selectionElement.classList.contains('show');
+      variant('links');
+      if (returnToSelection) {
+        selectionElement.addEventListener('hidden.bs.modal', function () { modal.show(); }, { once: true });
+        selector.hide();
+      } else modal.show();
+    });
+  });
+  variantButtons.forEach(function (button) {
+    button.addEventListener('click', function () { if (selectedUrl) variant(button.dataset.demoVariant); });
+  });
+  modalElement.addEventListener('hidden.bs.modal', function () {
+    frame.removeAttribute('src');
+    if (returnToSelection) selector.show();
+    returnToSelection = false;
+  });
+});
+</script>
 <script>
       function setTheme(themeName) {
         const selectElement = document.getElementById('theme-select');
