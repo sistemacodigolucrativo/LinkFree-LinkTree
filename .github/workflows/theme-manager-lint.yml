@@ -1,0 +1,34 @@
+name: Theme manager PHP lint
+on:
+  push:
+    paths:
+      - 'linkstack/app/Services/GithubThemes.php'
+      - 'linkstack/app/Http/Controllers/GithubThemesController.php'
+      - 'linkstack/app/Http/Controllers/ThemePreviewController.php'
+      - 'linkstack/app/Http/Controllers/AdminController.php'
+      - 'linkstack/app/Http/Controllers/UserController.php'
+      - 'linkstack/routes/web.php'
+      - '.github/workflows/theme-manager-lint.yml'
+  pull_request:
+    paths:
+      - 'linkstack/app/Services/GithubThemes.php'
+      - 'linkstack/app/Http/Controllers/GithubThemesController.php'
+      - 'linkstack/app/Http/Controllers/ThemePreviewController.php'
+      - 'linkstack/app/Http/Controllers/AdminController.php'
+      - 'linkstack/app/Http/Controllers/UserController.php'
+      - 'linkstack/routes/web.php'
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PHP syntax
+        run: |
+          set -e
+          php -l linkstack/app/Services/GithubThemes.php
+          php -l linkstack/app/Services/ThemeInstaller.php
+          php -l linkstack/app/Http/Controllers/GithubThemesController.php
+          php -l linkstack/app/Http/Controllers/ThemePreviewController.php
+          php -l linkstack/app/Http/Controllers/AdminController.php
+          php -l linkstack/app/Http/Controllers/UserController.php
+          php -l linkstack/routes/web.php

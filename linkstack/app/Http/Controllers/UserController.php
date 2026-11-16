@@ -763,7 +763,8 @@ class UserController extends Controller
         if (!empty($zipfile) && Auth::user()->role == 'admin') {
             try {
                 \Illuminate\Support\Facades\Cache::lock('github-themes-write', 180)->block(5, function () use ($zipfile) {
-                    app(\App\Services\ThemeInstaller::class)->install($zipfile->getRealPath());
+                    $directory = app(\App\Services\ThemeInstaller::class)->install($zipfile->getRealPath());
+                    app(\App\Services\GithubThemes::class)->registerUpload($directory, $zipfile->getRealPath());
                 });
                 $message = 'Tema importado com sucesso.';
             } catch (\Throwable $e) {

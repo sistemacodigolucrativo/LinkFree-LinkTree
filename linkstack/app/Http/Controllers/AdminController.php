@@ -592,134 +592,37 @@ class AdminController extends Controller
     return view('panel.backups');
   }
 
-  //Delete custom theme
+  // Delete an installed theme only after validation and confirmation.
   public function deleteTheme(request $request)
   {
-    $del = $request->deltheme;
-
-    if (empty($del)) {
-      echo '<script type="text/javascript">';
-      echo 'alert("No themes to delete!");';
-      echo 'window.location.href = "../studio/theme";';
-      echo "</script>";
-    } else {
-      $folderName = base_path() . "/themes/" . $del;
-
-      function removeFolder($folderName)
-      {
-        if (File::exists($folderName)) {
-          File::deleteDirectory($folderName);
-          return true;
+    $data = $request->validate([
+      'deltheme' => ['required', 'string', 'regex:/^[A-Za-z][A-Za-z0-9_-]*$/D'],
+    ]);
+    $name = $data['deltheme'];
+    $directory = base_path('themes/'.$name);
+    if (!is_dir($directory) || is_link($directory)) {
+      return back()->withErrors(['theme' => 'Tema não encontrado ou diretório inválido.']);
+    }
+    if (User::where('theme', $name)->exists()) {
+      return back()->withErrors(['theme' => 'Este tema está em uso. Selecione outro tema para os usuários antes de excluir.']);
+    }
+    try {
+      return \Illuminate\Support\Facades\Cache::lock('github-themes-write', 180)->block(5, function () use ($directory, $name) {
+        if (!\Illuminate\Support\Facades\File::deleteDirectory($directory)) {
+          throw new \RuntimeException('Falha na exclusão.');
         }
-
-        return false;
-      }
-
-      removeFolder($folderName);
-
-      return Redirect("/admin/theme");
+        app(\App\Services\GithubThemes::class)->unregister($name);
+        return redirect()->route('showThemes')->with('success', 'Tema '.$name.' excluído.');
+      });
+    } catch (\Throwable $e) {
+      return back()->withErrors(['theme' => 'Não foi possível excluir o tema.']);
     }
   }
 
-  // Update themes
+  // Theme updates are checked exclusively through the configured GitHub repository.
   public function updateThemes()
   {
-    $githubDirectories = array_column(app(\App\Services\GithubThemes::class)->state()['installed'] ?? [], 'directory');
-    if ($handle = opendir("themes")) {
-      while (false !== ($entry = readdir($handle))) {
-        if (in_array($entry, $githubDirectories, true)) continue;
-        if (file_exists(base_path("themes") . "/" . $entry . "/readme.md")) {
-          $text = file_get_contents(
-            base_path("themes") . "/" . $entry . "/readme.md",
-          );
-          $pattern = "/Theme Version:.*/";
-          preg_match($pattern, $text, $matches, PREG_OFFSET_CAPTURE);
-          if (!count($matches)) {
-            continue;
-          }
-          $verNr = substr($matches[0][0], 15);
-        }
-
-        $themeVe = null;
-
-        if ($entry != "." && $entry != "..") {
-          if (file_exists(base_path("themes") . "/" . $entry . "/readme.md")) {
-            if (
-              !strpos(
-                file_get_contents(
-                  base_path("themes") . "/" . $entry . "/readme.md",
-                ),
-                "Source code:",
-              )
-            ) {
-              $hasSource = false;
-            } else {
-              $hasSource = true;
-
-              $text = file_get_contents(
-                base_path("themes") . "/" . $entry . "/readme.md",
-              );
-              $pattern = "/Source code:.*/";
-              preg_match($pattern, $text, $matches, PREG_OFFSET_CAPTURE);
-              $sourceURL = substr($matches[0][0], 13);
-
-              $replaced = str_replace(
-                "https://github.com/",
-                "https://raw.githubusercontent.com/",
-                trim($sourceURL),
-              );
-              $replaced = $replaced . "/main/readme.md";
-
-              if (strpos($sourceURL, "github.com")) {
-                ini_set("user_agent", "Mozilla/4.0 (compatible; MSIE 6.0)");
-                try {
-                  $textGit = file_get_contents($replaced);
-                  $patternGit = "/Theme Version:.*/";
-                  preg_match(
-                    $patternGit,
-                    $textGit,
-                    $matches,
-                    PREG_OFFSET_CAPTURE,
-                  );
-                  $sourceURLGit = substr($matches[0][0], 15);
-                  $Vgitt = "v" . $sourceURLGit;
-                  $verNrv = "v" . $verNr;
-                } catch (Exception $ex) {
-                  $themeVe = "error";
-                  $Vgitt = null;
-                  $verNrv = null;
-                }
-
-                if (trim($Vgitt) > trim($verNrv)) {
-                  $fileUrl =
-                    trim($sourceURL) .
-                    "/archive/refs/tags/" .
-                    trim($Vgitt) .
-                    ".zip";
-
-                  file_put_contents(
-                    base_path("themes/theme.zip"),
-                    fopen($fileUrl, "r"),
-                  );
-
-                  try {
-                    \Illuminate\Support\Facades\Cache::lock('github-themes-write', 180)->block(5, function () use ($entry) {
-                      app(\App\Services\ThemeInstaller::class)->install(base_path('themes/theme.zip'), $entry);
-                    });
-                  } catch (\Throwable $e) {
-                    return Redirect('/studio/theme')->withErrors(['theme' => 'Não foi possível validar ou instalar a atualização.']);
-                  } finally {
-                    @unlink(base_path('themes/theme.zip'));
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return Redirect("/studio/theme");
+    return redirect()->route('githubThemes', ['updates' => 1]);
   }
 
   //Shows config file editor page

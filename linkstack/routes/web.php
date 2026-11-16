@@ -106,6 +106,7 @@ Route::get('/studio/edit-link/{id}', [UserController::class, 'AddUpdateLink'])->
 Route::post('/studio/sort-link', [UserController::class, 'sortLinks'])->name('sortLinks');
 Route::get('/studio/links', [UserController::class, $LinkPage])->name($LinkPage);
 Route::get('/studio/theme', [UserController::class, 'showTheme'])->name('showTheme');
+Route::get('/studio/theme-preview/{theme}', [\App\Http\Controllers\ThemePreviewController::class, 'show'])->name('themePreview')->where('theme', '[A-Za-z][A-Za-z0-9_-]*');
 Route::post('/studio/theme', [UserController::class, 'editTheme'])->name('editTheme');
 Route::get('/deleteLink/{id}', [UserController::class, 'deleteLink'])->name('deleteLink')->middleware('link-id');
 Route::delete('/deleteLink/{id}', [UserController::class, 'deleteLink'])->middleware('link-id');
@@ -182,6 +183,7 @@ Route::group([
     Route::post('/admin/theme', [AdminController::class, 'deleteTheme'])->name('deleteTheme');
     Route::get('/admin/theme', [AdminController::class, 'showThemes'])->name('showThemes');
     Route::get('/admin/github-themes', [\App\Http\Controllers\GithubThemesController::class, 'index'])->name('githubThemes');
+    Route::get('/admin/github-themes/status', [\App\Http\Controllers\GithubThemesController::class, 'status'])->name('githubThemes.status');
     Route::post('/admin/github-themes/configure', [\App\Http\Controllers\GithubThemesController::class, 'configure'])->name('githubThemes.configure');
     Route::get('/admin/github-themes/{category}/{name}/thumbnail', [\App\Http\Controllers\GithubThemesController::class, 'thumbnail'])->name('githubThemes.thumbnail');
     Route::post('/admin/github-themes/{category}/{name}/install', [\App\Http\Controllers\GithubThemesController::class, 'install'])->name('githubThemes.install');
