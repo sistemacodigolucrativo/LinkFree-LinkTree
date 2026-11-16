@@ -58,7 +58,7 @@ class GithubThemes
         $repo = $this->api($state, '');
         $commit = $this->api($state, '/commits/'.rawurlencode($repo['default_branch']));
         $sha = $commit['sha'];
-        $tree = $this->api($state, '/git/trees/'.$sha.'?recursive=1');
+        $tree = $this->api($state, '/git/trees/'.$commit['commit']['tree']['sha'].'?recursive=1');
         if (!empty($tree['truncated'])) throw new RuntimeException('Catálogo muito grande para listar com segurança.');
         return $this->trees[$key] = ['revision' => $sha, 'files' => $tree['tree'] ?? []];
     }
