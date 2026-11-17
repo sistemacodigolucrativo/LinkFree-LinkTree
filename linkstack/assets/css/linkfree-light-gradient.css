@@ -1,0 +1,84 @@
+/*
+ * LinkFree light-mode panel cards.
+ * Same 115deg violet/magenta gradient as Estúdio > Selecionar Tema.
+ * User public LinkStack templates are deliberately outside .main-content.
+ * Dark-mode cards, modal/dropdown surfaces and semantic status cards unchanged.
+ */
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.bg-light):not(.bg-white):not(.studio-link-slim):not(.notification-panel .card):not(.modal .card) {
+  --lf-gradient-fg:#ffffff;
+  --lf-gradient-muted:#f0dff6;
+  --lf-gradient-link:#e5f3ff;
+  --bs-card-bg:transparent;
+  --bs-card-color:#ffffff;
+  --bs-card-cap-bg:transparent;
+  --bs-heading-color:#ffffff;
+  background:linear-gradient(115deg,#391a66 0%,#6f215d 58%,#992b69 100%)!important;
+  color:var(--lf-gradient-fg)!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+}
+/* The card must not reintroduce a white header on top of the gradient. */
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) > :is(.card-header,.card-footer),
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) > .card-body :is(.card-header,.card-footer):not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning) {
+  background:rgba(255,255,255,.055)!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.26)!important;
+}
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) :is(h1,h2,h3,h4,h5,h6,.card-title,.card-text,label,legend,.form-label):not(.ck-content *):not(.ck *):not(.bg-white *) {
+  color:#fff!important;
+}
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) :is(.text-muted,.form-text,.text-gray-400):not(.ck-content *):not(.bg-white *) {
+  color:#f0dff6!important;
+}
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) a:not(.btn):not(.dropdown-item):not(.text-white):not(.ck *):not(.bg-white *):not(.top-link-title):not(.top-link-url) {
+  color:#e5f3ff!important;
+  text-decoration-color:currentColor;
+}
+body:not(.dark) .main-content .card :is(.form-control,.form-select,textarea,input:not([type="checkbox"]):not([type="radio"])) {
+  --bs-body-color:#18243b;
+  background-color:#ffffff;
+  color:#18243b;
+  border-color:#75839a;
+}
+body:not(.dark) .main-content .card :is(.form-control,.form-select,textarea,input)::placeholder {
+  color:#4b5870;
+  opacity:1;
+}
+body:not(.dark) .main-content .card :is(.input-group-text,.form-check-input) {
+  background:#f5edf9;
+  color:#18243b;
+  border-color:#75839a;
+}
+body:not(.dark) .main-content .card :is(.input-group-text,.form-check-input):checked {
+  background-color:var(--bs-primary);
+}
+body:not(.dark) .main-content .card .table:not(.table-light) {
+  --bs-table-color:#fff;
+  --bs-table-bg:transparent;
+  color:#fff;
+}
+body:not(.dark) .main-content .card .table:not(.table-light) :is(th,td) {
+  color:#fff;
+  border-color:rgba(255,255,255,.25);
+}
+body:not(.dark) .main-content .card :is(.nav-tabs .nav-link,.pagination .page-link):not(.active) {
+  color:#e5f3ff;
+}
+body:not(.dark) .main-content .card .bg-white,
+body:not(.dark) .main-content .card .bg-light {
+  color:#18243b;
+}
+/* Keep the accepted slim link cards and Top Clicks legible on light surfaces. */
+body:not(.dark) .main-content .studio-link-slim,
+body:not(.dark) .main-content .dashboard-slim .top-links-slim-item {
+  color:var(--lf-text,#18243b)!important;
+}
+/* Third-party rich editor and its popups use their own light/dark UI colors,
+   regardless of the purple parent card. */
+body:not(.dark) .main-content .studio-profile-editor-page .ck.ck-editor__editable.ck-content,
+body:not(.dark) .main-content .studio-profile-editor-page .ck.ck-editor__editable.ck-content :is(p,h1,h2,h3,h4,h5,h6,li):not([style*="color"]) {
+  color:#18243b!important;
+}
+body:not(.dark) .main-content .studio-profile-editor-page .ck.ck-editor__editable.ck-content {
+  background:#fff!important;
+}
+/* Page/theme screenshot imagery is never recolored or filtered. */
