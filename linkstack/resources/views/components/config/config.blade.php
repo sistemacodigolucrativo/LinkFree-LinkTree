@@ -150,8 +150,14 @@ input[type=radio] + label {
 .ch2{
     padding-top: 60px;
 }
-.nav-link{
-  color: var(--bs-primary);
+/* Restrito às abas desta página: não recolorir menu lateral nem a aba ativa. */
+#exTab2 #myTab.nav-tabs .nav-link:not(.active) {
+  color:var(--lf-link,var(--bs-primary));
+}
+#exTab2 #myTab.nav-tabs .nav-link.active {
+  background-color:var(--lf-primary,#3a57e8)!important;
+  border-color:var(--lf-primary,#3a57e8)!important;
+  color:var(--lf-on-primary,#ffffff)!important;
 }
 </style>
 

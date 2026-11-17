@@ -28,7 +28,7 @@ body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.
 body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) :is(.text-muted,.form-text,.text-gray-400):not(.ck-content *):not(.bg-white *) {
   color:var(--lf-muted)!important;
 }
-body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) a:not(.btn):not(.dropdown-item):not(.text-white):not(.text-muted):not(.ck *):not(.bg-white *):not(.top-link-title):not(.top-link-url) {
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) a:not(.btn):not(.dropdown-item):not(.nav-link):not(.text-white):not(.text-muted):not(.ck *):not(.bg-white *):not(.top-link-title):not(.top-link-url) {
   color:var(--lf-link)!important;
   text-decoration-color:currentColor;
 }

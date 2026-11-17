@@ -156,4 +156,61 @@ with sync_playwright() as p:
             context.close()
     finally:
         browser.close()
+# Admin configuration tab: verify the actual vendor + scoped config + Light V1 CSS.
+# Regression: card-wide a:not(.btn) used to override active tab foreground
+# with #204a9b, producing 1.47:1 over the blue #3a57e8 background.
+admin_config=(views/"components/config/config.blade.php").read_text(encoding="utf-8")
+config_css=admin_config.split("<style>",1)[1].split("</style>",1)[0]
+assert "#exTab2 #myTab.nav-tabs .nav-link.active" in config_css
+assert "a:not(.btn):not(.dropdown-item):not(.nav-link)" in gradient
+vendor=(root/"assets/css/hope-ui.min.css").read_text(encoding="utf-8")
+vendor_custom=(root/"assets/css/customizer.min.css").read_text(encoding="utf-8")
+vendor_dark=(root/"assets/css/dark.min.css").read_text(encoding="utf-8")
+
+tab_markup="""<!doctype html><html lang="pt-BR">
+<head><meta charset="utf-8"></head>
+<body class="light"><main class="main-content">
+<div class="card"><div class="card-body">
+<div id="exTab2"><ul id="myTab" class="nav nav-tabs">
+<li class="nav-item"><a href="#1" id="home-tab" class="nav-link active">Configuração</a></li>
+<li class="nav-item"><a href="#2" id="advanced-tab" class="nav-link">Avançado</a></li>
+</ul></div></div></div></main></body></html>"""
+
+def tab_contrast(text_color,background_color):
+    import re
+    def luminosity(color):
+        rgb=[int(value)/255 for value in re.findall(r"\d+",color)[:3]]
+        linear=[x/12.92 if x<=0.04045 else ((x+0.055)/1.055)**2.4 for x in rgb]
+        return sum(x*y for x,y in zip(linear,(0.2126,0.7152,0.0722)))
+    top,bottom=sorted([luminosity(text_color),luminosity(background_color)],reverse=True)
+    return (top+0.05)/(bottom+0.05)
+
+with sync_playwright() as playwright:
+    browser=playwright.chromium.launch(channel="chrome",headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
+    try:
+        page=browser.new_page(viewport={"width":390,"height":820})
+        page.set_content(tab_markup)
+        for css in (vendor,vendor_dark,vendor_custom,palette,gradient,config_css):
+            page.add_style_tag(content=css)
+        page.add_style_tag(content="*,*::before,*::after{animation:none!important;transition:none!important}")
+        for mode in ("light","dark"):
+            page.evaluate("(mode)=>{document.body.className=mode}",mode)
+            colors=page.evaluate("""() => {
+                const active=getComputedStyle(document.querySelector('#home-tab'));
+                const inactive=getComputedStyle(document.querySelector('#advanced-tab'));
+                return {
+                    active:[active.color,active.backgroundColor],
+                    inactive:[inactive.color,inactive.backgroundColor]
+                }
+            }""")
+            ratio=tab_contrast(*colors["active"])
+            assert ratio>=4.5,(mode,"Configuração active tab WCAG AA",round(ratio,2),colors)
+            if mode=="light":
+                assert colors["active"]==["rgb(255, 255, 255)","rgb(58, 87, 232)"],(mode,"active tab changed colors",colors)
+            print(f"PASS {mode} admin Configuração tab text/background: {ratio:.2f}:1")
+        page.close()
+    finally:
+        browser.close()
+print("ADMIN CONFIG TAB CONTRAST REGRESSION PASS")
+
 print("PROFILE + EDITOR + LIGHT GRADIENT AUDIT PASS (browser fixtures)")
