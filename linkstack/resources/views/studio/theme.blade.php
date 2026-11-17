@@ -1,5 +1,28 @@
 @extends('layouts.sidebar')
 
+<style>
+/* Ação de pré-visualização sem o antigo card cinza. */
+.theme-preview-strip {
+  width:100%; max-width:1000px; margin:0 0 22px;
+  padding:18px clamp(15px,3vw,26px);
+  background:linear-gradient(115deg,#391a66,#6f215d 58%,#992b69);
+  border-radius:16px; border:1px solid rgba(255,255,255,.18);
+}
+.theme-preview-strip .theme-preview-current {
+  display:flex; align-items:center; justify-content:center; gap:9px;
+  width:100%; min-height:50px; padding:12px 16px;
+  background:#ffcc36!important; border:2px solid #b78313!important;
+  border-radius:11px; color:#202020!important;
+  font-weight:750; font-size:1rem; line-height:1.3;
+}
+.theme-preview-strip .theme-preview-current:hover,
+.theme-preview-strip .theme-preview-current:active { background:#ffc01f!important; color:#171717!important; }
+.theme-preview-strip .theme-preview-current:focus-visible { outline:3px solid #fff; outline-offset:3px; }
+.theme-preview-strip .theme-preview-caption { color:#fff!important; line-height:1.5; }
+@media(max-width:575px) {
+  .theme-preview-strip { padding:14px; border-radius:12px; }
+}
+</style>
 @section('content')
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
@@ -37,22 +60,13 @@
                     <section class="text-gray-400"></section>
                     <div>
 
-                        <div style="max-width:1000px" class="col-md-12">
-                            <div class="card rounded shadow-lg bg-light aos-init aos-animate" data-aos="fade-up" data-aos-delay="800">
-                              <div class="flex-wrap card-header d-flex justify-content-between align-items-center bg-light">
-                                <div class="header-title">
-                                  <h4 class="card-title">{{__('messages.Preview')}}</h4>
-                                </div>
-                              </div>
-                              <div class="card-body">
-                                <button type="button" class="btn btn-outline-primary w-100" data-theme-preview-url="{{ route('themePreview', ['theme' => $page->theme ?: 'default']) }}">
-                                  <i class="bi bi-eye"></i> Pré-visualizar tema atual
-                                </button>
-                                <p class="small text-muted mt-2 mb-0">Duas demonstrações com links, botões, vídeos e outros componentes, sem alterar sua página.</p>
-
-                              </div>
-                            </div>
-                          </div>
+                        <div class="theme-preview-strip" aria-label="Pré-visualização do tema selecionado">
+                          <button type="button" class="btn theme-preview-current"
+                                  data-theme-preview-url="{{ route('themePreview', ['theme' => $page->theme ?: 'default']) }}">
+                            <i class="bi bi-eye" aria-hidden="true"></i> Pré-visualizar tema atual
+                          </button>
+                          <p class="theme-preview-caption small mt-3 mb-0">Duas demonstrações com links, botões, vídeos e outros componentes, sem alterar sua página.</p>
+                        </div>
 
                    </div>
                </div>
