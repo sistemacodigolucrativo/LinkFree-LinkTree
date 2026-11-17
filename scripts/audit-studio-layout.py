@@ -210,4 +210,22 @@ for template_path in [
 require('@endif"">Default Theme' not in theme,
         "Theme card has well-formed class attribute")
 
+
+# Sidebar mobile: regressões de posicionamento, sobreposição e rótulos cortados.
+require('> .sidebar-header > .sidebar-toggle {' in nav_css and
+        'position:static!important' in nav_css,
+        "Botão de recolhimento do Hope UI reposicionado no cabeçalho")
+require('#sidebar-menu .nav-link .item-name {' in nav_css and
+        'white-space:normal!important' in nav_css and 'min-width:0' in nav_css,
+        "Títulos da navegação podem quebrar em telas estreitas")
+require('#sidebar-menu .nav-accordion-toggle .right-icon {' in nav_css and
+        'flex:0 0 16px' in nav_css,
+        "Setas do acordeão reservam espaço e não se sobrepõem ao título")
+require('nav-accordion-toggle:is(.active,[aria-expanded="true"])' in nav_css,
+        "Categoria aberta usa superfície distinta do link ativo")
+require('id="sidebar-scroll-region"' in sidebar and
+        'data-bs-parent="#sidebar-menu"' in sidebar and
+        'data-bs-parent="#admin-navigation"' in sidebar,
+        "Rolagem e acordeão exclusivo preservados")
+
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")
