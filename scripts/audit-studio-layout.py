@@ -205,7 +205,7 @@ for template_path in [
     views / "studio" / "theme.blade.php",
 ]:
     markup = template_path.read_text(encoding="utf-8")
-    require(len(re.findall(r"<div\\b", markup)) == len(re.findall(r"</div>", markup)),
+    require(len(re.findall(r"<div\b", markup)) == len(re.findall(r"</div>", markup)),
             "Balanced DIV containers: " + template_path.name)
 require('@endif"">Default Theme' not in theme,
         "Theme card has well-formed class attribute")
