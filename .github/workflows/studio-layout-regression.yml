@@ -8,11 +8,14 @@ on:
       - 'linkstack/resources/views/layouts/sidebar.blade.php'
       - 'linkstack/resources/views/layouts/guest.blade.php'
       - 'linkstack/assets/css/linkfree-color-modes.css'
+      - 'linkstack/assets/css/linkfree-light-gradient.css'
+      - 'linkstack/resources/views/studio/page.blade.php'
       - 'linkstack/assets/js/main-dashboard.js'
       - 'linkstack/assets/js/sidebar-auto-close.js'
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-responsive-mobile.py'
+      - 'scripts/audit-profile-editor-gradient.py'
       - 'scripts/audit-linkfree-interactions.py'
       - 'scripts/audit-color-contrast.py'
       - '.github/workflows/studio-layout-regression.yml'
@@ -24,11 +27,14 @@ on:
       - 'linkstack/resources/views/layouts/sidebar.blade.php'
       - 'linkstack/resources/views/layouts/guest.blade.php'
       - 'linkstack/assets/css/linkfree-color-modes.css'
+      - 'linkstack/assets/css/linkfree-light-gradient.css'
+      - 'linkstack/resources/views/studio/page.blade.php'
       - 'linkstack/assets/js/main-dashboard.js'
       - 'linkstack/assets/js/sidebar-auto-close.js'
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-responsive-mobile.py'
+      - 'scripts/audit-profile-editor-gradient.py'
       - 'scripts/audit-linkfree-interactions.py'
       - 'scripts/audit-color-contrast.py'
       - '.github/workflows/studio-layout-regression.yml'
@@ -54,3 +60,5 @@ jobs:
         run: python scripts/audit-responsive-mobile.py
       - name: Test sidebar closing, inline link buttons and notification viewport
         run: python scripts/audit-linkfree-interactions.py
+      - name: Test profile avatar, CKEditor contrast and light gradient
+        run: python scripts/audit-profile-editor-gradient.py
