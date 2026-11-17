@@ -201,6 +201,8 @@ with sync_playwright() as playwright:
         page.add_style_tag(content=dark_vendor)
         page.add_style_tag(content=customizer)
         page.add_style_tag(content=palette)
+        # Measure settled colors, not intermediate keyframes/transitions immediately after theme switches.
+        page.add_style_tag(content="*,*::before,*::after{transition:none!important;animation:none!important}")
         for mode in ("light","dark"):
             for variant in ("sidebar-white","sidebar-dark","sidebar-color"):
                 page.evaluate("""([mode,variant]) => {
