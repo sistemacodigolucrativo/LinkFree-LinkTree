@@ -121,97 +121,10 @@
         </div>
      </div>
 
-     @if(auth()->user()->role == 'admin')
-    <div class="col-lg-12">
-      <section class="card rounded mb-3" aria-label="Temas GitHub">
-        <div class="card-body">
-          <h3 class="mb-3 card-header"><i class="bi bi-github" aria-hidden="true"></i> Temas GitHub</h3>
-          <p class="small text-muted">Instale temas Free e Premium/VIP ou consulte novas versões pelo repositório configurado.</p>
-          <div class="d-flex flex-wrap gap-2">
-            <a class="btn btn-primary" href="{{ route('githubThemes') }}">Selecionar temas GitHub</a>
-            <a id="github-theme-updates" class="btn btn-outline-primary" href="{{ route('githubThemes', ['updates' => 1]) }}">Verificar atualizações</a>
-          </div>
-          <p id="github-theme-status" class="small mt-2 mb-0" aria-live="polite"></p>
-        </div>
-      </section>
-    </div>
-    <div class="col-lg-12">
-        <div class="card   rounded">
-           <div class="card-body">
-              <div class="row">
-                  <div class="col-sm-12">
-                    <h3 class="mb-4 card-header">{{__('messages.Manage themes')}}</h3>
-                    @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
-                    <div class="row g-3">
-
-                      <div class="col-12">
-                        <section class="border rounded p-3 h-100" aria-label="Enviar temas">
-                          <h4 class="h5">Enviar temas</h4>
-                          <p class="small text-muted">Escolha um ZIP. O upload e a instalação começarão automaticamente.</p>
-                          <form action="{{ route('editTheme') }}" method="post" enctype="multipart/form-data" id="theme-upload-form">
-                            @csrf
-                            <label for="field-zip" class="form-label">Arquivo ZIP do tema</label>
-                            <input type="file" accept=".zip,application/zip" name="zip" class="form-control" id="field-zip" required>
-                            <span id="theme-upload-status" class="small" role="status"></span>
-                            <noscript><button type="submit" class="btn btn-primary mt-2">Enviar tema</button></noscript>
-                          </form>
-                        </section>
-                      </div>
-                    </div>
-                    <div class="d-flex flex-wrap gap-2 mt-3">
-                      <a href="{{ route('showThemes') }}" class="btn btn-outline-danger">{{__('messages.Delete themes')}}</a>
-                      <a href="https://linkstack.org/themes/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary">{{__('messages.Download themes')}}</a>
-                    </div>
-
-                    </div>
-                  </div>
-              </div>
-           </div>
-        </div>
-     </div>
-     @endif
-
 @endforeach
 
 <script src="{{ asset('assets/external-dependencies/jquery-1.12.4.min.js') }}"></script>
 </section>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  const file = document.getElementById('field-zip');
-  const form = document.getElementById('theme-upload-form');
-  if (file && form) {
-    file.addEventListener('change', function () {
-      if (!file.files || !file.files.length) return;
-      if (!/\.zip$/i.test(file.files[0].name)) {
-        file.setCustomValidity('Selecione um arquivo ZIP.');
-        file.reportValidity();
-        return;
-      }
-      file.setCustomValidity('');
-      document.getElementById('theme-upload-status').textContent = 'Enviando e instalando tema...';
-      if (form.requestSubmit) form.requestSubmit();
-      else form.submit();
-    });
-  }
-  const updateLink = document.getElementById('github-theme-updates');
-  const status = document.getElementById('github-theme-status');
-  if (updateLink) {
-    fetch(@json(route('githubThemes.status')), { credentials: 'same-origin' })
-      .then(function (response) { if (!response.ok) throw new Error(); return response.json(); })
-      .then(function (result) {
-        if (result.count > 0) {
-          updateLink.classList.remove('btn-outline-primary');
-          updateLink.classList.add('btn-success');
-          updateLink.textContent = 'Verificar atualizações (' + result.count + ')';
-          status.textContent = result.count + ' tema(s) com atualização disponível.';
-        } else {
-          status.textContent = 'Nenhuma atualização disponível.';
-        }
-      }).catch(function () { status.textContent = 'Não foi possível consultar as atualizações agora.'; });
-  }
-});
-</script>
-
 @push('sidebar-scripts')
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">

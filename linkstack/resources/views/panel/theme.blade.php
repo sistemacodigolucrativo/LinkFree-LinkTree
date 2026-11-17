@@ -1,7 +1,34 @@
 @extends('layouts.sidebar')
 @section('content')
 <div class="container-fluid content-inner mt-n5 py-0">
-  <div class="card rounded">
+
+<section class="card rounded mb-3" id="admin-theme-management" aria-label="Gerenciamento administrativo de temas">
+<div class="card-body">
+<h1 class="h3 mb-3"><i class="bi bi-brush"></i> {{__('messages.Nav Admin Theme Manager')}}</h1>
+<div class="row g-3">
+<div class="col-12 col-lg-6"><section class="border rounded p-3 h-100" aria-label="Temas GitHub">
+<h2 class="h5 mb-2"><i class="bi bi-github"></i> {{__('messages.Nav Admin GitHub Themes')}}</h2>
+<p class="small text-muted">Instale temas Free e Premium/VIP ou consulte novas versões pelo repositório configurado.</p>
+<div class="d-flex flex-wrap gap-2">
+<a class="btn btn-primary" href="{{ route('githubThemes') }}">Selecionar temas GitHub</a>
+<a id="github-theme-updates" class="btn btn-outline-primary" href="{{ route('githubThemes', ['updates' => 1]) }}">Verificar atualizações</a>
+</div><p id="github-theme-status" class="small mt-2 mb-0" aria-live="polite"></p>
+</section></div>
+<div class="col-12 col-lg-6"><section class="border rounded p-3 h-100" aria-label="Enviar temas">
+<h2 class="h5 mb-2">Enviar temas</h2>
+<p class="small text-muted">Escolha um ZIP. O upload e a instalação começarão automaticamente.</p>
+<form action="{{ route('editTheme') }}" method="post" enctype="multipart/form-data" id="theme-upload-form">
+@csrf
+<label for="field-zip" class="form-label">Arquivo ZIP do tema</label>
+<input type="file" accept=".zip,application/zip" name="zip" class="form-control" id="field-zip" required>
+<span id="theme-upload-status" class="small" role="status"></span>
+<noscript><button type="submit" class="btn btn-primary mt-2">Enviar tema</button></noscript>
+</form></section></div>
+</div>
+<a href="https://linkstack.org/themes/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary mt-3">{{__('messages.Download themes')}}</a>
+</div></section>
+
+  <div class="card rounded" id="admin-installed-themes">
     <div class="card-body">
       <h1 class="h3 mb-2"><i class="bi bi-brush"></i> {{ __('messages.Delete a theme') }}</h1>
       <p class="text-muted">Visualize cada tema antes de excluir. Temas em uso não podem ser removidos.</p>
@@ -58,6 +85,42 @@ document.querySelectorAll('.theme-delete-form').forEach(function (form) {
   form.addEventListener('submit', function (event) {
     if (!window.confirm('Excluir definitivamente o tema "' + form.dataset.theme + '"? Esta ação não pode ser desfeita.')) event.preventDefault();
   });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const file = document.getElementById('field-zip');
+  const form = document.getElementById('theme-upload-form');
+  if (file && form) {
+    file.addEventListener('change', function () {
+      if (!file.files || !file.files.length) return;
+      if (!/\.zip$/i.test(file.files[0].name)) {
+        file.setCustomValidity('Selecione um arquivo ZIP.');
+        file.reportValidity();
+        return;
+      }
+      file.setCustomValidity('');
+      document.getElementById('theme-upload-status').textContent = 'Enviando e instalando tema...';
+      if (form.requestSubmit) form.requestSubmit();
+      else form.submit();
+    });
+  }
+  const updateLink = document.getElementById('github-theme-updates');
+  const status = document.getElementById('github-theme-status');
+  if (updateLink && status) {
+    fetch(@json(route('githubThemes.status')), { credentials: 'same-origin' })
+      .then(function (response) { if (!response.ok) throw new Error(); return response.json(); })
+      .then(function (result) {
+        if (result.count > 0) {
+          updateLink.classList.remove('btn-outline-primary');
+          updateLink.classList.add('btn-success');
+          updateLink.textContent = 'Verificar atualizações (' + result.count + ')';
+          status.textContent = result.count + ' tema(s) com atualização disponível.';
+        } else {
+          status.textContent = 'Nenhuma atualização disponível.';
+        }
+      }).catch(function () { status.textContent = 'Não foi possível consultar as atualizações agora.'; });
+  }
 });
 </script>
 @endsection

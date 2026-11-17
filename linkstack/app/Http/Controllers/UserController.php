@@ -775,7 +775,7 @@ class UserController extends Controller
         }
 
 
-        return Redirect('/studio/theme')->with("success", $message);
+        return Redirect(!empty($zipfile) && Auth::user()->role === 'admin' ? '/admin/theme' : '/studio/theme')->with("success", $message);
     }
 
     //Show user (name, email, password)

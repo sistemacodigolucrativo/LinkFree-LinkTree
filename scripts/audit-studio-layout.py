@@ -71,10 +71,13 @@ require("data-theme-preview-url" in theme and 'id="themePreviewModal"' in theme,
         "Pré-visualização de temas e seletor existentes preservados")
 require("Duas demonstrações com links, botões, vídeos" not in theme,
         "Descrição das demonstrações removida")
-require(theme.index('aria-label="Temas GitHub"') < theme.index("{{__('messages.Manage themes')}}"),
-        "Card independente Temas GitHub aparece antes de Gerenciar Temas")
-require(theme.count('id="github-theme-updates"') == 1 and theme.count('id="github-theme-status"') == 1,
-        "Botões e notificações do GitHub preservados sem duplicação")
+admin_themes = (views / "panel" / "theme.blade.php").read_text(encoding="utf-8")
+require('id="theme-upload-form"' not in theme and 'aria-label="Temas GitHub"' not in theme,
+        "Ações administrativas removidas da página do membro")
+require('id="admin-theme-management"' in admin_themes and 'id="theme-upload-form"' in admin_themes,
+        "Gestão e upload de temas disponíveis na área administrativa")
+require(admin_themes.count('id="github-theme-updates"') == 1 and admin_themes.count('id="github-theme-status"') == 1,
+        "Monitoramento dos temas GitHub transferido sem duplicação")
 require("studio-links-sections" in links and "studio-links-sections>.links-section-card" in links,
         "Meus Links e Ícones de Página compartilham contêiner e largura")
 require("studio-link-slim" in links and "sortable-handle" in links and "linksTableOrders" in links,
@@ -89,8 +92,15 @@ require("mobile-unified-nav" in sidebar and ".mobile-unified-nav .navbar-toggler
         "Barra mobile sem menu hambúrguer duplicado")
 require("data-toggle=\"sidebar\"" in sidebar and ".mobile-unified-nav .sidebar-toggle" in sidebar,
         "Seta de abertura/fechamento do menu lateral mantida")
-require("id=\"navbarSupportedContent\"" in sidebar and "id=\"navbarDropdown\"" in sidebar and "id=\"mail-drop\"" in sidebar,
-        "Exibir página, atualizações e perfil mantidos no navbar")
+require('id="navbarSupportedContent"' in sidebar and 'id="navbarDropdown"' in sidebar,
+        "Exibir página e perfil preservados no navbar")
+require('id="nav-admin-panel"' in sidebar and "auth()->user()->role === 'admin'" in sidebar,
+        "Menu administrativo agrupado e restrito a administradores")
+require(sidebar.index('id="nav-admin-panel"') < sidebar.index('messages.Dashboard'),
+        "Administração está no topo do menu lateral")
+require('id="mail-drop"' not in sidebar and "url('/update')" in sidebar,
+        "Atualizações administrativas movidas ao menu Admin")
+
 
 # Revisão 2026-11: quatro pontos de contraste e compacidade.
 palette = (views.parents[1] / "assets" / "css" / "linkfree-color-modes.css").read_text(encoding="utf-8")
