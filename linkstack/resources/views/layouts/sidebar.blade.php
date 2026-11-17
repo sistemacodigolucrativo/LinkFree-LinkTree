@@ -63,6 +63,7 @@ $usrhandl = Auth::user()->littlelink_name;
       {{-- Shared high-contrast light/dark palette, after vendor theme styles. --}}
       <link rel="stylesheet" href="{{ asset('assets/css/linkfree-color-modes.css') }}?v={{ filemtime(base_path('assets/css/linkfree-color-modes.css')) }}" />
       <link rel="stylesheet" href="{{ asset('assets/css/linkfree-navigation-polish.css') }}?v={{ filemtime(base_path('assets/css/linkfree-navigation-polish.css')) }}" />
+      <link rel="stylesheet" href="{{ asset('assets/css/linkfree-light-gradient.css') }}?v={{ filemtime(base_path('assets/css/linkfree-light-gradient.css')) }}" />
 
 	  <meta name="csrf-token" content="{{ csrf_token() }}">
 	  <link rel="stylesheet" href="{{ asset('assets/linkstack/css/hover-min.css') }}">
@@ -237,6 +238,29 @@ $usrhandl = Auth::user()->littlelink_name;
  }
  .main-content .mobile-unified-nav #navbarSupportedContent #navbarDropdown img{
   width:29px!important;height:29px!important;min-width:29px;
+ }
+}
+/* Seta do menu lateral na barra superior: apenas o ícone, sem cartão. */
+@media(max-width:991.98px){
+ .main-content .mobile-unified-nav .sidebar-toggle{
+   width:40px!important;min-width:40px!important;height:40px!important;
+   padding:9px!important;margin:0!important;
+   border:0!important;background:transparent!important;
+   box-shadow:none!important;border-radius:0!important;
+   color:var(--lf-text)!important;
+ }
+ .main-content .mobile-unified-nav .sidebar-toggle svg,
+ .main-content .mobile-unified-nav .sidebar-toggle .icon-20{
+   width:16px!important;height:16px!important;
+   max-width:16px!important;max-height:16px!important;
+ }
+ .main-content .mobile-unified-nav .sidebar-toggle:hover{
+   background:transparent!important;opacity:.85;
+ }
+}
+@media(max-width:359px){
+ .main-content .mobile-unified-nav .sidebar-toggle{
+   width:38px!important;min-width:38px!important;height:40px!important;
  }
 }
 </style>
