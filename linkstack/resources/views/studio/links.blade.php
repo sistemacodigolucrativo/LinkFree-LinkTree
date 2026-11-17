@@ -50,9 +50,16 @@ if (isset($_COOKIE['LinkCount'])) {
 }
 .studio-links-preview-fab:hover, .studio-links-preview-fab:active { background:#f7bd28!important; color:#101010!important; }
 .studio-links-preview-fab:focus-visible { outline:3px solid #184e9c; outline-offset:3px; }
-.studio-links-preview-modal .modal-content { height:100vh; height:100dvh; display:flex; flex-direction:column; background:#fff; }
-.studio-links-preview-modal .modal-header { min-height:64px; padding:12px 16px; flex:0 0 auto; background:#171823; color:#fff; border:0; }
-.studio-links-preview-modal .modal-header .modal-title { color:#fff; font-size:clamp(1rem,3vw,1.2rem); line-height:1.3; }
+.studio-links-preview-modal .modal-content { position:relative; height:100vh; height:100dvh; display:flex; flex-direction:column; background:#fff; border:0; }
+.studio-links-preview-modal .studio-links-preview-close {
+ position:absolute; z-index:10; inset-inline-start:calc(12px + env(safe-area-inset-left,0px));
+ top:calc(10px + env(safe-area-inset-top,0px)); width:46px; height:46px;
+ border:1px solid #b9b9b9; border-radius:50%; background:#fff; color:#1b1b1b;
+ display:grid; place-items:center; padding:0; font:700 30px/1 system-ui,sans-serif;
+ box-shadow:0 2px 8px rgba(0,0,0,.15); cursor:pointer;
+}
+.studio-links-preview-modal .studio-links-preview-close:hover {background:#f4f4f4}
+.studio-links-preview-modal .studio-links-preview-close:focus-visible {outline:3px solid #046ab8; outline-offset:3px}
 .studio-links-preview-modal .modal-body { flex:1 1 auto; min-height:0; overflow:hidden; }
 .studio-links-preview-modal iframe { display:block; width:100%; height:100%; border:0; background:#fff; }
 @media(max-width:767px) {
@@ -76,6 +83,43 @@ if (isset($_COOKIE['LinkCount'])) {
  #links-table-body .col-12.py-1>a,#links-table-body .col-12.py-1>button{float:none!important;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
  #links-table-body img{max-width:100%}
 }
+
+/* Mesmo alinhamento e mesma largura externa para os dois cards. */
+.studio-links-page .studio-links-sections{display:flex;flex-direction:column;gap:16px;min-width:0;width:100%}
+.studio-links-page .studio-links-sections>.links-section-card{
+ display:block;flex:0 0 auto;width:100%!important;max-width:none!important;
+ margin:0!important;min-width:0;box-sizing:border-box}
+.studio-links-page .studio-links-sections .links-section-card>.card-body{
+ width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+.studio-links-page .page-icons-card .form-group{max-width:100%;width:100%}
+/* Card slim do link: título, endereço e controles sem grandes espaços vazios. */
+.studio-links-page .studio-link-slim{min-height:56px;margin-inline:0!important;
+ padding:5px 8px!important;align-items:center;background:var(--bs-card-bg,transparent)}
+.studio-links-page .studio-link-slim>.d-flex{width:100%;min-width:0;align-items:center;gap:6px}
+.studio-links-page .studio-link-slim .h-100{height:auto!important}
+.studio-links-page .studio-link-slim>.d-flex>.col-auto{flex:0 0 30px;padding:4px!important;margin:0!important}
+.studio-links-page .studio-link-slim .sortable-handle{width:23px;margin-right:0}
+.studio-links-page .studio-link-slim>.d-flex>.col{min-width:0;flex:1}
+.studio-links-page .studio-link-slim>.d-flex>.col>.row{
+ margin:0;display:flex;align-items:center;flex-wrap:wrap;column-gap:10px;row-gap:4px}
+.studio-links-page .studio-link-slim .col-12.p-2{
+ flex:1 1 220px;width:auto;min-width:0;max-width:none!important;padding:3px 0!important;margin:0}
+.studio-links-page .studio-link-slim .col-12.p-2 .h6{display:inline-block;max-width:100%;line-height:1.35;margin:0}
+.studio-links-page .studio-link-slim .col.text-end{flex:0 1 auto;min-width:0;max-width:100%;font-size:.8rem}
+.studio-links-page .studio-link-slim .col.text-end img{max-height:45px!important;width:auto}
+.studio-links-page .studio-link-slim .col-12.py-1{
+ flex:1 1 auto;width:auto;max-width:100%;min-width:0;padding:3px 0!important;
+ margin:0!important;display:flex;flex-wrap:wrap;gap:5px;align-items:center;justify-content:flex-end}
+.studio-links-page .studio-link-slim .col-12.py-1 :is(a,button){
+ float:none!important;margin:0!important;flex:0 0 auto;min-width:40px;min-height:40px;
+ display:inline-flex;align-items:center;justify-content:center}
+.studio-links-page .studio-link-slim .col-12.py-1>span{
+ margin-right:auto;font-size:.8rem;white-space:nowrap}
+@media(max-width:575px){
+ .studio-links-page .studio-link-slim{padding:5px!important}
+ .studio-links-page .studio-link-slim .col-12.py-1{justify-content:flex-start}
+ .studio-links-page .studio-link-slim .col-12.py-1 :is(a,button){min-width:44px;min-height:44px}
+}
 </style>
 @endpush
 
@@ -93,7 +137,7 @@ if (isset($_COOKIE['LinkCount'])) {
                   <div class="row">
                       <div class="col-sm-12">
 
-                        <div class="row">
+                        <div class="studio-links-sections">
                             <section class='pre-left links-section-card card rounded mb-3 text-gray-400' aria-labelledby='studio-my-links-title'>
                                 <h3 id="studio-my-links-title" class="card-header mb-3"><i class="bi bi-link-45deg">{{__('messages.My Links')}}</i>
                                         <a class="btn btn-primary float-end" href="{{ url('/studio/add-link') }}"> {{__('messages.Add new Link')}}</a>
@@ -115,7 +159,7 @@ if (isset($_COOKIE['LinkCount'])) {
                                         @php $button = Button::find($link->button_id); if(isset($button->name)){$buttonName = $button->name;}else{$buttonName = 0;} @endphp
                                         @php if($buttonName == "default email"){$buttonName = "email";} if($buttonName == "default email_alt"){$buttonName = "email_alt";} @endphp
                                         @if($button && $button->name !== 'icon')
-                                        <div class='row h-100 pb-0 mb-2 border rounded hvr-glow w-100' data-id="{{$link->id}}">
+                                        <div class='row studio-link-slim pb-0 mb-2 border rounded w-100' data-id="{{$link->id}}">
                                             <div class="d-flex ">
 
 
@@ -239,7 +283,6 @@ if (isset($_COOKIE['LinkCount'])) {
                                 </div>
                             </section>
 
-                            </div>
                             {{-- A prévia foi movida para um modal fullscreen acionado pelo botão flutuante. --}}
 
                             <section class='links-section-card page-icons-card card rounded mt-3 mb-3 text-gray-400' aria-labelledby='studio-page-icons-title'>
@@ -357,6 +400,7 @@ if (isset($_COOKIE['LinkCount'])) {
 
                             </div>
                             </section>
+                        </div>
 
                       </div>
                   </div>
@@ -378,14 +422,13 @@ if (isset($_COOKIE['LinkCount'])) {
 
 {{-- Modal do Bootstrap: ao fechar, mantém o scroll e o estado dos formulários da página. --}}
 <div class="modal fade studio-links-preview-modal" id="studioLinksPreviewModal" tabindex="-1"
-     aria-labelledby="studioLinksPreviewTitle" aria-hidden="true">
+     aria-label="Pré-visualização da página pública" aria-hidden="true">
   <div class="modal-dialog modal-fullscreen">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="studioLinksPreviewTitle">Minha página — visualização</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                aria-label="Fechar pré-visualização e voltar aos meus links"></button>
-      </div>
+      <button type="button" class="studio-links-preview-close" data-bs-dismiss="modal"
+              aria-label="Fechar pré-visualização e voltar aos meus links" title="Fechar prévia">
+        <span aria-hidden="true">&times;</span>
+      </button>
       <div class="modal-body p-0">
         <iframe id="studio-links-preview-frame" title="Página pública de links do usuário"
                 data-preview-url="{{ url('/@'.Auth::user()->littlelink_name) }}"
