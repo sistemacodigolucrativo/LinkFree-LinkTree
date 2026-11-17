@@ -185,7 +185,7 @@ if (isset($_COOKIE['LinkCount'])) {
   padding:5px 7px!important;min-height:0!important;box-sizing:border-box;
 }
 .studio-links-page #links-table-body .studio-link-slim .studio-link-clicks{
-  position:absolute;top:5px;right:7px;z-index:1;max-width:105px;
+  position:absolute;top:5px;right:7px;z-index:1;width:max-content!important;max-width:105px;
   padding:3px 6px;font-size:10px;line-height:1.2;font-weight:700;
   display:inline-flex;align-items:center;gap:3px;white-space:nowrap;
   color:var(--lf-text,#18243b);background:var(--lf-surface,#fff);
