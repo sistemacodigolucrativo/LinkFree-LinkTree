@@ -10,6 +10,8 @@ on:
       - 'linkstack/assets/css/linkfree-color-modes.css'
       - 'linkstack/assets/css/linkfree-light-gradient.css'
       - 'linkstack/resources/views/studio/page.blade.php'
+      - 'linkstack/resources/views/linkstack/modules/share-button.blade.php'
+      - 'scripts/audit-public-share-overlay.py'
       - 'linkstack/assets/js/main-dashboard.js'
       - 'linkstack/assets/js/sidebar-auto-close.js'
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
@@ -29,6 +31,8 @@ on:
       - 'linkstack/assets/css/linkfree-color-modes.css'
       - 'linkstack/assets/css/linkfree-light-gradient.css'
       - 'linkstack/resources/views/studio/page.blade.php'
+      - 'linkstack/resources/views/linkstack/modules/share-button.blade.php'
+      - 'scripts/audit-public-share-overlay.py'
       - 'linkstack/assets/js/main-dashboard.js'
       - 'linkstack/assets/js/sidebar-auto-close.js'
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
@@ -62,3 +66,5 @@ jobs:
         run: python scripts/audit-linkfree-interactions.py
       - name: Test profile avatar, CKEditor contrast and light gradient
         run: python scripts/audit-profile-editor-gradient.py
+      - name: Test public profile top spacing and share overlay priority
+        run: python scripts/audit-public-share-overlay.py
