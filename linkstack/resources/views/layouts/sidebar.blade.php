@@ -60,6 +60,8 @@ $usrhandl = Auth::user()->littlelink_name;
 
       <!-- RTL Css -->
       <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}" />
+      {{-- Shared high-contrast light/dark palette, after vendor theme styles. --}}
+      <link rel="stylesheet" href="{{ asset('assets/css/linkfree-color-modes.css') }}?v={{ filemtime(base_path('assets/css/linkfree-color-modes.css')) }}" />
 
 	  <meta name="csrf-token" content="{{ csrf_token() }}">
 	  <link rel="stylesheet" href="{{ asset('assets/linkstack/css/hover-min.css') }}">
