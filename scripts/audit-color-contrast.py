@@ -76,3 +76,52 @@ for name,fg,bg,minimum in sidebar_pairs:
 assert "LinkFree sidebar semantic contrast V1" in css
 assert ".nav-link:not(.static-item):is(.active,[aria-expanded=\"true\"])" in css
 print("AUDITORIA DE MENU LATERAL APROVADA")
+
+# Exercise the dashboard overrides too: the body palette alone does not cover
+# component tokens, semantic states or aliases used by migrated controls.
+rules = re.findall(r"([^{}]+)\{([^{}]*)\}", re.sub(r"/\*.*?\*/", "", css, flags=re.S))
+def dashboard_palette(mode):
+    selectors = {"body", "body .main-content"}
+    if mode == "dark":
+        selectors.update({"body.dark", "body.dark .main-content"})
+    else:
+        selectors.add("body:not(.dark) .main-content")
+    values = {}
+    for selector, declarations in rules:
+        if selectors.intersection(part.strip() for part in selector.split(',')):
+            values.update(re.findall(r"(--lf-[\w-]+)\s*:\s*([^;]+);", declarations))
+    def resolve(value):
+        if value.startswith("var("):
+            return resolve(values[value[4:-1]])
+        return value
+    return {key: resolve(value) for key, value in values.items()}
+
+for mode in ("light", "dark"):
+    tokens = dashboard_palette(mode)
+    pairs = [
+        ("checkbox border", "--lf-border", "--lf-input", 3),
+        ("checkbox focus", "--lf-focus", "--lf-input", 3),
+        ("checkbox hover", "--lf-link", "--lf-input", 3),
+        ("preview close", "--lf-text", "--lf-surface", 4.5),
+        ("preview close hover", "--lf-text", "--lf-hover", 4.5),
+        ("back action and tooltip", "--lf-on-primary", "--lf-back-action", 4.5),
+        ("remove background", "--lf-on-primary", "--lf-danger-action", 4.5),
+        ("backup button", "--lf-on-primary", "--lf-primary", 4.5),
+        ("backup button hover", "--lf-on-primary", "--lf-primary-hover", 4.5),
+        ("backup download", "--lf-on-primary", "--lf-backup-download-bg", 4.5),
+        ("beta badge", "--lf-warning", "--lf-warning-bg", 4.5),
+        ("notification indicator", "--lf-success-border", "--lf-surface", 3),
+        ("diagnostic warning", "--lf-danger", "--lf-surface", 4.5),
+        ("editor content", "--lf-text", "--lf-input", 4.5),
+        ("editor toolbar", "--lf-text", "--lf-raised", 4.5),
+    ]
+    if mode == "dark":
+        pairs.extend([
+            ("theme preview CTA", "--lf-preview-action-text", "--lf-preview-action", 4.5),
+            ("theme preview CTA hover", "--lf-preview-action-hover-text", "--lf-preview-action-hover", 4.5),
+        ])
+    for label, foreground, background, minimum in pairs:
+        value = ratio(tokens[foreground], tokens[background])
+        assert value >= minimum, (mode, label, round(value, 2), minimum)
+        print(f"PASS dashboard {mode}: {label} = {value:.2f}:1")
+print("AUDITORIA DOS CONTROLES MIGRADOS APROVADA (tokens; nao substitui teste visual)")

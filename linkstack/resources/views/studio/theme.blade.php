@@ -5,24 +5,24 @@
 .theme-preview-strip {
   width:100%; max-width:1000px; margin:0 0 22px;
   padding:18px clamp(15px,3vw,26px);
-  background:linear-gradient(115deg,#391a66,#6f215d 58%,#992b69);
-  border-radius:16px; border:1px solid rgba(255,255,255,.18);
+  background:var(--lf-preview-strip);
+  border-radius:16px; border:1px solid var(--lf-preview-border);
 }
 .theme-preview-strip .theme-preview-current {
   display:flex; align-items:center; justify-content:center; gap:9px;
   width:100%; min-height:50px; padding:12px 16px;
-  background:#ffcc36!important; border:2px solid #b78313!important;
-  border-radius:11px; color:#202020!important;
+  background:var(--lf-preview-action)!important; border:2px solid var(--lf-preview-action-border)!important;
+  border-radius:11px; color:var(--lf-preview-action-text)!important;
   font-weight:750; font-size:1rem; line-height:1.3;
 }
 .theme-preview-strip .theme-preview-current:hover,
-.theme-preview-strip .theme-preview-current:active { background:#ffc01f!important; color:#171717!important; }
-.theme-preview-strip .theme-preview-current:focus-visible { outline:3px solid #fff; outline-offset:3px; }
+.theme-preview-strip .theme-preview-current:active { background:var(--lf-preview-action-hover)!important; color:var(--lf-preview-action-hover-text)!important; }
+.theme-preview-strip .theme-preview-current:focus-visible { outline:3px solid var(--lf-on-primary); outline-offset:3px; }
 .theme-selection-layout>.card-body {padding:0!important}
 .theme-selection-layout {background:transparent;border:0;box-shadow:none}
 .theme-preview-strip{max-width:none;display:flex;flex-direction:column;align-items:stretch;gap:12px}
 .theme-preview-strip .theme-preview-title{
- margin:0 0 3px;color:#fff!important;font-weight:700;font-size:clamp(1.12rem,3vw,1.45rem);
+ margin:0 0 3px;color:var(--lf-on-primary)!important;font-weight:700;font-size:clamp(1.12rem,3vw,1.45rem);
  display:flex;align-items:center;gap:10px}
 .theme-preview-strip .theme-select-action{
  display:flex;align-items:center;justify-content:center;width:100%;min-height:50px;
@@ -103,7 +103,7 @@
                             <figure style="max-width:1000px;max-height:562.5px;" class="figure">
                             @if(!file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<p><i>{{__('messages.No image selected')}}</i></p>@endif
                             <img class="bd-placeholder-img figure-img img-fluid rounded" src="@if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id)))){{url('assets//img/background-img/'.findBackground(Auth::user()->id))}}@else{{url('/assets/linkstack/images/themes/no-preview.png')}}@endif"><br>
-                            @if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<a class="mt-3 ml-3 btn btn-primary" style="background-color:tomato!important;border-color:tomato!important;transform: scale(.9);" title="Delete background image" href="{{ url('/studio/rem-background') }}"><i class="bi bi-trash-fill"></i>{{__('messages.Remove background')}}</a><br>@endif
+                            @if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<a class="mt-3 ml-3 btn btn-primary" style="background-color:var(--lf-danger-action)!important;border-color:var(--lf-danger-action)!important;transform: scale(.9);" title="Delete background image" href="{{ url('/studio/rem-background') }}"><i class="bi bi-trash-fill"></i>{{__('messages.Remove background')}}</a><br>@endif
                             {{-- <figcaption class="figure-caption">A caption for the above image.</figcaption> --}}
                         </figure>
                             <br>

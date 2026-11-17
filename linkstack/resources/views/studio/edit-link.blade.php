@@ -69,7 +69,7 @@
                     <br><br>
 
                     <!-- Modal -->
-                    <style>.modal-title{color:#000!important;}</style>
+                    <style>.modal-title{color:var(--lf-text)!important;}</style>
                     <x-modal title="{{__('messages.Select Block')}}" id="SelectLinkType">
 
                         <div class="d-flex flex-row  flex-wrap p-3">

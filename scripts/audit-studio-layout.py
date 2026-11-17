@@ -58,7 +58,8 @@ require('class="pre-right' not in links and 'class="pre-bottom' not in links,
 require("theme-preview-strip" in theme, "Antigo card de prévia substituído")
 require('card-title">{{__(\'messages.Preview\')}}' not in theme,
         "Cabeçalho cinza 'Prévia' removido")
-require("theme-preview-current" in theme and "#ffcc36" in theme,
+require("theme-preview-current" in theme and "var(--lf-preview-action)" in theme and
+        "--lf-preview-action:#ffcc36;" in (views.parents[1] / "assets/css/linkfree-color-modes.css").read_text(encoding="utf-8"),
         "Botão pré-visualizar tema atual amarelo")
 require("theme-preview-title" in theme and "theme-select-action" in theme,
         "Título com pincel e seletor azul estão dentro do card de prévia")

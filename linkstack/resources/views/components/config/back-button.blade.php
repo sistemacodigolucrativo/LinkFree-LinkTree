@@ -9,8 +9,8 @@
 	}
 	
 	.label-text{
-		color:#FFF;
-		background:rgba(51,51,51,0.5);
+		color:var(--lf-on-primary);
+		background:var(--lf-back-action);
 		display:table-cell;
 		vertical-align:middle;
 		padding:10px;
@@ -21,7 +21,7 @@
 	.label-arrow{
 		display:table-cell;
 		vertical-align:middle;
-		color:#333;
+		color:var(--lf-back-action);
 		opacity:0.5;
 		z-index: 2000;
 	}
@@ -32,15 +32,15 @@
 		height:60px;
 		bottom:40px;
 		right:40px;
-		background-color:#17a2b8;
-		color:#FFF;
+		background-color:var(--lf-back-action);
+		color:var(--lf-on-primary);
 		border-radius:50px;
 		text-align:center;
-		box-shadow: 2px 2px 3px #111;
+		box-shadow: 2px 2px 3px var(--lf-back-shadow);
 		z-index: 2000;
 	}
 	.float:hover{
-		color: white;
+		color: var(--lf-on-primary);
 		-webkit-filter: brightness(90%);
 	}
 	

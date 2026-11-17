@@ -13,8 +13,8 @@
  width:100%;min-width:0;min-height:48px;padding:8px 12px;
  overflow-x:auto;overflow-y:hidden;overscroll-behavior-inline:contain;
  -webkit-overflow-scrolling:touch;white-space:nowrap;
- border:1px solid var(--bs-border-color,#dadfe5);border-inline-start:4px solid var(--bs-primary,#3461a6);
- border-radius:10px;background:var(--bs-card-bg,transparent);scrollbar-width:thin;
+ border:1px solid var(--lf-border);border-inline-start:4px solid var(--lf-chip);
+ border-radius:10px;background:var(--lf-raised);scrollbar-width:thin;
 }
 .dashboard-slim .top-links-list .top-link-info{
  display:inline-flex;align-items:center;gap:12px;flex:1 0 auto;
@@ -23,7 +23,7 @@
 .dashboard-slim .top-links-list .top-link-title{font-weight:700;white-space:nowrap}
 .dashboard-slim .top-links-list .top-link-url{font-size:.86rem;opacity:.8;white-space:nowrap}
 .dashboard-slim .top-links-list .top-link-clicks{display:inline-flex;align-items:center;flex:0 0 auto;white-space:nowrap;margin-inline-start:auto}
-.dashboard-slim .top-links-list>li.top-links-slim-item:focus-visible{outline:3px solid #7b61ff;outline-offset:2px}
+.dashboard-slim .top-links-list>li.top-links-slim-item:focus-visible{outline:3px solid var(--lf-focus);outline-offset:2px}
 @media(max-width:575px){
  .dashboard-slim .dashboard-main-section{padding:8px!important}
  .dashboard-slim .top-links-list>li.top-links-slim-item{padding:7px 9px;min-height:46px}

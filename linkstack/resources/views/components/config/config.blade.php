@@ -4,13 +4,13 @@
   input[type=checkbox],
 input[type=radio] {
     --active: var(--bs-primary);
-    --active-inner: #fff;
-    --focus: 2px var(--bs-primary);
-    --border: #BBC1E1;
-    --border-hover: var(--bs-primary);
-    --background: #fff;
-    --disabled: #F6F8FF;
-    --disabled-inner: #E1E6F9;
+    --active-inner: var(--lf-on-primary);
+    --focus: 2px var(--lf-focus);
+    --border: var(--lf-border);
+    --border-hover: var(--lf-link);
+    --background: var(--lf-input);
+    --disabled: var(--lf-disabled-bg);
+    --disabled-inner: var(--lf-disabled-bg);
     -webkit-appearance: none;
     -moz-appearance: none;
     height: 21px;
@@ -139,7 +139,7 @@ input[type=radio] + label {
   }
 }
 .txt-label{
-    color: white;
+    color: var(--lf-on-primary);
     padding-left: 5px;
     font-size: 200%;
     position: relative;

@@ -2,15 +2,15 @@
 <style>
     .backup-list button {
         border-style: none;
-        background-color: #0085ff;
-        color: #fff;
+        background-color: var(--lf-primary);
+        color: var(--lf-on-primary);
         border-radius: 5px;
     }
 
     .backup-list button:hover {
-        background-color: #0065c1;
-        color: #FFF;
-        box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.6);
+        background-color: var(--lf-primary-hover);
+        color: var(--lf-on-primary);
+        box-shadow: 0 10px 20px -10px var(--lf-shadow-backup);
     }
 
     .backup-list .buttondm {
@@ -69,7 +69,7 @@
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != '.' && $entry != '..') {
                     $entrys = substr($entry, 17);
-                    echo '<div class="button-entrance"><a class="buttondm button-hover icon-hover" style="color:#ffffff; background-color:#000;" href="' . url('admin/backups') . '?file=' . $entry . '"><i style="color: " class="icon hvr-icon fa fa-download"></i>&nbsp; ';
+                    echo '<div class="button-entrance"><a class="buttondm button-hover icon-hover" style="color:var(--lf-on-primary); background-color:var(--lf-backup-download-bg);" href="' . url('admin/backups') . '?file=' . $entry . '"><i style="color: " class="icon hvr-icon fa fa-download"></i>&nbsp; ';
                     print_r($entrys);
                     echo '</a></div><br>';
                 }

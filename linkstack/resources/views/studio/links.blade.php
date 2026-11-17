@@ -44,22 +44,22 @@ if (isset($_COOKIE['LinkCount'])) {
   bottom:calc(20px + env(safe-area-inset-bottom, 0px));
   z-index:1035; display:inline-flex; align-items:center; justify-content:center;
   gap:.5rem; min-width:56px; min-height:56px; padding:12px 19px;
-  border:2px solid #bd8b22; border-radius:100px; background:#ffcb43!important;
-  color:#191919!important; font-size:1rem; font-weight:700; line-height:1.2;
-  box-shadow:0 8px 28px rgba(0,0,0,.24); cursor:pointer;
+  border:2px solid var(--lf-border); border-radius:100px; background:var(--lf-raised)!important;
+  color:var(--lf-text)!important; font-size:1rem; font-weight:700; line-height:1.2;
+  box-shadow:0 8px 28px var(--lf-shadow-floating); cursor:pointer;
 }
-.studio-links-preview-fab:hover, .studio-links-preview-fab:active { background:#f7bd28!important; color:#101010!important; }
-.studio-links-preview-fab:focus-visible { outline:3px solid #184e9c; outline-offset:3px; }
-.studio-links-preview-modal .modal-content { position:relative; height:100vh; height:100dvh; display:flex; flex-direction:column; background:#fff; border:0; }
+.studio-links-preview-fab:hover, .studio-links-preview-fab:active { background:var(--lf-hover)!important; color:var(--lf-text)!important; }
+.studio-links-preview-fab:focus-visible { outline:3px solid var(--lf-focus); outline-offset:3px; }
+.studio-links-preview-modal .modal-content { position:relative; height:100vh; height:100dvh; display:flex; flex-direction:column; background:var(--lf-surface); border:0; }
 .studio-links-preview-modal .studio-links-preview-close {
  position:absolute; z-index:10; inset-inline-start:calc(12px + env(safe-area-inset-left,0px));
  top:calc(10px + env(safe-area-inset-top,0px)); width:46px; height:46px;
- border:1px solid #b9b9b9; border-radius:50%; background:#fff; color:#1b1b1b;
+ border:1px solid var(--lf-border); border-radius:50%; background:var(--lf-surface); color:var(--lf-text);
  display:grid; place-items:center; padding:0; font:700 30px/1 system-ui,sans-serif;
- box-shadow:0 2px 8px rgba(0,0,0,.15); cursor:pointer;
+ box-shadow:0 2px 8px var(--lf-shadow-close); cursor:pointer;
 }
-.studio-links-preview-modal .studio-links-preview-close:hover {background:#f4f4f4}
-.studio-links-preview-modal .studio-links-preview-close:focus-visible {outline:3px solid #046ab8; outline-offset:3px}
+.studio-links-preview-modal .studio-links-preview-close:hover {background:var(--lf-hover)}
+.studio-links-preview-modal .studio-links-preview-close:focus-visible {outline:3px solid var(--lf-focus); outline-offset:3px}
 .studio-links-preview-modal .modal-body { flex:1 1 auto; min-height:0; overflow:hidden; }
 .studio-links-preview-modal iframe { display:block; width:100%; height:100%; border:0; background:#fff; }
 @media(max-width:767px) {
@@ -69,7 +69,7 @@ if (isset($_COOKIE['LinkCount'])) {
 }
 @media(max-width:359px) { .studio-links-preview-fab { padding:12px 15px; } }
 </style>
-<style>.delete{position:relative; color:transparent; background-color:tomato; border-radius:5px; left:5px; padding:5px 12px; cursor: pointer;}.delete:hover{color:transparent;background-color:#f13d1d;}html,body{max-width:100%;overflow-x:hidden;}</style>
+<style>.delete{position:relative; color:transparent; background-color:var(--lf-danger-action); border-radius:5px; left:5px; padding:5px 12px; cursor: pointer;}.delete:hover{color:transparent;background-color:var(--lf-danger-action-hover);}html,body{max-width:100%;overflow-x:hidden;}</style>
 <style>
 @media(max-width:767px){
  .pre-left{min-width:0}
@@ -302,17 +302,17 @@ if (isset($_COOKIE['LinkCount'])) {
                                                     <div class='col-12 p-2' style="max-width:300px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;" title="{{ $link->title }}">
                                                         <span class='h6'>
                                                             @if($button->name == "custom_website")
-                                                            <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><img style="margin-bottom:3px;margin-left:4px;margin-right:4px;max-width:15px;max-height:15px;" alt="button-icon" class="icon hvr-icon" src="@if(file_exists(base_path("assets/favicon/icons/").localIcon($link->id))){{url('assets/favicon/icons/'.localIcon($link->id))}}@else{{getFavIcon($link->id)}}@endif" onerror="this.onerror=null; this.src='{{asset('assets/linkstack/icons/website.svg')}}';"></span>
+                                                            <span class="bg-soft-secondary" style="border: 1px solid var(--lf-border) !important;border-radius:5px;width:25px!important;height:25px!important;"><img style="margin-bottom:3px;margin-left:4px;margin-right:4px;max-width:15px;max-height:15px;" alt="button-icon" class="icon hvr-icon" src="@if(file_exists(base_path("assets/favicon/icons/").localIcon($link->id))){{url('assets/favicon/icons/'.localIcon($link->id))}}@else{{getFavIcon($link->id)}}@endif" onerror="this.onerror=null; this.src='{{asset('assets/linkstack/icons/website.svg')}}';"></span>
                                                             @elseif($button->name == "space")
-                                                            <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="margin-left:2.83px;margin-right:-1px;color:#fff;" class='bi bi-distribute-vertical'>&nbsp;</i></span>
+                                                            <span class="bg-soft-secondary" style="border: 1px solid var(--lf-border) !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="margin-left:2.83px;margin-right:-1px;color:var(--lf-text);" class='bi bi-distribute-vertical'>&nbsp;</i></span>
                                                             @elseif($button->name == "heading")
-                                                            <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="margin-left:2.83px;margin-right:-1px;color:#fff;" class='bi bi-card-heading'>&nbsp;</i></span>
+                                                            <span class="bg-soft-secondary" style="border: 1px solid var(--lf-border) !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="margin-left:2.83px;margin-right:-1px;color:var(--lf-text);" class='bi bi-card-heading'>&nbsp;</i></span>
                                                             @elseif($button->name == "text")
-                                                            <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="margin-left:2.83px;margin-right:-1px;color:#fff;" class='bi bi-fonts'>&nbsp;</i></span>
+                                                            <span class="bg-soft-secondary" style="border: 1px solid var(--lf-border) !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="margin-left:2.83px;margin-right:-1px;color:var(--lf-text);" class='bi bi-fonts'>&nbsp;</i></span>
                                                             @elseif($link->custom_icon && $link->type && $link->type !== 'predefined')
-                                                            <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="width:20px;margin:1px;color:#fff;" class='fa {{$link->custom_icon}}'>&nbsp;</i></span>
+                                                            <span class="bg-soft-secondary" style="border: 1px solid var(--lf-border) !important;border-radius:5px;width:25px!important;height:25px!important;"><i style="width:20px;margin:1px;color:var(--lf-text);" class='fa {{$link->custom_icon}}'>&nbsp;</i></span>
                                                             @else
-                                                            <span class="bg-soft-secondary" style="border: 1px solid #d0d4d7 !important;border-radius:5px;width:25px!important;height:25px!important;"><img style="max-width:15px !important;" alt="button-icon" height="15" class="m-1 " src="{{ asset('\/assets/linkstack/icons\/') . $buttonName }}.svg "></span>
+                                                            <span class="bg-soft-secondary" style="border: 1px solid var(--lf-border) !important;border-radius:5px;width:25px!important;height:25px!important;"><img style="max-width:15px !important;" alt="button-icon" height="15" class="m-1 " src="{{ asset('\/assets/linkstack/icons\/') . $buttonName }}.svg "></span>
                                                             @endif
 
                                                             {{strip_tags($link->title,'')}}</span>

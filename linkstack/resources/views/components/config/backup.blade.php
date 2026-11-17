@@ -50,8 +50,8 @@
     width: 2.5em;
     height: 2.5em;
     border: 0.4em solid transparent;
-    border-color: #eee;
-    border-top-color: #333;
+    border-color: var(--lf-border);
+    border-top-color: var(--lf-text);
     border-radius: 50%;
     animation: loadingspin 1s linear infinite;
   }
@@ -73,18 +73,18 @@
         .25em 0 0 rgba(0,0,0,0),
         .5em 0 0 rgba(0,0,0,0);}
     40% {
-      color: white;
+      color: var(--lf-text);
       text-shadow:
         .25em 0 0 rgba(0,0,0,0),
         .5em 0 0 rgba(0,0,0,0);}
     60% {
       text-shadow:
-        .25em 0 0 white,
+        .25em 0 0 var(--lf-text),
         .5em 0 0 rgba(0,0,0,0);}
     80%, 100% {
       text-shadow:
-        .25em 0 0 white,
-        .5em 0 0 white;}}
+        .25em 0 0 var(--lf-text),
+        .5em 0 0 var(--lf-text);}}
   </style>
 
   <div class="container">

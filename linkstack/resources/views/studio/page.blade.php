@@ -51,20 +51,6 @@
                     /* CKEditor has a separate editing canvas. In dark mode the
                        previous global white foreground sat on a white canvas.
                        Keep editor, toolbar, popovers and placeholder in sync. */
-                    body {
-                        --lf-editor-bg:#ffffff;
-                        --lf-editor-fg:#18243b;
-                        --lf-editor-ui:#f4f0fb;
-                        --lf-editor-edge:#75839a;
-                        --lf-editor-hint:#4b5870;
-                    }
-                    body.dark {
-                        --lf-editor-bg:#242c40;
-                        --lf-editor-fg:#f4f7fd;
-                        --lf-editor-ui:#2e364d;
-                        --lf-editor-edge:#7f90ad;
-                        --lf-editor-hint:#c3cede;
-                    }
                     .studio-profile-editor-page .ck.ck-editor__main > .ck-editor__editable,
                     .studio-profile-editor-page .ck.ck-editor__editable.ck-content {
                         background:var(--lf-editor-bg)!important;
@@ -117,13 +103,13 @@
                       input[type=checkbox],
                       input[type=radio] {
                       --active: var(--bs-primary);
-                      --active-inner: #fff;
-                      --focus: 2px var(--bs-primary);
-                      --border: #BBC1E1;
-                      --border-hover: var(--bs-primary);
-                      --background: #fff;
-                      --disabled: #F6F8FF;
-                      --disabled-inner: #E1E6F9;
+                      --active-inner: var(--lf-on-primary);
+                      --focus: 2px var(--lf-focus);
+                      --border: var(--lf-border);
+                      --border-hover: var(--lf-link);
+                      --background: var(--lf-input);
+                      --disabled: var(--lf-disabled-bg);
+                      --disabled-inner: var(--lf-disabled-bg);
                       -webkit-appearance: none;
                       -moz-appearance: none;
                       height: 21px;
@@ -252,7 +238,7 @@
                       }
                     }
                     .txt-label{
-                        color: white;
+                        color: var(--lf-on-primary);
                         padding-left: 5px;
                         font-size: 200%;
                         position: relative;
@@ -314,7 +300,7 @@
                     <div class="form-group col-lg-8">
                         <?php
                             $url = $_SERVER['REQUEST_URI'];
-                             if( strpos( $url, "no_page_name" ) == true ) echo '<span style="color:#FF0000; font-size:120%;">You do not have a Page URL</span>'; ?>
+                             if( strpos( $url, "no_page_name" ) == true ) echo '<span style="color:var(--lf-danger); font-size:120%;">You do not have a Page URL</span>'; ?>
                         <br>
                         <label class="form-label">{{__('messages.Page URL')}}</label>
                         <div class="input-group mb-3 has-validation">

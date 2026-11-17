@@ -21,7 +21,8 @@ assert "studio-profile-editor-page" in pageblade
 assert "linkfree-light-gradient.css" in sidebar
 assert "margin-top:0!important" in page_css
 assert ".studio-profile-editor-page .ck.ck-editor__main > .ck-editor__editable" in page_css
-assert "background:linear-gradient(115deg,#ffffff 0%,#f7f9ff 58%,#ecf2ff 100%)!important" in gradient
+assert "background:var(--lf-card-gradient)!important" in gradient
+assert "--lf-card-gradient:linear-gradient(115deg,#ffffff 0%,#f7f9ff 58%,#ecf2ff 100%);" in palette
 assert "body:not(.dark)" in gradient and "body.dark" not in gradient
 assert "width:16px!important;height:16px!important" in sidebar_css
 

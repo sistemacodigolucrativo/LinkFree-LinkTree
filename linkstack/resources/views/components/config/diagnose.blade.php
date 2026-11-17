@@ -35,7 +35,7 @@ $url2 = getUrlSatusCode(url('database/database.sqlite'));
 ?>
 
         @if($url1 == '200' or $url2 == '200')
-        <a href="https://docs.linkstack.org/installation-requirements/" target="_blank"><h4 style="color:tomato;">{{__('messages.security.risk')}}</h4></a>
+        <a href="https://docs.linkstack.org/installation-requirements/" target="_blank"><h4 style="color:var(--lf-danger);">{{__('messages.security.risk')}}</h4></a>
         @endif
 
         <h3 class="mb-4">{{__('messages.Security')}}</h3>
@@ -88,7 +88,7 @@ $url2 = getUrlSatusCode(url('database/database.sqlite'));
 
 <style>#dp{width:10%!important;text-align:center;}</style>
         <table class="table table-bordered">
-        <style>.bi-x-lg{color:tomato}</style>
+        <style>.bi-x-lg{color:var(--lf-danger)}</style>
         <tr><td>BCMath {{__('messages.PHP Extension')}}</td><td id="dp">@if(extension_loaded('bcmath'))<i class='bi bi-check-lg'></i>@else<i class='bi bi-x'></i>@endif</td></tr>
         <tr><td>Ctype {{__('messages.PHP Extension')}}</td><td id="dp">@if(extension_loaded('Ctype'))<i class='bi bi-check-lg'></i>@else<i class='bi bi-x'></i>@endif</td></tr>
         <tr><td>cURL {{__('messages.PHP Extension')}}</td><td id="dp">@if(extension_loaded('cURL'))<i class='bi bi-check-lg'></i>@else<i class='bi bi-x'></i>@endif</td></tr>

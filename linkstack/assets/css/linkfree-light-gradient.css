@@ -11,16 +11,16 @@ body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.
   --bs-card-color:var(--lf-text);
   --bs-card-cap-bg:transparent;
   --bs-heading-color:var(--lf-text);
-  background:linear-gradient(115deg,#ffffff 0%,#f7f9ff 58%,#ecf2ff 100%)!important;
+  background:var(--lf-card-gradient)!important;
   color:var(--lf-text)!important;
-  border:1px solid #d1d9e6!important;
+  border:1px solid var(--lf-card-divider)!important;
 }
 /* Headers e rodapes acompanhando os cartoes sem reintroduzir cores de fornecedor. */
 body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) > :is(.card-header,.card-footer),
 body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) > .card-body :is(.card-header,.card-footer):not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning) {
-  background:rgba(58,87,232,.035)!important;
+  background:var(--lf-card-cap)!important;
   color:var(--lf-text)!important;
-  border-color:#d1d9e6!important;
+  border-color:var(--lf-card-divider)!important;
 }
 body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) :is(h1,h2,h3,h4,h5,h6,.card-title,.card-text,label,legend,.form-label):not(.text-white):not(.text-primary):not(.text-success):not(.text-danger):not(.text-warning):not(.text-info):not(.ck-content *):not(.ck *):not(.bg-white *) {
   color:var(--lf-text)!important;
@@ -65,7 +65,7 @@ body:not(.dark) .main-content .card .table:not(.table-light) {
 }
 body:not(.dark) .main-content .card .table:not(.table-light) :is(th,td) {
   color:var(--lf-text);
-  border-color:#d1d9e6;
+  border-color:var(--lf-card-divider);
 }
 body:not(.dark) .main-content .card :is(.nav-tabs .nav-link,.pagination .page-link):not(.active) {
   color:var(--lf-link);
@@ -86,6 +86,6 @@ body:not(.dark) .main-content .studio-profile-editor-page .ck.ck-editor__editabl
   color:var(--lf-text)!important;
 }
 body:not(.dark) .main-content .studio-profile-editor-page .ck.ck-editor__editable.ck-content {
-  background:#fff!important;
+  background:var(--lf-editor-bg)!important;
 }
 /* Imagens e previews de temas publicos jamais recebem filtros de cor. */

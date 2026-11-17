@@ -147,8 +147,7 @@ body.dark :is(.auth-card .form-label,.auth-card label,.auth-card h1,.auth-card h
 }
 body.dark :is(.auth-card .text-muted,.auth-card .form-text) {color:var(--lf-muted)!important}
 body.dark .auth-card a:not(.btn) {color:var(--lf-link)}
-/* edit-link.blade.php still declares .modal-title{color:#000!important}.
-   Scope a stronger mode-specific rule instead of repainting all modal headers. */
+/* Modal titles follow the dashboard palette without repainting modal headers. */
 body.dark .main-content .modal-title {color:var(--lf-text)!important}
 body:not(.dark) .main-content .modal-title {color:var(--lf-text)!important}
 body.dark .modal-content .btn-close {filter:invert(1) grayscale(1) brightness(1.7)}
@@ -191,6 +190,32 @@ body.dark .sidebar.sidebar-default {
   --lf-info:#94d5fc;
   --lf-info-bg:#1e3a50;
   --lf-info-border:#63b7e9;
+}
+
+/* Dashboard-only component colors. Public previews and guest flows do not
+   consume these tokens; selection/persistence stays in the existing JS. */
+body .main-content {
+  --lf-shadow-header:rgba(0,0,0,.10);
+  --lf-shadow-floating:rgba(0,0,0,.24);
+  --lf-shadow-close:rgba(0,0,0,.15);
+  --lf-shadow-backup:rgba(0,0,0,.6);
+  --lf-backup-download-bg:#000000;
+  --lf-back-action:#117486;
+  --lf-back-shadow:#111111;
+  --lf-preview-strip:linear-gradient(115deg,#391a66,#6f215d 58%,#992b69);
+  --lf-preview-border:rgba(255,255,255,.18);
+  --lf-preview-action:#ffcc36;
+  --lf-preview-action-border:#b78313;
+  --lf-preview-action-text:#202020;
+  --lf-preview-action-hover:#ffc01f;
+  --lf-preview-action-hover-text:#171717;
+}
+body:not(.dark) .main-content {
+  --lf-card-gradient:linear-gradient(115deg,#ffffff 0%,#f7f9ff 58%,#ecf2ff 100%);
+  --lf-card-divider:#d1d9e6;
+  --lf-card-cap:rgba(58,87,232,.035);
+  --lf-preview-strip:linear-gradient(115deg,#2741a1,#3a57e8);
+  --lf-preview-border:#2741a1;
 }
 
 /* Links textuais nao podem herdar azul de botao sobre a superficie escura. */
@@ -345,7 +370,7 @@ body.dark .sidebar.sidebar-default:not(.sidebar-color):not(.sidebar-dark):not(.s
   --bs-link-hover-color:#bfd3ff;
   --bs-heading-color:var(--lf-text);
   --lf-edit-action:#3869c2;
-  --lf-edit-action-hover:#4564df;
+  --lf-edit-action-hover:var(--lf-primary-hover);
   --lf-danger-action:#b53039;
   --lf-danger-action-hover:#982831;
 }
@@ -597,8 +622,8 @@ body:not(.dark) .main-content .studio-links-preview-fab:focus-visible {
 }
 /* O card da selecao de tema e UI do painel, nao a pagina publica. */
 body:not(.dark) .main-content .theme-preview-strip {
-  background:linear-gradient(115deg,#2741a1,#3a57e8)!important;
-  border-color:#2741a1!important;
+  background:var(--lf-preview-strip)!important;
+  border-color:var(--lf-preview-border)!important;
 }
 body:not(.dark) .main-content .theme-preview-strip .theme-preview-current {
   background:var(--lf-surface)!important;
@@ -617,8 +642,12 @@ body:not(.dark) .main-content {
 }
 /* O CKEditor herdava um lilas legado (#f4f0fb); a barra segue os neutros Light V1.
    Apenas a superficie do editor muda: selecao, conteudo e JS sao preservados. */
-body:not(.dark) .main-content .studio-profile-editor-page {
+body .main-content .studio-profile-editor-page {
+  --lf-editor-bg:var(--lf-input);
+  --lf-editor-fg:var(--lf-text);
   --lf-editor-ui:var(--lf-raised);
+  --lf-editor-edge:var(--lf-border);
+  --lf-editor-hint:var(--lf-muted);
 }
 
 /* LinkFree sidebar semantic contrast V1: one component rule set for both modes. */
