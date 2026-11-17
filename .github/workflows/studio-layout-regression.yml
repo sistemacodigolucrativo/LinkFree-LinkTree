@@ -1,15 +1,19 @@
-name: Studio links and theme preview regression
+name: Studio, dashboard and mobile layout regression
 on:
   push:
     paths:
       - 'linkstack/resources/views/studio/links.blade.php'
       - 'linkstack/resources/views/studio/theme.blade.php'
+      - 'linkstack/resources/views/panel/index.blade.php'
+      - 'linkstack/resources/views/layouts/sidebar.blade.php'
       - 'scripts/audit-studio-layout.py'
       - '.github/workflows/studio-layout-regression.yml'
   pull_request:
     paths:
       - 'linkstack/resources/views/studio/links.blade.php'
       - 'linkstack/resources/views/studio/theme.blade.php'
+      - 'linkstack/resources/views/panel/index.blade.php'
+      - 'linkstack/resources/views/layouts/sidebar.blade.php'
       - 'scripts/audit-studio-layout.py'
       - '.github/workflows/studio-layout-regression.yml'
 
