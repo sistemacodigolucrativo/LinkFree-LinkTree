@@ -149,6 +149,8 @@ with sync_playwright() as playwright:
         page.set_content(html)
         page.add_style_tag(content=base_css)
         page.add_style_tag(content=styles)
+        # Test sidebar navigation without an unrelated notification popup on top.
+        page.evaluate("document.querySelector('.notification-panel').classList.remove('show')")
         page.evaluate("""() => {
           document.querySelectorAll('[data-toggle="sidebar"]').forEach(b=>
             b.addEventListener('click',()=>document.querySelector('#sidebar').classList.toggle('sidebar-mini'))
