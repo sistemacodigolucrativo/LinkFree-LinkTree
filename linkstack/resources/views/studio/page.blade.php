@@ -3,7 +3,7 @@
 
 @section('content')
 
-<div class="conatiner-fluid content-inner mt-n5 py-0">
+<div class="conatiner-fluid content-inner mt-n5 py-0 studio-profile-editor-page">
   <div class="row">
 
    <div class="col-lg-12">
@@ -24,6 +24,93 @@
                         margin: 20px auto;
                     }
 
+                    /* The vendor profile selector has margin-top:-70px; with the
+                       slim welcome header it pushes the avatar over the header.
+                       Restrict this correction to the profile/page editor. */
+                    .studio-profile-editor-page .profile-img.profile-logo {
+                        margin-top:0!important;
+                        margin-bottom:16px!important;
+                        width:max-content;
+                        max-width:100%;
+                        display:block;
+                        position:relative;
+                        z-index:0;
+                    }
+                    .studio-profile-editor-page .profile-img.profile-logo > img {
+                        display:block;
+                        width:100px;
+                        height:100px;
+                        max-width:100%;
+                        border-radius:50%;
+                        object-fit:cover;
+                    }
+                    .studio-profile-editor-page .profile-img.profile-logo .upload-icone {
+                        z-index:1;
+                    }
+
+                    /* CKEditor has a separate editing canvas. In dark mode the
+                       previous global white foreground sat on a white canvas.
+                       Keep editor, toolbar, popovers and placeholder in sync. */
+                    body {
+                        --lf-editor-bg:#ffffff;
+                        --lf-editor-fg:#18243b;
+                        --lf-editor-ui:#f4f0fb;
+                        --lf-editor-edge:#75839a;
+                        --lf-editor-hint:#4b5870;
+                    }
+                    body.dark {
+                        --lf-editor-bg:#242c40;
+                        --lf-editor-fg:#f4f7fd;
+                        --lf-editor-ui:#2e364d;
+                        --lf-editor-edge:#7f90ad;
+                        --lf-editor-hint:#c3cede;
+                    }
+                    .studio-profile-editor-page .ck.ck-editor__main > .ck-editor__editable,
+                    .studio-profile-editor-page .ck.ck-editor__editable.ck-content {
+                        background:var(--lf-editor-bg)!important;
+                        color:var(--lf-editor-fg)!important;
+                        border-color:var(--lf-editor-edge)!important;
+                        color-scheme:normal;
+                        min-height:200px;
+                    }
+                    .studio-profile-editor-page .ck.ck-editor__editable.ck-content :is(p,h1,h2,h3,h4,h5,h6,li,blockquote):not([style*="color"]) {
+                        color:inherit!important;
+                    }
+                    .studio-profile-editor-page .ck.ck-editor__editable.ck-content .ck-placeholder::before {
+                        color:var(--lf-editor-hint)!important;
+                    }
+                    .studio-profile-editor-page .ck.ck-toolbar,
+                    .studio-profile-editor-page .ck.ck-dropdown__panel,
+                    .studio-profile-editor-page .ck.ck-balloon-panel,
+                    .studio-profile-editor-page .ck.ck-list,
+                    .studio-profile-editor-page .ck.ck-input,
+                    .studio-profile-editor-page .ck.ck-reset_all {
+                        --ck-color-base-background:var(--lf-editor-ui);
+                        --ck-color-base-foreground:var(--lf-editor-fg);
+                        --ck-color-text:var(--lf-editor-fg);
+                        --ck-color-toolbar-background:var(--lf-editor-ui);
+                        --ck-color-dropdown-panel-background:var(--lf-editor-ui);
+                        --ck-color-list-background:var(--lf-editor-ui);
+                        --ck-color-input-background:var(--lf-editor-bg);
+                        --ck-color-input-text:var(--lf-editor-fg);
+                        --ck-color-base-border:var(--lf-editor-edge);
+                    }
+                    .studio-profile-editor-page .ck.ck-toolbar,
+                    .studio-profile-editor-page .ck.ck-dropdown__panel,
+                    .studio-profile-editor-page .ck.ck-balloon-panel {
+                        background:var(--lf-editor-ui)!important;
+                        color:var(--lf-editor-fg)!important;
+                        border-color:var(--lf-editor-edge)!important;
+                    }
+                    .studio-profile-editor-page .ck.ck-toolbar :is(.ck-button,.ck-label,.ck-icon),
+                    .studio-profile-editor-page .ck.ck-dropdown__panel :is(.ck-button,.ck-label) {
+                        color:var(--lf-editor-fg)!important;
+                    }
+                    .studio-profile-editor-page textarea#field-pageDescription:not(.ckeditor) {
+                        background:var(--lf-editor-bg)!important;
+                        color:var(--lf-editor-fg)!important;
+                        border-color:var(--lf-editor-edge)!important;
+                    }
                 </style>
                 <style>
                     @supports (-webkit-appearance: none) or (-moz-appearance: none) {
