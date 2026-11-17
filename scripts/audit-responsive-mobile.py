@@ -97,7 +97,7 @@ html = """<!doctype html><html lang="pt-BR"><head>
   <span class="top-link-clicks badge">123 cliques</span>
  </li></ol></div>
 </section>
-<div class="theme-preview-strip" style="margin:10px">
+<div class="theme-preview-strip">
  <h3 class="theme-preview-title">🎨 Seleção de tema</h3>
  <button class="btn btn-primary theme-select-action">Selecionar tema</button>
  <button class="btn theme-preview-current">Pré-visualizar tema atual</button>
