@@ -125,6 +125,8 @@
 
 <script src="{{ asset('assets/external-dependencies/jquery-1.12.4.min.js') }}"></script>
 </section>
+</div>
+</div>
 @push('sidebar-scripts')
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
@@ -149,7 +151,7 @@
                                  </div>
                               </div>
                               <div class="text-center">
-                                 <h2 class="m-3 @if($page->theme == "" or $page->theme == "default") text-white @else text-gray @endif"">Default Theme</h2>
+                                 <h2 class="m-3 @if($page->theme == "" or $page->theme == "default") text-white @else text-gray @endif">Default Theme</h2>
                                  <div>
                                  </div>
                               </div>

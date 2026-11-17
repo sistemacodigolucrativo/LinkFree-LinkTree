@@ -195,4 +195,19 @@ require('id="studio-my-links-title" class="card-header mb-3 d-flex flex-wrap' in
 require('href="{{ route(\'showThemes\') }}">Voltar ao gerenciamento' in github_view,
         "Admin themes return to admin management")
 
+
+# Validate DIV tag counts in shared templates; missed closing tags can change
+# element positioning and cause inaccessible controls in browsers.
+for template_path in [
+    views / "panel" / "index.blade.php",
+    views / "studio" / "links.blade.php",
+    views / "studio" / "page.blade.php",
+    views / "studio" / "theme.blade.php",
+]:
+    markup = template_path.read_text(encoding="utf-8")
+    require(len(re.findall(r"<div\\b", markup)) == len(re.findall(r"</div>", markup)),
+            "Balanced DIV containers: " + template_path.name)
+require('@endif"">Default Theme' not in theme,
+        "Theme card has well-formed class attribute")
+
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")

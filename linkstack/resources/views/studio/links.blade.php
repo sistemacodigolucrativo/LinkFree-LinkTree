@@ -540,6 +540,7 @@ if (isset($_COOKIE['LinkCount'])) {
 
       </div>
     </div>
+</div>
 
 {{-- Botão flutuante independente dos cards, disponível durante a edição. --}}
 <button id="studio-links-preview-trigger" class="studio-links-preview-fab" type="button"
