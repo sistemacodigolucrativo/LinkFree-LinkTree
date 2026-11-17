@@ -123,4 +123,29 @@ require("linkfree-color-modes.css" in sidebar and "linkfree-color-modes.css" in 
 require("body.dark .main-content .modal-title" in palette,
         "Cor de título modal não fica preta no modo escuro")
 
+
+# Última rodada de revisão: a auditoria verifica também o código de produção,
+# não somente os elementos simplificados do teste visual.
+nav_css = (views.parents[1] / "assets/css/linkfree-navigation-polish.css").read_text(encoding="utf-8")
+close_js = (views.parents[1] / "assets/js/sidebar-auto-close.js").read_text(encoding="utf-8")
+require('class=\'col-12 py-1 px-3 m-0 mt-2 studio-link-actions\'' in links,
+        "Barra de ações existente integra os botões do link")
+require(links.count('class="btn btn-sm btn-outline-secondary studio-link-move"') == 2,
+        "Duas setas de movimentação renderizadas ao lado de editar/excluir")
+require('class="studio-link-clicks"' in links and
+        links.index('class="studio-link-clicks"') < links.index('studio-link-actions\' role="group"'),
+        "Indicador de cliques fora da barra de botões e no topo")
+require("button.studio-link-move" in js and "row.append(controls)" not in js,
+        "Ordenação usa botões inline, sem criar segunda linha")
+require('view-page-slim' in sidebar and 'share-page-slim' in sidebar,
+        "Altura e alinhamento dos botões de Exibir Página e Compartilhar controlados")
+require('notification-panel' in sidebar and 'notification-panel.show' in nav_css,
+        "Notificações usam posicionamento fixo centralizado na viewport")
+require('sidebar-auto-close.js' in sidebar and 'sidebar-mini' in close_js and
+        '[data-toggle="sidebar"]' in close_js,
+        "Menu lateral fecha fora dele preservando a seta original")
+require('max-width:calc(100vw - 24px)!important' in nav_css and
+        'overflow-x:hidden!important' in nav_css,
+        "Card de notificações não causa transbordamento horizontal")
+
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")
