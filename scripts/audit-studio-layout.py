@@ -10,6 +10,9 @@ import re
 ROOT = Path(__file__).resolve().parents[1] / "linkstack" / "resources" / "views" / "studio"
 links = (ROOT / "links.blade.php").read_text(encoding="utf-8")
 theme = (ROOT / "theme.blade.php").read_text(encoding="utf-8")
+views = ROOT.parent
+dashboard = (views / "panel" / "index.blade.php").read_text(encoding="utf-8")
+sidebar = (views / "layouts" / "sidebar.blade.php").read_text(encoding="utf-8")
 
 def require(condition, description):
     if not condition:
@@ -38,8 +41,10 @@ require("modal-dialog modal-fullscreen" in links, "Modal ocupa a tela inteira")
 require('id="studio-links-preview-frame"' in links, "Iframe da página pública presente")
 require("data-preview-url=\"{{ url('/@'.Auth::user()->littlelink_name) }}\"" in links,
         "URL da página real do próprio usuário")
-require("data-bs-dismiss=\"modal\"" in links and "btn-close btn-close-white" in links,
-        "Botão X de fechar modal presente e acessível")
+require('class="studio-links-preview-close"' in links and "data-bs-dismiss=\"modal\"" in links,
+        "Botão X exclusivo de fechar modal presente e acessível")
+require("Minha página — visualização" not in links and "studioLinksPreviewTitle" not in links,
+        "Removida barra superior da prévia; somente X à esquerda")
 require("show.bs.modal" in links and "hidden.bs.modal" in links,
         "Carregamento sob demanda e limpeza ao fechar")
 require("window.location" not in links and "location.reload()" not in links,
@@ -55,11 +60,35 @@ require('card-title">{{__(\'messages.Preview\')}}' not in theme,
         "Cabeçalho cinza 'Prévia' removido")
 require("theme-preview-current" in theme and "#ffcc36" in theme,
         "Botão pré-visualizar tema atual amarelo")
-require("theme-preview-caption" in theme and "color:#fff!important" in theme,
-        "Texto de demonstração em branco")
+require("theme-preview-title" in theme and "theme-select-action" in theme,
+        "Título com pincel e seletor azul estão dentro do card de prévia")
+require(theme.index("theme-preview-title") < theme.index("theme-select-action") < theme.index("data-theme-preview-url"),
+        "Ordem dos controles: título, botão azul, botão amarelo")
+require("theme-selection-layout" in theme and 'class="theme-preview-strip"' in theme,
+        "Card independente de Seleção de Tema removido")
 require("data-theme-preview-url" in theme and 'id="themePreviewModal"' in theme,
         "Pré-visualização de temas e seletor existentes preservados")
-require("Duas demonstrações com links, botões, vídeos" in theme,
-        "Descrição das duas demonstrações preservada")
+require("Duas demonstrações com links, botões, vídeos" not in theme,
+        "Descrição das demonstrações removida")
+require(theme.index('aria-label="Temas GitHub"') < theme.index("{{__('messages.Manage themes')}}"),
+        "Card independente Temas GitHub aparece antes de Gerenciar Temas")
+require(theme.count('id="github-theme-updates"') == 1 and theme.count('id="github-theme-status"') == 1,
+        "Botões e notificações do GitHub preservados sem duplicação")
+require("studio-links-sections" in links and "studio-links-sections>.links-section-card" in links,
+        "Meus Links e Ícones de Página compartilham contêiner e largura")
+require("studio-link-slim" in links and "sortable-handle" in links and "linksTableOrders" in links,
+        "Cards slim mantêm controles e drag-and-drop")
+require("top-links-slim-item" in dashboard and "overflow-x:auto" in dashboard,
+        "Top Clicks em barras compactas com deslocamento horizontal")
+require("top-link-title" in dashboard and "top-link-url" in dashboard and "top-link-clicks" in dashboard,
+        "Título, link e cliques em linha única nos Top Clicks")
+require("welcome-slim" in sidebar and "height:auto;" in sidebar,
+        "Card de boas-vindas compactado")
+require("mobile-unified-nav" in sidebar and ".mobile-unified-nav .navbar-toggler{display:none!important}" in sidebar,
+        "Barra mobile sem menu hambúrguer duplicado")
+require("data-toggle=\"sidebar\"" in sidebar and ".mobile-unified-nav .sidebar-toggle" in sidebar,
+        "Seta de abertura/fechamento do menu lateral mantida")
+require("id=\"navbarSupportedContent\"" in sidebar and "id=\"navbarDropdown\"" in sidebar and "id=\"mail-drop\"" in sidebar,
+        "Exibir página, atualizações e perfil mantidos no navbar")
 
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")

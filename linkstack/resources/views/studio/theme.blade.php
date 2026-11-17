@@ -18,7 +18,18 @@
 .theme-preview-strip .theme-preview-current:hover,
 .theme-preview-strip .theme-preview-current:active { background:#ffc01f!important; color:#171717!important; }
 .theme-preview-strip .theme-preview-current:focus-visible { outline:3px solid #fff; outline-offset:3px; }
-.theme-preview-strip .theme-preview-caption { color:#fff!important; line-height:1.5; }
+.theme-selection-layout>.card-body {padding:0!important}
+.theme-selection-layout {background:transparent;border:0;box-shadow:none}
+.theme-preview-strip{max-width:none;display:flex;flex-direction:column;align-items:stretch;gap:12px}
+.theme-preview-strip .theme-preview-title{
+ margin:0 0 3px;color:#fff!important;font-weight:700;font-size:clamp(1.12rem,3vw,1.45rem);
+ display:flex;align-items:center;gap:10px}
+.theme-preview-strip .theme-select-action{
+ display:flex;align-items:center;justify-content:center;width:100%;min-height:50px;
+ font-size:1rem;font-weight:700;margin:0!important;border-radius:11px}
+.theme-preview-strip .theme-preview-current{margin:0!important}
+@media(max-width:575px){.theme-preview-strip{gap:10px}.theme-preview-strip .theme-preview-title{font-size:1.15rem}}
+
 @media(max-width:575px) {
   .theme-preview-strip { padding:14px; border-radius:12px; }
 }
@@ -29,7 +40,7 @@
     <div class="row">
 
      <div class="col-lg-12">
-        <div class="card   rounded">
+        <div class="theme-selection-layout">
             <div class="card-body">
                <div class="row">
                    <div class="col-sm-12">
@@ -37,7 +48,6 @@
                     @foreach($pages as $page)
 
                     <section class='text-gray-400'>
-                    <h3 class="mb-4 card-header"><i class="bi bi-brush">{{__('messages.Select a theme')}}</i></h3>
                     <div>
 
                         @if($errors->any())
@@ -53,19 +63,17 @@
                         </div>
                         @endif
 
-                        <button type="button" class="btn btn-primary mb-5" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        {{__('messages.Select theme')}}
-                        </button>
 
-                    <section class="text-gray-400"></section>
                     <div>
 
-                        <div class="theme-preview-strip" aria-label="Pré-visualização do tema selecionado">
+                        <div class="theme-preview-strip" aria-label="Selecionar e pré-visualizar tema">
+                          <h3 class="theme-preview-title"><i class="bi bi-brush" aria-hidden="true"></i> {{__('messages.Select a theme')}}</h3>
+                          <button type="button" class="btn btn-primary theme-select-action"
+                                  data-bs-toggle="modal" data-bs-target="#exampleModal">{{__('messages.Select theme')}}</button>
                           <button type="button" class="btn theme-preview-current"
                                   data-theme-preview-url="{{ route('themePreview', ['theme' => $page->theme ?: 'default']) }}">
                             <i class="bi bi-eye" aria-hidden="true"></i> Pré-visualizar tema atual
                           </button>
-                          <p class="theme-preview-caption small mt-3 mb-0">Duas demonstrações com links, botões, vídeos e outros componentes, sem alterar sua página.</p>
                         </div>
 
                    </div>
@@ -115,6 +123,19 @@
 
      @if(auth()->user()->role == 'admin')
     <div class="col-lg-12">
+      <section class="card rounded mb-3" aria-label="Temas GitHub">
+        <div class="card-body">
+          <h3 class="mb-3 card-header"><i class="bi bi-github" aria-hidden="true"></i> Temas GitHub</h3>
+          <p class="small text-muted">Instale temas Free e Premium/VIP ou consulte novas versões pelo repositório configurado.</p>
+          <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-primary" href="{{ route('githubThemes') }}">Selecionar temas GitHub</a>
+            <a id="github-theme-updates" class="btn btn-outline-primary" href="{{ route('githubThemes', ['updates' => 1]) }}">Verificar atualizações</a>
+          </div>
+          <p id="github-theme-status" class="small mt-2 mb-0" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-12">
         <div class="card   rounded">
            <div class="card-body">
               <div class="row">
@@ -122,18 +143,8 @@
                     <h3 class="mb-4 card-header">{{__('messages.Manage themes')}}</h3>
                     @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
                     <div class="row g-3">
-                      <div class="col-12 col-lg-6">
-                        <section class="border rounded p-3 h-100" aria-label="Temas GitHub">
-                          <h4 class="h5">Temas GitHub</h4>
-                          <p class="small text-muted">Instale temas Free e Premium/VIP ou consulte novas versões pelo repositório configurado.</p>
-                          <div class="d-flex flex-wrap gap-2">
-                            <a class="btn btn-primary" href="{{ route('githubThemes') }}">Selecionar temas GitHub</a>
-                            <a id="github-theme-updates" class="btn btn-outline-primary" href="{{ route('githubThemes', ['updates' => 1]) }}">Verificar atualizações</a>
-                          </div>
-                          <p id="github-theme-status" class="small mt-2 mb-0" aria-live="polite"></p>
-                        </section>
-                      </div>
-                      <div class="col-12 col-lg-6">
+
+                      <div class="col-12">
                         <section class="border rounded p-3 h-100" aria-label="Enviar temas">
                           <h4 class="h5">Enviar temas</h4>
                           <p class="small text-muted">Escolha um ZIP. O upload e a instalação começarão automaticamente.</p>
