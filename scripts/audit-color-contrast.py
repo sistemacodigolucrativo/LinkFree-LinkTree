@@ -51,3 +51,28 @@ assert "body.dark .main-content .modal-title" in css
 assert "body.dark :is(.auth-card" in css
 assert "dashboard-slim .top-links-list>li.top-links-slim-item" in css
 print("AUDITORIA DE CONTRASTE WCAG 2.2 AA APROVADA (paleta de tokens)")
+
+# Sidebar contrast regression for both themes and color variants.
+sidebar_pairs = [
+    ("light normal", "#18243b", "#ffffff", 4.5),
+    ("light section", "#4b5870", "#ffffff", 4.5),
+    ("light active", "#ffffff", "#3a57e8", 4.5),
+    ("light hover", "#18243b", "#eaf0fa", 4.5),
+    ("light divider", "#75839a", "#ffffff", 3),
+    ("dark normal", "#f4f7fd", "#222738", 4.5),
+    ("dark section", "#c3cede", "#222738", 4.5),
+    ("dark active", "#ffffff", "#3a57e8", 4.5),
+    ("dark hover", "#f4f7fd", "#354058", 4.5),
+    ("dark divider", "#7f90ad", "#222738", 3),
+    ("color section", "#ffffff", "#3a57e8", 4.5),
+    ("color active", "#204a9b", "#ffffff", 4.5),
+    ("color hover", "#ffffff", "#263dae", 4.5),
+    ("color divider", "#bdd0ff", "#3a57e8", 3),
+]
+for name,fg,bg,minimum in sidebar_pairs:
+    value=ratio(fg,bg)
+    assert value>=minimum,("sidebar",name,round(value,2),minimum)
+    print(f"PASS sidebar {name}: {value:.2f}:1")
+assert "LinkFree sidebar semantic contrast V1" in css
+assert ".nav-link:not(.static-item):is(.active,[aria-expanded=\"true\"])" in css
+print("AUDITORIA DE MENU LATERAL APROVADA")

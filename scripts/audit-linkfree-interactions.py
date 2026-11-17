@@ -167,6 +167,77 @@ with sync_playwright() as playwright:
         assert page.locator('#sidebar').evaluate("(el)=>el.classList.contains('sidebar-mini')"),"Escape did not close sidebar"
         print("OK sidebar: inside untouched, outside closes, arrow reopens, Escape closes")
         context.close()
+
+        # Real computed styles: vendor CSS + LinkFree tokens, one selector system for all modes.
+        vendor=(ROOT/"assets/css/hope-ui.min.css").read_text(encoding="utf-8")
+        dark_vendor=(ROOT/"assets/css/dark.min.css").read_text(encoding="utf-8")
+        customizer=(ROOT/"assets/css/customizer.min.css").read_text(encoding="utf-8")
+        sidebar_fixture="""<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"></head>
+        <body class="light"><aside id="contrast-sidebar" class="sidebar sidebar-default sidebar-white sidebar-base navs-rounded-all">
+          <div class="sidebar-header"><a class="navbar-brand"><h4 class="logo-title">LinkFree</h4></a></div>
+          <div class="sidebar-body"><div class="sidebar-list"><ul class="navbar-nav iq-main-menu">
+            <li class="nav-item static-item"><a class="nav-link static-item disabled"><span class="default-icon" id="section-text">Administração</span></a></li>
+            <li class="nav-item"><a id="normal-link" class="nav-link" href="#normal"><i class="icon">◉</i><span class="item-name">Painel</span></a></li>
+            <li class="nav-item"><a id="active-link" class="nav-link active" href="#active"><i class="icon">⚙</i><span id="active-text" class="item-name">Configuração</span></a></li>
+            <li class="nav-item"><a id="expanded-link" class="nav-link" aria-expanded="true" href="#expanded">Administrar</a></li>
+          </ul></div></div>
+        </aside><main class="main-content"><button class="btn btn-primary">Continuar</button></main>
+        </body></html>"""
+        import re
+
+        def lum_style(color):
+            parts=[int(v)/255 for v in re.findall(r"\d+",color)[:3]]
+            linear=[v/12.92 if v<=0.04045 else ((v+0.055)/1.055)**2.4 for v in parts]
+            return sum(v*w for v,w in zip(linear,(0.2126,0.7152,0.0722)))
+
+        def style_ratio(a,b):
+            hi,lo=sorted((lum_style(a),lum_style(b)),reverse=True)
+            return (hi+0.05)/(lo+0.05)
+
+        context=browser.new_context(viewport={"width":390,"height":820})
+        page=context.new_page()
+        page.set_content(sidebar_fixture)
+        page.add_style_tag(content=vendor)
+        page.add_style_tag(content=dark_vendor)
+        page.add_style_tag(content=customizer)
+        page.add_style_tag(content=palette)
+        for mode in ("light","dark"):
+            for variant in ("sidebar-white","sidebar-dark","sidebar-color"):
+                page.evaluate("""([mode,variant]) => {
+                  document.body.className=mode;
+                  document.querySelector('#contrast-sidebar').className=
+                    'sidebar sidebar-default sidebar-base navs-rounded-all '+variant;
+                }""",[mode,variant])
+                page.mouse.move(385,790)
+                values=page.evaluate("""() => {
+                  const css=s=>getComputedStyle(document.querySelector(s));
+                  const fg=s=>css(s).color;
+                  const bg=s=>css(s).backgroundColor;
+                  const sidebarBg=bg('#contrast-sidebar');
+                  return {
+                    sidebarBg,
+                    normal:[fg('#normal-link'),sidebarBg],
+                    icon:[fg('#normal-link i'),sidebarBg],
+                    section:[fg('#section-text'),sidebarBg],
+                    active:[fg('#active-text'),bg('#active-link')],
+                    expanded:[fg('#expanded-link'),bg('#expanded-link')],
+                    border:[css('.sidebar-header').borderBottomColor,sidebarBg],
+                    button:[fg('.btn-primary'),bg('.btn-primary')]
+                  };
+                }""")
+                for key,minimum in (("normal",4.5),("icon",3),("section",4.5),
+                                    ("active",4.5),("expanded",4.5),("border",3),
+                                    ("button",4.5)):
+                    value=style_ratio(*values[key])
+                    assert value>=minimum,(mode,variant,key,round(value,2),values)
+                page.hover("#normal-link")
+                hover=page.evaluate("""() => {
+                  const item=document.querySelector('#normal-link');
+                  return [getComputedStyle(item).color,getComputedStyle(item).backgroundColor];
+                }""")
+                assert style_ratio(*hover)>=4.5,(mode,variant,"hover",hover)
+                print(f"PASS sidebar computed {mode}/{variant}: normal, icon, section, active, expanded, hover, divider and primary CTA")
+        context.close()
     finally:
         browser.close()
 

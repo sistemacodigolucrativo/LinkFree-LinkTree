@@ -620,3 +620,104 @@ body:not(.dark) .main-content {
 body:not(.dark) .main-content .studio-profile-editor-page {
   --lf-editor-ui:var(--lf-raised);
 }
+
+/* LinkFree sidebar semantic contrast V1: one component rule set for both modes. */
+/* Tokens differ by surface; selectors below are identical in light and dark.
+   Never style page-tree/public themes: these selectors only target dashboard sidebar. */
+body:not(.dark) .sidebar.sidebar-default {
+  --lf-sidebar-surface:#ffffff;
+  --lf-sidebar-fg:#18243b;
+  --lf-sidebar-muted:#4b5870;
+  --lf-sidebar-divider:#75839a;
+  --lf-sidebar-hover-bg:#eaf0fa;
+  --lf-sidebar-active-bg:#3a57e8;
+  --lf-sidebar-active-fg:#ffffff;
+}
+body.dark .sidebar.sidebar-default {
+  --lf-sidebar-surface:#222738;
+  --lf-sidebar-fg:#f4f7fd;
+  --lf-sidebar-muted:#c3cede;
+  --lf-sidebar-divider:#7f90ad;
+  --lf-sidebar-hover-bg:#354058;
+  --lf-sidebar-active-bg:#3a57e8;
+  --lf-sidebar-active-fg:#ffffff;
+}
+/* The optional dark sidebar is readable even with the light page selected. */
+body .sidebar.sidebar-default.sidebar-dark {
+  --lf-sidebar-surface:#212529;
+  --lf-sidebar-fg:#f4f7fd;
+  --lf-sidebar-muted:#c3cede;
+  --lf-sidebar-divider:#7f90ad;
+  --lf-sidebar-hover-bg:#354058;
+}
+/* Blue sidebar has inverse selection: white on blue, dark blue on white. */
+body .sidebar.sidebar-default.sidebar-color {
+  --lf-sidebar-surface:#3a57e8;
+  --lf-sidebar-fg:#ffffff;
+  --lf-sidebar-muted:#ffffff;
+  --lf-sidebar-divider:#bdd0ff;
+  --lf-sidebar-hover-bg:#263dae;
+  --lf-sidebar-active-bg:#ffffff;
+  --lf-sidebar-active-fg:#204a9b;
+  --bs-primary:#3a57e8;
+  --bs-primary-rgb:58,87,232;
+}
+/* Transparent sidebar keeps its positioning and backdrop behavior. */
+body .sidebar.sidebar-default:not(.sidebar-transparent) {
+  background-color:var(--lf-sidebar-surface)!important;
+}
+body .sidebar.sidebar-default {
+  color:var(--lf-sidebar-fg);
+}
+body .sidebar.sidebar-default .sidebar-header {
+  border-bottom-color:var(--lf-sidebar-divider)!important;
+}
+body .sidebar.sidebar-default .navbar-brand .logo-title {
+  color:var(--lf-sidebar-fg)!important;
+}
+/* Section labels and separators: vendor gray-400 is inadequate on white. */
+body .sidebar.sidebar-default .sidebar-body .nav-item.static-item .nav-link,
+body .sidebar.sidebar-default .sidebar-body .nav-item.static-item .default-icon {
+  color:var(--lf-sidebar-muted)!important;
+}
+/* Normal, hover/keyboard and selected states form indivisible accessible pairs. */
+body .sidebar.sidebar-default .sidebar-body .sidebar-list .navbar-nav .nav-item
+.nav-link:not(.static-item):not(.active):not([aria-expanded="true"]) {
+  color:var(--lf-sidebar-fg)!important;
+}
+body .sidebar.sidebar-default .sidebar-body .sidebar-list .navbar-nav .nav-item
+.nav-link:not(.static-item):not(.active):not([aria-expanded="true"]):is(:hover,:focus-visible) {
+  background:var(--lf-sidebar-hover-bg)!important;
+  color:var(--lf-sidebar-fg)!important;
+}
+body .sidebar.sidebar-default .sidebar-body .sidebar-list .navbar-nav .nav-item
+.nav-link:not(.static-item):is(.active,[aria-expanded="true"]) {
+  background:var(--lf-sidebar-active-bg)!important;
+  color:var(--lf-sidebar-active-fg)!important;
+}
+/* Icons, labels and dropdown arrows always inherit the link foreground. */
+body .sidebar.sidebar-default .sidebar-body .sidebar-list .navbar-nav .nav-item
+.nav-link:not(.static-item) :is(.item-name,.mini-icon,.default-icon,.right-icon,i,svg) {
+  color:inherit!important;
+}
+/* Visible keyboard focus, including on filled active links. */
+body .sidebar.sidebar-default .sidebar-body .sidebar-list .navbar-nav .nav-item
+.nav-link:not(.static-item):is(.active,[aria-expanded="true"]):focus-visible {
+  outline:3px solid var(--lf-sidebar-active-fg)!important;
+  outline-offset:-4px!important;
+}
+body .sidebar.sidebar-default.sidebar-color .sidebar-body .sidebar-list .navbar-nav .nav-item
+.nav-link:not(.static-item):not(.active):focus-visible {
+  outline:3px solid #ffffff!important;
+  outline-offset:-4px!important;
+}
+/* The brand-colored button and its text must never become blue-on-blue. */
+body .main-content .btn.btn-primary:not(:disabled):not(.disabled),
+body .main-content .btn.btn-primary:not(:disabled):not(.disabled) :is(.btn-inner,.item-name,.text-primary,svg,i) {
+  color:#ffffff!important;
+}
+/* Informational blue backgrounds need inverse foreground on children too. */
+body .main-content .bg-primary:not(.btn):not(.btn-primary) :is(.text-primary,.link-primary) {
+  color:#ffffff!important;
+}
+
