@@ -67,6 +67,79 @@ $usrhandl = Auth::user()->littlelink_name;
 	  <link rel="stylesheet" href="{{ asset('assets/external-dependencies/bootstrap-icons.css') }}">
 
   <style>:focus-visible{outline:3px solid #7b61ff;outline-offset:3px}[role="button"]{cursor:pointer}button[data-setting]{font:inherit} .backup-list .button-entrance{max-width:100%}</style>
+  <style>
+/* Cabeçalho slim: mantém saudação, nome e botões de perfil sem banner alto. */
+.iq-navbar-header.welcome-slim{
+ width:calc(100% - 28px);max-width:980px;min-height:0;height:auto!important;
+ margin:12px auto 18px!important;padding:14px clamp(15px,3vw,25px)!important;
+ border-radius:15px;overflow:hidden;position:relative;box-shadow:0 8px 18px rgba(0,0,0,.10)
+}
+.iq-navbar-header.welcome-slim .iq-container{padding:0!important;max-width:100%}
+.iq-navbar-header.welcome-slim .row{margin:0!important}
+.iq-navbar-header.welcome-slim .col-md-12{padding:0!important}
+.iq-navbar-header.welcome-slim h1{
+ font-size:clamp(1.18rem,3vw,1.7rem);line-height:1.25;margin:0 0 4px!important;
+ overflow-wrap:anywhere
+}
+.iq-navbar-header.welcome-slim h5{
+ font-size:clamp(.84rem,2.3vw,1rem);line-height:1.4;margin:0!important;opacity:.96
+}
+.iq-navbar-header.welcome-slim .iq-header-img{display:none!important}
+.iq-navbar-header.welcome-slim .btn{min-height:40px;margin-top:5px}
+/* No mobile, a barra de ferramentas original ocupa o lugar da antiga barra
+   "LinkFree + menu hambúrguer". A seta [data-toggle=sidebar] continua ativa. */
+@media(max-width:991.98px){
+ .mobile-unified-nav .navbar-inner{
+  width:100%;min-width:0;display:flex!important;flex-wrap:nowrap!important;
+  gap:5px;align-items:center;padding:7px clamp(6px,2vw,16px)!important
+ }
+ .mobile-unified-nav .navbar-brand{display:none!important}
+ .mobile-unified-nav .navbar-toggler{display:none!important}
+ .mobile-unified-nav .sidebar-toggle{
+  display:inline-flex!important;align-items:center;justify-content:center;
+  flex:0 0 40px;min-width:40px;min-height:44px;margin:0!important;
+  position:relative;z-index:1
+ }
+ .mobile-unified-nav #navbarSupportedContent{
+  display:flex!important;flex:1 1 auto;min-width:0;width:auto!important;
+  max-width:100%;height:auto!important;visibility:visible!important;
+  align-items:center;justify-content:flex-end;overflow:visible
+ }
+ .mobile-unified-nav #navbarSupportedContent .navbar-list{
+  display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+  align-items:center!important;justify-content:flex-end;
+  gap:0;margin-left:auto!important;margin-bottom:0!important;min-width:0;padding:0
+ }
+ .mobile-unified-nav #navbarSupportedContent .navbar-list>li{
+  flex:0 0 auto;margin:0!important;min-width:0;position:relative
+ }
+ .mobile-unified-nav #navbarSupportedContent .navbar-list .nav-link{
+  min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:5px!important
+ }
+ .mobile-unified-nav #navbarSupportedContent .navbar-list .dropdown-menu{
+  max-width:min(94vw,360px);z-index:1060
+ }
+ .mobile-unified-nav #navbarDropdown .caption{display:none!important}
+ .mobile-unified-nav #navbarDropdown .avatar{width:34px!important;height:34px!important;object-fit:cover}
+ .mobile-unified-nav #navbarSupportedContent .navbar-list .btn.btn-sm{
+  font-size:.78rem;line-height:1.2;padding:9px 7px!important;min-height:40px
+ }
+ .mobile-unified-nav #navbarSupportedContent .navbar-list .btn-seg-ico{font-size:.85rem}
+ .iq-navbar-header.welcome-slim{
+  width:calc(100% - 16px);margin:8px auto 12px!important;
+  padding:12px 14px!important
+ }
+}
+@media(max-width:359px){
+ .mobile-unified-nav .navbar-inner{gap:2px;padding-inline:3px!important}
+ .mobile-unified-nav .sidebar-toggle{min-width:34px;flex-basis:34px}
+ .mobile-unified-nav #navbarSupportedContent .navbar-list .nav-link{padding:3px!important}
+ .mobile-unified-nav #navbarSupportedContent .navbar-list .btn.btn-sm{
+  padding:8px 4px!important;font-size:.71rem
+ }
+ .mobile-unified-nav #navbarDropdown .avatar{width:30px!important;height:30px!important}
+}
+</style>
 </head>
   <body class="  ">
     <!-- loader Start -->
@@ -234,7 +307,7 @@ $usrhandl = Auth::user()->littlelink_name;
     </aside>    <main class="main-content">
       <div class="position-relative iq-banner">
         <!--Nav Start-->
-        <nav class="nav navbar navbar-expand-lg navbar-light iq-navbar">
+        <nav class="nav navbar navbar-expand-lg navbar-light iq-navbar mobile-unified-nav">
           <div class="container-fluid navbar-inner">
             <a href="{{ route('panelIndex') }}" class="navbar-brand">
 
@@ -463,7 +536,7 @@ $usrhandl = Auth::user()->littlelink_name;
           </div>
         </nav>          <!-- Nav Header Component Start -->
         <style>.header-block{background-color:var(--bs-primary);border-bottom-left-radius:1rem;border-bottom-right-radius:1rem;}</style>
-          <div class="iq-navbar-header header-block mb-2" style="height: 205px;">
+          <div class="iq-navbar-header header-block mb-2 welcome-slim" style="height:auto;">
               <div class="container-fluid iq-container">
                   <div class="row">
                       <div class="col-md-12">
