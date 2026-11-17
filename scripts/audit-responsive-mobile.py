@@ -13,6 +13,7 @@ sidebar=(ROOT/"layouts/sidebar.blade.php").read_text()
 links=(ROOT/"studio/links.blade.php").read_text()
 dashboard=(ROOT/"panel/index.blade.php").read_text()
 theme=(ROOT/"studio/theme.blade.php").read_text()
+palette=(ROOT.parents[2]/"assets/css/linkfree-color-modes.css").read_text()
 # CSS has no dynamic Blade directives in the sections being exercised.
 css_sidebar=sidebar.split("/* Cabeçalho slim:",1)[1].split("</style>",1)[0]
 css_links=links.split("/* Mesmo alinhamento e mesma largura",1)[1].split("</style>",1)[0]
@@ -20,7 +21,7 @@ css_dashboard=dashboard.split("<style>",1)[1].split("</style>",1)[0]
 css_theme=theme.split("<style>",1)[1].split("</style>",1)[0]
 css = ("/* Cabeçalho slim:"+css_sidebar+
        "/* Mesmo alinhamento e mesma largura"+css_links+
-       css_dashboard+css_theme)
+       css_dashboard+css_theme+palette)
 base_css = """
 *{box-sizing:border-box}html,body{margin:0;font:16px/1.4 Arial,sans-serif}
 .row{display:flex;flex-wrap:wrap;width:100%;margin:0}
@@ -38,7 +39,7 @@ base_css = """
 """
 html = """<!doctype html><html lang="pt-BR"><head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta charset="utf-8"></head><body>
+<meta charset="utf-8"></head><body><div class="main-content"><div class="iq-banner">
 <nav class="nav navbar navbar-expand-lg navbar-light iq-navbar mobile-unified-nav">
 <div class="container-fluid navbar-inner" id="navbar-inner">
   <a href="#home" class="navbar-brand">Link Free</a>
@@ -63,6 +64,7 @@ html = """<!doctype html><html lang="pt-BR"><head>
  </div></div></div>
  <div class="iq-header-img"></div>
 </div>
+</div><div class="content-inner mt-n5">
 <main class="studio-links-page" style="max-width:100%;padding:10px">
  <div class="studio-links-sections">
    <section class="pre-left links-section-card card rounded" id="card-links">
@@ -103,7 +105,7 @@ html = """<!doctype html><html lang="pt-BR"><head>
  <button class="btn theme-preview-current">Pré-visualizar tema atual</button>
 </div>
 <div class="modal-content studio-links-preview-modal" style="position:relative;display:none"></div>
-</body></html>"""
+</div></div></body></html>"""
 
 with sync_playwright() as p:
     browser=p.chromium.launch(channel="chrome",headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
@@ -130,6 +132,14 @@ with sync_playwright() as p:
                 welcome:rect('#welcome').height,
                 toolbar:rect('#navbarSupportedContent').right,
                 topClickWidth:rect('.top-links-slim-item').width,
+                topClickBg:getComputedStyle(document.querySelector('.top-links-slim-item')).backgroundColor,
+                topClickColor:getComputedStyle(document.querySelector('.top-link-title')).color,
+                navBottom:rect('#navbar-inner').bottom,
+                welcomeTop:rect('#welcome').top,
+                welcomeBottom:rect('#welcome').bottom,
+                linksTop:rect('#card-links').top,
+                arrowMid:rect('#side-arrow').top+rect('#side-arrow').height/2,
+                profileMid:rect('#navbarDropdown').top+rect('#navbarDropdown').height/2,
                 offenders:[...document.querySelectorAll('body *')].filter(el=>{
                   const r=el.getBoundingClientRect();
                   return r.right>innerWidth+1||r.left< -1;
@@ -148,7 +158,24 @@ with sync_playwright() as p:
                 assert not values["navBrandVisible"] and not values["burgerVisible"],(width,"duplicate mobile navbar",values)
                 assert values["sidebarVisible"] and values["navControlVisible"],(width,"lost toolbar/side-arrow",values)
                 assert values["toolbar"]<=width+2,(width,"toolbar exceeds viewport",values)
+                assert abs(values["arrowMid"]-values["profileMid"]) < 7,(width,"arrow and profile not in same row",values)
+                assert values["navBottom"] <= values["welcomeTop"]+1,(width,"navbar overlaps welcome",values)
+                assert values["welcomeBottom"] <= values["linksTop"]+1,(width,"welcome overlaps content",values)
             assert values["welcome"]<180,(width,"welcome too tall",values)
+            assert values["topClickBg"]=="rgb(245, 247, 252)",(width,"light Top Clicks not using light palette",values)
+            page.evaluate("document.body.classList.add('dark')")
+            night=page.evaluate("""() => ({
+              background:getComputedStyle(document.querySelector('.top-links-slim-item')).backgroundColor,
+              title:getComputedStyle(document.querySelector('.top-link-title')).color,
+              muted:getComputedStyle(document.querySelector('.top-link-url')).color,
+              bodyVars:getComputedStyle(document.body).getPropertyValue('--lf-raised').trim(),
+              overlap:document.querySelector('#welcome').getBoundingClientRect().bottom >
+                      document.querySelector('#card-links').getBoundingClientRect().top + 1
+            })""")
+            assert night["background"]=="rgb(46, 54, 77)",(width,"Top Clicks dark background remains light",night)
+            assert night["title"]=="rgb(244, 247, 253)",(width,"Top Clicks title contrast",night)
+            assert night["muted"]=="rgb(195, 206, 222)",(width,"Top Clicks URL contrast",night)
+            assert not night["overlap"],(width,"dark-mode welcome overlaps content",night)
             print(f"OK viewport {width}px: same-width cards, slim header, mobile navbar, no page overflow")
             context.close()
     finally:
