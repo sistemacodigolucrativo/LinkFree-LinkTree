@@ -22,7 +22,7 @@ require(re.search(r"<section class='[^']*pre-left[^']*card rounded[^']*'", links
         "Meus Links possui card separado")
 require(re.search(r"<section class='[^']*page-icons-card card rounded[^']*'", links),
         "Ícones de Página possuem card separado")
-require(links.index("id='studio-my-links-title'") < links.index("id='studio-page-icons-title'"),
+require(links.index('id="studio-my-links-title"') < links.index('id="studio-page-icons-title"'),
         "Ordem correta de Meus Links e Ícones de Página")
 require('id="links-table-body"' in links, "Lista original de links preservada")
 require("route('editIcons')" in links, "Formulário de ícones preservado")
