@@ -609,3 +609,14 @@ body:not(.dark) .main-content .theme-preview-strip .theme-preview-current:is(:ho
   background:var(--lf-hover)!important;
   color:var(--lf-link)!important;
 }
+
+/* Light V1 review: canvas aplicado e editor harmonizado. */
+/* O token do canvas antes era declarado, mas nao utilizado no painel. */
+body:not(.dark) .main-content {
+  background-color:var(--lf-canvas);
+}
+/* O CKEditor herdava um lilas legado (#f4f0fb); a barra segue os neutros Light V1.
+   Apenas a superficie do editor muda: selecao, conteudo e JS sao preservados. */
+body:not(.dark) .main-content .studio-profile-editor-page {
+  --lf-editor-ui:var(--lf-raised);
+}

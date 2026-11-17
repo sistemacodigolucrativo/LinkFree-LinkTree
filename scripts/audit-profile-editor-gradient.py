@@ -106,6 +106,7 @@ def measure(page):
         editorBg:style('#editor').backgroundColor,
         editorFg:style('#editor').color,
         childFg:style('#editor p').color,
+        canvasBg:style('.main-content').backgroundColor,
         toolbarBg:style('.ck-toolbar').backgroundColor,
         toolbarFg:style('.ck-toolbar').color,
         arrowBg:style('#arrow').backgroundColor,
@@ -132,6 +133,8 @@ with sync_playwright() as p:
             assert light["cardGradient"].startswith("linear-gradient("),(width,"light card gradient absent",light)
             assert "rgb(255, 255, 255)" in light["cardGradient"] and "rgb(236, 242, 255)" in light["cardGradient"],(width,"incorrect light gradient",light)
             assert light["heading"]=="rgb(24, 36, 59)",(width,"light card title contrast",light)
+            assert light["canvasBg"]=="rgb(243, 246, 252)",(width,"Light V1 canvas token unused",light)
+            assert light["toolbarBg"]=="rgb(245, 247, 252)",(width,"Light V1 editor toolbar remains lilac",light)
             assert light["editorBg"]=="rgb(255, 255, 255)",(width,"light editor background",light)
             assert light["editorFg"]=="rgb(24, 36, 59)",(width,"light editor text contrast",light)
             assert light["childFg"]=="rgb(24, 36, 59)",(width,"light editor paragraphs",light)
