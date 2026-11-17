@@ -27,17 +27,40 @@ if (isset($_COOKIE['LinkCount'])) {
 @push('sidebar-stylesheets')
 <script src="{{ asset('assets/external-dependencies/fontawesome.js') }}" crossorigin="anonymous"></script>
 <style>
-@media only screen and (max-width: 1500px) {
-  .pre-side{display:none!important;}
-  .pre-left{width:100%!important;}
-  .pre-bottom{display:block!important;}
+/* Estúdio > Meus Links: cards independentes, sem prévia embutida. */
+.studio-links-page .links-workspace { width:100%; min-width:0; }
+.studio-links-page .links-workspace > .card-body { padding:0; }
+.studio-links-page .pre-left { width:100%; min-width:0; box-sizing:border-box; }
+.studio-links-page .links-section-card { width:100%; min-width:0; overflow-wrap:anywhere; }
+.studio-links-page .links-section-card .card-header { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; justify-content:space-between; }
+.studio-links-page .links-section-card .card-header > .btn { float:none!important; margin-left:auto; }
+.studio-links-page .links-section-card .card-body { width:100%; min-width:0; }
+.studio-links-page #links-table-body { width:100%; min-width:0; }
+.studio-links-page .page-icons-card .form-group { width:100%; max-width:760px; min-width:0; }
+.studio-links-page .page-icons-card .input-group { display:flex; min-width:0; flex-wrap:nowrap; }
+.studio-links-page .page-icons-card .input-group input { flex:1 1 auto; min-width:0; }
+.studio-links-preview-fab {
+  position:fixed; right:clamp(16px,3vw,34px);
+  bottom:calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index:1035; display:inline-flex; align-items:center; justify-content:center;
+  gap:.5rem; min-width:56px; min-height:56px; padding:12px 19px;
+  border:2px solid #bd8b22; border-radius:100px; background:#ffcb43!important;
+  color:#191919!important; font-size:1rem; font-weight:700; line-height:1.2;
+  box-shadow:0 8px 28px rgba(0,0,0,.24); cursor:pointer;
 }
-
-@media only screen and (min-width: 1501px) {
-  .pre-left{width:70%!important;}
-  .pre-right{width:30%!important;}
-  .pre-bottom{display:none!important;}
+.studio-links-preview-fab:hover, .studio-links-preview-fab:active { background:#f7bd28!important; color:#101010!important; }
+.studio-links-preview-fab:focus-visible { outline:3px solid #184e9c; outline-offset:3px; }
+.studio-links-preview-modal .modal-content { height:100vh; height:100dvh; display:flex; flex-direction:column; background:#fff; }
+.studio-links-preview-modal .modal-header { min-height:64px; padding:12px 16px; flex:0 0 auto; background:#171823; color:#fff; border:0; }
+.studio-links-preview-modal .modal-header .modal-title { color:#fff; font-size:clamp(1rem,3vw,1.2rem); line-height:1.3; }
+.studio-links-preview-modal .modal-body { flex:1 1 auto; min-height:0; overflow:hidden; }
+.studio-links-preview-modal iframe { display:block; width:100%; height:100%; border:0; background:#fff; }
+@media(max-width:767px) {
+  .studio-links-page .links-section-card .card-body { padding:14px!important; }
+  .studio-links-page .links-section-card .card-header > .btn { width:100%; margin-left:0; }
+  .studio-links-preview-fab { right:16px; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); }
 }
+@media(max-width:359px) { .studio-links-preview-fab { padding:12px 15px; } }
 </style>
 <style>.delete{position:relative; color:transparent; background-color:tomato; border-radius:5px; left:5px; padding:5px 12px; cursor: pointer;}.delete:hover{color:transparent;background-color:#f13d1d;}html,body{max-width:100%;overflow-x:hidden;}</style>
 <style>
@@ -61,26 +84,26 @@ if (isset($_COOKIE['LinkCount'])) {
 
 <?php if(!function_exists('strp')){function strp($urlStrp){return str_replace(array('http://', 'https://'), '', $urlStrp);}} ?>
 
-<div class="conatiner-fluid content-inner mt-n5 py-0">
+<div class="conatiner-fluid content-inner mt-n5 py-0 studio-links-page">
     <div class="row">
 
         <div class="col-lg-12">
-            <div class="card   rounded">
+            <div class="links-workspace">
                <div class="card-body">
                   <div class="row">
                       <div class="col-sm-12">
 
                         <div class="row">
-                            <section class='pre-left text-gray-400'>
-                                <h3 class="card-header mb-3"><i class="bi bi-link-45deg">{{__('messages.My Links')}}</i>
+                            <section class='pre-left links-section-card card rounded mb-3 text-gray-400' aria-labelledby='studio-my-links-title'>
+                                <h3 id="studio-my-links-title" class="card-header mb-3"><i class="bi bi-link-45deg">{{__('messages.My Links')}}</i>
                                         <a class="btn btn-primary float-end" href="{{ url('/studio/add-link') }}"> {{__('messages.Add new Link')}}</a>
                                 </h3>
 
-                                <div>
+                                <div class="card-body px-3 pb-3">
 
                                     {{-- <div style="text-align: right;"><a href="{{ url('/studio/links') }}/10">10</a> | <a href="{{ url('/studio/links') }}/20">20</a> | <a href="{{ url('/studio/links') }}/30">30</a> | <a href="{{ url('/studio/links') }}/all">all</a></div> --}}
 
-                                <div style="overflow-y: none;" class="col col-md-7 ms-3">
+                                <div class="col-12 px-1">
 
                                     <div id="links-table-body" data-page="{{request('page', 1)}}" data-per-page="{{$pagePage ? $pagePage : 0}}">
                                         @if($links->total() == 0)
@@ -216,26 +239,13 @@ if (isset($_COOKIE['LinkCount'])) {
                                 </div>
                             </section>
 
-                            <section class='pre-right text-gray-400 pre-side'>
-                                <h3 class="card-header"><i class="bi bi-window-fullscreen" style="font-style:normal!important;"> {{__('messages.Preview')}}</i></h3>
-                                    <div class='card-body p-0 p-md-3'>
-                                            <center><iframe title="Prévia da página de links" allowtransparency="true" id="frPreview1" style=" border-radius:0.25rem !important; background: #FFFFFF; min-height:600px; height:100%; max-width:500px !important;" class='w-100' src="{{ url('') }}/@<?= Auth::user()->littlelink_name ?>">{{__('messages.No compatible browser')}}</iframe></center>
-                                     </div>
-                            </section>
                             </div>
+                            {{-- A prévia foi movida para um modal fullscreen acionado pelo botão flutuante. --}}
 
-                            <br>
-                            <section style="width:100%;min-width:0;box-sizing:border-box;" class='pre-bottom text-gray-400 pre-side'>
-                                <h3 class="card-header"><i class="bi bi-window-fullscreen" style="font-style:normal!important;">{{__('messages.Preview')}}</i></h3>
-                                    <div class='card-body p-0 p-md-3'>
-                                            <center><iframe title="Prévia da página de links" allowtransparency="true" id="frPreview2" style=" border-radius:0.25rem !important; background: #FFFFFF; min-height:600px; height:100%; width:100% !important;" class='w-100' src="{{ url('') }}/@<?= Auth::user()->littlelink_name ?>">{{__('messages.No compatible browser')}}</iframe></center>
-                                     </div>
-                            </section><br>
-
-                            <section style="margin-left:-15px;margin-right:-15px;" class='text-gray-400'>
+                            <section class='links-section-card page-icons-card card rounded mt-3 mb-3 text-gray-400' aria-labelledby='studio-page-icons-title'>
                             <a name="icons"></a>
-                            <h3 class="mb-4 card-header"><i class="fa-solid fa-icons"></i> {{__('messages.Page Icons')}}</i></h3>
-                            <div class="card-body p-0 p-md-3">
+                            <h3 id="studio-page-icons-title" class="mb-3 card-header"><i class="fa-solid fa-icons"></i> {{__('messages.Page Icons')}}</h3>
+                            <div class="card-body p-3">
 
                             <form action="{{ route('editIcons') }}" enctype="multipart/form-data" method="post">
                                 @csrf
@@ -358,7 +368,46 @@ if (isset($_COOKIE['LinkCount'])) {
       </div>
     </div>
 
-<script src="{{ asset('assets/external-dependencies/jquery-1.12.4.min.js') }}"></script>
-<script type="text/javascript">$("iframe").load(function() { $("iframe").contents().find("a").each(function(index) { $(this).on("click", function(event) { event.preventDefault(); event.stopPropagation(); }); }); });</script>
+{{-- Botão flutuante independente dos cards, disponível durante a edição. --}}
+<button id="studio-links-preview-trigger" class="studio-links-preview-fab" type="button"
+        data-bs-toggle="modal" data-bs-target="#studioLinksPreviewModal"
+        aria-label="Abrir pré-visualização da minha página em tela inteira"
+        title="Pré-visualizar minha página">
+  <i class="bi bi-eye" aria-hidden="true"></i><span>Prévia</span>
+</button>
+
+{{-- Modal do Bootstrap: ao fechar, mantém o scroll e o estado dos formulários da página. --}}
+<div class="modal fade studio-links-preview-modal" id="studioLinksPreviewModal" tabindex="-1"
+     aria-labelledby="studioLinksPreviewTitle" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="studioLinksPreviewTitle">Minha página — visualização</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                aria-label="Fechar pré-visualização e voltar aos meus links"></button>
+      </div>
+      <div class="modal-body p-0">
+        <iframe id="studio-links-preview-frame" title="Página pública de links do usuário"
+                data-preview-url="{{ url('/@'.Auth::user()->littlelink_name) }}"
+                loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const modal = document.getElementById('studioLinksPreviewModal');
+  const frame = document.getElementById('studio-links-preview-frame');
+  if (!modal || !frame) return;
+  modal.addEventListener('show.bs.modal', function () {
+    // Recarrega apenas a prévia, nunca a página do editor.
+    frame.src = frame.dataset.previewUrl;
+  });
+  modal.addEventListener('hidden.bs.modal', function () {
+    // Para eventuais vídeos e áudio quando a prévia é fechada.
+    frame.removeAttribute('src');
+  });
+});
+</script>
 
 @endsection
