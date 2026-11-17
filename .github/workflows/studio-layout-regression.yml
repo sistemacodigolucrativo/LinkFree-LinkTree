@@ -9,8 +9,11 @@ on:
       - 'linkstack/resources/views/layouts/guest.blade.php'
       - 'linkstack/assets/css/linkfree-color-modes.css'
       - 'linkstack/assets/js/main-dashboard.js'
+      - 'linkstack/assets/js/sidebar-auto-close.js'
+      - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-responsive-mobile.py'
+      - 'scripts/audit-linkfree-interactions.py'
       - 'scripts/audit-color-contrast.py'
       - '.github/workflows/studio-layout-regression.yml'
   pull_request:
@@ -22,8 +25,11 @@ on:
       - 'linkstack/resources/views/layouts/guest.blade.php'
       - 'linkstack/assets/css/linkfree-color-modes.css'
       - 'linkstack/assets/js/main-dashboard.js'
+      - 'linkstack/assets/js/sidebar-auto-close.js'
+      - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-responsive-mobile.py'
+      - 'scripts/audit-linkfree-interactions.py'
       - 'scripts/audit-color-contrast.py'
       - '.github/workflows/studio-layout-regression.yml'
 
@@ -46,3 +52,5 @@ jobs:
         run: python -m pip install --quiet playwright
       - name: Test mobile widths in headless Chrome
         run: python scripts/audit-responsive-mobile.py
+      - name: Test sidebar closing, inline link buttons and notification viewport
+        run: python scripts/audit-linkfree-interactions.py

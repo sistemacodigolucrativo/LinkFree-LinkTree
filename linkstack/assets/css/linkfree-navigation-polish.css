@@ -1,0 +1,71 @@
+/* Navigation refinements: compact View Page and viewport-contained notifications. */
+.main-content .iq-navbar #navbarSupportedContent .navbar-list .view-page-slim,
+.main-content .iq-navbar #navbarSupportedContent .navbar-list .share-page-slim {
+  height:34px!important;min-height:34px!important;max-height:34px!important;
+  width:auto!important;min-width:0;box-sizing:border-box!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  vertical-align:middle!important;text-align:center!important;
+  padding:0 9px!important;line-height:1.1!important;
+  font-size:.76rem!important;font-weight:600!important;
+  white-space:nowrap!important;margin:0!important;
+}
+.main-content .iq-navbar #navbarSupportedContent .navbar-list .share-page-slim {
+  width:35px!important;min-width:35px!important;max-width:35px!important;
+  padding:0 7px!important;
+}
+.main-content .iq-navbar #navbarSupportedContent .navbar-list .view-page-buttons {
+  display:inline-flex!important;flex-direction:row!important;
+  align-items:center!important;justify-content:center!important;
+  width:auto;min-width:0;gap:0!important;
+}
+@media(max-width:359px){
+  .main-content .iq-navbar #navbarSupportedContent .navbar-list .view-page-slim{
+    height:32px!important;min-height:32px!important;max-height:32px!important;
+    padding:0 5px!important;font-size:.69rem!important;
+  }
+  .main-content .iq-navbar #navbarSupportedContent .navbar-list .share-page-slim {
+    height:32px!important;min-height:32px!important;max-height:32px!important;
+    width:31px!important;min-width:31px!important;max-width:31px!important;
+    padding:0 5px!important;
+  }
+}
+
+/* Bootstrap/Popper previously anchored this wide panel to the bell at
+ * screen edge; fixed viewport positioning prevents horizontal overflow.
+ * The override also wins against Popper's inline transform and legacy sub-drop rules. */
+body .main-content .iq-navbar .notification-panel.show,
+body .main-content .mobile-unified-nav #navbarSupportedContent .notification-panel.show {
+  position:fixed!important;
+  left:50%!important;right:auto!important;
+  inset-inline-start:50%!important;inset-inline-end:auto!important;
+  top:calc(63px + env(safe-area-inset-top,0px))!important;
+  bottom:auto!important;
+  transform:translate3d(-50%,0,0)!important;
+  width:min(420px,calc(100vw - 24px))!important;
+  min-width:0!important;max-width:calc(100vw - 24px)!important;
+  max-height:calc(100dvh - 78px - env(safe-area-inset-top,0px))!important;
+  margin:0!important;padding:0!important;
+  box-sizing:border-box!important;overflow-x:hidden!important;overflow-y:auto!important;
+  overscroll-behavior:contain;z-index:1100!important;
+  border-radius:12px!important;
+}
+body .main-content .iq-navbar .notification-panel .card{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  margin:0!important;box-sizing:border-box!important;
+}
+body .main-content .iq-navbar .notification-panel :is(.card-header,.card-body,.iq-sub-card){
+  width:100%;max-width:100%;min-width:0;box-sizing:border-box;
+}
+body .main-content .iq-navbar .notification-panel .card-header h5{
+  white-space:normal;overflow-wrap:anywhere;
+  margin:0;font-size:clamp(.88rem,3vw,1rem);
+}
+body .main-content .iq-navbar .notification-panel :is(p,a,span,div){
+  overflow-wrap:anywhere;
+}
+@supports not (height:100dvh){
+  body .main-content .iq-navbar .notification-panel.show,
+  body .main-content .mobile-unified-nav #navbarSupportedContent .notification-panel.show {
+    max-height:calc(100vh - 78px)!important;
+  }
+}

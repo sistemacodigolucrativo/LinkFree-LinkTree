@@ -178,6 +178,70 @@ if (isset($_COOKIE['LinkCount'])) {
  .studio-links-page .studio-link-slim .d-flex.gap-1 .btn{min-height:40px;height:40px;min-width:40px;width:40px}
  .studio-links-page .studio-link-slim>.d-flex>.col-auto{min-height:44px}
 }
+
+/* Meus Links — ações inline, controles visuais menores e cliques no topo. */
+.studio-links-page #links-table-body .studio-link-slim{
+  position:relative!important;display:block;min-width:0;
+  padding:5px 7px!important;min-height:0!important;box-sizing:border-box;
+}
+.studio-links-page #links-table-body .studio-link-slim .studio-link-clicks{
+  position:absolute;top:5px;right:7px;z-index:1;width:max-content!important;max-width:105px;
+  padding:3px 6px;font-size:10px;line-height:1.2;font-weight:700;
+  display:inline-flex;align-items:center;gap:3px;white-space:nowrap;
+  color:var(--lf-text,#18243b);background:var(--lf-surface,#fff);
+  border:1px solid var(--lf-border,#75839a);border-radius:7px;
+}
+.studio-links-page #links-table-body .studio-link-slim.has-clicks .col-12.p-2:first-child{
+  padding-right:110px!important;
+}
+.studio-links-page #links-table-body .studio-link-slim>.d-flex>.col-auto{
+  flex:0 0 30px!important;width:30px!important;min-width:30px!important;
+  max-width:30px!important;min-height:36px!important;
+  margin:0!important;padding:0!important;
+}
+.studio-links-page #links-table-body .studio-link-slim .sortable-handle{
+  width:14px!important;height:14px!important;min-width:14px!important;
+  max-width:14px!important;transform:rotate(90deg);margin:0!important;
+}
+.studio-links-page #links-table-body .studio-link-slim .studio-link-actions{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  display:flex!important;flex-direction:row!important;align-items:center!important;
+  justify-content:flex-start!important;flex-wrap:nowrap!important;gap:5px!important;
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;
+  white-space:nowrap;margin:3px 0 0!important;padding:1px 0 2px!important;
+}
+.studio-links-page #links-table-body .studio-link-slim .studio-link-actions :is(a.btn-icon,button.btn-icon,button.studio-link-move){
+  position:static!important;float:none!important;display:inline-flex!important;
+  justify-content:center!important;align-items:center!important;
+  flex:0 0 34px!important;box-sizing:border-box!important;
+  width:34px!important;height:34px!important;min-width:34px!important;
+  min-height:34px!important;max-width:34px!important;max-height:34px!important;
+  margin:0!important;padding:5px!important;border-radius:8px!important;
+  font-size:14px!important;line-height:1!important;box-shadow:none!important;
+}
+.studio-links-page #links-table-body .studio-link-slim .studio-link-actions :is(a.btn-icon,button.btn-icon) .btn-inner{
+  width:15px!important;height:15px!important;padding:0!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+}
+.studio-links-page #links-table-body .studio-link-slim .studio-link-actions :is(svg,.icon-20){
+  display:block;width:14px!important;height:14px!important;
+  min-width:14px!important;min-height:14px!important;
+  max-width:14px!important;max-height:14px!important;
+}
+.studio-links-page #links-table-body .studio-link-slim .studio-link-actions .studio-link-move i{
+  font-size:14px!important;line-height:1!important;
+}
+.studio-links-page #links-table-body .studio-link-slim .studio-link-actions>a:not(.btn-icon){
+  float:none!important;white-space:nowrap;flex:0 0 auto;margin:0!important;
+}
+@media(max-width:575px){
+ .studio-links-page #links-table-body .studio-link-slim .studio-link-actions :is(a.btn-icon,button.btn-icon,button.studio-link-move){
+  width:36px!important;height:36px!important;min-width:36px!important;
+  min-height:36px!important;max-width:36px!important;max-height:36px!important;
+  flex-basis:36px!important;
+ }
+ .studio-links-page #links-table-body .studio-link-slim.has-clicks .col-12.p-2:first-child{padding-right:100px!important}
+}
 </style>
 @endpush
 
@@ -217,7 +281,12 @@ if (isset($_COOKIE['LinkCount'])) {
                                         @php $button = Button::find($link->button_id); if(isset($button->name)){$buttonName = $button->name;}else{$buttonName = 0;} @endphp
                                         @php if($buttonName == "default email"){$buttonName = "email";} if($buttonName == "default email_alt"){$buttonName = "email_alt";} @endphp
                                         @if($button && $button->name !== 'icon')
-                                        <div class='row studio-link-slim pb-0 mb-2 border rounded w-100' data-id="{{$link->id}}">
+                                        <div class='row studio-link-slim pb-0 mb-2 border rounded w-100 {{ !empty($link->link) ? 'has-clicks' : '' }}' data-id="{{$link->id}}">
+                                            @if(!empty($link->link))
+                                              <span class="studio-link-clicks" aria-label="{{ $link->click_number }} {{__('messages.Clicks')}}">
+                                                <i class="bi bi-bar-chart-line" aria-hidden="true"></i> {{ $link->click_number }} {{__('messages.Clicks')}}
+                                              </span>
+                                            @endif
                                             <div class="d-flex ">
 
 
@@ -275,12 +344,7 @@ if (isset($_COOKIE['LinkCount'])) {
                                                     </div>
 
 
-                                                    <div class='col-12 py-1 px-3 m-0 mt-2'>
-
-                                                        @if(!empty($link->link))
-                                                        <span><i class="bi bi-bar-chart-line"></i> {{ $link->click_number }} {{__('messages.Clicks')}}</span>
-
-                                                        @endif
+                                                    <div class='col-12 py-1 px-3 m-0 mt-2 studio-link-actions' role="group" aria-label="Ações do link">
 
                                                         <a style="float: right;" href="{{ route('deleteLink', $link->id ) }}" data-delete-link data-confirm="{{ __('messages.confirm_delete', ['title' => $link->title]) }}" class="btn btn-sm me-1 btn-icon btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Delete" data-original-title="{{__('messages.Delete')}}">
                                                             <span class="btn-inner">
@@ -302,7 +366,13 @@ if (isset($_COOKIE['LinkCount'])) {
                                                                </span>
                                                             </a>
 
-                                                            @if(env('ENABLE_BUTTON_EDITOR') === true)
+                                                            <button type="button" class="btn btn-sm btn-outline-secondary studio-link-move" data-direction="-1" aria-label="Mover link para cima" title="Mover para cima">
+                                                               <i class="bi bi-arrow-up" aria-hidden="true"></i>
+                                                             </button>
+                                                             <button type="button" class="btn btn-sm btn-outline-secondary studio-link-move" data-direction="1" aria-label="Mover link para baixo" title="Mover para baixo">
+                                                               <i class="bi bi-arrow-down" aria-hidden="true"></i>
+                                                             </button>
+                                                             @if(env('ENABLE_BUTTON_EDITOR') === true)
                                                             @if(($link->button_id == '1' || $link->button_id == '2') && $link->type == 'link')
                                                                 <a style="float: right;" href="{{ route('editCSS', $link->id ) }}" class="btn btn-sm me-1 btn-icon btn-success" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Editar opções do link" data-bs-placement="top" data-original-title="{{__('messages.Customize')}}">
                                                                     <span class="btn-inner">

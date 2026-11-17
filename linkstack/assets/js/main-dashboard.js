@@ -133,15 +133,27 @@
                 }
             }
         });
-        const status=document.createElement('p');status.setAttribute('role','status');sortableTbody.after(status);
-        Array.from(sortableTbody.children).forEach(row=>{
-          if(!row.dataset.id)return;
-          const controls=document.createElement('div');controls.className='d-flex gap-1';
-          for(const [label,direction] of [['Mover para cima',-1],['Mover para baixo',1]]){
-            const button=document.createElement('button');button.type='button';button.className='btn btn-sm btn-outline-secondary';button.textContent=direction===-1?'↑':'↓';button.setAttribute('aria-label',label);
-            button.onclick=()=>{const sibling=direction===-1?row.previousElementSibling:row.nextElementSibling;if(!sibling)return;if(direction===-1)sortableTbody.insertBefore(row,sibling);else sortableTbody.insertBefore(sibling,row);sortableLinkTable.save();button.focus();status.textContent='Ordem atualizada.';};controls.append(button);
-          }
-          row.append(controls);
+        // Os botões de mover agora são renderizados dentro da mesma linha
+        // de Editar/Excluir. Não criar novos controles fora do card.
+        const status=document.createElement('p');
+        status.setAttribute('role','status');
+        status.className='visually-hidden';
+        sortableTbody.after(status);
+        sortableTbody.addEventListener('click', function(event) {
+            const button=event.target.closest('button.studio-link-move');
+            if(!button || !sortableTbody.contains(button))return;
+            event.preventDefault();
+            const row=button.closest('[data-id]');
+            if(!row)return;
+            const direction=Number(button.dataset.direction);
+            if(direction!==-1 && direction!==1)return;
+            const sibling=direction===-1 ? row.previousElementSibling : row.nextElementSibling;
+            if(!sibling || !sibling.matches('[data-id]'))return;
+            if(direction===-1)sortableTbody.insertBefore(row,sibling);
+            else sortableTbody.insertBefore(sibling,row);
+            sortableLinkTable.save();
+            button.focus();
+            status.textContent='Ordem atualizada.';
         });
     }
 

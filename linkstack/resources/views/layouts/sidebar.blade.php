@@ -62,6 +62,7 @@ $usrhandl = Auth::user()->littlelink_name;
       <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}" />
       {{-- Shared high-contrast light/dark palette, after vendor theme styles. --}}
       <link rel="stylesheet" href="{{ asset('assets/css/linkfree-color-modes.css') }}?v={{ filemtime(base_path('assets/css/linkfree-color-modes.css')) }}" />
+      <link rel="stylesheet" href="{{ asset('assets/css/linkfree-navigation-polish.css') }}?v={{ filemtime(base_path('assets/css/linkfree-navigation-polish.css')) }}" />
 
 	  <meta name="csrf-token" content="{{ csrf_token() }}">
 	  <link rel="stylesheet" href="{{ asset('assets/linkstack/css/hover-min.css') }}">
@@ -459,9 +460,9 @@ $usrhandl = Auth::user()->littlelink_name;
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
                 <li class="me-0 me-xl-2">
-                  <div class="dropdown d-flex flex-row align-items-center">
-                    <a target="_blank" href="{{url('/@'.Auth::user()->littlelink_name)}}" style="border-bottom-right-radius:0;border-top-right-radius:0;" class="btn btn-primary btn-sm pe-2">{{__('messages.View Page')}}</a>
-                    <button style="border-bottom-left-radius:0;border-top-left-radius:0;" class="btn btn-primary btn-sm dropdown-toggle ms-auto px-1" type="button" aria-label="Compartilhar perfil" id="dropdownMenuButtonSM" data-bs-toggle="dropdown" aria-expanded="false">
+                  <div class="dropdown d-flex flex-row align-items-center view-page-buttons">
+                    <a target="_blank" href="{{url('/@'.Auth::user()->littlelink_name)}}" style="border-bottom-right-radius:0;border-top-right-radius:0;" class="btn btn-primary btn-sm pe-2 view-page-slim">{{__('messages.View Page')}}</a>
+                    <button style="border-bottom-left-radius:0;border-top-left-radius:0;" class="btn btn-primary btn-sm dropdown-toggle ms-auto px-1 share-page-slim" type="button" aria-label="Compartilhar perfil" id="dropdownMenuButtonSM" data-bs-toggle="dropdown" aria-expanded="false">
                       <i class="btn-seg-ico bi bi-share-fill"></i>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonSM">
@@ -493,7 +494,7 @@ $usrhandl = Auth::user()->littlelink_name;
                       </svg>
                       <span class="bg-danger dots"></span>
                   </a>
-                  <div class="p-0 sub-drop dropdown-menu dropdown-menu-end" aria-labelledby="notification-drop">
+                  <div class="p-0 sub-drop dropdown-menu dropdown-menu-end notification-panel" aria-labelledby="notification-drop">
                       <div class="m-0 shadow-none card">
                         <div class="py-3 card-header d-flex justify-content-between bg-primary">
                             <div class="header-title">
@@ -936,6 +937,7 @@ $usrhandl = Auth::user()->littlelink_name;
 
     <!-- App Script -->
     <script src="{{asset('assets/js/hope-ui.js')}}" defer></script>
+    <script src="{{ asset('assets/js/sidebar-auto-close.js') }}?v={{ filemtime(base_path('assets/js/sidebar-auto-close.js')) }}" defer></script>
 
     <!-- Flatpickr Script -->
     <script src="{{asset('assets/vendor/flatpickr/dist/flatpickr.min.js')}}"></script>
