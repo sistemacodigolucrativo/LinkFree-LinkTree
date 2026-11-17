@@ -21,7 +21,7 @@ assert "studio-profile-editor-page" in pageblade
 assert "linkfree-light-gradient.css" in sidebar
 assert "margin-top:0!important" in page_css
 assert ".studio-profile-editor-page .ck.ck-editor__main > .ck-editor__editable" in page_css
-assert "background:linear-gradient(115deg,#391a66 0%,#6f215d 58%,#992b69 100%)!important" in gradient
+assert "background:linear-gradient(115deg,#ffffff 0%,#f7f9ff 58%,#ecf2ff 100%)!important" in gradient
 assert "body:not(.dark)" in gradient and "body.dark" not in gradient
 assert "width:16px!important;height:16px!important" in sidebar_css
 
@@ -130,8 +130,8 @@ with sync_playwright() as p:
             assert light["avatarTop"]>=light["welcomeBottom"]-1,(width,"avatar overlaps welcome",light)
             assert light["avatarH"]<=101,(width,"avatar oversized",light)
             assert light["cardGradient"].startswith("linear-gradient("),(width,"light card gradient absent",light)
-            assert "rgb(57, 26, 102)" in light["cardGradient"],(width,"incorrect light gradient",light)
-            assert light["heading"]=="rgb(255, 255, 255)",(width,"light card title contrast",light)
+            assert "rgb(255, 255, 255)" in light["cardGradient"] and "rgb(236, 242, 255)" in light["cardGradient"],(width,"incorrect light gradient",light)
+            assert light["heading"]=="rgb(24, 36, 59)",(width,"light card title contrast",light)
             assert light["editorBg"]=="rgb(255, 255, 255)",(width,"light editor background",light)
             assert light["editorFg"]=="rgb(24, 36, 59)",(width,"light editor text contrast",light)
             assert light["childFg"]=="rgb(24, 36, 59)",(width,"light editor paragraphs",light)

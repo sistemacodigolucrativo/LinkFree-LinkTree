@@ -1,84 +1,91 @@
 /*
- * LinkFree light-mode panel cards.
- * Same 115deg violet/magenta gradient as Estúdio > Selecionar Tema.
- * User public LinkStack templates are deliberately outside .main-content.
- * Dark-mode cards, modal/dropdown surfaces and semantic status cards unchanged.
+ * LinkFree Light V1: cartoes claros com azul muito sutil e texto escuro.
+ * O gradiente nao muda geometria, imagem, preview ou comportamento da pagina.
+ * Os temas publicos LinkStack seguem isolados, fora de .main-content.
  */
 body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.bg-light):not(.bg-white):not(.studio-link-slim):not(.notification-panel .card):not(.modal .card) {
-  --lf-gradient-fg:#ffffff;
-  --lf-gradient-muted:#f0dff6;
-  --lf-gradient-link:#e5f3ff;
+  --lf-gradient-fg:var(--lf-text);
+  --lf-gradient-muted:var(--lf-muted);
+  --lf-gradient-link:var(--lf-link);
   --bs-card-bg:transparent;
-  --bs-card-color:#ffffff;
+  --bs-card-color:var(--lf-text);
   --bs-card-cap-bg:transparent;
-  --bs-heading-color:#ffffff;
-  background:linear-gradient(115deg,#391a66 0%,#6f215d 58%,#992b69 100%)!important;
-  color:var(--lf-gradient-fg)!important;
-  border:1px solid rgba(255,255,255,.16)!important;
+  --bs-heading-color:var(--lf-text);
+  background:linear-gradient(115deg,#ffffff 0%,#f7f9ff 58%,#ecf2ff 100%)!important;
+  color:var(--lf-text)!important;
+  border:1px solid #d1d9e6!important;
 }
-/* The card must not reintroduce a white header on top of the gradient. */
+/* Headers e rodapes acompanhando os cartoes sem reintroduzir cores de fornecedor. */
 body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) > :is(.card-header,.card-footer),
 body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) > .card-body :is(.card-header,.card-footer):not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning) {
-  background:rgba(255,255,255,.055)!important;
-  color:#fff!important;
-  border-color:rgba(255,255,255,.26)!important;
+  background:rgba(58,87,232,.035)!important;
+  color:var(--lf-text)!important;
+  border-color:#d1d9e6!important;
 }
-body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) :is(h1,h2,h3,h4,h5,h6,.card-title,.card-text,label,legend,.form-label):not(.ck-content *):not(.ck *):not(.bg-white *) {
-  color:#fff!important;
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) :is(h1,h2,h3,h4,h5,h6,.card-title,.card-text,label,legend,.form-label):not(.text-white):not(.text-primary):not(.text-success):not(.text-danger):not(.text-warning):not(.text-info):not(.ck-content *):not(.ck *):not(.bg-white *) {
+  color:var(--lf-text)!important;
 }
 body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) :is(.text-muted,.form-text,.text-gray-400):not(.ck-content *):not(.bg-white *) {
-  color:#f0dff6!important;
+  color:var(--lf-muted)!important;
 }
-body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) a:not(.btn):not(.dropdown-item):not(.text-white):not(.ck *):not(.bg-white *):not(.top-link-title):not(.top-link-url) {
-  color:#e5f3ff!important;
+body:not(.dark) .main-content .card:not(.bg-primary):not(.bg-soft-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info):not(.notification-panel .card):not(.modal .card) a:not(.btn):not(.dropdown-item):not(.text-white):not(.text-muted):not(.ck *):not(.bg-white *):not(.top-link-title):not(.top-link-url) {
+  color:var(--lf-link)!important;
   text-decoration-color:currentColor;
 }
+/* Controles: backgrounds claros, bordas com contraste funcional. */
 body:not(.dark) .main-content .card :is(.form-control,.form-select,textarea,input:not([type="checkbox"]):not([type="radio"])) {
-  --bs-body-color:#18243b;
-  background-color:#ffffff;
-  color:#18243b;
-  border-color:#75839a;
+  --bs-body-color:var(--lf-text);
+  background-color:var(--lf-input);
+  color:var(--lf-text);
+  border-color:var(--lf-border);
 }
 body:not(.dark) .main-content .card :is(.form-control,.form-select,textarea,input)::placeholder {
-  color:#4b5870;
+  color:var(--lf-muted);
   opacity:1;
 }
 body:not(.dark) .main-content .card :is(.input-group-text,.form-check-input) {
-  background:#f5edf9;
-  color:#18243b;
-  border-color:#75839a;
+  background:var(--lf-hover);
+  color:var(--lf-text);
+  border-color:var(--lf-border);
 }
-body:not(.dark) .main-content .card :is(.input-group-text,.form-check-input):checked {
-  background-color:var(--bs-primary);
+body:not(.dark) .main-content .card .form-check-input:checked {
+  background-color:var(--lf-primary);
+  border-color:var(--lf-primary);
+}
+body:not(.dark) .main-content .card :is(.form-control,.form-select,textarea).is-invalid {
+  border-color:var(--lf-danger-border)!important;
+}
+body:not(.dark) .main-content .card :is(.form-control,.form-select,textarea).is-valid {
+  border-color:var(--lf-success-border)!important;
 }
 body:not(.dark) .main-content .card .table:not(.table-light) {
-  --bs-table-color:#fff;
+  --bs-table-color:var(--lf-text);
   --bs-table-bg:transparent;
-  color:#fff;
+  color:var(--lf-text);
 }
 body:not(.dark) .main-content .card .table:not(.table-light) :is(th,td) {
-  color:#fff;
-  border-color:rgba(255,255,255,.25);
+  color:var(--lf-text);
+  border-color:#d1d9e6;
 }
 body:not(.dark) .main-content .card :is(.nav-tabs .nav-link,.pagination .page-link):not(.active) {
-  color:#e5f3ff;
+  color:var(--lf-link);
 }
 body:not(.dark) .main-content .card .bg-white,
-body:not(.dark) .main-content .card .bg-light {
-  color:#18243b;
-}
-/* Keep the accepted slim link cards and Top Clicks legible on light surfaces. */
+body:not(.dark) .main-content .card .bg-light {color:var(--lf-text)}
+/* Cards de link e cliques ficam sobre superficie elevada, sem gradiente. */
 body:not(.dark) .main-content .studio-link-slim,
 body:not(.dark) .main-content .dashboard-slim .top-links-slim-item {
-  color:var(--lf-text,#18243b)!important;
+  color:var(--lf-text)!important;
 }
-/* Third-party rich editor and its popups use their own light/dark UI colors,
-   regardless of the purple parent card. */
+body:not(.dark) .main-content .studio-links-page .studio-link-slim .h6 {
+  color:var(--lf-text)!important;
+}
+/* CKEditor e seus popups nao herdam o acabamento dos cards. */
 body:not(.dark) .main-content .studio-profile-editor-page .ck.ck-editor__editable.ck-content,
 body:not(.dark) .main-content .studio-profile-editor-page .ck.ck-editor__editable.ck-content :is(p,h1,h2,h3,h4,h5,h6,li):not([style*="color"]) {
-  color:#18243b!important;
+  color:var(--lf-text)!important;
 }
 body:not(.dark) .main-content .studio-profile-editor-page .ck.ck-editor__editable.ck-content {
   background:#fff!important;
 }
-/* Page/theme screenshot imagery is never recolored or filtered. */
+/* Imagens e previews de temas publicos jamais recebem filtros de cor. */

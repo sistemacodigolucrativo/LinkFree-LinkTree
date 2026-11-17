@@ -426,3 +426,186 @@ body.dark .main-content .studio-links-preview-fab:is(:hover,:active) {
 body.dark .main-content .studio-links-preview-fab:focus-visible {
   outline-color:var(--lf-focus)!important;
 }
+
+/* Light V1: design system dos paineis autenticados, separado dos temas publicos.
+   A regra so se aplica quando o modo escuro nao esta ativo. */
+body:not(.dark) .main-content,
+body:not(.dark) .sidebar.sidebar-default:not(.sidebar-dark):not(.sidebar-color):not(.sidebar-transparent) {
+  --lf-canvas:#f3f6fc;
+  --lf-surface:#ffffff;
+  --lf-raised:#f5f7fc;
+  --lf-text:#18243b;
+  --lf-muted:#4b5870;
+  --lf-border:#75839a;
+  --lf-input:#ffffff;
+  --lf-hover:#eaf0fa;
+  --lf-link:#204a9b;
+  --lf-focus:#275fbd;
+  --lf-chip:#2454a3;
+  --lf-primary:#3a57e8;
+  --lf-primary-hover:#304acb;
+  --lf-primary-active:#263dae;
+  --lf-on-primary:#ffffff;
+  --lf-secondary-accent:#355d72;
+  --lf-nav-active:#e8effd;
+  --lf-disabled-bg:#e0e6ef;
+  --lf-disabled-text:#586779;
+  --lf-edit-action:#315dac;
+  --lf-edit-action-hover:#244a8d;
+  --lf-danger-action:#b53039;
+  --lf-danger-action-hover:#982831;
+  --lf-success:#186d4d;
+  --lf-success-bg:#e6f6ef;
+  --lf-success-border:#247f5b;
+  --lf-warning:#805312;
+  --lf-warning-bg:#fff4dc;
+  --lf-warning-border:#98651d;
+  --lf-danger:#b02e3e;
+  --lf-danger-bg:#fff0f1;
+  --lf-danger-border:#c74153;
+  --lf-info:#155e8a;
+  --lf-info-bg:#e8f4ff;
+  --lf-info-border:#257da8;
+  --bs-primary:var(--lf-primary);
+  --bs-primary-rgb:58,87,232;
+  --bs-primary-shade-20:var(--lf-primary-active);
+  --bs-link-color:var(--lf-link);
+  --bs-link-hover-color:#16376d;
+  --bs-heading-color:var(--lf-text);
+  color-scheme:light;
+}
+/* O header institucional, antes dependente do customizador, segue azul/ branco. */
+body:not(.dark) .main-content .iq-navbar-header.welcome-slim.header-block {
+  background-color:var(--lf-primary)!important;
+  color:var(--lf-on-primary);
+}
+body:not(.dark) .main-content .iq-navbar-header.welcome-slim.header-block :is(h1,h2,h3,h4,h5,h6) {
+  color:var(--lf-on-primary)!important;
+}
+body:not(.dark) .main-content .btn.btn-primary:not(:disabled):not(.disabled) {
+  background-color:var(--lf-primary);
+  border-color:var(--lf-primary);
+  color:var(--lf-on-primary);
+}
+body:not(.dark) .main-content .btn.btn-primary:not(:disabled):not(.disabled):is(:hover,:focus-visible) {
+  background-color:var(--lf-primary-hover);
+  border-color:var(--lf-primary-hover);
+  color:var(--lf-on-primary);
+}
+body:not(.dark) .main-content .btn.btn-primary:not(:disabled):not(.disabled):active {
+  background-color:var(--lf-primary-active);
+  border-color:var(--lf-primary-active);
+}
+body:not(.dark) .main-content .btn.btn-primary:disabled,
+body:not(.dark) .main-content .btn.btn-primary.disabled {
+  background-color:var(--lf-disabled-bg);
+  border-color:var(--lf-disabled-bg);
+  color:var(--lf-disabled-text);
+  opacity:1;
+}
+body:not(.dark) .main-content .btn-outline-primary {
+  color:var(--lf-link);
+  border-color:var(--lf-link);
+}
+body:not(.dark) .main-content .btn-outline-primary:not(:disabled):hover {
+  color:var(--lf-on-primary);
+  background-color:var(--lf-primary);
+  border-color:var(--lf-primary);
+}
+body:not(.dark) .main-content .btn-outline-secondary {
+  color:var(--lf-secondary-accent);
+  border-color:var(--lf-border);
+}
+body:not(.dark) .main-content .btn-outline-secondary:not(:disabled):hover {
+  color:var(--lf-text);
+  background-color:var(--lf-hover);
+  border-color:var(--lf-border);
+}
+/* Acessibilidade: controles, estados e mensagens nao dependem so da cor. */
+body:not(.dark) .main-content :is(.text-primary:not(.btn),.link-primary) {color:var(--lf-link)!important}
+body:not(.dark) .main-content .text-success:not(.btn) {color:var(--lf-success)!important}
+body:not(.dark) .main-content .text-warning:not(.btn) {color:var(--lf-warning)!important}
+body:not(.dark) .main-content .text-danger:not(.btn) {color:var(--lf-danger)!important}
+body:not(.dark) .main-content .text-info:not(.btn) {color:var(--lf-info)!important}
+body:not(.dark) .main-content :is(.form-control,.form-select,textarea).is-invalid {border-color:var(--lf-danger-border)!important}
+body:not(.dark) .main-content :is(.form-control,.form-select,textarea).is-valid {border-color:var(--lf-success-border)!important}
+body:not(.dark) .main-content :is(.invalid-feedback,.invalid-tooltip) {color:var(--lf-danger)}
+body:not(.dark) .main-content :is(.valid-feedback,.valid-tooltip) {color:var(--lf-success)}
+body:not(.dark) .main-content .alert-success:not(.alert-solid) {
+  --bs-alert-color:var(--lf-success);--bs-alert-bg:var(--lf-success-bg);--bs-alert-border-color:var(--lf-success-border);
+}
+body:not(.dark) .main-content .alert-warning:not(.alert-solid) {
+  --bs-alert-color:var(--lf-warning);--bs-alert-bg:var(--lf-warning-bg);--bs-alert-border-color:var(--lf-warning-border);
+}
+body:not(.dark) .main-content .alert-danger:not(.alert-solid) {
+  --bs-alert-color:var(--lf-danger);--bs-alert-bg:var(--lf-danger-bg);--bs-alert-border-color:var(--lf-danger-border);
+}
+body:not(.dark) .main-content .alert-info:not(.alert-solid) {
+  --bs-alert-color:var(--lf-info);--bs-alert-bg:var(--lf-info-bg);--bs-alert-border-color:var(--lf-info-border);
+}
+body:not(.dark) .main-content .bg-soft-success {background-color:var(--lf-success-bg)!important;color:var(--lf-success)!important}
+body:not(.dark) .main-content .bg-soft-warning {background-color:var(--lf-warning-bg)!important;color:var(--lf-warning)!important}
+body:not(.dark) .main-content .bg-soft-danger {background-color:var(--lf-danger-bg)!important;color:var(--lf-danger)!important}
+body:not(.dark) .main-content .bg-soft-info {background-color:var(--lf-info-bg)!important;color:var(--lf-info)!important}
+
+/* Menu padrao: preservar as variantes de sidebar escolhidas no personalizador. */
+body:not(.dark) .sidebar.sidebar-default:not(.sidebar-color):not(.sidebar-dark):not(.sidebar-transparent) .nav-link.active:not(.static-item) {
+  background-color:var(--lf-nav-active)!important;
+  color:var(--lf-link)!important;
+}
+body:not(.dark) .sidebar.sidebar-default:not(.sidebar-color):not(.sidebar-dark):not(.sidebar-transparent) .nav-link:not(.static-item):not(.active):hover {
+  background-color:var(--lf-hover);
+  color:var(--lf-text);
+}
+/* Meus Links: titulo, URL e acoes seguem a mesma hierarquia do Dark V1. */
+body:not(.dark) .main-content .studio-links-page #links-table-body .studio-link-slim .h6 {
+  color:var(--lf-text)!important;
+}
+body:not(.dark) .main-content .studio-links-page #links-table-body .studio-link-slim a.text-muted {
+  color:var(--lf-muted)!important;
+  opacity:1;
+}
+body:not(.dark) .main-content .studio-links-page .studio-link-actions .btn-warning {
+  background-color:var(--lf-edit-action)!important;
+  border-color:var(--lf-edit-action)!important;
+  color:var(--lf-on-primary)!important;
+}
+body:not(.dark) .main-content .studio-links-page .studio-link-actions .btn-warning:is(:hover,:focus-visible) {
+  background-color:var(--lf-edit-action-hover)!important;
+  border-color:var(--lf-edit-action-hover)!important;
+}
+body:not(.dark) .main-content .studio-links-page .studio-link-actions .btn-danger {
+  background-color:var(--lf-danger-action)!important;
+  border-color:var(--lf-danger-action)!important;
+  color:var(--lf-on-primary)!important;
+}
+body:not(.dark) .main-content .studio-links-page .studio-link-actions .btn-danger:is(:hover,:focus-visible) {
+  background-color:var(--lf-danger-action-hover)!important;
+  border-color:var(--lf-danger-action-hover)!important;
+}
+body:not(.dark) .main-content .studio-links-preview-fab {
+  background:var(--lf-raised)!important;
+  border-color:var(--lf-border)!important;
+  color:var(--lf-text)!important;
+}
+body:not(.dark) .main-content .studio-links-preview-fab:is(:hover,:active) {
+  background:var(--lf-hover)!important;
+  color:var(--lf-text)!important;
+}
+body:not(.dark) .main-content .studio-links-preview-fab:focus-visible {
+  outline-color:var(--lf-focus)!important;
+}
+/* O card da selecao de tema e UI do painel, nao a pagina publica. */
+body:not(.dark) .main-content .theme-preview-strip {
+  background:linear-gradient(115deg,#2741a1,#3a57e8)!important;
+  border-color:#2741a1!important;
+}
+body:not(.dark) .main-content .theme-preview-strip .theme-preview-current {
+  background:var(--lf-surface)!important;
+  border-color:var(--lf-border)!important;
+  color:var(--lf-link)!important;
+}
+body:not(.dark) .main-content .theme-preview-strip .theme-preview-current:is(:hover,:active) {
+  background:var(--lf-hover)!important;
+  color:var(--lf-link)!important;
+}
