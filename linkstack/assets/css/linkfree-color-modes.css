@@ -1,0 +1,135 @@
+/*
+ * LinkFree palette audit 2026-11-16.
+ * Shared palette for authenticated dashboard, admin and guest flows.
+ * Never load this on the users' public LinkStack pages: those use theme CSS.
+ * The original setting.js owns body.light/body.dark/body.auto; no second toggle.
+ */
+body {
+  --lf-surface:#ffffff;
+  --lf-raised:#f5f7fc;
+  --lf-text:#18243b;
+  --lf-muted:#4b5870;
+  --lf-border:#bbc6d8;
+  --lf-input:#ffffff;
+  --lf-hover:#eef2fa;
+  --lf-link:#204a9b;
+  --lf-focus:#275fbd;
+  --lf-chip:#2454a3;
+  color-scheme:light;
+}
+body.dark {
+  --lf-surface:#222738;
+  --lf-raised:#2e364d;
+  --lf-text:#f4f7fd;
+  --lf-muted:#c3cede;
+  --lf-border:#52617f;
+  --lf-input:#242c40;
+  --lf-hover:#354058;
+  --lf-link:#9ac9ff;
+  --lf-focus:#f6c65b;
+  --lf-chip:#3869c2;
+  color-scheme:dark;
+}
+
+/* Tokens, not hard-coded light backgrounds, for cards, list items, overlays.
+   Exclude semantic status backgrounds (success/error/warning/brand). */
+body.dark .main-content .card:not(.bg-primary):not(.bg-success):not(.bg-danger):not(.bg-warning):not(.bg-info),
+body.dark .main-content .modal-content,
+body.dark .main-content .offcanvas,
+body.dark .main-content .dropdown-menu {
+  background-color:var(--lf-surface);
+  color:var(--lf-text);
+  border-color:var(--lf-border);
+}
+body.dark .main-content :is(.card-header,.card-footer):not(.bg-primary):not(.bg-danger):not(.bg-success):not(.bg-warning),
+body.dark .main-content .modal-header:not(.bg-primary):not(.bg-danger):not(.bg-success):not(.bg-warning) {
+  background-color:var(--lf-surface);
+  color:var(--lf-text);
+  border-color:var(--lf-border);
+}
+body.dark .main-content :is(.bg-white,.bg-light,.bg-soft-secondary):not(.alert) {
+  background-color:var(--lf-raised)!important;
+  color:var(--lf-text);
+}
+body.dark .main-content :is(.border,.rounded.border,.list-group-item,.table,.table th,.table td) {
+  border-color:var(--lf-border)!important;
+}
+body.dark .main-content :is(.list-group-item,.list-group,.accordion-item,.accordion-button) {
+  background-color:var(--lf-raised);
+  color:var(--lf-text);
+}
+body.dark .main-content :is(.text-dark,.text-gray-400,.text-gray-500,.text-gray-600,.text-gray-700,.text-gray-800) {
+  color:var(--lf-text)!important;
+}
+body.dark :is(.text-muted,.form-text,.text-secondary,small.text-muted) {
+  color:var(--lf-muted)!important;
+}
+body:not(.dark) :is(.text-muted,.form-text,small.text-muted) {color:var(--lf-muted)!important}
+body.dark .main-content :is(.card-title,.card-header h1,.card-header h2,.card-header h3,.card-header h4,.card-header h5,.modal-title),
+body.dark .main-content :is(h1,h2,h3,h4,h5,h6):not(.text-white):not(.text-primary) {
+  color:var(--lf-text);
+}
+body.dark .main-content :is(.form-control,.form-select,.form-check-input,.input-group-text,textarea,select) {
+  background-color:var(--lf-input);
+  color:var(--lf-text);
+  border-color:var(--lf-border);
+}
+body.dark :is(.form-control,.form-select,textarea,input)::placeholder {color:var(--lf-muted);opacity:1}
+body.dark :is(.form-control,.form-select,textarea):focus {
+  border-color:var(--lf-link);outline-color:var(--lf-focus);color:var(--lf-text);
+}
+body.dark .main-content :is(.dropdown-item,.dropdown-header) {color:var(--lf-text)}
+body.dark .main-content .dropdown-item:hover,
+body.dark .main-content .dropdown-item:focus {color:var(--lf-text);background-color:var(--lf-hover)}
+body.dark .main-content :is(.table,.table-striped,.table-responsive) {color:var(--lf-text)}
+body.dark .main-content .table :is(th,td) {color:var(--lf-text);border-color:var(--lf-border)}
+body.dark .main-content .table-striped tbody tr:nth-of-type(odd) {background-color:var(--lf-raised)}
+body.dark .main-content :is(.nav-tabs .nav-link,.pagination .page-link,.btn-outline-secondary) {
+  color:var(--lf-muted);border-color:var(--lf-border);
+}
+body.dark .main-content .btn-outline-primary {color:var(--lf-link);border-color:var(--lf-link)}
+body.dark .main-content :is(a:not(.btn):not(.dropdown-item),.text-primary):not(.text-white) {
+  text-decoration-color:currentColor;
+}
+body.dark .main-content .badge.bg-light {background-color:var(--lf-raised)!important;color:var(--lf-text)!important}
+body.dark .main-content .input-group-text {color:var(--lf-text)}
+body.dark .main-content .card .card-body :is(label,legend) {color:var(--lf-text)}
+body.dark .main-content :is(.alert-light,.toast:not(.bg-primary):not(.bg-danger),.popover) {
+  background-color:var(--lf-raised);color:var(--lf-text);border-color:var(--lf-border);
+}
+body.dark .main-content :is(.btn-close) {filter:invert(1) grayscale(1) brightness(1.6)}
+/* Keep custom theme demo thumbnails, illustrations and colored status badges unchanged. */
+
+/* Focus states are equally visible in either color mode. */
+body :is(a,button,input,select,textarea,[tabindex]):focus-visible {
+  outline:3px solid var(--lf-focus)!important;outline-offset:2px;
+}
+body.dark .main-content :is(a:not(.btn):not(.dropdown-item)) {
+  color:var(--lf-link);
+}
+body.dark .main-content .card a.text-white {color:#fff!important}
+
+/* Top Clicks: Bootstrap --bs-card-bg stays white even after .dark .card changes
+   its computed background. Explicit palette tokens avoid this mismatch. */
+.dashboard-slim .top-links-list>li.top-links-slim-item {
+  background:var(--lf-raised)!important;
+  color:var(--lf-text)!important;
+  border-color:var(--lf-border)!important;
+  border-inline-start-color:var(--lf-chip)!important;
+}
+.dashboard-slim .top-links-list .top-link-url {color:var(--lf-muted)!important;opacity:1!important}
+.dashboard-slim .top-links-list .top-link-title {color:var(--lf-text)!important}
+.dashboard-slim .top-links-list .top-link-clicks {
+  background-color:var(--lf-chip)!important;color:#fff!important;
+}
+
+/* User-visible lists and link controls in the Studio also use the active mode. */
+.studio-links-page .studio-link-slim {
+  background:var(--lf-raised)!important;
+  color:var(--lf-text);
+  border-color:var(--lf-border)!important;
+}
+.studio-links-page .studio-link-slim :is(.text-muted,a.text-muted) {color:var(--lf-muted)!important}
+body.dark .studio-links-page .page-icons-card .input-group-text {background:var(--lf-raised)}
+
+/* Keep decorative preview CTA and buttons' semantic colors intact. */
