@@ -116,9 +116,67 @@ if (isset($_COOKIE['LinkCount'])) {
 .studio-links-page .studio-link-slim .col-12.py-1>span{
  margin-right:auto;font-size:.8rem;white-space:nowrap}
 @media(max-width:575px){
- .studio-links-page .studio-link-slim{padding:5px!important}
+ .studio-links-page .studio-link-slim{padding:4px 6px!important}
  .studio-links-page .studio-link-slim .col-12.py-1{justify-content:flex-start}
- .studio-links-page .studio-link-slim .col-12.py-1 :is(a,button){min-width:44px;min-height:44px}
+ /* A área clicável permanece acessível, mas o ÍCONE visual é pequeno. */
+ .studio-links-page .studio-link-slim .col-12.py-1 :is(a,button){min-width:40px;min-height:40px}
+}
+/* Controles slim de edição/exclusão/arraste (anotação 03). */
+.studio-links-page .studio-link-slim{
+ min-height:48px!important;padding:4px 8px!important;margin-bottom:8px!important;
+}
+.studio-links-page .studio-link-slim>.d-flex{gap:4px;align-items:center}
+.studio-links-page .studio-link-slim>.d-flex>.col-auto{
+ flex:0 0 38px!important;max-width:38px!important;width:38px!important;
+ min-width:38px!important;min-height:42px;
+ margin:0!important;padding:0!important;display:flex;align-items:center;justify-content:center;
+}
+.studio-links-page .studio-link-slim .sortable-handle{
+ width:16px!important;height:16px!important;max-width:16px;
+ min-width:16px;margin:0!important;touch-action:pan-y;
+ cursor:grab;
+}
+.studio-links-page .studio-link-slim .col-12.p-2{padding:2px 0!important}
+.studio-links-page .studio-link-slim .col-12.p-2 .h6{font-size:.87rem;line-height:1.25}
+.studio-links-page .studio-link-slim .col-12.p-2 a{font-size:.78rem;line-height:1.25}
+.studio-links-page .studio-link-slim .col-12.py-1{
+ padding:0!important;margin:2px 0 0!important;gap:4px!important;
+ align-items:center;justify-content:flex-end;
+}
+.studio-links-page .studio-link-slim .col-12.py-1 a.btn-icon,
+.studio-links-page .studio-link-slim .col-12.py-1 button.btn-icon{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:38px!important;height:38px!important;min-width:38px!important;
+ min-height:38px!important;max-width:38px!important;max-height:38px!important;
+ padding:7px!important;margin:0!important;border-radius:9px;
+}
+.studio-links-page .studio-link-slim .col-12.py-1 a.btn-icon :is(svg,.icon,.icon-20),
+.studio-links-page .studio-link-slim .col-12.py-1 button.btn-icon :is(svg,.icon,.icon-20){
+ width:15px!important;height:15px!important;max-width:15px!important;max-height:15px!important;
+}
+.studio-links-page .studio-link-slim .col-12.py-1 .btn-inner{
+ display:inline-flex;align-items:center;justify-content:center;
+ width:16px!important;height:16px!important;padding:0!important;margin:0!important;
+}
+.studio-links-page .studio-link-slim .col-12.py-1>span{
+ font-size:.76rem;line-height:1.2;margin-right:auto;
+}
+.studio-links-page .studio-link-slim > .d-flex > .col > .row{row-gap:2px}
+.studio-links-page .studio-link-slim .d-flex.gap-1{
+ padding:0 0 0 38px!important;gap:4px!important;margin-top:0!important;
+}
+.studio-links-page .studio-link-slim .d-flex.gap-1 .btn{
+ width:36px;min-width:36px;min-height:36px;height:36px;padding:4px!important;
+ font-size:.9rem;line-height:1;
+}
+@media(max-width:575px){
+ .studio-links-page .studio-link-slim .col-12.py-1 a.btn-icon,
+ .studio-links-page .studio-link-slim .col-12.py-1 button.btn-icon{
+   width:40px!important;height:40px!important;min-width:40px!important;min-height:40px!important;
+   max-width:40px!important;max-height:40px!important;
+ }
+ .studio-links-page .studio-link-slim .d-flex.gap-1 .btn{min-height:40px;height:40px;min-width:40px;width:40px}
+ .studio-links-page .studio-link-slim>.d-flex>.col-auto{min-height:44px}
 }
 </style>
 @endpush
