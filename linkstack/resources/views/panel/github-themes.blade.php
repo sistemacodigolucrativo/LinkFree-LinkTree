@@ -35,7 +35,7 @@
       <a class="btn {{ $checkingUpdates && count($updates) ? 'btn-success' : 'btn-outline-primary' }}" href="{{ route('githubThemes', ['updates' => 1]) }}">
         Verificar atualizações @if($checkingUpdates && count($updates)) ({{ count($updates) }}) @endif
       </a>
-      <a class="btn btn-outline-secondary" href="{{ route('showTheme') }}">Voltar ao gerenciamento</a>
+      <a class="btn btn-outline-secondary" href="{{ route('showThemes') }}">Voltar ao gerenciamento</a>
     </div>
 
     @if($checkingUpdates)

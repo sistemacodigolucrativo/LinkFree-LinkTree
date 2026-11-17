@@ -99,7 +99,8 @@ class AdminController extends Controller
       "countries" => visits("App\Models\User", $littlelink_name)->countries(),
     ];
 
-    return view("panel/index", [
+    $dashboardView = request()->is("admin/overview") ? "panel/admin-overview" : "panel/index";
+    return view($dashboardView, [
       "lastMonthCount" => $lastMonthCount,
       "lastWeekCount" => $lastWeekCount,
       "last24HrsCount" => $last24HrsCount,

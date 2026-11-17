@@ -167,6 +167,7 @@ return [
     'Nav Link Management' => 'Link management',
     'Nav Public Page' => 'My page',
     'Nav Themes Appearance' => 'Themes and appearance',
+    'Nav Admin Overview' => 'Administration overview',
     'Nav Admin Users' => 'Users',
     'Nav Admin New User' => 'New user',
     'Nav Admin Site' => 'Site and content',

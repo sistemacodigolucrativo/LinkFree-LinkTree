@@ -261,8 +261,9 @@ if (isset($_COOKIE['LinkCount'])) {
 
                         <div class="studio-links-sections">
                             <section class='pre-left links-section-card card rounded mb-3 text-gray-400' aria-labelledby='studio-my-links-title'>
-                                <h3 id="studio-my-links-title" class="card-header mb-3"><i class="bi bi-link-45deg">{{__('messages.My Links')}}</i>
-                                        <a class="btn btn-primary float-end" href="{{ url('/studio/add-link') }}"> {{__('messages.Add new Link')}}</a>
+                                <h3 id="studio-my-links-title" class="card-header mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                    <span><i class="bi bi-link-45deg" aria-hidden="true"></i> {{__('messages.My Links')}}</span>
+                                    <a class="btn btn-primary" href="{{ url('/studio/add-link') }}">{{__('messages.Add new Link')}}</a>
                                 </h3>
 
                                 <div class="card-body px-3 pb-3">
@@ -273,8 +274,8 @@ if (isset($_COOKIE['LinkCount'])) {
 
                                     <div id="links-table-body" data-page="{{request('page', 1)}}" data-per-page="{{$pagePage ? $pagePage : 0}}">
                                         @if($links->total() == 0)
-                                              <div class="col-6 text-center">
-                                                <p class="mt-5">{{__('messages.No Link Added')}}</p>
+                                              <div class="col-12 text-center">
+                                                <p class="my-4">{{__('messages.No Link Added')}}</p>
                                               </div>
                                         @else
                                         @foreach($links as $link)

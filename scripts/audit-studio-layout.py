@@ -172,4 +172,27 @@ require('max-width:calc(100vw - 24px)!important' in nav_css and
         'overflow-x:hidden!important' in nav_css,
         "Card de notificações não causa transbordamento horizontal")
 
+# Consistency checks: navigation, admin cards, account deletion and link list.
+admin_overview = (views / "panel" / "admin-overview.blade.php").read_text(encoding="utf-8")
+users_view = (views / "panel" / "users.blade.php").read_text(encoding="utf-8")
+profile_view = (views / "studio" / "profile.blade.php").read_text(encoding="utf-8")
+github_view = (views / "panel" / "github-themes.blade.php").read_text(encoding="utf-8")
+web_routes = (views.parents[1] / "routes" / "web.php").read_text(encoding="utf-8")
+require("Site statistics:" not in dashboard and "Site statistics:" in admin_overview,
+        "Global statistics moved out of shared dashboard")
+require("auth()->user()->role === 'admin'" in admin_overview and
+        "Route::get('/admin/overview'" in web_routes and
+        "route('adminOverview')" in sidebar,
+        "Admin statistics guarded and reachable in administrative menu")
+require('<h5 class="mb-2">{{__(\'messages.Select Action\')}}:</h5>' in users_view,
+        "Admin users heading closes correctly")
+require('style="height:100vh;"' not in profile_view,
+        "Account deletion confirmation cannot force a whole extra viewport")
+require('min-height:420px' not in theme and 'height:min(60dvh,640px)' in theme,
+        "Theme preview adjusts to compact mobile screens")
+require('id="studio-my-links-title" class="card-header mb-3 d-flex flex-wrap' in links,
+        "My Links heading flex-wraps with its action")
+require('href="{{ route(\'showThemes\') }}">Voltar ao gerenciamento' in github_view,
+        "Admin themes return to admin management")
+
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")

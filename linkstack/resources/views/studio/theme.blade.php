@@ -222,7 +222,7 @@
           <button class="btn btn-primary" type="button" data-demo-variant="links">1. Links e botões</button>
           <button class="btn btn-outline-primary" type="button" data-demo-variant="media">2. Vídeos e mídias</button>
         </div>
-        <iframe id="theme-demo-frame" title="Demonstração renderizada do tema" class="w-100 border rounded" style="height:min(72vh,760px);min-height:420px" loading="lazy" sandbox="allow-same-origin"></iframe>
+        <iframe id="theme-demo-frame" title="Demonstração renderizada do tema" class="w-100 border rounded" style="height:60vh;height:min(60dvh,640px);min-height:0" loading="lazy" sandbox="allow-same-origin"></iframe>
         <p class="small text-muted">A demonstração usa conteúdo fictício. Componentes incompatíveis são apresentados em telas diferentes.</p>
       </div>
     </div>

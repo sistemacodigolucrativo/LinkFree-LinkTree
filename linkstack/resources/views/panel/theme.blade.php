@@ -76,7 +76,7 @@
           <p>Nenhum tema instalado disponível para exclusão.</p>
         @endforelse
       </div>
-      <a class="btn btn-outline-primary mt-4" href="{{ route('showTheme') }}"><i class="bi bi-arrow-left-short"></i> {{ __('messages.Back') }}</a>
+      <a class="btn btn-outline-primary mt-4" href="{{ route('githubThemes') }}"><i class="bi bi-arrow-left-short"></i> {{ __('messages.Back') }}</a>
     </div>
   </div>
 </div>

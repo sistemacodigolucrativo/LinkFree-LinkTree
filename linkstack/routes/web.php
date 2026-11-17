@@ -157,6 +157,7 @@ Route::group([
 ], function () {
     if(env('FORCE_ROUTE_HTTPS') == 'true'){URL::forceScheme('https');}
     Route::get('/panel/index', function(){return redirect(url('dashboard'));});
+    Route::get('/admin/overview', [AdminController::class, 'index'])->name('adminOverview');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('showUsers');
     Route::get('/admin/links/{id}', [AdminController::class, 'showLinksUser'])->name('showLinksUser');
     Route::get('/admin/deleteLink/{id}', [AdminController::class, 'deleteLinkUser'])->name('deleteLinkUser');

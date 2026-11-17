@@ -52,7 +52,6 @@ html = """<!doctype html><html lang="pt-BR"><head>
           <button class="btn btn-primary btn-sm dropdown-toggle" aria-label="Compartilhar">↗</button>
       </div></li>
       <li class="nav-item dropdown"><a href="#" class="nav-link" aria-label="Notificações">◉</a></li>
-      <li class="nav-item dropdown"><a href="#" class="nav-link" id="mail-drop" aria-label="Atualizações">↻</a></li>
       <li class="nav-item dropdown"><a href="#" class="nav-link" id="navbarDropdown" aria-label="Perfil">
        <img class="avatar avatar-40" alt="Perfil" width="40" height="40" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="></a></li>
     </ul>

@@ -334,6 +334,7 @@ $usrhandl = Auth::user()->littlelink_name;
     <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
   </a>
   <ul class="sub-nav collapse {{ $adminMenuOpen ? 'show' : '' }}" id="admin-navigation" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/overview') ? 'active' : '' }}" href="{{ route('adminOverview') }}"><i class="icon bi bi-graph-up-arrow" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Overview')}}</span></a></li>
     <li class="nav-item nav-accordion-group nav-accordion-admin">
   <a class="nav-link nav-accordion-toggle {{ $adminUsersOpen ? 'active' : '' }}" href="#admin-users-menu" data-bs-toggle="collapse" role="button" aria-expanded="{{ $adminUsersOpen ? 'true' : 'false' }}" aria-controls="admin-users-menu">
     <i class="icon bi bi-people-fill" aria-hidden="true"></i>

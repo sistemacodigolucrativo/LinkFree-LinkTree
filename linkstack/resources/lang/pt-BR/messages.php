@@ -162,6 +162,7 @@ return array(
     'Nav Link Management' => 'Gerenciamento de links',
     'Nav Public Page' => 'Minha página',
     'Nav Themes Appearance' => 'Temas e aparência',
+    'Nav Admin Overview' => 'Visão geral administrativa',
     'Nav Admin Users' => 'Usuários',
     'Nav Admin New User' => 'Novo usuário',
     'Nav Admin Site' => 'Site e conteúdo',

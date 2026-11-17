@@ -23,7 +23,7 @@
                         <div class="card-body p-0 p-md-3">
 
                         <div id="select-active" class="d-none">
-                          <h5 class="mb-2">{{__('messages.Select Action')}}:</h3>
+                          <h5 class="mb-2">{{__('messages.Select Action')}}:</h5>
                           <button class="mb-3 btn btn-danger rounded-pill btn-sm">
                               <span class="btn-inner">
                                 <svg class="icon-16" width="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -41,7 +41,7 @@
                       </form>
               @endif
 
-              <br><br><form  action="{{ route('editProfile') }}" method="post">
+              <form class="mt-4" action="{{ route('editProfile') }}" method="post">
                 @csrf
                   <div class="form-group col-lg-8">
                     <h4>{{__('messages.Password')}}</h4>
@@ -50,14 +50,13 @@
                   <button type="submit" class="mt-3 ml-3 btn btn-primary">{{__('messages.Change password')}}</button>
                 </form>
 
-                @csrf
-                  <br><br><div class="form-group col-lg-8">
+                  <div class="form-group col-lg-8 mt-4">
                     <h4>Role</h4>
                     <input type="text" class="form-control" value="{{ strtoupper($profile->role) }}" readonly>
                   </div>
 
               @if(env('ALLOW_USER_EXPORT') != false)
-              <div class="mt-3"><br><br><br>
+              <div class="mt-4">
                 <h4>{{__('messages.Export user data')}}</h4>
                 <p>{{__('messages.Export your user data')}}</p>
                 <div class="row">
@@ -76,7 +75,7 @@
               @if(env('ALLOW_USER_IMPORT') != false)
               <form action="{{ route('importData') }}" enctype="multipart/form-data" method="post">
                 @csrf
-                <div class="form-group col-lg-8"><br><br><br>
+                <div class="form-group col-lg-8 mt-4">
                   <h4>{{__('messages.Import user data')}}</h4>
                     <label for="customFile">{{__('messages.Import your user data from another instance')}}</label>
                     <input type="file" accept="application/JSON" class="form-control" id="customFile" name="import">
@@ -96,7 +95,7 @@
               @endif
 
               @if(($_SERVER['QUERY_STRING'] ?? '') === 'delete')
-              <div class="d-flex justify-content-center align-items-center" style="height:100vh;">
+              <div class="d-flex justify-content-center align-items-center py-4 py-md-5">
                 <div class="text-center">
                   <h2 class="text-decoration-underline">{{__('messages.You are about to delete')}}</h2>
                   <p>{{__('messages.You are about to delete This action cannot be undone')}}</p>
