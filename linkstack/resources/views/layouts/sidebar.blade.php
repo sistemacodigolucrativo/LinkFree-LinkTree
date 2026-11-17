@@ -60,6 +60,8 @@ $usrhandl = Auth::user()->littlelink_name;
 
       <!-- RTL Css -->
       <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}" />
+      {{-- Shared high-contrast light/dark palette, after vendor theme styles. --}}
+      <link rel="stylesheet" href="{{ asset('assets/css/linkfree-color-modes.css') }}?v={{ filemtime(base_path('assets/css/linkfree-color-modes.css')) }}" />
 
 	  <meta name="csrf-token" content="{{ csrf_token() }}">
 	  <link rel="stylesheet" href="{{ asset('assets/linkstack/css/hover-min.css') }}">
@@ -138,6 +140,103 @@ $usrhandl = Auth::user()->littlelink_name;
   padding:8px 4px!important;font-size:.71rem
  }
  .mobile-unified-nav #navbarDropdown .avatar{width:30px!important;height:30px!important}
+}
+
+/* Revisão do cabeçalho (anotação 01): sem barra extra nem sobreposição.
+ * O tema original usava margem de -3rem (ou +4em no mobile) para um banner
+ * de 205px; agora o banner é slim e essa compensação não é válida. */
+.main-content > .iq-banner:not(.hide) + .content-inner,
+.main-content > .iq-banner:not(.hide) + .conatiner-fluid.content-inner{
+ margin-top:0!important;padding-top:0!important;
+}
+.iq-navbar-header.welcome-slim{clear:both}
+@media(max-width:991.98px){
+ .main-content > .iq-banner{display:flow-root;position:relative;margin:0!important;padding:0!important}
+ .main-content .mobile-unified-nav{
+  position:relative!important;z-index:889;
+  width:100%!important;min-height:56px;height:auto!important;
+  margin:0!important;padding:0!important;border-radius:0!important;
+  background:var(--lf-surface);
+  border-bottom:1px solid var(--lf-border);box-shadow:none;
+ }
+ .main-content .mobile-unified-nav > .navbar-inner{
+  display:grid!important;grid-template-columns:44px minmax(0,1fr);
+  column-gap:6px;row-gap:0;align-items:center;
+  width:100%!important;max-width:100%;min-height:56px;height:auto!important;
+  margin:0!important;padding:4px 10px!important;overflow:visible;
+ }
+ .main-content .mobile-unified-nav .navbar-brand,
+ .main-content .mobile-unified-nav .navbar-toggler{display:none!important}
+ .main-content .mobile-unified-nav .sidebar-toggle{
+  position:static!important;inset:auto!important;transform:none!important;
+  grid-column:1;grid-row:1;order:0;
+  display:flex!important;align-items:center;justify-content:center;
+  width:44px!important;height:44px!important;min-width:44px!important;
+  margin:0!important;padding:9px!important;border:1px solid var(--lf-border)!important;
+  border-radius:10px!important;background:var(--lf-raised)!important;
+  color:var(--lf-text)!important;box-shadow:none!important;
+ }
+ .main-content .mobile-unified-nav .sidebar-toggle .icon{transform:none!important}
+ .main-content .mobile-unified-nav #navbarSupportedContent{
+  grid-column:2;grid-row:1;min-width:0!important;max-width:100%!important;
+  width:100%!important;flex:1 1 auto;align-self:center;
+  display:flex!important;align-items:center!important;justify-content:flex-end!important;
+  visibility:visible!important;opacity:1!important;position:static!important;
+  height:auto!important;max-height:none!important;min-height:44px;
+  margin:0!important;padding:0!important;border:0!important;
+  background:transparent!important;box-shadow:none!important;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent > .navbar-list{
+  display:flex!important;flex-flow:row nowrap!important;gap:1px!important;
+  justify-content:flex-end!important;align-items:center!important;
+  width:100%;min-width:0!important;max-width:100%;height:auto;
+  margin:0!important;padding:0!important;list-style:none;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent > .navbar-list > li{
+  float:none!important;position:relative;flex:0 0 auto;min-width:0!important;
+  display:flex;align-items:center;justify-content:center;margin:0!important;padding:0!important;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent .nav-link{
+  width:auto;min-width:32px;min-height:44px;max-height:48px;
+  padding:6px 3px!important;margin:0!important;color:var(--lf-text);
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent .btn.btn-sm{
+  min-height:40px!important;font-size:clamp(.68rem,2.5vw,.78rem)!important;
+  margin:0!important;padding:8px 5px!important;white-space:nowrap;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent #navbarDropdown{
+  min-width:38px;padding-inline:2px!important;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent #navbarDropdown img{
+  width:32px!important;height:32px!important;min-width:32px;
+  object-fit:cover;border-radius:50%;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent .dropdown-menu{
+  position:absolute;z-index:1060;max-width:min(96vw,340px);
+ }
+ .main-content .iq-navbar-header.welcome-slim{
+  margin:10px auto 12px!important;padding:11px 14px!important;
+  width:calc(100% - 20px);max-width:100%;border-radius:12px;
+ }
+ .main-content .iq-banner:not(.hide)+.content-inner{margin-top:0!important}
+}
+@media(max-width:359px){
+ .main-content .mobile-unified-nav>.navbar-inner{
+  grid-template-columns:38px minmax(0,1fr);column-gap:2px;padding:4px 5px!important;
+ }
+ .main-content .mobile-unified-nav .sidebar-toggle{
+  width:38px!important;min-width:38px!important;height:42px!important;padding:7px!important;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent .nav-link{
+  min-width:29px;padding:5px 2px!important;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent .btn.btn-sm{padding:8px 3px!important}
+ .main-content .mobile-unified-nav #navbarSupportedContent #navbarDropdown{
+  min-width:32px!important;
+ }
+ .main-content .mobile-unified-nav #navbarSupportedContent #navbarDropdown img{
+  width:29px!important;height:29px!important;min-width:29px;
+ }
 }
 </style>
 </head>

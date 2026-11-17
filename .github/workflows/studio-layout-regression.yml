@@ -6,8 +6,12 @@ on:
       - 'linkstack/resources/views/studio/theme.blade.php'
       - 'linkstack/resources/views/panel/index.blade.php'
       - 'linkstack/resources/views/layouts/sidebar.blade.php'
+      - 'linkstack/resources/views/layouts/guest.blade.php'
+      - 'linkstack/assets/css/linkfree-color-modes.css'
+      - 'linkstack/assets/js/main-dashboard.js'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-responsive-mobile.py'
+      - 'scripts/audit-color-contrast.py'
       - '.github/workflows/studio-layout-regression.yml'
   pull_request:
     paths:
@@ -15,8 +19,12 @@ on:
       - 'linkstack/resources/views/studio/theme.blade.php'
       - 'linkstack/resources/views/panel/index.blade.php'
       - 'linkstack/resources/views/layouts/sidebar.blade.php'
+      - 'linkstack/resources/views/layouts/guest.blade.php'
+      - 'linkstack/assets/css/linkfree-color-modes.css'
+      - 'linkstack/assets/js/main-dashboard.js'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-responsive-mobile.py'
+      - 'scripts/audit-color-contrast.py'
       - '.github/workflows/studio-layout-regression.yml'
 
 permissions:
@@ -32,6 +40,8 @@ jobs:
           python-version: '3.12'
       - name: Verify links cards, fullscreen preview and theme preview UI
         run: python scripts/audit-studio-layout.py
+      - name: Audit light and dark WCAG contrast ratios
+        run: python scripts/audit-color-contrast.py
       - name: Install browser test dependencies
         run: python -m pip install --quiet playwright
       - name: Test mobile widths in headless Chrome

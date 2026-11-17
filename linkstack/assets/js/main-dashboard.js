@@ -3,6 +3,15 @@
 
     "use strict";
 
+    // Prévia é carregada apenas enquanto o modal fullscreen está aberto.
+    // Evita a referência aos iframes removidos frPreview1/frPreview2.
+    const refreshStudioPreview = function () {
+        const frame = document.getElementById('studio-links-preview-frame');
+        if (frame && frame.hasAttribute('src')) {
+            frame.src = frame.dataset.previewUrl || frame.src;
+        }
+    };
+
     document.addEventListener('click', async function (event) {
         const control = event.target.closest('[data-delete-link]');
         if (!control) return;
@@ -42,7 +51,7 @@
                 ? 'Link excluído e alteração salva.' : 'Link excluído e alteração salva. Não há mais links nesta página.';
             if (next) next.querySelector('a,button')?.focus();
             else { feedback.tabIndex = -1; feedback.focus(); }
-            document.querySelectorAll('#frPreview1,#frPreview2').forEach(frame => { frame.src = frame.src; });
+            refreshStudioPreview();
         } catch (error) {
             feedback.textContent = 'Não foi possível confirmar a exclusão. Verifique sua conexão e tente novamente.';
             control.removeAttribute('aria-disabled');
@@ -118,10 +127,9 @@
                         }
                     });
 
-                    setTimeout(function(){
-                        document.getElementById('frPreview1').src += '';
-                        document.getElementById('frPreview2').src += '';
-                    }, 300);
+                    // A próxima abertura do modal carrega a página atualizada.
+                    // Se já estiver aberto, atualizar o iframe existente sem erro.
+                    refreshStudioPreview();
                 }
             }
         });

@@ -91,4 +91,36 @@ require("data-toggle=\"sidebar\"" in sidebar and ".mobile-unified-nav .sidebar-t
 require("id=\"navbarSupportedContent\"" in sidebar and "id=\"navbarDropdown\"" in sidebar and "id=\"mail-drop\"" in sidebar,
         "Exibir página, atualizações e perfil mantidos no navbar")
 
+# Revisão 2026-11: quatro pontos de contraste e compacidade.
+palette = (views.parents[1] / "assets" / "css" / "linkfree-color-modes.css").read_text(encoding="utf-8")
+guest = (views / "layouts" / "guest.blade.php").read_text(encoding="utf-8")
+js = (views.parents[1] / "assets" / "js" / "main-dashboard.js").read_text(encoding="utf-8")
+require(".main-content > .iq-banner:not(.hide) + .content-inner" in sidebar,
+        "Margem antiga do banner removida: sem sobreposição no mobile")
+require("grid-template-columns:44px minmax(0,1fr)" in sidebar,
+        "Seta e botões do mobile na mesma linha de uma única barra")
+require("position:static!important" in sidebar and "data-toggle=\"sidebar\"" in sidebar,
+        "Seta sem posição absoluta e handler de sidebar preservado")
+require("width:16px!important;height:16px!important" in links,
+        "Ícone visual de seis pontos reduzido")
+require("width:15px!important;height:15px!important" in links,
+        "Ícones editar/excluir reduzidos e ações mantidas")
+require("min-width:40px!important" in links and "min-height:40px!important" in links,
+        "Áreas tocáveis compactas e preservadas")
+require("frPreview1').src" not in js and "frPreview2').src" not in js,
+        "Ordenação não acessa mais iframes de prévia removidos")
+require("refreshStudioPreview" in js and "Sortable.create" in js,
+        "Prévia e reordenação continuam integradas")
+require("background:var(--lf-raised)!important" in palette and
+        ".dashboard-slim .top-links-list>li.top-links-slim-item" in palette,
+        "Top Clicks usam cor semântica nos dois modos")
+require("body.dark" in palette and "--lf-text:#f4f7fd" in palette and
+        "--lf-muted:#c3cede" in palette, "Paleta Dark utiliza contraste legível")
+require("--lf-surface:#ffffff" in palette and "--lf-text:#18243b" in palette,
+        "Paleta Light utiliza contraste legível")
+require("linkfree-color-modes.css" in sidebar and "linkfree-color-modes.css" in guest,
+        "Paleta central ativada nos layouts do painel e autenticação")
+require("body.dark .main-content .modal-title" in palette,
+        "Cor de título modal não fica preta no modo escuro")
+
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")

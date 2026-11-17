@@ -45,6 +45,8 @@
       
       <!-- RTL Css -->
       <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}" />
+      {{-- Shared high-contrast light/dark palette, after vendor theme styles. --}}
+      <link rel="stylesheet" href="{{ asset('assets/css/linkfree-color-modes.css') }}?v={{ filemtime(base_path('assets/css/linkfree-color-modes.css')) }}" />
 
       <!-- Scripts -->
       <script src="{{ asset('assets/js/app.js') }}" defer></script>
