@@ -129,7 +129,15 @@ with sync_playwright() as p:
                 nav:rect('#navbar-inner').width,
                 welcome:rect('#welcome').height,
                 toolbar:rect('#navbarSupportedContent').right,
-                topClickWidth:rect('.top-links-slim-item').width
+                topClickWidth:rect('.top-links-slim-item').width,
+                offenders:[...document.querySelectorAll('body *')].filter(el=>{
+                  const r=el.getBoundingClientRect();
+                  return r.right>innerWidth+1||r.left< -1;
+                }).slice(0,12).map(el=>({element:el.tagName,
+                  className:typeof el.className==='string'?el.className:'',
+                  left:Math.round(el.getBoundingClientRect().left),
+                  right:Math.round(el.getBoundingClientRect().right),
+                  scroll:el.scrollWidth,client:el.clientWidth}))
               };
             }""")
             assert values["overflow"] <= 2, (width,"page horizontal overflow",values)
