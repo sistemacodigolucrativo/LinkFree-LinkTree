@@ -155,3 +155,177 @@ body.dark .modal-content .btn-close {filter:invert(1) grayscale(1) brightness(1.
 body.dark .main-content .text-muted,body.dark .main-content .card .text-muted{
   color:var(--lf-muted)!important;
 }
+
+/* LinkFree Dark V1 - painel autenticado (membros e administradores). */
+/* Somente o layout autenticado: nao altera login, tema claro nem paginas publicas.
+   Primitivos -> semanticos -> componentes. O toggle existente continua intocado. */
+body.dark .main-content,
+body.dark .sidebar.sidebar-default {
+  --lf-canvas:#151824;
+  --lf-surface:#222738;
+  --lf-raised:#2e364d;
+  --lf-input:#242c40;
+  --lf-hover:#354058;
+  --lf-text:#f4f7fd;
+  --lf-muted:#c3cede;
+  --lf-border:#7f90ad;
+  --lf-link:#95b8ff;
+  --lf-focus:#f6c65b;
+  --lf-primary:#3a57e8;
+  --lf-primary-hover:#4564df;
+  --lf-primary-active:#2a43b5;
+  --lf-on-primary:#ffffff;
+  --lf-secondary-accent:#8cbec8;
+  --lf-nav-active:#29355f;
+  --lf-disabled-bg:#30384f;
+  --lf-disabled-text:#a7b4c7;
+  --lf-success:#76dcaa;
+  --lf-success-bg:#193d33;
+  --lf-success-border:#4abf87;
+  --lf-warning:#f6c65b;
+  --lf-warning-bg:#483822;
+  --lf-warning-border:#cfa345;
+  --lf-danger:#ff989e;
+  --lf-danger-bg:#4b2732;
+  --lf-danger-border:#e16e80;
+  --lf-info:#94d5fc;
+  --lf-info-bg:#1e3a50;
+  --lf-info-border:#63b7e9;
+}
+
+/* Links textuais nao podem herdar azul de botao sobre a superficie escura. */
+body.dark .main-content .text-primary:not(.btn),
+body.dark .main-content .link-primary {
+  color:var(--lf-link)!important;
+}
+body.dark .main-content .text-success:not(.btn) {color:var(--lf-success)!important}
+body.dark .main-content .text-warning:not(.btn) {color:var(--lf-warning)!important}
+body.dark .main-content .text-danger:not(.btn) {color:var(--lf-danger)!important}
+body.dark .main-content .text-info:not(.btn) {color:var(--lf-info)!important}
+
+/* Botao institucional: preservar o fundo primario atual e padronizar estados. */
+body.dark .main-content .btn-primary {
+  --bs-btn-color:var(--lf-on-primary);
+  --bs-btn-bg:var(--bs-primary, var(--lf-primary));
+  --bs-btn-border-color:var(--bs-primary, var(--lf-primary));
+  --bs-btn-hover-color:var(--lf-on-primary);
+  --bs-btn-hover-bg:var(--lf-primary-hover);
+  --bs-btn-hover-border-color:var(--lf-primary-hover);
+  --bs-btn-active-color:var(--lf-on-primary);
+  --bs-btn-active-bg:var(--lf-primary-active);
+  --bs-btn-active-border-color:var(--lf-primary-active);
+}
+body.dark .main-content .btn-primary:not(:disabled):not(.disabled):hover {
+  color:var(--lf-on-primary);
+  background-color:var(--lf-primary-hover);
+  border-color:var(--lf-primary-hover);
+}
+body.dark .main-content .btn-primary:not(:disabled):not(.disabled):active,
+body.dark .main-content .btn-primary.active {
+  color:var(--lf-on-primary);
+  background-color:var(--lf-primary-active);
+  border-color:var(--lf-primary-active);
+}
+body.dark .main-content .btn-primary:disabled,
+body.dark .main-content .btn-primary.disabled {
+  color:var(--lf-disabled-text);
+  background-color:var(--lf-disabled-bg);
+  border-color:var(--lf-disabled-bg);
+  opacity:1;
+}
+body.dark .main-content .btn-outline-primary:not(:disabled):hover {
+  color:var(--lf-on-primary);
+  background-color:var(--lf-primary);
+  border-color:var(--lf-primary);
+}
+body.dark .main-content .btn-outline-secondary {
+  color:var(--lf-secondary-accent);
+  border-color:var(--lf-border);
+}
+body.dark .main-content .btn-outline-secondary:not(:disabled):hover {
+  color:var(--lf-text);
+  background-color:var(--lf-hover);
+  border-color:var(--lf-border);
+}
+body.dark .main-content .btn-soft-primary {
+  --bs-btn-color:var(--lf-link);
+  --bs-btn-hover-color:var(--lf-text);
+}
+
+/* Campos: estados de validacao devem prevalecer sobre a borda generica. */
+body.dark .main-content :is(.form-control,.form-select,textarea).is-invalid {
+  border-color:var(--lf-danger)!important;
+}
+body.dark .main-content :is(.form-control,.form-select,textarea).is-valid {
+  border-color:var(--lf-success-border)!important;
+}
+body.dark .main-content :is(.invalid-feedback,.invalid-tooltip) {
+  color:var(--lf-danger);
+}
+body.dark .main-content :is(.valid-feedback,.valid-tooltip) {
+  color:var(--lf-success);
+}
+
+/* Estados semanticos suaves, sem modificar alertas solid ou cards decorativos. */
+body.dark .main-content .alert-success:not(.alert-solid) {
+  --bs-alert-color:var(--lf-success);
+  --bs-alert-bg:var(--lf-success-bg);
+  --bs-alert-border-color:var(--lf-success-border);
+}
+body.dark .main-content .alert-warning:not(.alert-solid) {
+  --bs-alert-color:var(--lf-warning);
+  --bs-alert-bg:var(--lf-warning-bg);
+  --bs-alert-border-color:var(--lf-warning-border);
+}
+body.dark .main-content .alert-danger:not(.alert-solid) {
+  --bs-alert-color:var(--lf-danger);
+  --bs-alert-bg:var(--lf-danger-bg);
+  --bs-alert-border-color:var(--lf-danger-border);
+}
+body.dark .main-content .alert-info:not(.alert-solid) {
+  --bs-alert-color:var(--lf-info);
+  --bs-alert-bg:var(--lf-info-bg);
+  --bs-alert-border-color:var(--lf-info-border);
+}
+body.dark .main-content .alert-success:not(.alert-solid) .alert-link {color:var(--lf-success)}
+body.dark .main-content .alert-warning:not(.alert-solid) .alert-link {color:var(--lf-warning)}
+body.dark .main-content .alert-danger:not(.alert-solid) .alert-link {color:var(--lf-danger)}
+body.dark .main-content .alert-info:not(.alert-solid) .alert-link {color:var(--lf-info)}
+
+body.dark .main-content .bg-soft-success {
+  background-color:var(--lf-success-bg)!important;
+  color:var(--lf-success)!important;
+}
+body.dark .main-content .bg-soft-warning {
+  background-color:var(--lf-warning-bg)!important;
+  color:var(--lf-warning)!important;
+}
+body.dark .main-content .bg-soft-danger {
+  background-color:var(--lf-danger-bg)!important;
+  color:var(--lf-danger)!important;
+}
+body.dark .main-content .bg-soft-info {
+  background-color:var(--lf-info-bg)!important;
+  color:var(--lf-info)!important;
+}
+
+/* Navegacao: aplicar somente no menu lateral padrao, sem afetar variantes. */
+body.dark .sidebar.sidebar-default:not(.sidebar-color):not(.sidebar-dark):not(.sidebar-transparent) .nav-link.active:not(.static-item) {
+  background-color:var(--lf-nav-active)!important;
+  color:var(--lf-link)!important;
+}
+body.dark .sidebar.sidebar-default:not(.sidebar-color):not(.sidebar-dark):not(.sidebar-transparent) .nav-link:not(.static-item):not(.active):hover {
+  background-color:var(--lf-hover);
+  color:var(--lf-text);
+}
+body.dark .main-content .nav-tabs .nav-link.active,
+body.dark .main-content .pagination .page-item.active .page-link {
+  background-color:var(--lf-nav-active);
+  color:var(--lf-link);
+  border-color:var(--lf-border);
+}
+body.dark .main-content .nav-tabs .nav-link:not(.active):hover,
+body.dark .main-content .pagination .page-item:not(.active) .page-link:hover {
+  color:var(--lf-text);
+  background-color:var(--lf-hover);
+}
