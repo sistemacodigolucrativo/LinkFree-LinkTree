@@ -104,7 +104,8 @@ body.dark .main-content :is(.btn-close) {filter:invert(1) grayscale(1) brightnes
 body :is(a,button,input,select,textarea,[tabindex]):focus-visible {
   outline:3px solid var(--lf-focus)!important;outline-offset:2px;
 }
-body.dark .main-content :is(a:not(.btn):not(.dropdown-item)) {
+/* Accent links only inside article/card content; keep navbar and icon colors intact. */
+body.dark .main-content .card-body a:not(.btn):not(.dropdown-item):not(.nav-link):not(.text-white) {
   color:var(--lf-link);
 }
 body.dark .main-content .card a.text-white {color:#fff!important}
@@ -133,3 +134,24 @@ body.dark .main-content .card a.text-white {color:#fff!important}
 body.dark .studio-links-page .page-icons-card .input-group-text {background:var(--lf-raised)}
 
 /* Keep decorative preview CTA and buttons' semantic colors intact. */
+
+/* Auth/login layout shares Hope UI but does not use .main-content. */
+body.dark :is(.auth-card,.auth-card .card,.auth-card .card-body,.auth-card .card-header) {
+  background-color:var(--lf-surface);color:var(--lf-text);border-color:var(--lf-border);
+}
+body.dark :is(.auth-card .form-control,.auth-card .form-select,.auth-card input:not([type="checkbox"])) {
+  background:var(--lf-input);color:var(--lf-text);border-color:var(--lf-border);
+}
+body.dark :is(.auth-card .form-label,.auth-card label,.auth-card h1,.auth-card h2,.auth-card h3) {
+  color:var(--lf-text);
+}
+body.dark :is(.auth-card .text-muted,.auth-card .form-text) {color:var(--lf-muted)!important}
+body.dark .auth-card a:not(.btn) {color:var(--lf-link)}
+/* edit-link.blade.php still declares .modal-title{color:#000!important}.
+   Scope a stronger mode-specific rule instead of repainting all modal headers. */
+body.dark .main-content .modal-title {color:var(--lf-text)!important}
+body:not(.dark) .main-content .modal-title {color:var(--lf-text)!important}
+body.dark .modal-content .btn-close {filter:invert(1) grayscale(1) brightness(1.7)}
+body.dark .main-content .text-muted,body.dark .main-content .card .text-muted{
+  color:var(--lf-muted)!important;
+}
