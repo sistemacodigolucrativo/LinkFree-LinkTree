@@ -9,7 +9,7 @@ body {
   --lf-raised:#f5f7fc;
   --lf-text:#18243b;
   --lf-muted:#4b5870;
-  --lf-border:#bbc6d8;
+  --lf-border:#75839a;
   --lf-input:#ffffff;
   --lf-hover:#eef2fa;
   --lf-link:#204a9b;
@@ -22,7 +22,7 @@ body.dark {
   --lf-raised:#2e364d;
   --lf-text:#f4f7fd;
   --lf-muted:#c3cede;
-  --lf-border:#52617f;
+  --lf-border:#7f90ad;
   --lf-input:#242c40;
   --lf-hover:#354058;
   --lf-link:#9ac9ff;
