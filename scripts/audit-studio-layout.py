@@ -105,8 +105,6 @@ for group in ("admin-users-menu", "admin-site-menu", "admin-themes-menu", "admin
             "Subcategoria administrativa com fechamento exclusivo: " + group)
 require(sidebar.count('class="nav-link nav-accordion-toggle') == 10,
         "Todas as dez categorias usam gatilhos de acordeão")
-require("overflow-y:auto!important" in nav_css and "#sidebar-scroll-region" in nav_css,
-        "Rolagem vertical nativa e acessível no menu lateral")
 require('id="nav-admin-panel"' in sidebar and "auth()->user()->role === 'admin'" in sidebar,
         "Menu administrativo agrupado e restrito a administradores")
 require(sidebar.index('id="nav-admin-panel"') < sidebar.index('messages.Dashboard'),
@@ -151,6 +149,8 @@ require("body.dark .main-content .modal-title" in palette,
 # Última rodada de revisão: a auditoria verifica também o código de produção,
 # não somente os elementos simplificados do teste visual.
 nav_css = (views.parents[1] / "assets/css/linkfree-navigation-polish.css").read_text(encoding="utf-8")
+require("overflow-y:auto!important" in nav_css and "#sidebar-scroll-region" in nav_css,
+        "Rolagem vertical nativa e acessível no menu lateral")
 close_js = (views.parents[1] / "assets/js/sidebar-auto-close.js").read_text(encoding="utf-8")
 require('class=\'col-12 py-1 px-3 m-0 mt-2 studio-link-actions\'' in links,
         "Barra de ações existente integra os botões do link")
