@@ -664,8 +664,8 @@ $usrhandl = Auth::user()->littlelink_name;
               <div class="container-fluid iq-container">
                   <div class="row">
                       <div class="col-md-12">
-                          <div style="z-index:5;position:relative;" class="flex-wrap d-flex justify-content-between align-items-center">
-                              <div>
+                          <div style="z-index:5;position:relative;" class="flex-wrap d-flex justify-content-center align-items-center">
+                              <div class="w-100 text-center">
                                 @if(!isset($usrhandl))
                                   <h1>👋 {{__('messages.Hi')}}, {{__('messages.stranger')}}</h1>
                                 @else
