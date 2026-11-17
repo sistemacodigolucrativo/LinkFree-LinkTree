@@ -329,3 +329,100 @@ body.dark .main-content .pagination .page-item:not(.active) .page-link:hover {
   color:var(--lf-text);
   background-color:var(--lf-hover);
 }
+
+/* Dark V1 / correcao cirurgica: contraste e identidade visual do dashboard. */
+/*
+ * O customizador legado ajusta --bs-primary no body. Fixar o azul apenas
+ * na arvore autenticada evita roxo no banner/botoes sem afetar o tema claro,
+ * a tela de login ou as paginas publicas dos usuarios.
+ */
+body.dark .main-content,
+body.dark .sidebar.sidebar-default:not(.sidebar-color):not(.sidebar-dark):not(.sidebar-transparent) {
+  --bs-primary:var(--lf-primary);
+  --bs-primary-rgb:58,87,232;
+  --bs-primary-shade-20:var(--lf-primary-active);
+  --bs-link-color:var(--lf-link);
+  --bs-link-hover-color:#bfd3ff;
+  --bs-heading-color:var(--lf-text);
+  --lf-edit-action:#3869c2;
+  --lf-edit-action-hover:#4564df;
+  --lf-danger-action:#b53039;
+  --lf-danger-action-hover:#982831;
+}
+
+/* Cabecalho e CTA principal: azul institucional, branco AA. */
+body.dark .main-content .iq-navbar-header.welcome-slim.header-block {
+  background-color:var(--lf-primary)!important;
+  color:var(--lf-on-primary);
+}
+body.dark .main-content .iq-navbar-header.welcome-slim.header-block :is(h1,h2,h3,h4,h5,h6) {
+  color:var(--lf-on-primary)!important;
+}
+body.dark .main-content .btn.btn-primary:not(:disabled):not(.disabled) {
+  background-color:var(--lf-primary);
+  border-color:var(--lf-primary);
+  color:var(--lf-on-primary);
+}
+body.dark .main-content .btn.btn-primary:not(:disabled):not(.disabled):is(:hover,:focus-visible) {
+  background-color:var(--lf-primary-hover);
+  border-color:var(--lf-primary-hover);
+  color:var(--lf-on-primary);
+}
+body.dark .main-content .btn.btn-primary:not(:disabled):not(.disabled):active {
+  background-color:var(--lf-primary-active);
+  border-color:var(--lf-primary-active);
+  color:var(--lf-on-primary);
+}
+
+/* Titulo de link: .h6 trazia #8a92a6 do CSS legado (contraste insuficiente). */
+body.dark .main-content .studio-links-page #links-table-body .studio-link-slim .h6 {
+  color:var(--lf-text)!important;
+}
+body.dark .main-content .studio-links-page #links-table-body .studio-link-slim a.text-muted {
+  color:var(--lf-muted)!important;
+  opacity:1;
+}
+
+/* Somente a acao Editar dos cards Meus Links fica em azul secundario.
+   Warning global continua reservado para avisos reais. */
+body.dark .main-content .studio-links-page .studio-link-actions .btn-warning {
+  --bs-btn-bg:var(--lf-edit-action);
+  --bs-btn-border-color:var(--lf-edit-action);
+  --bs-btn-color:var(--lf-on-primary);
+  background-color:var(--lf-edit-action)!important;
+  border-color:var(--lf-edit-action)!important;
+  color:var(--lf-on-primary)!important;
+}
+body.dark .main-content .studio-links-page .studio-link-actions .btn-warning:is(:hover,:focus-visible) {
+  background-color:var(--lf-edit-action-hover)!important;
+  border-color:var(--lf-edit-action-hover)!important;
+}
+body.dark .main-content .studio-links-page .studio-link-actions .btn-warning:active {
+  background-color:var(--lf-primary-active)!important;
+  border-color:var(--lf-primary-active)!important;
+}
+body.dark .main-content .studio-links-page .studio-link-actions .btn-danger {
+  background-color:var(--lf-danger-action)!important;
+  border-color:var(--lf-danger-action)!important;
+  color:var(--lf-on-primary)!important;
+}
+body.dark .main-content .studio-links-page .studio-link-actions .btn-danger:is(:hover,:focus-visible) {
+  background-color:var(--lf-danger-action-hover)!important;
+  border-color:var(--lf-danger-action-hover)!important;
+}
+
+/* A previa nao e operacao de risco: remover amarelo chamativo do FAB,
+   preservando posicao, tamanho, icone, modal e comportamento original. */
+body.dark .main-content .studio-links-preview-fab {
+  background:var(--lf-raised)!important;
+  border-color:var(--lf-border)!important;
+  color:var(--lf-text)!important;
+}
+body.dark .main-content .studio-links-preview-fab:is(:hover,:active) {
+  background:var(--lf-hover)!important;
+  border-color:var(--lf-border)!important;
+  color:var(--lf-text)!important;
+}
+body.dark .main-content .studio-links-preview-fab:focus-visible {
+  outline-color:var(--lf-focus)!important;
+}
