@@ -13,7 +13,7 @@ sidebar=(ROOT/"layouts/sidebar.blade.php").read_text()
 links=(ROOT/"studio/links.blade.php").read_text()
 dashboard=(ROOT/"panel/index.blade.php").read_text()
 theme=(ROOT/"studio/theme.blade.php").read_text()
-palette=(ROOT.parents[2]/"assets/css/linkfree-color-modes.css").read_text()
+palette=(ROOT.parents[1]/"assets/css/linkfree-color-modes.css").read_text()
 # CSS has no dynamic Blade directives in the sections being exercised.
 css_sidebar=sidebar.split("/* Cabeçalho slim:",1)[1].split("</style>",1)[0]
 css_links=links.split("/* Mesmo alinhamento e mesma largura",1)[1].split("</style>",1)[0]
