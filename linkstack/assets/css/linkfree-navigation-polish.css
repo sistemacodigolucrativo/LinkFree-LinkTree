@@ -69,3 +69,69 @@ body .main-content .iq-navbar .notification-panel :is(p,a,span,div){
     max-height:calc(100vh - 78px)!important;
   }
 }
+
+/* Navegação vertical nativa, independente da rolagem da página.
+   O atributo data-scrollbar foi removido apenas da sidebar para evitar
+   concorrência do scrollbar customizado do tema. */
+.sidebar.sidebar-default {
+  display:flex!important;
+  flex-direction:column!important;
+  height:100vh;
+  height:100dvh;
+  max-height:100vh;
+  max-height:100dvh;
+}
+.sidebar.sidebar-default > .sidebar-header,
+.sidebar.sidebar-default > .sidebar-footer {
+  flex:0 0 auto;
+}
+.sidebar.sidebar-default > .sidebar-body#sidebar-scroll-region {
+  flex:1 1 auto!important;
+  min-height:0!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+  scrollbar-color:var(--lf-sidebar-divider) transparent;
+}
+.sidebar.sidebar-default > .sidebar-body#sidebar-scroll-region::-webkit-scrollbar {
+  width:7px;
+}
+.sidebar.sidebar-default > .sidebar-body#sidebar-scroll-region::-webkit-scrollbar-thumb {
+  background:var(--lf-sidebar-divider);
+  border-radius:999px;
+}
+.sidebar.sidebar-default > .sidebar-body#sidebar-scroll-region::-webkit-scrollbar-track {
+  background:transparent;
+}
+.sidebar.sidebar-default .iq-main-menu .nav-accordion-toggle {
+  display:flex!important;
+  align-items:center!important;
+  gap:10px;
+  width:100%;
+  cursor:pointer;
+}
+.sidebar.sidebar-default .iq-main-menu .nav-accordion-toggle .right-icon {
+  margin-inline-start:auto;
+  transition:transform .2s ease;
+}
+.sidebar.sidebar-default .iq-main-menu .nav-accordion-toggle[aria-expanded="true"] .right-icon {
+  transform:rotate(180deg);
+}
+.sidebar.sidebar-default .iq-main-menu .sub-nav {
+  list-style:none;
+}
+.sidebar.sidebar-default .iq-main-menu .sub-nav .nav-accordion-toggle {
+  padding-inline-start:18px;
+}
+.sidebar.sidebar-default .iq-main-menu .sub-nav .sub-nav .nav-link:not(.nav-accordion-toggle) {
+  padding-inline-start:28px;
+}
+@media(prefers-reduced-motion:reduce) {
+  .sidebar.sidebar-default .iq-main-menu .nav-accordion-toggle .right-icon {
+    transition:none;
+  }
+}

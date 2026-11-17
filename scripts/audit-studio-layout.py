@@ -94,6 +94,19 @@ require("data-toggle=\"sidebar\"" in sidebar and ".mobile-unified-nav .sidebar-t
         "Seta de abertura/fechamento do menu lateral mantida")
 require('id="navbarSupportedContent"' in sidebar and 'id="navbarDropdown"' in sidebar,
         "Exibir página e perfil preservados no navbar")
+require('id="sidebar-scroll-region"' in sidebar and
+        'class="sidebar-body pt-0 data-scrollbar"' not in sidebar,
+        "Sidebar usa rolagem vertical independente sem conflito com o plugin")
+for group in ("admin-navigation", "nav-overview", "nav-links", "nav-my-page", "nav-appearance", "nav-account"):
+    require('id="' + group + '" data-bs-parent="#sidebar-menu"' in sidebar,
+            "Acordeão principal com fechamento exclusivo: " + group)
+for group in ("admin-users-menu", "admin-site-menu", "admin-themes-menu", "admin-system-menu"):
+    require('id="' + group + '" data-bs-parent="#admin-navigation"' in sidebar,
+            "Subcategoria administrativa com fechamento exclusivo: " + group)
+require(sidebar.count('class="nav-link nav-accordion-toggle') == 10,
+        "Todas as dez categorias usam gatilhos de acordeão")
+require("overflow-y:auto!important" in nav_css and "#sidebar-scroll-region" in nav_css,
+        "Rolagem vertical nativa e acessível no menu lateral")
 require('id="nav-admin-panel"' in sidebar and "auth()->user()->role === 'admin'" in sidebar,
         "Menu administrativo agrupado e restrito a administradores")
 require(sidebar.index('id="nav-admin-panel"') < sidebar.index('messages.Dashboard'),

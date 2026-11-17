@@ -308,48 +308,138 @@ $usrhandl = Auth::user()->littlelink_name;
                 </i>
             </button>
         </div>
-        <div class="sidebar-body pt-0 data-scrollbar">
+        <div class="sidebar-body pt-0" id="sidebar-scroll-region" tabindex="0" aria-label="Navegação lateral rolável">
             <div class="sidebar-list">
                 <!-- Sidebar Menu Start -->
                 <ul class="navbar-nav iq-main-menu" id="sidebar-menu">
+@php
+  $navOverviewOpen = request()->is('dashboard');
+  $navLinksOpen = request()->is('studio/links*') || request()->is('studio/add-link') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*');
+  $navPageOpen = request()->is('studio/page*') || request()->is('studio/no_page_name');
+  $navAppearanceOpen = request()->is('studio/theme') || request()->is('studio/theme-preview/*');
+  $navAccountOpen = request()->is('studio/profile');
+@endphp
 @if(auth()->check() && auth()->user()->role === 'admin')
-@php $adminMenuOpen = request()->is('admin/*') || request()->is('update'); @endphp
-<li class="nav-item" id="nav-admin-panel">
-<a class="nav-link {{ $adminMenuOpen ? 'active' : '' }}" data-bs-toggle="collapse" href="#admin-navigation" role="button" aria-expanded="{{ $adminMenuOpen ? 'true' : 'false' }}" aria-controls="admin-navigation"><i class="icon bi bi-shield-lock" style="font-size:20px" aria-hidden="true"></i><span class="item-name">{{__('messages.Administration')}}</span><i class="right-icon bi bi-chevron-down" aria-hidden="true"></i></a>
-<ul class="sub-nav collapse {{ $adminMenuOpen ? 'show' : '' }}" id="admin-navigation" data-bs-parent="#sidebar-menu">
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Nav Admin Users')}}</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') ? 'active' : '' }}" href="{{ route('showUsers') }}"><i class="bi bi-people-fill" aria-hidden="true"></i><span class="item-name">{{__('messages.Manage Users')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/new-user') ? 'active' : '' }}" href="{{ route('createNewUser') }}"><i class="bi bi-person-plus" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin New User')}}</span></a></li>
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Nav Admin Site')}}</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/site*') ? 'active' : '' }}" href="{{ route('showSite') }}"><i class="bi bi-palette" aria-hidden="true"></i><span class="item-name">{{__('messages.Site Customization')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/pages*') ? 'active' : '' }}" href="{{ route('showSitePage') }}"><i class="bi bi-file-earmark-text" aria-hidden="true"></i><span class="item-name">{{__('messages.Footer Pages')}}</span></a></li>
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Nav Admin Themes')}}</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/theme') ? 'active' : '' }}" href="{{ route('showThemes') }}"><i class="bi bi-brush" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Theme Manager')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/github-themes*') ? 'active' : '' }}" href="{{ route('githubThemes') }}"><i class="bi bi-github" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin GitHub Themes')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/linktype*') ? 'active' : '' }}" href="{{ url('/admin/linktype') }}"><i class="bi bi-grid" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Block Types')}}</span></a></li>
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Nav Admin System')}}</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/config') ? 'active' : '' }}" href="{{ route('showConfig') }}"><i class="bi bi-sliders" aria-hidden="true"></i><span class="item-name">{{__('messages.Config')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/backups') ? 'active' : '' }}" href="{{ route('showBackups') }}"><i class="bi bi-database" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Backups')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/advanced-config') ? 'active' : '' }}" href="{{ route('showFileEditor') }}"><i class="bi bi-gear-wide-connected" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Advanced Config')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/env') ? 'active' : '' }}" href="{{ route('showEnvEditor') }}"><i class="bi bi-file-earmark-code" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Env')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/phpinfo') ? 'active' : '' }}" href="{{ route('phpinfo') }}"><i class="bi bi-cpu" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin PHP Info')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('update') ? 'active' : '' }}" href="{{ url('/update') }}"><i class="bi bi-arrow-repeat" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Updates')}}</span></a></li>
-</ul></li>
+@php
+  $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user');
+  $adminSiteOpen = request()->is('admin/site*') || request()->is('admin/pages*');
+  $adminThemesOpen = request()->is('admin/theme') || request()->is('admin/github-themes*') || request()->is('admin/linktype*');
+  $adminSystemOpen = request()->is('admin/config') || request()->is('admin/backups') || request()->is('admin/advanced-config') || request()->is('admin/env') || request()->is('admin/phpinfo') || request()->is('update');
+  $adminMenuOpen = $adminUsersOpen || $adminSiteOpen || $adminThemesOpen || $adminSystemOpen || request()->is('admin/*');
+@endphp
+<li class="nav-item nav-accordion-group nav-accordion-admin" id="nav-admin-panel">
+  <a class="nav-link nav-accordion-toggle {{ $adminMenuOpen ? 'active' : '' }}" href="#admin-navigation" data-bs-toggle="collapse" role="button" aria-expanded="{{ $adminMenuOpen ? 'true' : 'false' }}" aria-controls="admin-navigation">
+    <i class="icon bi bi-shield-lock" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Administration')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $adminMenuOpen ? 'show' : '' }}" id="admin-navigation" data-bs-parent="#sidebar-menu">
+    <li class="nav-item nav-accordion-group nav-accordion-admin">
+  <a class="nav-link nav-accordion-toggle {{ $adminUsersOpen ? 'active' : '' }}" href="#admin-users-menu" data-bs-toggle="collapse" role="button" aria-expanded="{{ $adminUsersOpen ? 'true' : 'false' }}" aria-controls="admin-users-menu">
+    <i class="icon bi bi-people-fill" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Nav Admin Users')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $adminUsersOpen ? 'show' : '' }}" id="admin-users-menu" data-bs-parent="#admin-navigation">
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') ? 'active' : '' }}" href="{{ route('showUsers') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">{{__('messages.Manage Users')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/new-user') ? 'active' : '' }}" href="{{ route('createNewUser') }}"><i class="icon bi bi-person-plus" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin New User')}}</span></a></li>
+  </ul>
+</li>
+    <li class="nav-item nav-accordion-group nav-accordion-admin">
+  <a class="nav-link nav-accordion-toggle {{ $adminSiteOpen ? 'active' : '' }}" href="#admin-site-menu" data-bs-toggle="collapse" role="button" aria-expanded="{{ $adminSiteOpen ? 'true' : 'false' }}" aria-controls="admin-site-menu">
+    <i class="icon bi bi-globe2" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Nav Admin Site')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $adminSiteOpen ? 'show' : '' }}" id="admin-site-menu" data-bs-parent="#admin-navigation">
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/site*') ? 'active' : '' }}" href="{{ route('showSite') }}"><i class="icon bi bi-palette" aria-hidden="true"></i><span class="item-name">{{__('messages.Site Customization')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/pages*') ? 'active' : '' }}" href="{{ route('showSitePage') }}"><i class="icon bi bi-file-earmark-text" aria-hidden="true"></i><span class="item-name">{{__('messages.Footer Pages')}}</span></a></li>
+  </ul>
+</li>
+    <li class="nav-item nav-accordion-group nav-accordion-admin">
+  <a class="nav-link nav-accordion-toggle {{ $adminThemesOpen ? 'active' : '' }}" href="#admin-themes-menu" data-bs-toggle="collapse" role="button" aria-expanded="{{ $adminThemesOpen ? 'true' : 'false' }}" aria-controls="admin-themes-menu">
+    <i class="icon bi bi-brush" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Nav Admin Themes')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $adminThemesOpen ? 'show' : '' }}" id="admin-themes-menu" data-bs-parent="#admin-navigation">
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/theme') ? 'active' : '' }}" href="{{ route('showThemes') }}"><i class="icon bi bi-brush" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Theme Manager')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/github-themes*') ? 'active' : '' }}" href="{{ route('githubThemes') }}"><i class="icon bi bi-github" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin GitHub Themes')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/linktype*') ? 'active' : '' }}" href="{{ url('/admin/linktype') }}"><i class="icon bi bi-grid" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Block Types')}}</span></a></li>
+  </ul>
+</li>
+    <li class="nav-item nav-accordion-group nav-accordion-admin">
+  <a class="nav-link nav-accordion-toggle {{ $adminSystemOpen ? 'active' : '' }}" href="#admin-system-menu" data-bs-toggle="collapse" role="button" aria-expanded="{{ $adminSystemOpen ? 'true' : 'false' }}" aria-controls="admin-system-menu">
+    <i class="icon bi bi-sliders" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Nav Admin System')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $adminSystemOpen ? 'show' : '' }}" id="admin-system-menu" data-bs-parent="#admin-navigation">
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/config') ? 'active' : '' }}" href="{{ route('showConfig') }}"><i class="icon bi bi-sliders" aria-hidden="true"></i><span class="item-name">{{__('messages.Config')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/backups') ? 'active' : '' }}" href="{{ route('showBackups') }}"><i class="icon bi bi-database" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Backups')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/advanced-config') ? 'active' : '' }}" href="{{ route('showFileEditor') }}"><i class="icon bi bi-gear-wide-connected" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Advanced Config')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/env') ? 'active' : '' }}" href="{{ route('showEnvEditor') }}"><i class="icon bi bi-file-earmark-code" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Env')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/phpinfo') ? 'active' : '' }}" href="{{ route('phpinfo') }}"><i class="icon bi bi-cpu" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin PHP Info')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('update') ? 'active' : '' }}" href="{{ url('/update') }}"><i class="icon bi bi-arrow-repeat" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Updates')}}</span></a></li>
+  </ul>
+</li>
+  </ul>
+</li>
 @endif
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Home')}}</span><span class="mini-icon">-</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('panelIndex') }}"><i class="icon bi bi-speedometer2" style="font-size:20px" aria-hidden="true"></i><span class="item-name">{{__('messages.Dashboard')}}</span></a></li>
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Nav Link Management')}}</span><span class="mini-icon">-</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/links*') ? 'active' : '' }}" href="{{ url('/studio/links') }}"><i class="icon bi bi-link-45deg" style="font-size:20px" aria-hidden="true"></i><span class="item-name">{{__('messages.Links')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/add-link') ? 'active' : '' }}" href="{{ url('/studio/add-link') }}"><i class="icon bi bi-plus-square" style="font-size:20px" aria-hidden="true"></i><span class="item-name">{{__('messages.Add Link')}}</span></a></li>
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Nav Public Page')}}</span><span class="mini-icon">-</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/page*') ? 'active' : '' }}" href="{{ url('/studio/page') }}"><i class="icon bi bi-person-badge" style="font-size:20px" aria-hidden="true"></i><span class="item-name">{{__('messages.My Profile')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ false ? 'active' : '' }}" href="{{ url('/@'.Auth::user()->littlelink_name) }}" target="_blank" rel="noopener noreferrer"><i class="icon bi bi-box-arrow-up-right" style="font-size:20px" aria-hidden="true"></i><span class="item-name">{{__('messages.View Page')}}</span></a></li>
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Personalization')}}</span><span class="mini-icon">-</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/theme*') ? 'active' : '' }}" href="{{ url('/studio/theme') }}"><i class="icon bi bi-palette" style="font-size:20px" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Themes Appearance')}}</span></a></li>
-<li class="nav-item static-item"><span class="nav-link static-item disabled"><span class="default-icon">{{__('messages.Account Settings')}}</span><span class="mini-icon">-</span></span></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/profile') ? 'active' : '' }}" href="{{ url('/studio/profile') }}"><i class="icon bi bi-gear" style="font-size:20px" aria-hidden="true"></i><span class="item-name">{{__('messages.Settings')}}</span></a></li>
+<li class="nav-item nav-accordion-group">
+  <a class="nav-link nav-accordion-toggle {{ $navOverviewOpen ? 'active' : '' }}" href="#nav-overview" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navOverviewOpen ? 'true' : 'false' }}" aria-controls="nav-overview">
+    <i class="icon bi bi-house-door" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Home')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $navOverviewOpen ? 'show' : '' }}" id="nav-overview" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('panelIndex') }}"><i class="icon bi bi-speedometer2" aria-hidden="true"></i><span class="item-name">{{__('messages.Dashboard')}}</span></a></li>
+  </ul>
+</li>
+<li class="nav-item nav-accordion-group">
+  <a class="nav-link nav-accordion-toggle {{ $navLinksOpen ? 'active' : '' }}" href="#nav-links" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navLinksOpen ? 'true' : 'false' }}" aria-controls="nav-links">
+    <i class="icon bi bi-link-45deg" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Nav Link Management')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $navLinksOpen ? 'show' : '' }}" id="nav-links" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/links*') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*') ? 'active' : '' }}" href="{{ url('/studio/links') }}"><i class="icon bi bi-link-45deg" aria-hidden="true"></i><span class="item-name">{{__('messages.Links')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/add-link') ? 'active' : '' }}" href="{{ url('/studio/add-link') }}"><i class="icon bi bi-plus-square" aria-hidden="true"></i><span class="item-name">{{__('messages.Add Link')}}</span></a></li>
+  </ul>
+</li>
+<li class="nav-item nav-accordion-group">
+  <a class="nav-link nav-accordion-toggle {{ $navPageOpen ? 'active' : '' }}" href="#nav-my-page" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navPageOpen ? 'true' : 'false' }}" aria-controls="nav-my-page">
+    <i class="icon bi bi-person-badge" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Nav Public Page')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $navPageOpen ? 'show' : '' }}" id="nav-my-page" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/page*') || request()->is('studio/no_page_name') ? 'active' : '' }}" href="{{ url('/studio/page') }}"><i class="icon bi bi-person-badge" aria-hidden="true"></i><span class="item-name">{{__('messages.My Profile')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ false ? 'active' : '' }}" href="{{ url('/@'.Auth::user()->littlelink_name) }}" target="_blank" rel="noopener noreferrer"><i class="icon bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="item-name">{{__('messages.View Page')}}</span></a></li>
+  </ul>
+</li>
+<li class="nav-item nav-accordion-group">
+  <a class="nav-link nav-accordion-toggle {{ $navAppearanceOpen ? 'active' : '' }}" href="#nav-appearance" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navAppearanceOpen ? 'true' : 'false' }}" aria-controls="nav-appearance">
+    <i class="icon bi bi-palette" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Personalization')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $navAppearanceOpen ? 'show' : '' }}" id="nav-appearance" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/theme*') ? 'active' : '' }}" href="{{ url('/studio/theme') }}"><i class="icon bi bi-palette" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Themes Appearance')}}</span></a></li>
+  </ul>
+</li>
+<li class="nav-item nav-accordion-group">
+  <a class="nav-link nav-accordion-toggle {{ $navAccountOpen ? 'active' : '' }}" href="#nav-account" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navAccountOpen ? 'true' : 'false' }}" aria-controls="nav-account">
+    <i class="icon bi bi-gear" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Account Settings')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $navAccountOpen ? 'show' : '' }}" id="nav-account" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/profile') ? 'active' : '' }}" href="{{ url('/studio/profile') }}"><i class="icon bi bi-gear" aria-hidden="true"></i><span class="item-name">{{__('messages.Settings')}}</span></a></li>
+  </ul>
+</li>
 </ul>
-<!-- Sidebar Menu End -->        </div>
+                <!-- Sidebar Menu End -->        </div>
         </div>
         <div class="sidebar-footer"></div>
     </aside>    <main class="main-content">
