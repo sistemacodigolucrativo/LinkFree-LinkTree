@@ -7,6 +7,7 @@ usage() {
 Uso interativo: sudo bash instal.sh
 Uso avançado: sudo bash instal.sh --mode ip --public-ip IP --database sqlite [--dest /srv/linkfree]
               sudo bash instal.sh --mode domain --domain dominio --database mysql (--email email | --cert arquivo --key arquivo) [--dest /srv/linkfree]
+Diagnóstico DNS: bash instal.sh --dns-check --domain dominio [--public-ip IP]
 Teste local:  bash instal.sh --prepare-only /caminho/novo --url http://localhost:8080
 
 Prepara uma VPS Ubuntu 24.04, clona main e abre o instalador web original.
@@ -22,7 +23,7 @@ HELP
 }
 fail() { printf 'Erro: %s\n' "$*" >&2; exit 1; }
 repo=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
-domain= cidr= cert= key= email= dest=/srv/linkfree prepare= url= mode= db= cloudflare=0 public_ip=
+domain= cidr= cert= key= email= dest=/srv/linkfree prepare= url= mode= db= cloudflare=0 public_ip= dns_only=0 ipv6_listen=0
 while (($#)); do
  case "$1" in
   --help|-h) usage; exit 0;;
@@ -30,6 +31,7 @@ while (($#)); do
    (($# >= 2)) || fail "Falta valor para $1"
    case "$1" in --domain) domain=$2;; --cert) cert=$2;; --key) key=$2;; --email) email=$2;; --mode) mode=$2;; --database) db=$2;; --public-ip) public_ip=$2;; --dest) dest=$2;; --prepare-only) prepare=$2;; --url) url=$2;; esac; shift 2;;
   --cloudflare) cloudflare=1; shift;;
+  --dns-check) dns_only=1; shift;;
   *) fail "Opção desconhecida: $1";;
  esac
 done
@@ -41,7 +43,12 @@ detect_public_ip() {
  if [[ -n $token ]]; then
   result=$(curl --noproxy '*' -fsS --max-time 2 -H "X-aws-ec2-metadata-token: $token" http://169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null || true)
  fi
- if [[ -z ${result:-} ]]; then result=$(curl -4fsS --max-time 5 https://api.ipify.org 2>/dev/null || true); fi
+ if [[ -n ${result:-} ]]; then
+  printf 'IPv4 detectado pelos metadados IMDSv2 da EC2: %s\n' "$result" >&2
+ else
+  result=$(curl -4fsS --max-time 5 https://api.ipify.org 2>/dev/null || true)
+  [[ -z $result ]] || printf 'IPv4 detectado por serviço externo: %s (pode ser um IP de saída NAT; confirme que é o endereço da VPS).\n' "$result" >&2
+ fi
  printf '%s' "${result:-}"
 }
 valid_ip() { python3 - "$1" <<'PYIP'
@@ -51,6 +58,160 @@ try:
 except (ValueError,AssertionError): sys.exit(1)
 PYIP
 }
+dns_check() {
+ python3 - "$domain" "$public_ip" "$cf_file" <<'PYDNS'
+import ipaddress
+import json
+import socket
+import subprocess
+import sys
+import urllib.parse
+
+RESOLVERS = (('Cloudflare 1.1.1.1', 'https://cloudflare-dns.com/dns-query'),
+             ('Google 8.8.8.8', 'https://dns.google/resolve'))
+
+def query(endpoint, domain, kind):
+    url = endpoint + '?' + urllib.parse.urlencode({'name': domain, 'type': kind})
+    result = subprocess.run(['curl', '--noproxy', '*', '-fsS', '--max-time', '8',
+                             '-H', 'Accept: application/dns-json', url],
+                            capture_output=True, text=True, check=True)
+    data = json.loads(result.stdout)
+    if data.get('Status') == 3:
+        return set()  # NXDOMAIN é uma resposta negativa, não uma falha de transporte.
+    if data.get('Status') != 0:
+        raise ValueError('DNS status ' + str(data.get('Status', 'desconhecido')))
+    version = 4 if kind == 'A' else 6
+    answers = set()
+    for answer in data.get('Answer', []):
+        if answer.get('type') == (1 if version == 4 else 28):
+            address = ipaddress.ip_address(answer['data'])
+            if address.version == version:
+                answers.add(str(address))
+    return answers
+
+def local_ipv6():
+    result = subprocess.run(['ip', '-j', '-6', 'addr', 'show', 'scope', 'global'],
+                            capture_output=True, text=True, check=True)
+    addresses = set()
+    for interface in json.loads(result.stdout):
+        for addr in interface.get('addr_info', []):
+            flags = set(addr.get('flags', []))
+            if addr.get('scope') == 'global' and not flags.intersection({'tentative', 'dadfailed', 'deprecated'}):
+                address = ipaddress.ip_address(addr['local'])
+                if address.version == 6 and address.is_global:
+                    addresses.add(str(address))
+    return addresses
+
+def evaluate(a, aaaa, public_ip, ipv6, networks):
+    messages = []
+    answers = a | aaaa
+    proxied = {x for x in answers if any(ipaddress.ip_address(x) in n for n in networks)}
+    if not a:
+        messages.append('Nenhum registro A público encontrado; é necessário um IPv4 para a VPS.')
+    if proxied and proxied != answers:
+        messages.append('DNS mistura endereços da Cloudflare e outros: ' + ', '.join(sorted(answers)))
+    if proxied and proxied == answers and a:
+        messages.append('Proxy Cloudflare detectado. Confirme no painel que a origem aponta para esta VPS e use SSL Full (strict); o DNS não comprova a origem.')
+        return 'cloudflare', messages
+    for address in sorted(a):
+        if address == public_ip:
+            messages.append('A ' + address + ': corresponde ao IPv4 público da VPS.')
+        else:
+            messages.append('A ' + address + ': diverge do IPv4 público da VPS (' + public_ip + '); pode receber conexões e desafios ACME.')
+    for address in sorted(aaaa):
+        if address in ipv6:
+            messages.append('AAAA ' + address + ': configurado na VPS.')
+        else:
+            messages.append('AAAA ' + address + ': não encontrado nos IPv6 globais ativos da VPS; corrija ou remova este registro.')
+    if not proxied and a == {public_ip} and aaaa <= ipv6:
+        return ('direto6' if aaaa else 'direto'), messages
+    return None, messages
+
+def main(domain, public_ip, cf_file):
+    try:
+        ip = ipaddress.ip_address(public_ip)
+        if ip.version != 4 or not ip.is_global:
+            raise ValueError('IPv4 público inválido')
+        with open(cf_file) as f:
+            networks = [ipaddress.ip_network(x.strip()) for x in f if x.strip()]
+        if {n.version for n in networks} != {4, 6}:
+            raise ValueError('lista de redes Cloudflare incompleta')
+    except (OSError, ValueError) as exc:
+        print('Falha na configuração: ' + str(exc), file=sys.stderr)
+        return 1
+    print('IPv4 público usado na comparação: ' + public_ip, file=sys.stderr)
+    try:
+        local = {x[4][0] for x in socket.getaddrinfo(domain, None, type=socket.SOCK_STREAM)}
+        print('Resolvedor local: ' + (', '.join(sorted(local)) or 'sem respostas'), file=sys.stderr)
+    except socket.gaierror as exc:
+        local = set()
+        print('Resolvedor local falhou: ' + str(exc), file=sys.stderr)
+    results = []
+    for name, endpoint in RESOLVERS:
+        try:
+            a, aaaa = query(endpoint, domain, 'A'), query(endpoint, domain, 'AAAA')
+            print(name + ': A=' + (', '.join(sorted(a)) or '(nenhum)') + '; AAAA=' + (', '.join(sorted(aaaa)) or '(nenhum)'), file=sys.stderr)
+            results.append((name, a, aaaa))
+        except (OSError, ValueError, subprocess.SubprocessError, json.JSONDecodeError) as exc:
+            print(name + ': consulta falhou: ' + str(exc), file=sys.stderr)
+    if not results:
+        print('Nenhum resolvedor público respondeu para A e AAAA; verifique acesso HTTPS e tente novamente.', file=sys.stderr)
+        return 1
+    if len(results) < len(RESOLVERS):
+        print('Aviso: somente um resolvedor público respondeu; divergências de cache podem não ser detectadas.', file=sys.stderr)
+    if any((a, aaaa) != (results[0][1], results[0][2]) for _, a, aaaa in results[1:]):
+        print('Aviso: os resolvedores públicos retornaram conjuntos diferentes; cada resposta será validada.', file=sys.stderr)
+    all_answers = set().union(*(a | aaaa for _, a, aaaa in results))
+    if local != all_answers:
+        print('Aviso: o resolvedor local difere do DNS público; verifique cache local ou /etc/hosts.', file=sys.stderr)
+    try:
+        ipv6 = local_ipv6() if any(aaaa for _, _, aaaa in results) else set()
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        print('Não foi possível verificar os IPv6 locais: ' + str(exc), file=sys.stderr)
+        return 1
+    modes = set()
+    for name, a, aaaa in results:
+        mode, messages = evaluate(a, aaaa, public_ip, ipv6, networks)
+        for message in messages:
+            print(name + ': ' + message, file=sys.stderr)
+        if mode is None:
+            return 1
+        modes.add(mode)
+    if 'cloudflare' in modes and len(modes) > 1:
+        print('Os resolvedores discordam sobre o proxy Cloudflare; aguarde a atualização dos caches.', file=sys.stderr)
+        return 1
+    mode = 'cloudflare' if 'cloudflare' in modes else ('direto6' if 'direto6' in modes else 'direto')
+    print(mode)
+    return 0
+
+if __name__ == '__main__':
+    sys.exit(main(*sys.argv[1:]))
+PYDNS
+}
+fetch_cloudflare_ranges() {
+ local ipv4_file ipv6_file
+ ipv4_file=$(mktemp) && ipv6_file=$(mktemp) || fail 'Não foi possível criar arquivos temporários.'
+ if ! curl -fsS --max-time 15 https://www.cloudflare.com/ips-v4 > "$ipv4_file" ||
+    ! curl -fsS --max-time 15 https://www.cloudflare.com/ips-v6 > "$ipv6_file"; then
+  rm -f -- "$ipv4_file" "$ipv6_file"
+  fail 'Não foi possível obter as redes oficiais da Cloudflare.'
+ fi
+ { cat "$ipv4_file"; printf '\n'; cat "$ipv6_file"; printf '\n'; } > "$cf_file"
+ rm -f -- "$ipv4_file" "$ipv6_file"
+}
+if [[ $dns_only == 1 ]]; then
+ [[ -n $domain && -z $prepare ]] || fail 'Use --dns-check --domain dominio [--public-ip IP].'
+ command -v python3 >/dev/null && command -v curl >/dev/null && command -v ip >/dev/null || fail 'O diagnóstico precisa de python3, curl e ip.'
+ domain=${domain,,}
+ [[ $domain =~ ^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$ && $domain == *.* && $domain != *..* ]] || fail 'Domínio inválido.'
+ if [[ -z $public_ip ]]; then public_ip=$(detect_public_ip); fi
+ valid_ip "$public_ip" || fail 'Não foi possível detectar IPv4 público válido; informe --public-ip.'
+ cf_file=$(mktemp)
+ trap 'rm -f -- "$cf_file"' EXIT
+ fetch_cloudflare_ranges
+ dns_check
+ exit $?
+fi
 if [[ -n $prepare ]]; then
  dest=$prepare
  [[ $url =~ ^https?://[a-zA-Z0-9.:-]+$ ]] || fail 'Informe --url, por exemplo http://localhost:8080.'
@@ -75,6 +236,7 @@ else
   printf 'Atenção: HTTP não cifra senhas ou dados. Use uma rede confiável.\n'
  else
   if [[ -z $domain ]]; then ask 'Domínio ou subdomínio: '; domain=${REPLY,,}; fi
+  domain=${domain,,}
   [[ $domain =~ ^[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?$ && $domain == *.* && $domain != *..* ]] || fail 'Domínio inválido.'
   url="https://$domain"
   if [[ -z $cert && -z $key && -z $email ]]; then
@@ -131,7 +293,7 @@ if [[ -z $prepare ]]; then
  exec > >(tee -a "$log_file") 2>&1
  printf 'Preparação LinkFree iniciada em %s. Log: %s\n' "$(date -u +%FT%TZ)" "$log_file"
  export DEBIAN_FRONTEND=noninteractive
- packages=(nginx php8.3-fpm php8.3-cli php8.3-bcmath php8.3-curl php8.3-mbstring php8.3-xml php8.3-sqlite3 php8.3-mysql php8.3-gd php8.3-zip sqlite3 git unzip curl ca-certificates openssl python3 composer dnsutils)
+ packages=(nginx php8.3-fpm php8.3-cli php8.3-bcmath php8.3-curl php8.3-mbstring php8.3-xml php8.3-sqlite3 php8.3-mysql php8.3-gd php8.3-zip sqlite3 git unzip curl ca-certificates openssl python3 composer)
  [[ $db == mysql ]] && packages+=(mariadb-server)
  [[ $mode == domain && -n $email ]] && packages+=(certbot)
  missing=()
@@ -143,85 +305,18 @@ if [[ -z $prepare ]]; then
  fi
  cf_file=$(mktemp /tmp/linkfree-cf.XXXXXXXX)
  if [[ $mode == domain ]]; then
-  if ! { curl -fsS --max-time 15 https://www.cloudflare.com/ips-v4; curl -fsS --max-time 15 https://www.cloudflare.com/ips-v6; } > "$cf_file"; then
-   fail 'Não foi possível obter os IPs oficiais da Cloudflare; verifique a conexão antes de continuar.'
-  fi
+  fetch_cloudflare_ranges
   while :; do
-   dns_result=$(python3 - "$domain" "$public_ip" "$cf_file" <<'PYDNS'
-import ipaddress
-import subprocess
-import sys
-
-domain, public_ip, cf_file = sys.argv[1:4]
-try:
-    networks = [ipaddress.ip_network(line.strip()) for line in open(cf_file) if line.strip()]
-    if not any(net.version == 4 for net in networks) or not any(net.version == 6 for net in networks):
-        raise ValueError('faixas da Cloudflare incompletas')
-    expected = ipaddress.IPv4Address(public_ip)
-except (OSError, ValueError) as exc:
-    print(f'Falha nos dados de validação: {exc}', file=sys.stderr)
-    print('invalido')
-    sys.exit(0)
-
-def lookup(server, kind):
-    result = subprocess.run(
-        ['dig', '+time=2', '+tries=1', '+short', f'@{server}', domain, kind],
-        capture_output=True, text=True, timeout=5, check=False,
-    )
-    if result.returncode:
-        raise RuntimeError(result.stderr.strip() or f'consulta {kind} falhou')
-    addresses = set()
-    for line in result.stdout.splitlines():
-        try:
-            address = ipaddress.ip_address(line.strip())
-        except ValueError:
-            continue  # Um CNAME pode aparecer antes do endereço numérico.
-        if address.version == (4 if kind == 'A' else 6):
-            addresses.add(address)
-    return addresses
-
-validations = []
-for resolver in ('1.1.1.1', '8.8.8.8'):
-    try:
-        a_records = lookup(resolver, 'A')
-        aaaa_records = lookup(resolver, 'AAAA')
-    except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
-        print(f'DNS {resolver}: consulta indisponível ({exc})', file=sys.stderr)
-        continue
-    addresses = a_records | aaaa_records
-    print(
-        f'DNS {resolver}: A={",".join(sorted(map(str, a_records))) or "nenhum"}; '
-        f'AAAA={",".join(sorted(map(str, aaaa_records))) or "nenhum"}',
-        file=sys.stderr,
-    )
-    if addresses and all(any(address in net for net in networks) for address in addresses):
-        state = 'cloudflare'
-    elif a_records == {expected} and not aaaa_records:
-        state = 'direto'
-    else:
-        state = 'invalido'
-        if aaaa_records:
-            print('Existe registro AAAA: verifique/remova IPv6 se a VPS não dispõe dele. '
-                  'O Let’s Encrypt pode priorizar IPv6.', file=sys.stderr)
-        if a_records != {expected}:
-            print(f'O registro A não corresponde exclusivamente ao IP esperado {expected}.', file=sys.stderr)
-    validations.append(state)
-
-if not validations:
-    print('Nenhum DNS público respondeu; confira saída UDP/TCP 53 e a conexão.', file=sys.stderr)
-    print('invalido')
-elif len(set(validations)) > 1:
-    print('Servidores DNS públicos divergem; aguarde propagação/cache e tente novamente.', file=sys.stderr)
-    print('invalido')
-else:
-    print(validations[0])
-PYDNS
-)
-   case "$dns_result" in
-    cloudflare) cloudflare=1; printf 'DNS indica proxy da Cloudflare; verifique se a origem aponta para esta VPS e use SSL Full (strict).\n'; break;;
-    direto) printf 'DNS aponta para o IP público detectado.\n'; break;;
-    *) printf 'DNS não validado para %s. Confira os registros A/AAAA e os diagnósticos acima.\n' "$domain"; ask 'Pressione Enter para tentar novamente ou digite sair: '; [[ $REPLY != sair ]] || fail 'DNS ainda não validado.';;
-   esac
+   if dns_result=$(dns_check); then
+    case "$dns_result" in
+     cloudflare) cloudflare=1; break;;
+     direto) break;;
+     direto6) ipv6_listen=1; break;;
+     *) fail 'Resultado inesperado da validação DNS.';;
+    esac
+   fi
+   ask 'Pressione Enter para repetir somente a verificação DNS ou digite sair: '
+   [[ $REPLY != sair ]] || fail 'DNS ainda não validado.'
   done
  fi
  clone_dir=$(mktemp -d /tmp/linkfree-repo.XXXXXXXX)
@@ -292,10 +387,13 @@ if [[ -n $email && $site_existing != 1 ]]; then
  challenge_dir="/var/lib/linkfree-acme/$domain"
  install -d -m 755 /var/lib/linkfree-acme "$challenge_dir"
  challenge_site="/etc/nginx/sites-available/linkfree-acme-$domain"
+ ipv6_http=
+ [[ $ipv6_listen != 1 ]] || ipv6_http="listen [::]:80;"
  [[ ! -e $challenge_site && ! -e /etc/nginx/sites-enabled/linkfree-acme-$domain ]] || fail 'Já existe configuração temporária ACME para este domínio.'
  cat > "$challenge_site" <<ACME
 server {
  listen 80;
+ $ipv6_http
  server_name $domain;
  location ^~ /.well-known/acme-challenge/ { root $challenge_dir; }
  location / { return 404; }
@@ -333,15 +431,18 @@ if [[ $cloudflare == 1 ]]; then
  real_ip_config+="real_ip_header CF-Connecting-IP;"
 fi
 if [[ $mode == domain ]]; then
+ ipv6_http= ipv6_https=
+ if [[ $ipv6_listen == 1 ]]; then ipv6_http="listen [::]:80;"; ipv6_https="listen [::]:443 ssl;"; fi
  cat > "$site" <<NGINX
 server {
  listen 80;
+ $ipv6_http
  server_name $domain;
  location ^~ /.well-known/acme-challenge/ { root /var/lib/linkfree-acme/$domain; }
  location / { return 308 https://\$host\$request_uri; }
 }
 NGINX
- listen_directive='listen 443 ssl;'
+ listen_directive="listen 443 ssl; $ipv6_https"
  ssl_directives="ssl_certificate $cert; ssl_certificate_key $key;"
  https_param='fastcgi_param HTTPS on;'
 else

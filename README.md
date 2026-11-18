@@ -29,6 +29,19 @@ Para Let's Encrypt, o desafio HTTP permanece configurado para renovação, o tem
 
 Ao final, abra a URL HTTPS ou HTTP apresentada, e siga o instalador web para selecionar o banco, criar o administrador e concluir a configuração. Se escolher MySQL no assistente, use os dados do arquivo de credenciais indicado. A rota `/skip` é bloqueada. O assistente fica acessível publicamente; conclua a instalação e crie o administrador assim que possível.
 
+### Verificação de DNS
+
+Antes da emissão do certificado, o instalador compara os registros A e AAAA obtidos de resolvedores públicos com o IPv4 público e os IPv6 globais ativos da VPS. Os resultados também são comparados com o resolvedor local para diagnosticar cache ou `/etc/hosts`. Respostas divergentes são apresentadas individualmente; um endereço extra que não esteja nesta VPS pode receber tráfego ou o desafio ACME e deve ser corrigido. Se houver um AAAA válido, o Nginx também escuta em IPv6. DNS não comprova que portas, firewall e roteamento estejam acessíveis externamente; o Certbot ainda precisa validar o desafio.
+
+Para repetir apenas o diagnóstico, sem instalar pacotes ou alterar a instalação, baixe o script e execute (requer Python 3, curl, `ip` e acesso HTTPS):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/sistemacodigolucrativo/LinkFree-LinkTree/main/instal.sh -o instal.sh
+bash instal.sh --dns-check --domain linkfree.website --public-ip 13.185.135.57
+```
+
+Troque domínio e IP pelos seus; `--public-ip` é opcional e o instalador tenta IMDSv2 na EC2 e depois um serviço externo. O serviço externo pode mostrar um IP de saída NAT que não seja o IP da VPS. Durante a instalação, Enter após uma falha repete somente a consulta de DNS, sem reinstalar dependências. Para executar os testes: `python3 -m unittest discover -s tests -p 'test_dns_installer.py' -v`.
+
 ### Cloudflare
 
 Quando o DNS retornar endereços da Cloudflare, o script reconhece o proxy e configura o Nginx para aceitar `CF-Connecting-IP` apenas das redes oficiais obtidas durante a instalação. Use SSL/TLS **Full (strict)** e confirme no painel da Cloudflare que o endereço de origem aponta para a VPS. O DNS público de um domínio com proxy mostra endereços da Cloudflare, portanto o preparador não consegue comprovar automaticamente o IP de origem configurado no painel. Mantenha a lista de redes da Cloudflare atualizada.

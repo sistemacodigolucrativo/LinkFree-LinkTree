@@ -1,0 +1,19 @@
+name: Installer DNS tests
+on:
+  push:
+    paths:
+      - 'instal.sh'
+      - 'tests/test_dns_installer.py'
+      - '.github/workflows/installer-dns-tests.yml'
+  pull_request:
+    paths:
+      - 'instal.sh'
+      - 'tests/test_dns_installer.py'
+      - '.github/workflows/installer-dns-tests.yml'
+jobs:
+  dns:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash -n instal.sh
+      - run: python3 -m unittest discover -s tests -p 'test_dns_installer.py' -v
