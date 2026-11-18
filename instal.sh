@@ -5,15 +5,15 @@ umask 027
 usage() {
   cat <<'HELP'
 Uso interativo: sudo bash instal.sh
-Uso avançado: sudo bash instal.sh --mode ip --public-ip IP --admin-cidr IP/CIDR --database sqlite [--dest /srv/linkfree]
-              sudo bash instal.sh --mode domain --domain dominio --admin-cidr IP/CIDR --database mysql (--email email | --cert arquivo --key arquivo) [--dest /srv/linkfree]
+Uso avançado: sudo bash instal.sh --mode ip --public-ip IP --database sqlite [--dest /srv/linkfree]
+              sudo bash instal.sh --mode domain --domain dominio --database mysql (--email email | --cert arquivo --key arquivo) [--dest /srv/linkfree]
 Teste local:  bash instal.sh --prepare-only /caminho/novo --url http://localhost:8080
 
 Prepara uma VPS Ubuntu 24.04, clona main e abre o instalador web original.
 SQLite usa dependências locais; MariaDB é instalado apenas se escolhido.
 No modo domínio, --email solicita Let's Encrypt. DNS e portas 80/443 precisam funcionar.
 No modo IP a conexão usa HTTP sem criptografia. Use apenas rede confiável.
-O IP autorizado protege temporariamente o instalador; a rota /skip é bloqueada.
+O instalador fica acessível pelo link; a rota /skip é bloqueada.
 Para evitar a pergunta de diretório em automações, use LINKFREE_NONINTERACTIVE=1.
 O modo --prepare-only requer uma cópia completa do repositório local.
 O destino existente só pode ser retomado quando pertence à preparação identificada.
@@ -26,9 +26,9 @@ domain= cidr= cert= key= email= dest=/srv/linkfree prepare= url= mode= db= cloud
 while (($#)); do
  case "$1" in
   --help|-h) usage; exit 0;;
-  --domain|--admin-cidr|--cert|--key|--email|--dest|--prepare-only|--url|--mode|--database|--public-ip)
+  --domain|--cert|--key|--email|--dest|--prepare-only|--url|--mode|--database|--public-ip)
    (($# >= 2)) || fail "Falta valor para $1"
-   case "$1" in --domain) domain=$2;; --admin-cidr) cidr=$2;; --cert) cert=$2;; --key) key=$2;; --email) email=$2;; --mode) mode=$2;; --database) db=$2;; --public-ip) public_ip=$2;; --dest) dest=$2;; --prepare-only) prepare=$2;; --url) url=$2;; esac; shift 2;;
+   case "$1" in --domain) domain=$2;; --cert) cert=$2;; --key) key=$2;; --email) email=$2;; --mode) mode=$2;; --database) db=$2;; --public-ip) public_ip=$2;; --dest) dest=$2;; --prepare-only) prepare=$2;; --url) url=$2;; esac; shift 2;;
   --cloudflare) cloudflare=1; shift;;
   *) fail "Opção desconhecida: $1";;
  esac
@@ -99,18 +99,6 @@ else
   ask 'Usar /srv/linkfree como diretório? [S/n] '
   if [[ $REPLY =~ ^[Nn] ]]; then ask 'Diretório absoluto novo: '; dest=$REPLY; fi
  fi
- if [[ -z $cidr ]]; then
-  ssh_ip=${SSH_CONNECTION%% *}
-  if valid_ip "${ssh_ip:-}"; then
-   ask "IP autorizado para abrir o instalador [$ssh_ip]: "; cidr=${REPLY:-$ssh_ip}
-  else ask 'IP público autorizado para abrir o instalador: '; cidr=$REPLY; fi
- fi
- python3 - "$cidr" <<'PYNET' || fail 'IP/CIDR inválido ou aberto para toda a internet.'
-import ipaddress,sys
-try:
- n=ipaddress.ip_network(sys.argv[1],strict=False); assert n.prefixlen != 0
-except (ValueError,AssertionError): sys.exit(1)
-PYNET
 
 fi
 [[ $dest == /* && $dest != / && ! -L $dest ]] || fail 'O destino deve ser absoluto e não pode ser um link simbólico.'
@@ -305,11 +293,6 @@ else
  https_param=
 fi
 cat >> "$site" <<NGINX
-geo \$linkfree_setup_allowed_$$ {
- default 0;
- $cidr 1;
- 127.0.0.1/32 1;
-}
 server {
  $listen_directive
  server_name $domain;
@@ -318,11 +301,6 @@ server {
  root $dest;
  index index.php;
  client_max_body_size 20m;
- set \$setup_guard 0;
- if (-f $dest/INSTALLING) { set \$setup_guard 1; }
- if (-f $dest/INSTALLERLOCK) { set \$setup_guard 1; }
- if (\$linkfree_setup_allowed_$$ = 1) { set \$setup_guard 0; }
- if (\$setup_guard = 1) { return 403; }
  location = /skip { return 404; }
  location = /vendor/livewire/livewire/dist/livewire.js { try_files \$uri =404; }
  location ~ /\. { deny all; }
@@ -411,6 +389,6 @@ else
  http_code=$(curl --noproxy '*' -sS --max-time 20 -H "Host: $domain" -o /dev/null -w '%{http_code}' http://127.0.0.1/ || true)
 fi
 [[ $http_code == 200 ]] || fail "O instalador web não respondeu HTTP 200 na origem (resposta: $http_code)."
-printf '\nLINKFREE — VPS PREPARADA\nDependências, servidor web, PHP, banco e código: OK\nInstalador web: DISPONÍVEL na origem\nAcesse %s a partir de %s e conclua o assistente.\n' "$url" "$cidr"
+printf '\nLINKFREE — VPS PREPARADA\nDependências, servidor web, PHP, banco e código: OK\nInstalador web: DISPONÍVEL na origem\nAcesse %s e conclua o assistente.\n' "$url"
 if [[ $db == mysql ]]; then printf 'No assistente escolha MySQL. Credenciais em %s.\n' "$db_file"; else printf 'No assistente escolha SQLite.\n'; fi
 printf 'Crie o administrador, conclua todas as etapas e verifique login e gravação do perfil.\n'
