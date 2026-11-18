@@ -20,6 +20,11 @@ if [[ "$MODE" != --check && "$MODE" != --deploy ]]; then
   exit 2
 fi
 if (( EUID != 0 )); then echo 'Execute como root (sudo).' >&2; exit 1; fi
+# O instal.sh nao instala rsync: obtenha-o no primeiro deploy, sem prompts Y/N.
+if ! command -v rsync >/dev/null 2>&1; then
+  export DEBIAN_FRONTEND=noninteractive
+  apt-get update && apt-get install -y rsync
+fi
 for cmd in git rsync php flock runuser cmp mktemp cp python3; do
   command -v "$cmd" >/dev/null || { echo "Dependencia ausente: $cmd" >&2; exit 1; }
 done
