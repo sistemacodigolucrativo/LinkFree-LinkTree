@@ -314,8 +314,7 @@ $usrhandl = Auth::user()->littlelink_name;
                 <ul class="navbar-nav iq-main-menu" id="sidebar-menu">
 @php
   $navOverviewOpen = request()->is('dashboard');
-  $navLinksOpen = request()->is('studio/links*') || request()->is('studio/add-link') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*');
-  $navPageOpen = request()->is('studio/page*') || request()->is('studio/no_page_name');
+  $navLinksOpen = request()->is('studio/links*') || request()->is('studio/page-icons') || request()->is('studio/blocks') || request()->is('studio/add-link') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*');
   $navAppearanceOpen = request()->is('studio/theme') || request()->is('studio/theme-preview/*');
   $navAccountOpen = request()->is('studio/profile');
 @endphp
@@ -405,18 +404,9 @@ $usrhandl = Auth::user()->littlelink_name;
   </a>
   <ul class="sub-nav collapse {{ $navLinksOpen ? 'show' : '' }}" id="nav-links" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('studio/links*') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*') ? 'active' : '' }}" href="{{ url('/studio/links') }}"><i class="icon bi bi-link-45deg" aria-hidden="true"></i><span class="item-name">{{__('messages.Links')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/add-link') ? 'active' : '' }}" href="{{ url('/studio/add-link') }}"><i class="icon bi bi-plus-square" aria-hidden="true"></i><span class="item-name">{{__('messages.Add Link')}}</span></a></li>
-  </ul>
-</li>
-<li class="nav-item nav-accordion-group">
-  <a class="nav-link nav-accordion-toggle {{ $navPageOpen ? 'active' : '' }}" href="#nav-my-page" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navPageOpen ? 'true' : 'false' }}" aria-controls="nav-my-page">
-    <i class="icon bi bi-person-badge" aria-hidden="true"></i>
-    <span class="item-name">{{__('messages.Nav Public Page')}}</span>
-    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
-  </a>
-  <ul class="sub-nav collapse {{ $navPageOpen ? 'show' : '' }}" id="nav-my-page" data-bs-parent="#sidebar-menu">
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/page*') || request()->is('studio/no_page_name') ? 'active' : '' }}" href="{{ url('/studio/page') }}"><i class="icon bi bi-person-badge" aria-hidden="true"></i><span class="item-name">{{__('messages.My Profile')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ false ? 'active' : '' }}" href="{{ url('/@'.Auth::user()->littlelink_name) }}" target="_blank" rel="noopener noreferrer"><i class="icon bi bi-box-arrow-up-right" aria-hidden="true"></i><span class="item-name">{{__('messages.View Page')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/page-icons') ? 'active' : '' }}" href="{{ route('showPageIcons') }}"><i class="icon bi bi-images" aria-hidden="true"></i><span class="item-name">Ícones de Página</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/blocks') ? 'active' : '' }}" href="{{ route('showBlocks') }}"><i class="icon bi bi-grid-3x3-gap" aria-hidden="true"></i><span class="item-name">Gerenciar blocos</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/add-link') ? 'active' : '' }}" href="{{ route('showButtons') }}"><i class="icon bi bi-plus-square" aria-hidden="true"></i><span class="item-name">Link Pré -Config</span></a></li>
   </ul>
 </li>
 <li class="nav-item nav-accordion-group">
@@ -500,8 +490,7 @@ $usrhandl = Auth::user()->littlelink_name;
               <ul class="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
                 <li class="me-0 me-xl-2">
                   <div class="dropdown d-flex flex-row align-items-center view-page-buttons">
-                    <a target="_blank" href="{{url('/@'.Auth::user()->littlelink_name)}}" style="border-bottom-right-radius:0;border-top-right-radius:0;" class="btn btn-primary btn-sm pe-2 view-page-slim">{{__('messages.View Page')}}</a>
-                    <button style="border-bottom-left-radius:0;border-top-left-radius:0;" class="btn btn-primary btn-sm dropdown-toggle ms-auto px-1 share-page-slim" type="button" aria-label="Compartilhar perfil" id="dropdownMenuButtonSM" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-primary btn-sm dropdown-toggle ms-auto px-1 share-page-slim rounded" type="button" aria-label="Compartilhar perfil" id="dropdownMenuButtonSM" data-bs-toggle="dropdown" aria-expanded="false">
                       <i class="btn-seg-ico bi bi-share-fill"></i>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonSM">
@@ -572,7 +561,7 @@ $usrhandl = Auth::user()->littlelink_name;
                     </div>
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="{{ url('/studio/page') }}"><i class="bi bi-person-fill"></i> {{__('messages.Profile')}}</a></li>
+                    <li><a class="dropdown-item" href="{{ url('/studio/page') }}"><i class="bi bi-person-fill"></i> {{__('messages.My Profile')}}</a></li>
                     <li><a class="dropdown-item" href="{{ url('/studio/profile') }}"><i class="bi bi-gear-fill"></i> {{__('messages.Settings')}}</a></li>
                     <li><a class="dropdown-item" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" role="button" aria-controls="offcanvasExample"><i class="bi bi-brush-fill"></i> {{__('messages.Styling')}}</a></li>
                     <li><hr class="dropdown-divider"></li>
@@ -590,6 +579,17 @@ $usrhandl = Auth::user()->littlelink_name;
         </nav>          <!-- Nav Header Component Start -->
         <style>.header-block{background-color:var(--bs-primary);border-bottom-left-radius:1rem;border-bottom-right-radius:1rem;}</style>
           <div class="iq-navbar-header header-block mb-2 welcome-slim" style="height:auto;">
+        <style>
+        .welcome-slim{position:relative}
+        .welcome-slim .lf-welcome-public-link{position:absolute;inset:0;z-index:8;display:block;border-radius:inherit}
+        .welcome-slim .lf-welcome-public-link:focus-visible{outline:3px solid #f6c65b;outline-offset:-5px}
+        .welcome-slim:has(.lf-welcome-public-link):hover{filter:brightness(1.04)}
+        </style>
+        @if(!empty(Auth::user()->littlelink_name))
+          <a class="lf-welcome-public-link" href="{{ url('/@'.Auth::user()->littlelink_name) }}"
+             target="_blank" rel="noopener noreferrer" aria-label="{{__('messages.View Page')}}: {{'@'.Auth::user()->littlelink_name}}"></a>
+        @endif
+
               <div class="container-fluid iq-container">
                   <div class="row">
                       <div class="col-md-12">

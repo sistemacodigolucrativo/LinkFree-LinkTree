@@ -197,7 +197,16 @@ class UserController extends Controller
         ];
 
         $data['typename'] = $linkData->type ?? 'predefined';
-    
+        // Novo gerenciador seleciona um tipo permitido sem modificar dados.
+        $requestedType = request()->query('block');
+        if (is_string($requestedType) && LinkType::existsByTypename($requestedType)) {
+            $data['typename'] = $requestedType;
+        }
+        $selectedType = LinkType::findByTypename($data['typename']);
+        $data['selectedLinkTypeTitle'] = $selectedType && $selectedType->title
+            ? (block_text_translation_check($selectedType->title) ? bt($selectedType->title) : __('messages.block.title.'.$selectedType->typename))
+            : __('messages.Select Block');
+
         return view('studio/edit-link', $data);
     }
 
@@ -445,11 +454,33 @@ class UserController extends Controller
         return view('studio/links', $data);
     }
 
+    // Telas exclusivas: os formularios e as tabelas continuam compartilhados.
+    public function showIcons()
+    {
+        return view('studio/icons');
+    }
+
+    public function showBlocks(Request $request)
+    {
+        $editingLink = null;
+        if ($request->filled('edit')) {
+            $editId = $request->query('edit');
+            abort_unless(is_string($editId) && ctype_digit($editId) && (int) $editId > 0, 404);
+            $editingLink = Link::where('user_id', Auth::id())
+                ->where('id', (int) $editId)->firstOrFail();
+        }
+        return view('studio/blocks', [
+            'LinkTypes' => LinkType::get(),
+            'editingLink' => $editingLink,
+        ]);
+    }
+
     //Delete link
     public function deleteLink(request $request)
     {
         $linkId = $request->id;
 
+        $isPageIcon = Link::where('id', $linkId)->where('user_id', Auth::id())->where('button_id', 94)->exists();
         Link::where('id', $linkId)->delete();
 
         $directory = base_path("assets/favicon/icons");
@@ -464,7 +495,7 @@ class UserController extends Controller
         if ($request->expectsJson()) {
             return response()->json(['deleted' => true, 'id' => (string) $linkId]);
         }
-        return redirect('/studio/links');
+        return $isPageIcon ? redirect()->route('showPageIcons') : redirect('/studio/links');
     }
 
     //Delete icon
@@ -1075,7 +1106,7 @@ class UserController extends Controller
             }
         }
 
-        return redirect('studio/links#icons');
+        return redirect()->route('showPageIcons');
     }
 
     private function searchIcon($icon)

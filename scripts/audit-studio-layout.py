@@ -23,12 +23,15 @@ def require(condition, description):
 require('class="links-workspace"' in links, "Removido o grande cartão externo")
 require(re.search(r"<section class='[^']*pre-left[^']*card rounded[^']*'", links),
         "Meus Links possui card separado")
-require(re.search(r"<section class='[^']*page-icons-card card rounded[^']*'", links),
-        "Ícones de Página possuem card separado")
-require(links.index('id="studio-my-links-title"') < links.index('id="studio-page-icons-title"'),
-        "Ordem correta de Meus Links e Ícones de Página")
+icons = (ROOT / "icons.blade.php").read_text(encoding="utf-8")
+blocks = (ROOT / "blocks.blade.php").read_text(encoding="utf-8")
+editor = (ROOT / "edit-link.blade.php").read_text(encoding="utf-8")
+require("page-icons-card card rounded" in icons and "page-icons-card card rounded" not in links,
+        "Ícones de Página exclusivos na nova rota")
+require("lf-block-grid" in blocks and "SelectLinkType" not in editor,
+        "Gerenciar blocos é página exclusiva, sem modal duplicado")
 require('id="links-table-body"' in links, "Lista original de links preservada")
-require("route('editIcons')" in links, "Formulário de ícones preservado")
+require("route('editIcons')" in icons, "Formulário de ícones preservado")
 require("route('editLink'" in links and "route('deleteLink'" in links,
         "Ações de editar/excluir links preservadas")
 require("linksTableOrders" in links, "Ordenação de links preservada")
@@ -79,7 +82,7 @@ require('id="admin-theme-management"' in admin_themes and 'id="theme-upload-form
 require(admin_themes.count('id="github-theme-updates"') == 1 and admin_themes.count('id="github-theme-status"') == 1,
         "Monitoramento dos temas GitHub transferido sem duplicação")
 require("studio-links-sections" in links and "studio-links-sections>.links-section-card" in links,
-        "Meus Links e Ícones de Página compartilham contêiner e largura")
+        "Meus Links mantém a estrutura e largura do card")
 require("studio-link-slim" in links and "sortable-handle" in links and "linksTableOrders" in links,
         "Cards slim mantêm controles e drag-and-drop")
 require("top-links-slim-item" in dashboard and "overflow-x:auto" in dashboard,
@@ -93,18 +96,18 @@ require("mobile-unified-nav" in sidebar and ".mobile-unified-nav .navbar-toggler
 require("data-toggle=\"sidebar\"" in sidebar and ".mobile-unified-nav .sidebar-toggle" in sidebar,
         "Seta de abertura/fechamento do menu lateral mantida")
 require('id="navbarSupportedContent"' in sidebar and 'id="navbarDropdown"' in sidebar,
-        "Exibir página e perfil preservados no navbar")
+        "Navbar e menu do avatar preservados")
 require('id="sidebar-scroll-region"' in sidebar and
         'class="sidebar-body pt-0 data-scrollbar"' not in sidebar,
         "Sidebar usa rolagem vertical independente sem conflito com o plugin")
-for group in ("admin-navigation", "nav-overview", "nav-links", "nav-my-page", "nav-appearance", "nav-account"):
+for group in ("admin-navigation", "nav-overview", "nav-links", "nav-appearance", "nav-account"):
     require('id="' + group + '" data-bs-parent="#sidebar-menu"' in sidebar,
             "Acordeão principal com fechamento exclusivo: " + group)
 for group in ("admin-users-menu", "admin-site-menu", "admin-themes-menu", "admin-system-menu"):
     require('id="' + group + '" data-bs-parent="#admin-navigation"' in sidebar,
             "Subcategoria administrativa com fechamento exclusivo: " + group)
-require(sidebar.count('class="nav-link nav-accordion-toggle') == 10,
-        "Todas as dez categorias usam gatilhos de acordeão")
+require(sidebar.count('class="nav-link nav-accordion-toggle') == 9,
+        "Nove categorias restantes usam gatilhos de acordeão")
 require('id="nav-admin-panel"' in sidebar and "auth()->user()->role === 'admin'" in sidebar,
         "Menu administrativo agrupado e restrito a administradores")
 require(sidebar.index('id="nav-admin-panel"') < sidebar.index('messages.Dashboard'),
@@ -161,8 +164,8 @@ require('class="studio-link-clicks"' in links and
         "Indicador de cliques fora da barra de botões e no topo")
 require("button.studio-link-move" in js and "row.append(controls)" not in js,
         "Ordenação usa botões inline, sem criar segunda linha")
-require('view-page-slim' in sidebar and 'share-page-slim' in sidebar,
-        "Altura e alinhamento dos botões de Exibir Página e Compartilhar controlados")
+require('lf-welcome-public-link' in sidebar and 'view-page-slim">{{' not in sidebar and 'share-page-slim' in sidebar,
+        "Página pública concentrada no Bem-vindo; compartilhamento preservado")
 require('notification-panel' in sidebar and 'notification-panel.show' in nav_css,
         "Notificações usam posicionamento fixo centralizado na viewport")
 require('sidebar-auto-close.js' in sidebar and 'sidebar-mini' in close_js and

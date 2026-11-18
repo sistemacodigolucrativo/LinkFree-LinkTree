@@ -105,6 +105,8 @@ Route::post('/studio/edit-link', [UserController::class, 'saveLink'])->name('add
 Route::get('/studio/edit-link/{id}', [UserController::class, 'AddUpdateLink'])->name('showLink')->middleware('link-id');
 Route::post('/studio/sort-link', [UserController::class, 'sortLinks'])->name('sortLinks');
 Route::get('/studio/links', [UserController::class, $LinkPage])->name($LinkPage);
+Route::get('/studio/page-icons', [UserController::class, 'showIcons'])->name('showPageIcons');
+Route::get('/studio/blocks', [UserController::class, 'showBlocks'])->name('showBlocks');
 Route::get('/studio/theme', [UserController::class, 'showTheme'])->name('showTheme');
 Route::get('/studio/theme-preview/{theme}', [\App\Http\Controllers\ThemePreviewController::class, 'show'])->name('themePreview')->where('theme', '[A-Za-z][A-Za-z0-9_-]*');
 Route::post('/studio/theme', [UserController::class, 'editTheme'])->name('editTheme');
@@ -122,7 +124,7 @@ Route::get('/studio/rem-background', [UserController::class, 'removeBackground']
 Route::get('/studio/profile', [UserController::class, 'showProfile'])->name('showProfile');
 Route::post('/studio/profile', [UserController::class, 'editProfile'])->name('editProfile');
 // Returning to the form URL with GET must not resubmit changes.
-Route::get('/edit-icons', fn () => redirect('/studio/links'));
+Route::get('/edit-icons', fn () => redirect()->route('showPageIcons'));
 Route::post('/edit-icons', [UserController::class, 'editIcons'])->name('editIcons');
 Route::get('/clearIcon/{id}', [UserController::class, 'clearIcon'])->name('clearIcon')->middleware('link-id');
 Route::get('/studio/page/delprofilepicture', [UserController::class, 'delProfilePicture'])->name('delProfilePicture');
