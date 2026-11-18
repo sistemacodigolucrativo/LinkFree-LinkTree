@@ -78,6 +78,15 @@
       <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}" />
 
 
+  <style>
+:root{--lf-green:#a5f33d;--lf-ink:#f5f7ef;--lf-muted:#aab4ab;--lf-panel:#151c17}
+body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
+.lf-nav{position:sticky;top:0;z-index:50;background:rgba(11,16,13,.94);border-bottom:1px solid #273129;backdrop-filter:blur(12px)}
+.lf-container{width:min(1160px,calc(100% - 40px));margin:auto}.lf-nav-inner{min-height:76px;display:flex;align-items:center;gap:28px}.lf-brand{display:flex;align-items:center;gap:10px;color:white;font-size:1.35rem;font-weight:800;text-decoration:none}.lf-brand img{width:34px;height:34px;object-fit:contain}.lf-links{display:flex;align-items:center;gap:24px;margin-left:auto}.lf-links a{color:#d8e0d8;text-decoration:none}.lf-actions{display:flex;align-items:center;gap:12px}.lf-button{display:inline-flex;justify-content:center;align-items:center;padding:13px 21px;border-radius:999px;background:var(--lf-green);color:#10180d!important;text-decoration:none!important;font-weight:750;border:1px solid var(--lf-green);transition:transform .2s,box-shadow .2s}.lf-button:hover{transform:translateY(-3px);box-shadow:0 8px 30px #a5f33440}.lf-button.alt{background:transparent;color:white!important;border-color:#48564a}.lf-menu{display:none;background:transparent;border:1px solid #48564a;border-radius:9px;color:white;padding:8px 12px;margin-left:auto}
+.lf-hero{position:relative;overflow:hidden;padding:100px 0 90px;background:radial-gradient(circle at 78% 32%,#263d20 0,transparent 38%)}.lf-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:70px;align-items:center}.lf-eyebrow{display:inline-block;color:var(--lf-green);font-size:.8rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.lf-hero h1{font-size:clamp(2.8rem,6vw,5.2rem);line-height:1.04;letter-spacing:-.05em;color:white;margin:20px 0}.lf-hero h1 span{color:var(--lf-green)}.lf-lead{color:var(--lf-muted);font-size:1.14rem;line-height:1.7;max-width:570px}.lf-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}.lf-note{color:#9dab9e;font-size:.86rem;margin-top:18px}.lf-phone{width:min(100%,310px);margin:auto;padding:10px;background:#222b23;border:1px solid #586758;border-radius:39px;box-shadow:0 30px 90px #0008;transform:rotate(3deg)}.lf-phone iframe{display:block;width:100%;height:570px;border:0;border-radius:30px;background:white}.lf-section{padding:100px 0}.lf-section.alt{background:#101713}.lf-heading{text-align:center;max-width:720px;margin:0 auto 48px}.lf-heading h2,.lf-split h2,.lf-final h2{color:white;font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.04em;line-height:1.15;margin:14px 0}.lf-heading p,.lf-card p,.lf-split p,.lf-final p{color:var(--lf-muted);line-height:1.7}.lf-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.lf-card{padding:28px;background:var(--lf-panel);border:1px solid #2b382d;border-radius:20px}.lf-card h3{color:white;font-size:1.2rem;margin:18px 0 10px}.lf-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#263920;color:var(--lf-green);font-size:1.3rem;font-weight:800}.lf-split{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}.lf-steps{display:grid;gap:14px}.lf-step{display:flex;gap:16px;align-items:flex-start;padding:20px;border:1px solid #2b382d;border-radius:18px;background:var(--lf-panel)}.lf-step strong{display:block;color:white;margin-bottom:4px}.lf-step p{margin:0}.lf-number{color:var(--lf-green);font-weight:800}.lf-faq{max-width:760px;margin:auto}.lf-faq details{border-bottom:1px solid #2b382d;padding:20px 0}.lf-faq summary{cursor:pointer;color:white;font-weight:700}.lf-faq p{color:var(--lf-muted);line-height:1.7;margin:14px 0 0}.lf-final{text-align:center;padding:70px 25px;border-radius:28px;background:radial-gradient(circle at top,#2a4722,#172319);border:1px solid #40543b}.lf-final .lf-cta{justify-content:center}.lf-footer{padding:32px 0;border-top:1px solid #2b382d;color:#aab4ab}.lf-footer .footer-body{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}.lf-footer a{color:#c9d4c9}.lf-reveal{transition:opacity .65s ease,transform .65s ease}.js-reveal .lf-reveal{opacity:0;transform:translateY(24px)}.js-reveal .lf-reveal.visible{opacity:1;transform:none}
+@media(max-width:767px){.lf-nav-inner{flex-wrap:wrap;padding:14px 0}.lf-menu{display:block}.lf-links{display:none;flex-basis:100%;margin:0;align-items:stretch;flex-direction:column;gap:16px;padding:12px 0}.lf-links.open{display:flex}.lf-actions{flex-wrap:wrap}.lf-hero{padding:65px 0}.lf-grid,.lf-split{grid-template-columns:1fr;gap:40px}.lf-phone{width:min(280px,100%);transform:none}.lf-phone iframe{height:500px}.lf-section{padding:70px 0}.lf-cards{grid-template-columns:1fr}.lf-heading{text-align:left}.lf-cta .lf-button{flex:1 1 180px}.lf-footer .footer-body{display:block}.lf-footer .right-panel{margin-top:16px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.js-reveal .lf-reveal{opacity:1;transform:none}}
+</style>
   </head>
 
   @php
@@ -86,139 +95,39 @@
   @endphp
 
   <body class=" " data-bs-spy="scroll" data-bs-target="#elements-section" data-bs-offset="0" tabindex="0">
-        <!--Nav Start-->
-        <nav class="nav navbar navbar-expand-lg navbar-light iq-navbar fixed-top">
-          <div class="container-fluid navbar-inner">
-            <a href="{{ route('panelIndex') }}" class="navbar-brand">
-
-                <!--Logo start-->
-                <div class="logo-main">
-                  @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
-                  <div class="logo-normal">
-                    <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
-                </div>
-                <div class="logo-mini">
-                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
-                </div>
-                  @else
-                  <div class="logo-normal">
-                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
-                </div>
-                <div class="logo-mini">
-                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
-                </div>
-                  @endif
-                  </div>
-                <!--logo End-->
-
-
-                <h4 class="logo-title">{{env('APP_NAME')}}</h4>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon">
-                  <span class="mt-2 navbar-toggler-bar bar1"></span>
-                  <span class="navbar-toggler-bar bar2"></span>
-                  <span class="navbar-toggler-bar bar3"></span>
-                </span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
-                @if (Route::has('login'))
-                @auth
-                <li class="me-0 me-xl-2">
-                  <a class="btn btn-primary btn-sm d-flex gap-2 align-items-center" aria-current="page" href="{{ url('dashboard') }}">
-                    {{__('messages.Dashboard')}}
-                  </a>
-                </li>
-            @else
-                @if (Route::has('login'))
-                <li class="me-0 me-xl-2">
-                  <a class="btn btn-primary btn-sm d-flex gap-2 align-items-center" aria-current="page" href="{{ route('login') }}">
-                    {{__('messages.Log in')}}
-                  </a>
-                </li>
-                @endif
-
-                @if ((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))
-                <li class="me-0 me-xl-2">
-                  <a class="btn btn-secondary btn-sm d-flex gap-2 align-items-center" aria-current="page" href="{{ route('register') }}">
-                    {{__('messages.Register')}}
-                  </a>
-                </li>
-                @endif
-            @endauth
-                  @endif
-              </ul>
-            </div>
-          </div>
-        </nav>
-        <!--Nav End-->
-
-    <!-- loader Start -->
-    <div id="loading">
-      <div class="loader simple-loader">
-          <div class="loader-body"></div>
-      </div>    </div>
-    <!-- loader END -->
-
-    <div class="wrapper d-flex">
-      <section class="login-content">
-        <div class="row m-0 align-items-center bg-white vh-100 vw-100">
-          <div class="col-md-6 p-0">
-            <div class="card card-transparent auth-card shadow-none d-flex mb-0">
-              <div class="card-body justify-content-center text-center">
-
-                @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
-                <img alt="avatar" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" width="auto" height="128px">
-                @else
-                <div class="logo-container fadein">
-                  <img src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo" style="width:150px; height:150px;">
-                </div>
-                @endif
-
-                <h1 class="h1 fw-bold mb-4 pt-4">{{ config('app.name') }}</h1>
-
-                <div class="lead">
-                  @if($message->home_message == "default")
-                    {!!__('messages.HOME.MESSAGE')!!}
-                  @else
-                    {!!$message->home_message!!}
-                  @endif
-                </div>
-
-                <div class="d-flex justify-content-center align-items-center pt-4">
-                  @if (Route::has('login'))
-                  @auth
-                  <a class="btn btn-primary me-3" href="{{ url('dashboard') }}">{{__('messages.Dashboard')}}</a>
-              @else
-                  @if (Route::has('login'))
-                  <a class="btn btn-primary me-3" href="{{ route('login') }}">{{__('messages.Log in')}}</a>
-                  @endif
-
-                  @if ((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))
-                  <a class="btn btn-secondary me-3" href="{{ route('register') }}">{{__('messages.Register')}}</a>
-                  @endif
-              @endauth
-                    @endif
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6 d-md-block d-none bg-light p-0 mt-n1 vh-100 overflow-hidden">
-            <div class="d-flex align-items-center h-100">
-              <div class="card-body justify-content-center text-center">
-                <style>.iframe-container{position:relative;width:100%;max-width:370px;height:650px;}.iframe-container iframe{position:absolute;top:0;left:0;width:100%;height:100%;border-radius:30px;border:16px solid black}@media only screen and (max-width:767px){.iframe-container{max-width:375px;margin:0 auto 20px}.iframe-container:after{content:"";display:block;padding-bottom:15px}}</style>
-<center><div class="iframe-container"><iframe title="Prévia da página de links" src="{{url('/demo-page')}}"></iframe></div></center>
-              </div>
-            </div>
-          </div>
-      </section>
-    </div>
-
+<header class="lf-nav"><div class="lf-container lf-nav-inner">
+<a class="lf-brand" href="{{ url('/') }}">@if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))<img src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" alt="">@else<img src="{{ asset('assets/linkstack/images/favicon.svg') }}" alt="">@endif <span>{{ config('app.name') }}</span></a>
+<button class="lf-menu" type="button" aria-expanded="false" aria-controls="lf-navigation">Menu ☰</button>
+<nav class="lf-links" id="lf-navigation" aria-label="Navegação principal"><a href="#recursos">Recursos</a><a href="#como-funciona">Como funciona</a><a href="#duvidas">Dúvidas</a><div class="lf-actions">
+@auth<a class="lf-button" href="{{ url('dashboard') }}">Meu painel</a>@else
+@if(Route::has('login'))<a href="{{ route('login') }}">Entrar</a>@endif
+@if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">Criar minha página</a>@endif
+@endauth</div></nav></div></header>
+<main>
+<section class="lf-hero"><div class="lf-container lf-grid"><div class="lf-reveal"><span class="lf-eyebrow">Sua presença em um só lugar</span><h1>Um link. <span>Todos os seus caminhos.</span></h1><p class="lf-lead">Reúna suas redes sociais, contatos e conteúdos em uma página com a sua cara. Compartilhe um único link e facilite a conexão com quem importa.</p><div class="lf-cta">
+@auth<a class="lf-button" href="{{ url('dashboard') }}">Acessar meu painel</a>@else
+@if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">Criar minha página</a>@elseif(Route::has('login'))<a class="lf-button" href="{{ route('login') }}">Entrar</a>@endif
+@endauth<a class="lf-button alt" href="#como-funciona">Como funciona</a></div><p class="lf-note">Uma página para compartilhar onde você estiver.</p></div><div class="lf-reveal"><div class="lf-phone"><iframe title="Exemplo de página de links" src="{{ url('/demo-page') }}" loading="lazy"></iframe></div></div></div></section>
+<section class="lf-section" id="recursos"><div class="lf-container"><div class="lf-heading lf-reveal"><span class="lf-eyebrow">Tudo começa com um link</span><h2>Seu mundo, organizado do seu jeito</h2><p>Apresente o que você faz e ajude as pessoas a encontrarem seus conteúdos, produtos e canais de contato.</p></div><div class="lf-cards">
+<article class="lf-card lf-reveal"><span class="lf-icon">↗</span><h3>Seus links reunidos</h3><p>Adicione seus destinos importantes em uma única página, pronta para compartilhar na bio e onde mais quiser.</p></article>
+<article class="lf-card lf-reveal"><span class="lf-icon">✦</span><h3>Uma página com sua identidade</h3><p>Escolha um tema e personalize a apresentação para criar uma página que combine com você.</p></article>
+<article class="lf-card lf-reveal"><span class="lf-icon">▦</span><h3>Mais formas de se conectar</h3><p>Organize links, textos e informações de contato para orientar seus visitantes.</p></article>
+</div></div></section>
+<section class="lf-section alt" id="como-funciona"><div class="lf-container lf-split"><div class="lf-reveal"><span class="lf-eyebrow">Simples de começar</span><h2>Da sua ideia para o mundo</h2><p>Crie um ponto de encontro para sua presença digital e mantenha seus links organizados em um só lugar.</p></div><div class="lf-steps">
+<div class="lf-step lf-reveal"><span class="lf-number">01</span><div><strong>Crie sua conta</strong><p>Comece pelo cadastro e acesse seu painel.</p></div></div>
+<div class="lf-step lf-reveal"><span class="lf-number">02</span><div><strong>Monte sua página</strong><p>Adicione seus links e personalize a apresentação.</p></div></div>
+<div class="lf-step lf-reveal"><span class="lf-number">03</span><div><strong>Compartilhe seu link</strong><p>Coloque sua página na bio, nas redes e onde seu público estiver.</p></div></div>
+</div></div></section>
+<section class="lf-section" id="duvidas"><div class="lf-container"><div class="lf-heading lf-reveal"><span class="lf-eyebrow">Perguntas frequentes</span><h2>Quer saber mais?</h2></div><div class="lf-faq lf-reveal">
+<details><summary>O que é uma árvore de links?</summary><p>É uma página que reúne vários links em um só endereço, facilitando o acesso aos seus conteúdos e contatos.</p></details>
+<details><summary>Posso personalizar minha página?</summary><p>Sim. No painel, você pode escolher um tema e organizar os links e informações da sua página.</p></details>
+<details><summary>Onde posso compartilhar minha página?</summary><p>Você pode compartilhar o endereço na bio das redes sociais, em mensagens ou em qualquer lugar que aceite links.</p></details>
+</div></div></section>
+<section class="lf-section alt"><div class="lf-container"><div class="lf-final lf-reveal"><span class="lf-eyebrow">Pronto para começar?</span><h2>Seu próximo clique começa aqui.</h2><p>Reúna seus links e apresente tudo o que importa em uma página.</p><div class="lf-cta">@auth<a class="lf-button" href="{{ url('dashboard') }}">Acessar meu painel</a>@else @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">Criar minha página</a>@elseif(Route::has('login'))<a class="lf-button" href="{{ route('login') }}">Entrar</a>@endif @endauth</div></div></div></section>
+</main>
           <!-- Footer Section Start -->
-          <footer class="footer fixed-bottom">
-            <div class="footer-body">
+          <footer class="lf-footer">
+            <div class="footer-body lf-container">
                 <ul class="left-panel list-inline mb-0 p-0">
                   @if(env('DISPLAY_FOOTER') === true)
                     @if(env('DISPLAY_FOOTER_HOME') === true)<li class="list-inline-item"><a class="list-inline-item" href="@if(str_replace('"', "", EnvEditor::getKey('HOME_FOOTER_LINK')) === "" ){{ url('') }}@else{{ str_replace('"', "", EnvEditor::getKey('HOME_FOOTER_LINK')) }}@endif">{{footer('Home')}}</a></li>@endif
@@ -242,6 +151,9 @@
         </footer>
         <!-- Footer Section End -->
 
+<script>
+(function(){var button=document.querySelector('.lf-menu'),nav=document.getElementById('lf-navigation');if(button&&nav){button.addEventListener('click',function(){var open=nav.classList.toggle('open');button.setAttribute('aria-expanded',String(open));});nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',function(){nav.classList.remove('open');button.setAttribute('aria-expanded','false');});});}if('IntersectionObserver' in window&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('js-reveal');var observer=new IntersectionObserver(function(entries){entries.forEach(function(entry){if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target);}});},{threshold:0.1});document.querySelectorAll('.lf-reveal').forEach(function(el){observer.observe(el);});}})();
+</script>
     <!-- Library Bundle Script -->
     <script src="{{asset('assets/js/core/libs.min.js')}}"></script>
 
