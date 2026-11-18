@@ -131,7 +131,7 @@ if [[ -z $prepare ]]; then
  exec > >(tee -a "$log_file") 2>&1
  printf 'Preparação LinkFree iniciada em %s. Log: %s\n' "$(date -u +%FT%TZ)" "$log_file"
  export DEBIAN_FRONTEND=noninteractive
- packages=(nginx php8.3-fpm php8.3-cli php8.3-bcmath php8.3-curl php8.3-mbstring php8.3-xml php8.3-sqlite3 php8.3-mysql php8.3-gd php8.3-zip sqlite3 git unzip curl ca-certificates openssl python3 composer)
+ packages=(nginx php8.3-fpm php8.3-cli php8.3-bcmath php8.3-curl php8.3-mbstring php8.3-xml php8.3-sqlite3 php8.3-mysql php8.3-gd php8.3-zip sqlite3 git unzip curl ca-certificates openssl python3 composer dnsutils)
  [[ $db == mysql ]] && packages+=(mariadb-server)
  [[ $mode == domain && -n $email ]] && packages+=(certbot)
  missing=()
@@ -148,21 +148,79 @@ if [[ -z $prepare ]]; then
   fi
   while :; do
    dns_result=$(python3 - "$domain" "$public_ip" "$cf_file" <<'PYDNS'
-import ipaddress,socket,sys
+import ipaddress
+import subprocess
+import sys
+
+domain, public_ip, cf_file = sys.argv[1:4]
 try:
- nets=[ipaddress.ip_network(x.strip()) for x in open(sys.argv[3]) if x.strip()]
- if not any(x.version == 4 for x in nets) or not any(x.version == 6 for x in nets): raise ValueError()
- answers={x[4][0] for x in socket.getaddrinfo(sys.argv[1],None,type=socket.SOCK_STREAM)}
- if answers and all(any(ipaddress.ip_address(a) in n for n in nets) for a in answers): print('cloudflare')
- elif sys.argv[2] and sys.argv[2] in answers and all(a == sys.argv[2] for a in answers): print('direto')
- else: print('invalido')
-except (OSError,ValueError): print('invalido')
+    networks = [ipaddress.ip_network(line.strip()) for line in open(cf_file) if line.strip()]
+    if not any(net.version == 4 for net in networks) or not any(net.version == 6 for net in networks):
+        raise ValueError('faixas da Cloudflare incompletas')
+    expected = ipaddress.IPv4Address(public_ip)
+except (OSError, ValueError) as exc:
+    print(f'Falha nos dados de validação: {exc}', file=sys.stderr)
+    print('invalido')
+    sys.exit(0)
+
+def lookup(server, kind):
+    result = subprocess.run(
+        ['dig', '+time=2', '+tries=1', '+short', f'@{server}', domain, kind],
+        capture_output=True, text=True, timeout=5, check=False,
+    )
+    if result.returncode:
+        raise RuntimeError(result.stderr.strip() or f'consulta {kind} falhou')
+    addresses = set()
+    for line in result.stdout.splitlines():
+        try:
+            address = ipaddress.ip_address(line.strip())
+        except ValueError:
+            continue  # Um CNAME pode aparecer antes do endereço numérico.
+        if address.version == (4 if kind == 'A' else 6):
+            addresses.add(address)
+    return addresses
+
+validations = []
+for resolver in ('1.1.1.1', '8.8.8.8'):
+    try:
+        a_records = lookup(resolver, 'A')
+        aaaa_records = lookup(resolver, 'AAAA')
+    except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
+        print(f'DNS {resolver}: consulta indisponível ({exc})', file=sys.stderr)
+        continue
+    addresses = a_records | aaaa_records
+    print(
+        f'DNS {resolver}: A={",".join(sorted(map(str, a_records))) or "nenhum"}; '
+        f'AAAA={",".join(sorted(map(str, aaaa_records))) or "nenhum"}',
+        file=sys.stderr,
+    )
+    if addresses and all(any(address in net for net in networks) for address in addresses):
+        state = 'cloudflare'
+    elif a_records == {expected} and not aaaa_records:
+        state = 'direto'
+    else:
+        state = 'invalido'
+        if aaaa_records:
+            print('Existe registro AAAA: verifique/remova IPv6 se a VPS não dispõe dele. '
+                  'O Let’s Encrypt pode priorizar IPv6.', file=sys.stderr)
+        if a_records != {expected}:
+            print(f'O registro A não corresponde exclusivamente ao IP esperado {expected}.', file=sys.stderr)
+    validations.append(state)
+
+if not validations:
+    print('Nenhum DNS público respondeu; confira saída UDP/TCP 53 e a conexão.', file=sys.stderr)
+    print('invalido')
+elif len(set(validations)) > 1:
+    print('Servidores DNS públicos divergem; aguarde propagação/cache e tente novamente.', file=sys.stderr)
+    print('invalido')
+else:
+    print(validations[0])
 PYDNS
 )
    case "$dns_result" in
     cloudflare) cloudflare=1; printf 'DNS indica proxy da Cloudflare; verifique se a origem aponta para esta VPS e use SSL Full (strict).\n'; break;;
     direto) printf 'DNS aponta para o IP público detectado.\n'; break;;
-    *) printf 'DNS ainda não corresponde ao IP %s. Corrija registros A/AAAA ou confira a conexão.\n' "${public_ip:-não detectado}"; ask 'Pressione Enter para tentar novamente ou digite sair: '; [[ $REPLY != sair ]] || fail 'DNS ainda não validado.';;
+    *) printf 'DNS não validado para %s. Confira os registros A/AAAA e os diagnósticos acima.\n' "$domain"; ask 'Pressione Enter para tentar novamente ou digite sair: '; [[ $REPLY != sair ]] || fail 'DNS ainda não validado.';;
    esac
   done
  fi
