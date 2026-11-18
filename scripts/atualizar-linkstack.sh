@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # LinkFree-LinkTree: atualizacao seletiva GitHub -> desenvolvimento -> producao.
 # Uso: sudo bash atualizar-linkstack.sh --check | --deploy
+# Primeiro acesso: prepara clone persistente e estágio de código (sem dados privados).
 set -Eeuo pipefail
 umask 077
 
-REPO=/home/ubuntu/LinkFree-LinkTree
+REPO=/home/ubuntu/src-Projects/LinkFree-LinkTree
 DEV=/home/ubuntu/linkstack-dev
-PROD=/srv/linkstack
+PROD=/srv/linkfree
 BRANCH=main
-STATE_DIR=/var/lib/linkstack-deploy
+STATE_DIR=/var/lib/linkfree-deploy
 LAST_FILE="$STATE_DIR/last-successful-sha"
-BACKUP_ROOT=/var/backups/linkstack-deploy
-SITE=https://linkstack.3.141.97.135.sslip.io
+BACKUP_ROOT=/var/backups/linkfree-deploy
+SITE=https://linkfree.website
 
 MODE="${1:-}"
 if [[ "$MODE" != --check && "$MODE" != --deploy ]]; then
@@ -19,49 +20,138 @@ if [[ "$MODE" != --check && "$MODE" != --deploy ]]; then
   exit 2
 fi
 if (( EUID != 0 )); then echo 'Execute como root (sudo).' >&2; exit 1; fi
-for cmd in git rsync php flock runuser cmp mktemp cp; do
+for cmd in git rsync php flock runuser cmp mktemp cp python3; do
   command -v "$cmd" >/dev/null || { echo "Dependencia ausente: $cmd" >&2; exit 1; }
 done
-for dir in "$REPO/.git" "$REPO/linkstack" "$DEV" "$PROD"; do
-  [[ -d "$dir" ]] || { echo "Diretorio ausente: $dir" >&2; exit 1; }
-done
-exec 9>/tmp/linkstack-deploy.lock
-flock -n 9 || { echo 'Ja existe uma atualizacao em andamento.' >&2; exit 1; }
-
-current_branch="$(git -C "$REPO" symbolic-ref --short HEAD)"
-[[ "$current_branch" == "$BRANCH" ]] || { echo "Branch inesperada: $current_branch" >&2; exit 1; }
-[[ -z "$(git -C "$REPO" status --porcelain)" ]] || {
-  echo 'Reposítorio local possui alteracoes pendentes. Pare para evitar perda de codigo.' >&2
-  git -C "$REPO" status --short >&2
+[[ -d "$PROD" && -f "$PROD/artisan" && -f "$PROD/.env" ]] || {
+  echo "Instalacao LinkFree nao encontrada em $PROD. Nenhum arquivo modificado." >&2
   exit 1
 }
-remote_url="$(git -C "$REPO" config --get remote.origin.url || :)"
+[[ ! -L "$PROD" && ! -L "$DEV" && ! -L "$REPO" ]] || { echo 'Diretorio simbólico recusado.' >&2; exit 1; }
+id ubuntu >/dev/null 2>&1 || { echo 'Usuario ubuntu nao existe.' >&2; exit 1; }
+exec 9>/tmp/linkfree-deploy.lock
+flock -n 9 || { echo 'Ja existe uma atualizacao em andamento.' >&2; exit 1; }
+
+# O instal.sh obtem um clone temporario. O deploy mantem sua propria copia persistente.
+if [[ ! -d "$REPO/.git" ]]; then
+  [[ ! -e "$REPO" ]] || { echo "Destino do clone ocupado: $REPO" >&2; exit 1; }
+  install -d -o ubuntu -g ubuntu -m 755 /home/ubuntu/src-Projects
+  echo "Criando clone persistente em $REPO..."
+  runuser -u ubuntu -- git clone --branch "$BRANCH" \
+    https://github.com/sistemacodigolucrativo/LinkFree-LinkTree.git "$REPO"
+fi
+[[ -d "$REPO/linkstack" ]] || { echo 'Aplicacao ausente no clone.' >&2; exit 1; }
+# Evita o bloqueio de ownership do Git ao usar sudo/root em repositorio do ubuntu.
+gitrepo() { runuser -u ubuntu -- git -C "$REPO" "$@"; }
+
+current_branch="$(gitrepo symbolic-ref --short HEAD)"
+[[ "$current_branch" == "$BRANCH" ]] || { echo "Branch inesperada: $current_branch" >&2; exit 1; }
+[[ -z "$(gitrepo status --porcelain)" ]] || {
+  echo 'Reposítorio local possui alteracoes pendentes. Pare para evitar perda de codigo.' >&2
+  gitrepo status --short >&2
+  exit 1
+}
+remote_url="$(gitrepo config --get remote.origin.url || :)"
 case "$remote_url" in
   https://github.com/sistemacodigolucrativo/LinkFree-LinkTree.git|https://github.com/sistemacodigolucrativo/LinkFree-LinkTree|git@github.com:sistemacodigolucrativo/LinkFree-LinkTree.git) ;;
   *) echo 'O origin nao corresponde ao repositorio esperado; operacao bloqueada.' >&2; exit 1 ;;
 esac
 
 echo 'Buscando atualizacoes no GitHub...'
-git -C "$REPO" fetch --quiet origin "$BRANCH"
-TARGET="$(git -C "$REPO" rev-parse "origin/$BRANCH^{commit}")"
-LOCAL_HEAD="$(git -C "$REPO" rev-parse 'HEAD^{commit}')"
+gitrepo fetch --quiet origin "$BRANCH"
+TARGET="$(gitrepo rev-parse "origin/$BRANCH^{commit}")"
+LOCAL_HEAD="$(gitrepo rev-parse 'HEAD^{commit}')"
 BASE="$LOCAL_HEAD"
 if [[ -s "$LAST_FILE" ]]; then
   BASE="$(head -n1 "$LAST_FILE")"
-  git -C "$REPO" cat-file -e "$BASE^{commit}" || { echo 'Historico de deploy invalido.' >&2; exit 1; }
+  gitrepo cat-file -e "$BASE^{commit}" || { echo 'Historico de deploy invalido.' >&2; exit 1; }
+else
+  # O instalador web copia os fontes sem gravar SHA da instalacao. Procura uma
+  # revisao cujos arquivos de codigo coincidam EXATAMENTE com a producao.
+  # Arquivos de usuario, .env, SQLite, uploads e dependencias ficam fora.
+  # Se nao houver coincidencia, para sem presumir uma versao ou sobrescrever dados.
+  echo 'Identificando a revisao instalada pela comparacao dos arquivos de codigo...'
+  BASE=$(python3 - "$REPO" "$PROD" <<'PYBASE'
+import hashlib
+import os
+import subprocess
+import sys
+
+repo, prod = sys.argv[1:3]
+gitcmd = ['git', '-c', f'safe.directory={repo}', '-C', repo]
+def git(*args):
+    return subprocess.check_output(gitcmd + list(args))
+
+def managed(rel):
+    if rel == '.env' or rel.startswith(('.env.', 'storage/', 'database/', 'themes/',
+                                        'vendor/', 'node_modules/', '.git/',
+                                        'assets/favicon/icons/')):
+        return False
+    if rel in ('config/advanced-config.php', 'INSTALLERLOCK',
+               'composer.json', 'composer.lock', 'package.json', 'package-lock.json',
+               'yarn.lock', 'webpack.mix.js'):
+        return False
+    if rel.endswith(('.sqlite', '.db')) or rel.startswith(('vite.config.',)):
+        return False
+    return rel.startswith(('app/', 'config/', 'routes/', 'resources/', 'assets/',
+                           'blocks/', 'bootstrap/', 'docs/')) or rel in (
+                               'index.php', '.htaccess', 'server.php', 'web.config',
+                               'mix-manifest.json', 'version.json')
+
+cache = {}
+def live_blob(rel):
+    if rel in cache:
+        return cache[rel]
+    path = os.path.join(prod, rel)
+    if not os.path.isfile(path) or os.path.islink(path):
+        cache[rel] = None
+        return None
+    h = hashlib.sha1()
+    h.update(b'blob ' + str(os.path.getsize(path)).encode() + b'\0')
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b''):
+            h.update(chunk)
+    cache[rel] = h.hexdigest().encode()
+    return cache[rel]
+
+for candidate in git('rev-list', '-n', '500', 'origin/main').splitlines():
+    raw = git('ls-tree', '-r', '-z', candidate.decode(), '--', 'linkstack/')
+    compared = 0
+    for record in raw.split(b'\0'):
+        if not record:
+            continue
+        meta, path = record.split(b'\t', 1)
+        if meta.split()[1] != b'blob':
+            continue
+        rel = os.fsdecode(path)[len('linkstack/'):]
+        if not managed(rel):
+            continue
+        compared += 1
+        if live_blob(rel) != meta.split()[2]:
+            break
+    else:
+        if compared >= 5:
+            print(candidate.decode())
+            sys.exit(0)
+print('Nao foi possivel identificar com seguranca o commit instalado. '
+      'Nada foi atualizado; solicite revisao antes do primeiro deploy.', file=sys.stderr)
+sys.exit(1)
+PYBASE
+  ) || exit 1
+  printf 'Versao original identificada: %.12s\n' "$BASE"
 fi
 
-git -C "$REPO" merge-base --is-ancestor "$LOCAL_HEAD" "$TARGET" || {
+gitrepo merge-base --is-ancestor "$LOCAL_HEAD" "$TARGET" || {
   echo 'Main local divergiu do remoto. Resolva manualmente; nao sera usado reset --hard.' >&2
   exit 1
 }
-git -C "$REPO" merge-base --is-ancestor "$BASE" "$TARGET" || {
+gitrepo merge-base --is-ancestor "$BASE" "$TARGET" || {
   echo 'O commit de referencia do ultimo deploy nao e ancestral de origin/main.' >&2
   exit 1
 }
 
-mapfile -t changed < <(git -C "$REPO" diff --name-only --diff-filter=ACMRT "$BASE" "$TARGET" -- linkstack/)
-mapfile -t deleted < <(git -C "$REPO" diff --name-only --diff-filter=D "$BASE" "$TARGET" -- linkstack/)
+mapfile -t changed < <(gitrepo diff --name-only --diff-filter=ACMRT "$BASE" "$TARGET" -- linkstack/)
+mapfile -t deleted < <(gitrepo diff --name-only --diff-filter=D "$BASE" "$TARGET" -- linkstack/)
 if (( ${#deleted[@]} )); then
   echo 'AVISO: ha exclusoes no projeto. Este script nao remove arquivos da producao:' >&2
   printf '  %s\n' "${deleted[@]}" >&2
@@ -98,14 +188,17 @@ fi
 for rel in "${files[@]}"; do
   old_path="linkstack/$rel"
   old_exists=false
-  if git -C "$REPO" cat-file -e "$BASE:$old_path" 2>/dev/null; then old_exists=true; fi
+  if gitrepo cat-file -e "$BASE:$old_path" 2>/dev/null; then old_exists=true; fi
   for dest in "$DEV" "$PROD"; do
+    # O diretorio DEV pode nao existir numa instalacao criada pelo instal.sh;
+    # sera inicializado somente em --deploy com fontes de codigo, sem dados.
+    [[ "$dest" != "$DEV" || -d "$DEV" ]] || continue
     if [[ -L "$dest/$rel" ]]; then
       echo "CONFLITO: destino e link simbolico: $dest/$rel" >&2
       exit 1
     fi
     if [[ "$old_exists" == true ]]; then
-      if [[ ! -f "$dest/$rel" ]] || ! git -C "$REPO" show "$BASE:$old_path" | cmp -s - "$dest/$rel"; then
+      if [[ ! -f "$dest/$rel" ]] || ! gitrepo show "$BASE:$old_path" | cmp -s - "$dest/$rel"; then
         echo "CONFLITO: $dest/$rel difere da versao base ($BASE). Nao sobrescrevi." >&2
         exit 1
       fi
@@ -117,14 +210,33 @@ for rel in "${files[@]}"; do
 done
 
 if [[ "$MODE" == --check ]]; then
-  echo 'SIMULACAO CONCLUIDA: os destinos passaram na verificacao de conflito.'
+  [[ -d "$DEV" ]] || echo "O estagio de codigo $DEV sera criado no primeiro --deploy (sem .env ou banco)."
+  echo 'SIMULACAO CONCLUIDA: os destinos existentes passaram na verificacao de conflito.'
   echo 'Nenhum arquivo da aplicacao foi modificado.'
   echo 'Para publicar: bash atualizar-linkstack.sh --deploy'
   exit 0
 fi
 
+# Cria o estagio de desenvolvimento com APENAS os arquivos de codigo da
+# revisao instalada. Nao copia .env, usuarios, SQLite, uploads ou storage.
+if [[ ! -d "$DEV" ]]; then
+  echo "Preparando estagio de codigo isolado em $DEV..."
+  stage_list=$(mktemp)
+  while IFS= read -r path; do
+    rel="${path#linkstack/}"
+    case "$rel" in
+      .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*|composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) ;;
+      app/*|config/*|routes/*|resources/*|assets/*|blocks/*|bootstrap/*|docs/*|index.php|.htaccess|server.php|web.config|mix-manifest.json|version.json) printf '%s\n' "$rel" >> "$stage_list";;
+    esac
+  done < <(gitrepo ls-tree -r --name-only "$BASE" -- linkstack/)
+  install -d -o ubuntu -g ubuntu -m 755 "$DEV"
+  rsync -a --files-from="$stage_list" "$PROD/" "$DEV/"
+  chown -R ubuntu:ubuntu "$DEV"
+  rm -f "$stage_list"
+fi
+
 if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 ]]; then
-  echo 'Repositório ja atualizado, nenhum arquivo pendente de publicacao.'
+  echo 'Repositorio ja atualizado, nenhum arquivo pendente de publicacao.'
   exit 0
 fi
 
@@ -175,7 +287,7 @@ rollback() {
 trap rollback EXIT
 
 # O repositorio local e atualizado somente por fast-forward.
-git -C "$REPO" merge --ff-only --quiet "origin/$BRANCH"
+gitrepo merge --ff-only --quiet "origin/$BRANCH"
 
 # Analise sintatica antes de publicar na producao.
 for rel in "${files[@]}"; do
