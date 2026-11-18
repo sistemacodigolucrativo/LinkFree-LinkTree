@@ -91,7 +91,7 @@ html = """<!doctype html><html lang="pt-BR"><head>
     </div>
   </section>
 </div>
-<button id="outside" style="position:relative;margin:15px">Área externa ao menu</button>
+<button id="outside" style="position:relative;margin:15px 0 15px 180px">Área externa ao menu</button>
 </div></body></html>"""
 
 def metrics(page):
