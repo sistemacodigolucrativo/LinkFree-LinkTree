@@ -48,23 +48,23 @@ Quando o DNS retornar endereços da Cloudflare, o script reconhece o proxy e con
 
 ### Atualização do LinkFree (deploy)
 
-O instalador inicial prepara a aplicação em **\`/srv/linkfree\`**. Para atualizar essa instalação, use o script independente \`scripts/atualizar-linkstack.sh\`, que agora reconhece a estrutura do \`instal.sh\`:
+O instalador inicial prepara a aplicação em **`/srv/linkfree`**. Para atualizar essa instalação, use o script independente `scripts/atualizar-linkstack.sh`, que agora reconhece a estrutura do `instal.sh`:
 
-- Produção: \`/srv/linkfree\` — **preserva** \`.env\`, banco SQLite, usuários, uploads, temas e arquivos do usuário.
-- Repositório permanente: \`/home/ubuntu/src-Projects/LinkFree-LinkTree\` — criado automaticamente na primeira execução do deploy se estiver ausente.
-- Estágio de código (não é um servidor de desenvolvimento ativo): \`/home/ubuntu/linkstack-dev\` — criado sem copiar dados privados da produção.
-- Backups: \`/var/backups/linkfree-deploy\`; o SQLite recebe uma cópia consistente antes da publicação de código.
-- Referência de versão: \`/var/lib/linkfree-deploy/last-successful-sha\`.
+- Produção: `/srv/linkfree` — **preserva** `.env`, banco SQLite, usuários, uploads, temas e arquivos do usuário.
+- Repositório permanente: `/home/ubuntu/src-Projects/LinkFree-LinkTree` — criado automaticamente na primeira execução do deploy se estiver ausente.
+- Estágio de código (não é um servidor de desenvolvimento ativo): `/home/ubuntu/linkstack-dev` — criado sem copiar dados privados da produção.
+- Backups: `/var/backups/linkfree-deploy`; o SQLite recebe uma cópia consistente antes da publicação de código.
+- Referência de versão: `/var/lib/linkfree-deploy/last-successful-sha`.
 
 Execute primeiro a simulação e só depois publique, como root ou com sudo:
 
-\`\`\`bash
+```bash
 curl -fsSL https://raw.githubusercontent.com/sistemacodigolucrativo/LinkFree-LinkTree/main/scripts/atualizar-linkstack.sh -o /root/atualizar-linkstack.sh && chmod 700 /root/atualizar-linkstack.sh && sudo bash /root/atualizar-linkstack.sh --check && sudo bash /root/atualizar-linkstack.sh --deploy
-\`\`\`
+```
 
-Na primeira execução, o deploy tenta identificar a revisão instalada **comparando o código real em produção** com commits históricos, sem presumir que o último commit do GitHub já esteja instalado. Se não conseguir identificar uma versão consistente, a operação será interrompida para revisão. O script rejeita arquivos de código modificados no servidor e não executa \`git reset --hard\` ou \`rsync --delete\`.
+Na primeira execução, o deploy tenta identificar a revisão instalada **comparando o código real em produção** com commits históricos, sem presumir que o último commit do GitHub já esteja instalado. Se não conseguir identificar uma versão consistente, a operação será interrompida para revisão. O script rejeita arquivos de código modificados no servidor e não executa `git reset --hard` ou `rsync --delete`.
 
-**Limitação importante:** mudanças em migrações do banco e dependências (Composer/NPM) exigem procedimento separado. O deploy bloqueia essas situações em vez de aplicar alterações potencialmente incompatíveis ou modificar o banco automaticamente. A etapa \`--check\` pode clonar o repositório, mas não altera os arquivos da aplicação em produção.
+**Limitação importante:** mudanças em migrações do banco e dependências (Composer/NPM) exigem procedimento separado. O deploy bloqueia essas situações em vez de aplicar alterações potencialmente incompatíveis ou modificar o banco automaticamente. A etapa `--check` pode clonar o repositório, mas não altera os arquivos da aplicação em produção.
 
 ### Recuperação e diagnóstico
 
