@@ -45,7 +45,7 @@
       @if(file_exists(base_path("assets/linkstack/images/").findFile('favicon')))
       <link rel="icon" type="image/png" href="{{ asset('assets/linkstack/images/'.findFile('favicon')) }}">
       @else
-      <link rel="icon" type="image/svg+xml" href="{{ asset('assets/linkstack/images/logo.svg') }}">
+      <link rel="icon" type="image/svg+xml" href="{{ asset('assets/linkstack/images/favicon.svg') }}">
       @endif
 
       <script src="{{asset('assets/js/detect-dark-mode.js')}}"></script>
@@ -102,10 +102,10 @@
                 </div>
                   @else
                   <div class="logo-normal">
-                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/logo.svg') }}" width="30px" height="30px">
+                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
                 </div>
                 <div class="logo-mini">
-                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/logo.svg') }}" width="30px" height="30px">
+                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
                 </div>
                   @endif
                   </div>
@@ -172,7 +172,7 @@
                 <img alt="avatar" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" width="auto" height="128px">
                 @else
                 <div class="logo-container fadein">
-                  <img src="{{ asset('assets/linkstack/images/logo-animated.svg') }}" alt="Logo" style="width:150px; height:150px;">
+                  <img src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo" style="width:150px; height:150px;">
                 </div>
                 @endif
 
