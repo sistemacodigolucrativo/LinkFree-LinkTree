@@ -76,7 +76,7 @@ $usrhandl = Auth::user()->littlelink_name;
 .iq-navbar-header.welcome-slim{
  width:calc(100% - 28px);max-width:980px;min-height:0;height:auto!important;
  margin:12px auto 18px!important;padding:14px clamp(15px,3vw,25px)!important;
- border-radius:15px;overflow:hidden;position:relative;box-shadow:0 8px 18px var(--lf-shadow-header)
+ border-radius:15px;overflow:visible;position:relative;box-shadow:0 8px 18px var(--lf-shadow-header)
 }
 .iq-navbar-header.welcome-slim .iq-container{padding:0!important;max-width:100%}
 .iq-navbar-header.welcome-slim .row{margin:0!important}
@@ -488,31 +488,6 @@ $usrhandl = Auth::user()->littlelink_name;
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="mb-2 navbar-nav ms-auto align-items-center navbar-list mb-lg-0">
-                <li class="me-0 me-xl-2">
-                  <div class="dropdown d-flex flex-row align-items-center view-page-buttons">
-                    <button class="btn btn-primary btn-sm dropdown-toggle ms-auto px-1 share-page-slim rounded" type="button" aria-label="Compartilhar perfil" id="dropdownMenuButtonSM" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="btn-seg-ico bi bi-share-fill"></i>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonSM">
-                      <li><h6 class="dropdown-header">{{__('messages.Share your profile:')}}</h6></li>
-                      @if(env('SUPPORTED_DOMAINS') !== '' and env('SUPPORTED_DOMAINS') !== null)
-                      @php $sDomains = str_replace(' ', '', env('SUPPORTED_DOMAINS')); $sDomains = explode(',', $sDomains); @endphp
-                        @foreach ($sDomains as $myvar)
-                            <li>
-                                <a class="dropdown-item share-button" style="cursor:pointer!important;" data-share="{{'https://'.$myvar.'/@'.Auth::user()->littlelink_name}}">
-                                    <i class="bi bi-files"></i> {{ $myvar }}
-                                </a>
-                            </li>
-                        @endforeach
-                      @else
-                      <li><a class="dropdown-item share-button" style="cursor:pointer!important;" data-share="{{url('').'/@'.Auth::user()->littlelink_name}}"><i class="bi bi-files"></i> {{ str_replace(['http://', 'https://'], '', url('')) }}                      </a></li>
-                      @endif
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" data-bs-toggle="modal" style="cursor:pointer!important;" data-bs-target="#staticBackdrop"><i class="bi bi-qr-code-scan"></i> {{__('messages.QR Code')}}</a></li>
-                    </ul>
-                  </div>
-                </li>
-
                 <li class="nav-item dropdown">
                   <a href="#"  class="nav-link" aria-label="Notificações" id="notification-drop" data-bs-toggle="dropdown" >
                       <svg class="icon-24" width="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -580,41 +555,111 @@ $usrhandl = Auth::user()->littlelink_name;
         <style>.header-block{background-color:var(--bs-primary);border-bottom-left-radius:1rem;border-bottom-right-radius:1rem;}</style>
           <div class="iq-navbar-header header-block mb-2 welcome-slim" style="height:auto;">
         <style>
-        .welcome-slim{position:relative}
-        .welcome-slim .lf-welcome-public-link{position:absolute;inset:0;z-index:8;display:block;border-radius:inherit}
-        .welcome-slim .lf-welcome-public-link:focus-visible{outline:3px solid #f6c65b;outline-offset:-5px}
-        .welcome-slim:has(.lf-welcome-public-link):hover{filter:brightness(1.04)}
+          .welcome-slim{position:relative}
+          .welcome-slim .lf-welcome-summary{position:relative;display:flex;align-items:center;justify-content:center;min-height:58px;padding:0 48px}
+          .welcome-slim .lf-welcome-copy{min-width:0;text-align:center}
+          .welcome-slim .lf-welcome-toggle{
+            position:absolute;inset:0;z-index:6;display:block;width:100%;height:100%;
+            padding:0;border:0;border-radius:12px;background:transparent;color:#fff;
+            cursor:pointer;text-align:right
+          }
+          .welcome-slim .lf-welcome-toggle:hover{background:rgba(255,255,255,.06)}
+          .welcome-slim .lf-welcome-toggle:focus-visible{outline:3px solid #f6c65b;outline-offset:-2px}
+          .welcome-slim .lf-welcome-toggle i{
+            position:absolute;top:50%;right:2px;transform:translateY(-50%);
+            display:grid;place-items:center;width:40px;height:40px;border-radius:11px;
+            background:rgba(255,255,255,.17);border:1px solid rgba(255,255,255,.38);
+            color:#fff;font-size:1.08rem
+          }
+          .welcome-slim .lf-welcome-actions{position:relative;z-index:10}
+          .welcome-slim .lf-welcome-actions-inner{
+            display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:9px;
+            padding:15px 0 2px;margin-top:12px;border-top:1px solid rgba(255,255,255,.3)
+          }
+          .welcome-slim .lf-welcome-action{
+            display:inline-flex;align-items:center;justify-content:center;gap:7px;
+            box-sizing:border-box;min-height:42px;min-width:0;max-width:100%;
+            border:1px solid rgba(255,255,255,.48);border-radius:10px;
+            padding:9px 12px;background:rgba(255,255,255,.15);
+            color:#fff!important;text-decoration:none;font-size:.85rem;font-weight:650;
+            line-height:1.25;cursor:pointer
+          }
+          .welcome-slim .lf-welcome-action:hover{background:rgba(255,255,255,.27)}
+          .welcome-slim .lf-welcome-action:focus-visible{outline:3px solid #f6c65b;outline-offset:2px}
+          .welcome-slim .lf-welcome-share-dropdown{position:relative}
+          .welcome-slim .lf-welcome-share-dropdown .dropdown-menu{max-width:min(320px,90vw);min-width:210px;z-index:1080}
+          .welcome-slim .lf-welcome-share-dropdown .dropdown-item{white-space:normal;overflow-wrap:anywhere}
+          @media(max-width:575px){
+            .welcome-slim .lf-welcome-summary{padding:0 40px 0 0;min-height:56px}
+            .welcome-slim .lf-welcome-copy{text-align:left}
+            .welcome-slim .lf-welcome-toggle i{right:0;width:36px;height:36px}
+            .welcome-slim .lf-welcome-actions-inner{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+            .welcome-slim .lf-welcome-share-dropdown{width:100%}
+            .welcome-slim .lf-welcome-action{width:100%;justify-content:center}
+          }
         </style>
-        @if(!empty(Auth::user()->littlelink_name))
-          <a class="lf-welcome-public-link" href="{{ url('/@'.Auth::user()->littlelink_name) }}"
-             target="_blank" rel="noopener noreferrer" aria-label="{{__('messages.View Page')}}: {{'@'.Auth::user()->littlelink_name}}"></a>
-        @endif
-
-              <div class="container-fluid iq-container">
-                  <div class="row">
-                      <div class="col-md-12">
-                          <div style="z-index:5;position:relative;" class="flex-wrap d-flex justify-content-center align-items-center">
-                              <div class="w-100 text-center">
-                                @if(!isset($usrhandl))
-                                  <h1>👋 {{__('messages.Hi')}}, {{__('messages.stranger')}}</h1>
-                                @else
-                                  <h1>👋 {{__('messages.Hi')}}, {{'@'.$usrhandl}}</h1>
-                                @endif
-
-                                  <h5>{{__('messages.welcome', ['appName' => config('app.name')])}}</h5>
-                              </div>
-                              <div>
-                                @if(!isset($usrhandl))
-                                  <a href="{{ url('/studio/page') }}" class="btn btn-link btn-soft-light">
-                                    <i style="top:3px;position:relative;font-size:2.5vh;" class="bi bi-at"></i>
-                                    {{__('messages.Set a handle')}}
-                                  </a>
-                                  @endif
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+        <div class="container-fluid iq-container">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="lf-welcome-summary">
+                <div class="lf-welcome-copy">
+                  @if(empty($usrhandl))
+                    <h1>👋 {{__('messages.Hi')}}, {{__('messages.stranger')}}</h1>
+                  @else
+                    <h1>👋 {{__('messages.Hi')}}, {{'@'.$usrhandl}}</h1>
+                  @endif
+                  <h5>{{__('messages.welcome', ['appName' => config('app.name')])}}</h5>
+                  @if(empty($usrhandl))
+                    <a href="{{ url('/studio/page') }}" class="btn btn-link btn-soft-light" style="position:relative;z-index:9">
+                      <i class="bi bi-at" aria-hidden="true"></i> {{__('messages.Set a handle')}}
+                    </a>
+                  @endif
+                </div>
+                @if(!empty($usrhandl))
+                  <button class="lf-welcome-toggle" type="button" data-bs-toggle="collapse"
+                          data-bs-target="#lfWelcomeActions" aria-controls="lfWelcomeActions"
+                          aria-expanded="false" aria-label="{{__('messages.Share your profile:')}}">
+                    <i class="bi bi-share-fill" aria-hidden="true"></i>
+                  </button>
+                @endif
               </div>
+              @if(!empty($usrhandl))
+                <div class="collapse lf-welcome-actions" id="lfWelcomeActions">
+                  <div class="lf-welcome-actions-inner">
+                    <a class="lf-welcome-action" href="{{ url('/@'.$usrhandl) }}" target="_blank" rel="noopener noreferrer">
+                      <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i> {{__('messages.View Page')}}
+                    </a>
+                    <div class="dropdown lf-welcome-share-dropdown">
+                      <button class="lf-welcome-action dropdown-toggle" type="button" id="lfWelcomeShareMenu"
+                              data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-share-fill" aria-hidden="true"></i> {{__('messages.Share your profile:')}}
+                      </button>
+                      <ul class="dropdown-menu" aria-labelledby="lfWelcomeShareMenu">
+                        @if(env('SUPPORTED_DOMAINS') !== '' and env('SUPPORTED_DOMAINS') !== null)
+                          @php $sDomains = explode(',', str_replace(' ', '', env('SUPPORTED_DOMAINS'))); @endphp
+                          @foreach($sDomains as $myvar)
+                            <li><button class="dropdown-item share-button" type="button"
+                                        data-share="{{'https://'.$myvar.'/@'.$usrhandl}}">
+                              <i class="bi bi-files" aria-hidden="true"></i> {{ $myvar }}
+                            </button></li>
+                          @endforeach
+                        @else
+                          <li><button class="dropdown-item share-button" type="button"
+                                      data-share="{{url('/@'.$usrhandl)}}">
+                            <i class="bi bi-files" aria-hidden="true"></i> {{ str_replace(['http://', 'https://'], '', url('')) }}
+                          </button></li>
+                        @endif
+                      </ul>
+                    </div>
+                    <button class="lf-welcome-action" type="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                      <i class="bi bi-qr-code-scan" aria-hidden="true"></i> {{__('messages.QR Code')}}
+                    </button>
+                  </div>
+                </div>
+              @endif
+            </div>
+          </div>
+        </div>
               <div style="z-index:0!important;" class="iq-header-img">
                 @php if(file_exists(base_path("assets/dashboard-themes/header.png"))){$headerImage = asset('assets/dashboard-themes/header.png');}else{$headerImage = asset('assets/images/dashboard/top-header-overlay.png');} @endphp
                   <img src="{{$headerImage}}" draggable="false" alt="header" class="img-fluid w-100 h-100 animated-scaleX">
@@ -806,7 +851,7 @@ $usrhandl = Auth::user()->littlelink_name;
               </div>
               @php
               try {
-                $redirectURL = url('').'/'.'u/'.Auth::user()->id;
+                $redirectURL = !empty(Auth::user()->littlelink_name) ? url('/@'.Auth::user()->littlelink_name) : url('/u/'.Auth::id());
 
                 $argValues = config('advanced-config.qr_code_gradient') ?? [0, 0, 0, 0, 0, 0, 'diagonal'];
                 list($arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $arg7) = $argValues;
