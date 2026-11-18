@@ -7,6 +7,14 @@ on:
       - 'linkstack/resources/views/panel/index.blade.php'
       - 'linkstack/resources/views/layouts/sidebar.blade.php'
       - 'linkstack/resources/views/layouts/guest.blade.php'
+      - 'linkstack/resources/views/auth/login.blade.php'
+      - 'linkstack/assets/css/linkfree-login.css'
+      - 'linkstack/resources/views/studio/icons.blade.php'
+      - 'linkstack/resources/views/studio/blocks.blade.php'
+      - 'linkstack/resources/views/studio/edit-link.blade.php'
+      - 'linkstack/routes/web.php'
+      - 'linkstack/app/Http/Controllers/UserController.php'
+      - 'scripts/audit-login-layout.py'
       - 'linkstack/assets/css/linkfree-color-modes.css'
       - 'linkstack/assets/css/linkfree-light-gradient.css'
       - 'linkstack/resources/views/studio/page.blade.php'
@@ -28,6 +36,14 @@ on:
       - 'linkstack/resources/views/panel/index.blade.php'
       - 'linkstack/resources/views/layouts/sidebar.blade.php'
       - 'linkstack/resources/views/layouts/guest.blade.php'
+      - 'linkstack/resources/views/auth/login.blade.php'
+      - 'linkstack/assets/css/linkfree-login.css'
+      - 'linkstack/resources/views/studio/icons.blade.php'
+      - 'linkstack/resources/views/studio/blocks.blade.php'
+      - 'linkstack/resources/views/studio/edit-link.blade.php'
+      - 'linkstack/routes/web.php'
+      - 'linkstack/app/Http/Controllers/UserController.php'
+      - 'scripts/audit-login-layout.py'
       - 'linkstack/assets/css/linkfree-color-modes.css'
       - 'linkstack/assets/css/linkfree-light-gradient.css'
       - 'linkstack/resources/views/studio/page.blade.php'
@@ -66,5 +82,7 @@ jobs:
         run: python scripts/audit-linkfree-interactions.py
       - name: Test profile avatar, CKEditor contrast and light gradient
         run: python scripts/audit-profile-editor-gradient.py
+      - name: Audit premium login layout and preserved authentication
+        run: python scripts/audit-login-layout.py
       - name: Test public profile top spacing and share overlay priority
         run: python scripts/audit-public-share-overlay.py

@@ -8,19 +8,23 @@ foreach($pages as $page)
 
 <x-guest-layout>
 @include('layouts.lang')
+<link rel="stylesheet" href="{{ asset('assets/css/linkfree-login.css') }}?v={{ filemtime(base_path('assets/css/linkfree-login.css')) }}">
 
-    <x-auth-card>
-        <x-slot name="logo"></x-slot>
-
-        <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
-
-        <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
-
-        <div style="max-width:480px" class="container mt-5 w-100">
-          <div class="card p-5">
-              <a href="{{ url('') }}" class="d-flex align-items-center mb-3">
+<x-auth-card>
+  <x-slot name="logo"></x-slot>
+  <section class="lf-login-shell" aria-labelledby="lf-login-title">
+    <aside class="lf-login-visual" aria-hidden="true">
+      <div class="lf-login-visual-mark"><i class="bi bi-link-45deg"></i> {{ config('app.name') }}</div>
+      <div class="lf-login-visual-center">
+        <div class="lf-login-visual-symbol"><i class="bi bi-grid-1x2-fill"></i></div>
+        <p class="lf-login-eyebrow">LINKFREE</p>
+        <h2>{{ config('app.name') }}</h2>
+        <p>{{ __('messages.Login to stay connected') }}</p>
+      </div>
+      <div class="lf-login-visual-footer"><span></span><span></span><span></span></div>
+    </aside>
+    <div class="lf-login-panel">
+      <a href="{{ url('') }}" class="lf-login-brand d-flex align-items-center">
                 <!--Logo start-->
                 <div class="logo-main">
                     @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
@@ -42,15 +46,20 @@ foreach($pages as $page)
                     <!--logo End-->
                 <h4 class="logo-title ms-3">{{env('APP_NAME')}}</h4>
               </a>
-              <h2 class="mb-2 text-center">{{__('messages.Sign In')}}</h2>
-              <p class="text-center">{{__('messages.Login to stay connected')}}.</p>
-              <form method="POST" action="{{ route('login') }}">
+      <div class="lf-login-heading">
+        <p class="lf-login-kicker">{{ config('app.name') }}</p>
+        <h1 id="lf-login-title">{{ __('messages.Sign In') }}</h1>
+        <p>{{ __('messages.Login to stay connected') }}.</p>
+      </div>
+      <x-auth-session-status class="mb-4" :status="session('status')" />
+      <x-auth-validation-errors class="mb-4" :errors="$errors" />
+      <form class="lf-login-form" method="POST" action="{{ route('login') }}">
                 @csrf
                 <div class="row">
                   <div class="col-lg-12">
                     <div class="form-group">
                       <label for="email" class="form-label">{{__('messages.Email')}}</label>
-                      <input type="email" class="form-control" id="email" name="email" aria-describedby="email" placeholder=" " value="{{ old('email') }}" required autofocus >
+                      <input type="email" class="form-control" id="email" name="email" autocomplete="username" inputmode="email" autocapitalize="none" aria-describedby="email" placeholder=" " value="{{ old('email') }}" required autofocus >
                     </div>
                   </div>
                   <div class="col-lg-12">
@@ -59,7 +68,7 @@ foreach($pages as $page)
                       <input type="password" class="form-control" id="password" aria-describedby="password" placeholder=" " name="password" required autocomplete="current-password" />
                     </div>
                   </div>
-                  <div class="col-lg-12 d-flex justify-content-between">
+                  <div class="col-lg-12 d-flex justify-content-between lf-login-remember-row">
                     <div class="form-check mb-3">
                       <input type="checkbox" class="form-check-input" name="remember" id="remember_me">
                       <label class="form-check-label" for="remember_me">{{__('messages.Remember Me')}}</label>
@@ -68,12 +77,12 @@ foreach($pages as $page)
                   </div>
                 </div>
                 <div class="d-flex justify-content-center">
-                  <button type="submit" class="btn btn-primary">{{__('messages.Sign In')}}</button>
+                  <button type="submit" class="btn btn-primary lf-login-submit">{{__('messages.Sign In')}}</button>
                 </div>
                 @if(env('ENABLE_SOCIAL_LOGIN') == 'true')
                 <p class="text-center my-3">{{__('messages.or sign in with other accounts?')}}</p>
                 <div class="d-flex justify-content-center">
-                  <ul class="list-group list-group-horizontal list-group-flush">
+                  <ul class="list-group list-group-horizontal list-group-flush lf-login-social">
                     @if(!empty(env('FACEBOOK_CLIENT_ID')))
                     <li class="list-group-item border-0 pb-0">
                       <a href="{{ route('social.redirect','facebook') }}" aria-label="Entrar com Facebook">
@@ -113,8 +122,7 @@ foreach($pages as $page)
                 </p>
                 @endif
               </form>
-            </div>
-          </div>
-
-    </x-auth-card>
+    </div>
+  </section>
+</x-auth-card>
 </x-guest-layout>

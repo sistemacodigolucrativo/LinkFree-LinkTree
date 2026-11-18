@@ -1,0 +1,161 @@
+/* LinkFree | Login premium mobile-first, isolado das demais telas de autenticação. */
+body:has(.lf-login-shell){
+  background:#f3f6fc!important;
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+}
+body.dark:has(.lf-login-shell){background:#151824!important}
+body:has(.lf-login-shell) .container:has(.lf-login-shell){
+  width:100%;max-width:1280px;height:auto!important;
+  min-height:100vh;min-height:100dvh;
+  padding:clamp(14px,3vw,34px);margin-inline:auto;
+  display:flex;align-items:center;justify-content:center;
+}
+body:has(.lf-login-shell) .container:has(.lf-login-shell)>.col-lg-6{
+  flex:0 1 1120px!important;width:100%!important;max-width:1120px!important;min-width:0;
+}
+.lf-login-shell{
+  --lf-login-surface:#ffffff;
+  --lf-login-fg:#18243b;
+  --lf-login-muted:#4b5870;
+  --lf-login-field:#ffffff;
+  --lf-login-border:#75839a;
+  --lf-login-link:#204a9b;
+  --lf-login-focus:#275fbd;
+  --lf-login-raised:#f5f7fc;
+  display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  width:100%;min-width:0;border-radius:24px;overflow:hidden;
+  background:var(--lf-login-surface);color:var(--lf-login-fg);
+  border:1px solid rgba(117,131,154,.36);
+  box-shadow:0 24px 64px rgba(24,36,59,.12);
+}
+body.dark .lf-login-shell{
+  --lf-login-surface:#222738;
+  --lf-login-fg:#f4f7fd;
+  --lf-login-muted:#c3cede;
+  --lf-login-field:#242c40;
+  --lf-login-border:#7f90ad;
+  --lf-login-link:#95b8ff;
+  --lf-login-focus:#f6c65b;
+  --lf-login-raised:#2e364d;
+  border-color:#7f90ad;
+  box-shadow:0 24px 64px rgba(0,0,0,.28);
+}
+.lf-login-visual{
+  position:relative;isolation:isolate;display:flex;flex-direction:column;
+  justify-content:space-between;gap:30px;min-width:0;overflow:hidden;
+  padding:clamp(30px,4.5vw,56px);
+  background:linear-gradient(145deg,#18243b 0%,#263e75 62%,#3a57e8 100%);
+  color:#ffffff;
+}
+.lf-login-visual::before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;width:330px;height:330px;
+  border-radius:50%;right:-135px;top:18%;border:54px solid rgba(255,255,255,.075);
+}
+.lf-login-visual-mark{
+  display:flex;align-items:center;gap:12px;font-weight:750;font-size:1.05rem;line-height:1.4;
+  overflow-wrap:anywhere;
+}
+.lf-login-visual-mark i{font-size:1.6rem;color:#dbe7ff}
+.lf-login-visual-center{max-width:400px;padding:56px 0}
+.lf-login-visual-symbol{
+  display:grid;place-items:center;width:68px;height:68px;margin-bottom:30px;
+  border-radius:20px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.35);
+  font-size:2rem;color:#ffffff;
+}
+.lf-login-eyebrow{font-size:.76rem;font-weight:750;letter-spacing:.17em;color:#dbe7ff;margin-bottom:12px}
+.lf-login-visual-center h2{color:#ffffff!important;font-size:clamp(2rem,3.5vw,3.25rem);line-height:1.12;
+  letter-spacing:-.045em;font-weight:750;overflow-wrap:anywhere;margin-bottom:18px}
+.lf-login-visual-center>p:last-child{color:#ecf1ff;font-size:1rem;line-height:1.65;max-width:32ch}
+.lf-login-visual-footer{display:flex;gap:8px}
+.lf-login-visual-footer span{width:20px;height:4px;background:rgba(255,255,255,.35);border-radius:9px}
+.lf-login-visual-footer span:first-child{background:#ffffff;width:43px}
+.lf-login-panel{
+  display:flex;flex-direction:column;justify-content:center;min-width:0;
+  padding:clamp(28px,5vw,64px);background:var(--lf-login-surface);
+}
+.lf-login-brand{display:inline-flex;gap:10px;align-items:center;align-self:flex-start;
+  max-width:100%;text-decoration:none;color:var(--lf-login-fg);margin-bottom:clamp(24px,4vw,42px)}
+.lf-login-brand:hover,.lf-login-brand:focus-visible{color:var(--lf-login-link)}
+.lf-login-brand .logo-title{font-weight:750;font-size:1.1rem;color:inherit!important;
+  margin:0!important;overflow-wrap:anywhere;letter-spacing:-.02em}
+.lf-login-brand .logo-main img{max-width:46px;max-height:40px;object-fit:contain}
+.lf-login-heading{margin-bottom:28px;min-width:0}
+.lf-login-kicker{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:750;color:var(--lf-login-link);margin-bottom:10px}
+.lf-login-heading h1{font-size:clamp(1.75rem,3.2vw,2.4rem);line-height:1.18;
+  font-weight:750;letter-spacing:-.035em;color:var(--lf-login-fg)!important;margin:0 0 12px}
+.lf-login-heading>p:last-child{color:var(--lf-login-muted);line-height:1.6;margin:0}
+.lf-login-form{min-width:0}
+.lf-login-form .row{margin-inline:0!important}
+.lf-login-form .row>[class*="col-"]{padding-inline:0!important;min-width:0}
+.lf-login-form .form-group{margin-bottom:20px}
+.lf-login-form .form-label,.lf-login-form .form-check-label{
+  font-size:.9rem;font-weight:650;color:var(--lf-login-fg);margin-bottom:9px
+}
+.lf-login-form :is(.form-control,.form-select){
+  display:block;min-width:0;width:100%;min-height:50px;
+  padding:12px 15px;border:1.5px solid var(--lf-login-border);
+  border-radius:10px;background:var(--lf-login-field);color:var(--lf-login-fg);
+  line-height:1.4;box-shadow:none;outline:none;
+}
+.lf-login-form .form-control:focus{
+  background:var(--lf-login-field);color:var(--lf-login-fg);
+  border-color:var(--lf-login-focus);box-shadow:0 0 0 3px rgba(58,87,232,.15);
+}
+body.dark .lf-login-form .form-control:focus{box-shadow:0 0 0 3px rgba(246,198,91,.18)}
+.lf-login-form .form-check-input{width:18px;height:18px;margin-top:.15rem;flex:0 0 18px;
+  border:1px solid var(--lf-login-border);background-color:var(--lf-login-field)}
+.lf-login-form .form-check-input:checked{background-color:#3a57e8;border-color:#3a57e8}
+.lf-login-form .form-check-input:focus-visible{outline:3px solid var(--lf-login-focus);outline-offset:2px}
+.lf-login-form a:not(.btn){color:var(--lf-login-link);text-decoration:none;font-weight:650}
+.lf-login-form a:not(.btn):hover{text-decoration:underline}
+.lf-login-form a:focus-visible,.lf-login-brand:focus-visible{
+  outline:3px solid var(--lf-login-focus);outline-offset:3px;border-radius:5px
+}
+.lf-login-remember-row{display:flex!important;align-items:flex-start;gap:12px;
+  flex-wrap:wrap;margin-bottom:24px}
+.lf-login-remember-row .form-check{display:flex;align-items:center;gap:9px;margin:0!important;padding-left:0}
+.lf-login-remember-row .form-check-input{position:static;margin:0;float:none}
+.lf-login-remember-row .form-check-label{margin:0}
+.lf-login-remember-row>a{font-size:.88rem;line-height:1.5;margin-left:auto}
+.lf-login-form .lf-login-submit{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-width:0;min-height:50px;padding:12px 18px;border-radius:11px;
+  border:1px solid #3a57e8;background:#3a57e8;color:#ffffff!important;
+  font-weight:750;letter-spacing:.01em;line-height:1.35;
+  box-shadow:0 6px 16px rgba(58,87,232,.18);
+}
+.lf-login-form .lf-login-submit:hover{background:#304acb;border-color:#304acb;color:#ffffff!important}
+.lf-login-form .lf-login-submit:focus-visible{
+  outline:3px solid var(--lf-login-focus);outline-offset:3px;
+}
+.lf-login-form .lf-login-submit:disabled{background:#30384f;border-color:#30384f;color:#c3cede!important}
+.lf-login-form .lf-login-social{display:flex;justify-content:center;align-items:center;
+  flex-wrap:wrap;gap:10px}
+.lf-login-form .lf-login-social .list-group-item{border:0!important;padding:0!important;
+  background:transparent!important}
+.lf-login-form .lf-login-social a{display:grid;place-items:center;width:46px;height:46px;
+  border:1px solid var(--lf-login-border);border-radius:12px;
+  color:var(--lf-login-link);background:var(--lf-login-raised);
+}
+.lf-login-form .lf-login-social a:hover{background:var(--lf-login-field);text-decoration:none}
+.lf-login-form .lf-login-social i{font-size:1.18rem}
+.lf-login-panel :is(.alert,.invalid-feedback){max-width:100%;overflow-wrap:anywhere}
+@media(max-width:900px){
+  .lf-login-shell{grid-template-columns:minmax(0,1fr);max-width:540px;margin-inline:auto;border-radius:19px}
+  .lf-login-visual{display:none}
+  .lf-login-panel{padding:clamp(24px,6vw,42px)}
+}
+@media(max-width:420px){
+  body:has(.lf-login-shell) .container:has(.lf-login-shell){padding:12px}
+  .lf-login-shell{border-radius:16px}
+  .lf-login-panel{padding:24px 20px}
+  .lf-login-brand{margin-bottom:26px}
+  .lf-login-heading{margin-bottom:24px}
+  .lf-login-remember-row>a{margin-left:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .lf-login-form :is(a,button,input){transition:none!important}
+}
