@@ -30,6 +30,22 @@ require("page-icons-card card rounded" in icons and "page-icons-card card rounde
         "Ícones de Página exclusivos na nova rota")
 require("lf-block-grid" in blocks and "SelectLinkType" not in editor,
         "Gerenciar blocos é página exclusiva, sem modal duplicado")
+block_previews_js = (views.parents[1] / "assets/js/linkfree-block-previews.js").read_text(encoding="utf-8")
+require('class="lf-block-preview-toggle"' in blocks and
+        'aria-expanded="false"' in blocks and
+        'class="lf-block-preview-panel"' in blocks and
+        'class="lf-block-preview-frame"' in blocks,
+        "Cada card possui controle de prévia expansível com iframe isolado")
+require('sandbox=""' in blocks and 'data-block-kind' in blocks and
+        'linkfree-block-previews.js' in blocks and
+        'data-preview-brand-css' in blocks,
+        "Prévia não executa ações e usa o tema ativo")
+for kind in ('predefined', 'link', 'vcard', 'email', 'telephone', 'heading', 'spacer', 'text'):
+    require('case "' + kind + '":' in block_previews_js,
+            "Prévia disponível: " + kind)
+require('fetch(' not in block_previews_js and '.submit(' not in block_previews_js,
+        "Prévias não enviam dados nem alteram blocos")
+
 require('id="links-table-body"' in links, "Lista original de links preservada")
 require("route('editIcons')" in icons, "Formulário de ícones preservado")
 require("route('editLink'" in links and "route('deleteLink'" in links,
@@ -164,8 +180,12 @@ require('class="studio-link-clicks"' in links and
         "Indicador de cliques fora da barra de botões e no topo")
 require("button.studio-link-move" in js and "row.append(controls)" not in js,
         "Ordenação usa botões inline, sem criar segunda linha")
-require('lf-welcome-public-link' in sidebar and 'view-page-slim">{{' not in sidebar and 'share-page-slim' in sidebar,
-        "Página pública concentrada no Bem-vindo; compartilhamento preservado")
+require('lf-welcome-public-link' not in sidebar and 'share-page-slim' not in sidebar and
+        'id="lfWelcomeActions"' in sidebar and 'lf-welcome-toggle' in sidebar and
+        'class="dropdown-item share-button"' in sidebar and
+        'data-bs-target="#staticBackdrop"' in sidebar and
+        "url('/@'.Auth::user()->littlelink_name)" in sidebar,
+        "Página pública, compartilhamento e QR Code concentrados no Bem-vindo")
 require('notification-panel' in sidebar and 'notification-panel.show' in nav_css,
         "Notificações usam posicionamento fixo centralizado na viewport")
 require('sidebar-auto-close.js' in sidebar and 'sidebar-mini' in close_js and
