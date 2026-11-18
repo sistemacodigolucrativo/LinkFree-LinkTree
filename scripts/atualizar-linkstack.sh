@@ -164,6 +164,7 @@ manual=()
 for path in "${changed[@]}"; do
   rel="${path#linkstack/}"
   case "$rel" in
+    database/migrations/*) manual+=("$rel"); continue ;; # Alteracao de esquema requer migracao e backup coordenados.
     .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*) protected+=("$rel"); continue ;;
     composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) manual+=("$rel"); continue ;;
     app/*|config/*|routes/*|resources/*|assets/*|blocks/*|bootstrap/*|docs/*|index.php|.htaccess|server.php|web.config|mix-manifest.json|version.json)
@@ -236,6 +237,8 @@ if [[ ! -d "$DEV" ]]; then
 fi
 
 if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 ]]; then
+  install -d -m 700 "$STATE_DIR"
+  if [[ ! -s "$LAST_FILE" ]]; then printf '%s\n' "$BASE" > "$LAST_FILE"; fi
   echo 'Repositorio ja atualizado, nenhum arquivo pendente de publicacao.'
   exit 0
 fi
@@ -244,6 +247,18 @@ mkdir -p "$STATE_DIR" "$BACKUP_ROOT"
 if [[ ! -s "$LAST_FILE" ]]; then printf '%s\n' "$BASE" > "$LAST_FILE"; fi
 backup="$(mktemp -d "$BACKUP_ROOT/$(date +%Y%m%d-%H%M%S)-XXXXXX")"
 mkdir -p "$backup/dev" "$backup/prod"
+# O instalador deste servidor utiliza SQLite. Crie um snapshot consistente
+# sem interromper o site: SQLite .backup utiliza a API de backup online.
+if [[ -f "$PROD/database/database.sqlite" ]]; then
+  command -v sqlite3 >/dev/null || { echo 'sqlite3 ausente: backup SQLite obrigatório não realizado.' >&2; exit 1; }
+  sqlite3 "$PROD/database/database.sqlite" ".backup '$backup/sqlite-before-deploy.sqlite'" ||
+    { echo 'Falha no backup SQLite; publicacao bloqueada.' >&2; exit 1; }
+  check_sqlite=$(sqlite3 "$backup/sqlite-before-deploy.sqlite" 'PRAGMA quick_check;')
+  [[ "$check_sqlite" == ok ]] || { echo "Integridade do backup SQLite falhou: $check_sqlite" >&2; exit 1; }
+  echo "Backup SQLite gerado: $backup/sqlite-before-deploy.sqlite"
+else
+  echo 'Aviso: SQLite nao encontrado. Para MySQL/MariaDB, providencie backup consistente separado.'
+fi
 : > "$backup/new-dev.txt"
 : > "$backup/new-prod.txt"
 : > "$backup/files.txt"
@@ -315,4 +330,4 @@ completed=true
 printf '\nPUBLICACAO CONCLUIDA: %.12s\n' "$TARGET"
 echo "Backup: $backup"
 echo "Site: $SITE"
-echo 'Confira no navegador com sessao autenticada: /studio/theme e /admin/github-themes.'
+echo 'Confira no navegador com sessao autenticada: /dashboard, /studio/profile e /admin/config.'
