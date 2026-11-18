@@ -32,7 +32,7 @@ foreach($pages as $page)
         @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
           <img src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" alt="" class="lf-login-logo">
         @else
-          <img src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="" class="lf-login-logo">
+          <img src="{{ asset('assets/linkstack/images/favicon.svg') }}" alt="" class="lf-login-logo">
         @endif
         <span class="lf-login-brand-name">{{ config('app.name') }}</span>
       </a>
