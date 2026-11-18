@@ -46,6 +46,26 @@ Troque domínio e IP pelos seus; `--public-ip` é opcional e o instalador tenta 
 
 Quando o DNS retornar endereços da Cloudflare, o script reconhece o proxy e configura o Nginx para aceitar `CF-Connecting-IP` apenas das redes oficiais obtidas durante a instalação. Use SSL/TLS **Full (strict)** e confirme no painel da Cloudflare que o endereço de origem aponta para a VPS. O DNS público de um domínio com proxy mostra endereços da Cloudflare, portanto o preparador não consegue comprovar automaticamente o IP de origem configurado no painel. Mantenha a lista de redes da Cloudflare atualizada.
 
+### Atualização do LinkFree (deploy)
+
+O instalador inicial prepara a aplicação em **\`/srv/linkfree\`**. Para atualizar essa instalação, use o script independente \`scripts/atualizar-linkstack.sh\`, que agora reconhece a estrutura do \`instal.sh\`:
+
+- Produção: \`/srv/linkfree\` — **preserva** \`.env\`, banco SQLite, usuários, uploads, temas e arquivos do usuário.
+- Repositório permanente: \`/home/ubuntu/src-Projects/LinkFree-LinkTree\` — criado automaticamente na primeira execução do deploy se estiver ausente.
+- Estágio de código (não é um servidor de desenvolvimento ativo): \`/home/ubuntu/linkstack-dev\` — criado sem copiar dados privados da produção.
+- Backups: \`/var/backups/linkfree-deploy\`; o SQLite recebe uma cópia consistente antes da publicação de código.
+- Referência de versão: \`/var/lib/linkfree-deploy/last-successful-sha\`.
+
+Execute primeiro a simulação e só depois publique, como root ou com sudo:
+
+\`\`\`bash
+curl -fsSL https://raw.githubusercontent.com/sistemacodigolucrativo/LinkFree-LinkTree/main/scripts/atualizar-linkstack.sh -o /root/atualizar-linkstack.sh && chmod 700 /root/atualizar-linkstack.sh && sudo bash /root/atualizar-linkstack.sh --check && sudo bash /root/atualizar-linkstack.sh --deploy
+\`\`\`
+
+Na primeira execução, o deploy tenta identificar a revisão instalada **comparando o código real em produção** com commits históricos, sem presumir que o último commit do GitHub já esteja instalado. Se não conseguir identificar uma versão consistente, a operação será interrompida para revisão. O script rejeita arquivos de código modificados no servidor e não executa \`git reset --hard\` ou \`rsync --delete\`.
+
+**Limitação importante:** mudanças em migrações do banco e dependências (Composer/NPM) exigem procedimento separado. O deploy bloqueia essas situações em vez de aplicar alterações potencialmente incompatíveis ou modificar o banco automaticamente. A etapa \`--check\` pode clonar o repositório, mas não altera os arquivos da aplicação em produção.
+
 ### Recuperação e diagnóstico
 
 O log técnico fica em `/var/log/linkfree-preparer.log`. Dados do banco ficam no arquivo protegido indicado ao final, não no log. A instalação não substitui um destino existente. Quando há um estado de preparação reconhecido e o instalador web ainda não foi concluído, execute novamente o comando e informe as mesmas opções para retomar sem substituir o banco ou a configuração. Se a interrupção ocorrer antes de o estado ser registrado, ou se arquivos gerenciados tiverem sido alterados, revise o estado manualmente; o script interrompe para preservar os dados.
