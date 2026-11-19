@@ -161,6 +161,7 @@ Route::group([
     Route::get('/panel/index', function(){return redirect(url('dashboard'));});
     Route::get('/admin/overview', [AdminController::class, 'index'])->name('adminOverview');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('showUsers');
+    Route::post('/admin/users/registration-vip', [AdminController::class, 'updateRegistrationVip'])->name('admin.registration-vip');
     Route::get('/admin/links/{id}', [AdminController::class, 'showLinksUser'])->name('showLinksUser');
     Route::get('/admin/deleteLink/{id}', [AdminController::class, 'deleteLinkUser'])->name('deleteLinkUser');
     Route::get('/admin/users/block/{block}/{id}', [AdminController::class, 'blockUser'])->name('blockUser');
