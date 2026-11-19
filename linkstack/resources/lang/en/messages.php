@@ -231,7 +231,8 @@ return [
     'Verified user' => 'Verified user',
     'User' => 'User',
     'Profile' => 'Profile',
-    'Styling' => 'Styling',
+    'Styling' => 'Panel theme',
+    'Panel Theme' => 'Panel theme',
     'Logout' => 'Logout',
 
 
