@@ -1,0 +1,47 @@
+name: SEO, sitemap and social preview regression
+
+on:
+  push:
+    paths:
+      - 'linkstack/resources/views/home.blade.php'
+      - 'linkstack/resources/views/linkstack/modules/meta.blade.php'
+      - 'linkstack/app/Http/Controllers/SeoController.php'
+      - 'linkstack/app/Http/Controllers/SocialPreviewController.php'
+      - 'linkstack/app/Http/Controllers/UserController.php'
+      - 'linkstack/routes/web.php'
+      - 'scripts/audit-seo.py'
+      - '.github/workflows/seo-regression.yml'
+  pull_request:
+    paths:
+      - 'linkstack/resources/views/home.blade.php'
+      - 'linkstack/resources/views/linkstack/modules/meta.blade.php'
+      - 'linkstack/app/Http/Controllers/SeoController.php'
+      - 'linkstack/app/Http/Controllers/SocialPreviewController.php'
+      - 'linkstack/app/Http/Controllers/UserController.php'
+      - 'linkstack/routes/web.php'
+      - 'scripts/audit-seo.py'
+      - '.github/workflows/seo-regression.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  seo-static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit source contracts
+        run: python scripts/audit-seo.py
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, mbstring
+      - name: PHP syntax checks
+        run: |
+          php -l linkstack/app/Http/Controllers/SocialPreviewController.php
+          php -l linkstack/app/Http/Controllers/SeoController.php
+          php -l linkstack/app/Http/Controllers/UserController.php
+          php -l linkstack/routes/web.php
