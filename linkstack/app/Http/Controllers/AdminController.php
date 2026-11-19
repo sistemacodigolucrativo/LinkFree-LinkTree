@@ -28,6 +28,7 @@ use App\Models\Button;
 use App\Models\Link;
 use App\Models\Page;
 use App\Models\UserData;
+use App\Services\RegistrationVip;
 
 class AdminController extends Controller
 {
@@ -123,7 +124,7 @@ class AdminController extends Controller
   // Users page
   public function users()
   {
-    return view("panel/users");
+    return view("panel/users", ['autoVipNewUsers' => RegistrationVip::enabled()]);
   }
 
   // Send test mail
@@ -240,6 +241,9 @@ class AdminController extends Controller
       "role" => "user",
       "block" => "no",
     ]);
+
+    $user->role = RegistrationVip::roleForNewUser();
+    $user->save();
 
     return redirect("admin/edit-user/" . $user->id);
   }
