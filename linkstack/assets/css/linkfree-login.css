@@ -152,3 +152,20 @@ body.dark .lf-login-field .form-control:focus{box-shadow:0 0 0 3px rgba(242,196,
 @media(prefers-reduced-motion:reduce){
   .lf-login-shell :is(a,button,input){transition:none!important}
 }
+
+/* Login, registro e recuperacao compartilham o mesmo shell e seus tokens. */
+.lf-auth-view{width:100%;min-width:0}
+.lf-auth-view[hidden]{display:none!important}
+.lf-auth-view .lf-login-handle{display:flex;flex-wrap:nowrap;min-width:0}
+.lf-auth-view .lf-login-handle .input-group-text{
+  display:flex;align-items:center;max-width:48%;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  padding:10px;font-size:.79rem;color:var(--lf-fg);
+  border:1.5px solid var(--lf-stroke);border-right:0;
+  border-radius:10px 0 0 10px;background:var(--lf-soft);
+}
+.lf-auth-view .lf-login-handle .form-control{
+  flex:1 1 auto;width:1%;min-width:0;
+  border-radius:0 10px 10px 0;
+}
+.lf-auth-view .invalid-feedback{font-size:.8rem;color:#bb283e}
