@@ -115,6 +115,7 @@ Index Of Script
         if (chosen === 'auto') {
             document.body.classList.toggle('dark', !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
         }
+        document.documentElement.classList.toggle('lf-prepaint-dark', document.body.classList.contains('dark'));
         checkSettingMenu('color-mode', 'color', chosen);
     };
     const applySidebarColor = value => {
