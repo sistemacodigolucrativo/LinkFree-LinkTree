@@ -78,7 +78,7 @@
                 <div class="form-group col-lg-8 mt-4">
                   <h4>{{__('messages.Import user data')}}</h4>
                     <label for="customFile">{{__('messages.Import your user data from another instance')}}</label>
-                    <input type="file" accept="application/JSON" class="form-control" id="customFile" name="import">
+                    <input type="file" accept=".json,application/json" class="form-control" id="customFile" name="import" required>
                 </div>
 
                 <button type="submit" class="mt-3 ml-3 btn btn-primary" onclick="return confirm('{{__('messages.import.user.alert')}}')">{{__('messages.Import')}}</button>

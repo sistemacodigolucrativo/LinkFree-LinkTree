@@ -378,6 +378,8 @@ return array(
 	'Export user data' => 'Exportar dados do usuário',
 	'Export your user data' => 'Exporte seus dados de usuário',
 	'Export all data' => 'Exportar todos os dados',
+    'Export failed' => 'Não foi possível gerar o arquivo de exportação. Tente novamente.',
+    'Invalid import file' => 'O arquivo de importação está incompleto, corrompido ou contém links inválidos. Seus links anteriores foram preservados.',
 	'Export links only' => 'Exportar somente links',
 	'Import user data' => 'Importar dados do usuário',
 	'import.user.alert' => 'Tem certeza de que deseja importar esse arquivo? Essa ação substituirá todos os seus dados atuais, inclusive os links!',

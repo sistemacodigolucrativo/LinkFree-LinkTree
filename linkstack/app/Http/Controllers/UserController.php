@@ -900,67 +900,85 @@ class UserController extends Controller
         return back();
     }
 
-    //Export user links
-    public function exportLinks(request $request)
+    // Build an entire JSON file before exposing a download to the browser.
+    // Symfony sets Content-Length and removes the temporary file after sending it.
+    private function downloadExportJson(array $data, string $prefix, Request $request)
     {
-        $userId = Auth::id();
-        $user = User::find($userId);
-        $links = Link::where('user_id', $userId)->get();
-        
-        if (!$user) {
-            // handle the case where the user is null
-            return response()->json(['message' => 'User not found'], 404);
+        $temporaryFile = null;
+        try {
+            $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+            $temporaryFile = tempnam(sys_get_temp_dir(), 'linkfree-export-');
+            if ($temporaryFile === false) {
+                throw new \RuntimeException('Could not create export file.');
+            }
+            $written = file_put_contents($temporaryFile, $json, LOCK_EX);
+            if ($written === false || $written !== strlen($json)) {
+                throw new \RuntimeException('Export file was not completely written.');
+            }
+
+            $hostname = preg_replace('/[^A-Za-z0-9.-]/', '-', $request->getHost());
+            $hostname = trim($hostname, '.-') ?: 'linkfree';
+            $filename = $prefix . '-' . $hostname . '-' . date('Y-m-d_H-i-s') . '.json';
+
+            return response()->download($temporaryFile, $filename, [
+                'Content-Type' => 'application/json; charset=UTF-8',
+                'Cache-Control' => 'private, no-store, no-cache, must-revalidate',
+                'Pragma' => 'no-cache',
+                'X-Content-Type-Options' => 'nosniff',
+            ])->deleteFileAfterSend(true);
+        } catch (\Throwable $exception) {
+            if ($temporaryFile !== null && is_file($temporaryFile)) {
+                @unlink($temporaryFile);
+            }
+            \Illuminate\Support\Facades\Log::error('Failed to generate user export', [
+                'user_id' => Auth::id(),
+                'export' => $prefix,
+                'exception' => $exception->getMessage(),
+            ]);
+            return redirect()->route('showProfile')->with('error', __('messages.Export failed'));
         }
-
-        $userData['links'] = $links->toArray();
-
-        $domain = $_SERVER['HTTP_HOST'];
-        $date = date('Y-m-d_H-i-s');
-        $fileName = "links-$domain-$date.json";
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
-        ];
-        return response()->json($userData, 200, $headers);
-
-        return back();
     }
 
-    //Export all user data
-    public function exportAll(Request $request)
+    // Preserve the legacy links-only JSON format for cross-instance imports.
+    public function exportLinks(Request $request)
     {
         $userId = Auth::id();
-        $user = User::find($userId);
-        $links = Link::where('user_id', $userId)->get();
-    
-        if (!$user) {
-            // handle the case where the user is null
-            return response()->json(['message' => 'User not found'], 404);
+        if (!$userId) {
+            abort(401);
         }
-    
-        $userData = $user->toArray();
-        $userData['links'] = $links->toArray();
+        return $this->downloadExportJson([
+            'links' => Link::where('user_id', $userId)->get()->toArray(),
+        ], 'links', $request);
+    }
 
-        if (file_exists(base_path(findAvatar($userId)))){
-            $imagePath = base_path(findAvatar($userId));
-            $imageData = base64_encode(file_get_contents($imagePath));
-            $userData['image_data'] = $imageData;
-    
-            $imageExtension = pathinfo($imagePath, PATHINFO_EXTENSION);
-            $userData['image_extension'] = $imageExtension;
+    // The all-data export includes profile data, links and optional avatar.
+    public function exportAll(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(401);
         }
-    
-        $domain = $_SERVER['HTTP_HOST'];
-        $date = date('Y-m-d_H-i-s');
-        $fileName = "user_data-$domain-$date.json";
-        $headers = [
-            'Content-Type' => 'application/json',
-            'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
-        ];
-        return response()->json($userData, 200, $headers);
-    
-        return back();
-    }    
+
+        $data = $user->toArray();
+        $data['links'] = Link::where('user_id', $user->id)->get()->toArray();
+        $avatar = findAvatar($user->id);
+        if ($avatar !== 'error.error') {
+            $imagePath = base_path($avatar);
+            if (is_file($imagePath)) {
+                $imageContents = @file_get_contents($imagePath);
+                if ($imageContents === false) {
+                    \Illuminate\Support\Facades\Log::error('Could not read user avatar for export', [
+                        'user_id' => $user->id,
+                    ]);
+                    return redirect()->route('showProfile')->with('error', __('messages.Export failed'));
+                }
+                $data['image_data'] = base64_encode($imageContents);
+                $data['image_extension'] = pathinfo($imagePath, PATHINFO_EXTENSION);
+            }
+        }
+
+        return $this->downloadExportJson($data, 'user_data', $request);
+    }
 
     public function importData(Request $request)
     {
@@ -971,7 +989,19 @@ class UserController extends Controller
             }
             $file = $request->file('import');
             $jsonString = $file->get();
-            $userData = json_decode($jsonString, true);
+            $userData = json_decode($jsonString, true, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($userData) || !isset($userData['links']) || !is_array($userData['links'])) {
+                throw new \UnexpectedValueException('Invalid or truncated backup JSON.');
+            }
+            // Validate every link before changing profile data or deleting links.
+            foreach ($userData['links'] as $linkData) {
+                if (!is_array($linkData)
+                    || !array_key_exists('button_id', $linkData)
+                    || !array_key_exists('title', $linkData)
+                    || Validator::make($linkData, ['link' => 'nullable|exturl'])->fails()) {
+                    throw new \UnexpectedValueException('Invalid backup link record.');
+                }
+            }
     
             // Update the authenticated user's profile data if defined in the JSON file
             $user = auth()->user();
@@ -1011,8 +1041,9 @@ class UserController extends Controller
                 }
             }
 
+            DB::beginTransaction();
             $user->save();
-    
+
             // Delete all links for the authenticated user
             Link::where('user_id', $user->id)->delete();
     
@@ -1058,8 +1089,19 @@ class UserController extends Controller
                 // Save the new link to the database
                 $newLink->save();
             }
+            DB::commit();
             return redirect('studio/profile')->with('success', __('messages.Profile updated successfully!'));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
+            if ($e instanceof \JsonException || $e instanceof \UnexpectedValueException) {
+                return redirect('studio/profile')->with('error', __('messages.Invalid import file'));
+            }
+            \Illuminate\Support\Facades\Log::error('User data import failed', [
+                'user_id' => Auth::id(),
+                'exception' => $e->getMessage(),
+            ]);
             return redirect('studio/profile')->with('error', __('messages.An error occurred while updating your profile.'));
         }
     }
