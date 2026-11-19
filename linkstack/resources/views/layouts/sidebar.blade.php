@@ -316,8 +316,43 @@ $usrhandl = Auth::user()->littlelink_name;
   $navOverviewOpen = request()->is('dashboard');
   $navLinksOpen = request()->is('studio/links*') || request()->is('studio/page-icons') || request()->is('studio/blocks') || request()->is('studio/add-link') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*');
   $navAppearanceOpen = request()->is('studio/theme') || request()->is('studio/theme-preview/*');
-  $navAccountOpen = request()->is('studio/profile');
 @endphp
+
+<li class="nav-item nav-accordion-group">
+  <a class="nav-link nav-accordion-toggle {{ $navOverviewOpen ? 'active' : '' }}" href="#nav-overview" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navOverviewOpen ? 'true' : 'false' }}" aria-controls="nav-overview">
+    <i class="icon bi bi-house-door" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Home')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $navOverviewOpen ? 'show' : '' }}" id="nav-overview" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('panelIndex') }}"><i class="icon bi bi-speedometer2" aria-hidden="true"></i><span class="item-name">{{__('messages.Dashboard')}}</span></a></li>
+  </ul>
+</li>
+<li class="nav-item nav-accordion-group">
+  <a class="nav-link nav-accordion-toggle {{ $navLinksOpen ? 'active' : '' }}" href="#nav-links" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navLinksOpen ? 'true' : 'false' }}" aria-controls="nav-links">
+    <i class="icon bi bi-link-45deg" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Nav Link Management')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $navLinksOpen ? 'show' : '' }}" id="nav-links" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/links*') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*') ? 'active' : '' }}" href="{{ url('/studio/links') }}"><i class="icon bi bi-link-45deg" aria-hidden="true"></i><span class="item-name">{{__('messages.Links')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/page-icons') ? 'active' : '' }}" href="{{ route('showPageIcons') }}"><i class="icon bi bi-images" aria-hidden="true"></i><span class="item-name">Ícones de Página</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/blocks') ? 'active' : '' }}" href="{{ route('showBlocks') }}"><i class="icon bi bi-grid-3x3-gap" aria-hidden="true"></i><span class="item-name">Gerenciar blocos</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/add-link') ? 'active' : '' }}" href="{{ route('showButtons') }}"><i class="icon bi bi-plus-square" aria-hidden="true"></i><span class="item-name">Link Pré -Config</span></a></li>
+  </ul>
+</li>
+<li class="nav-item nav-accordion-group">
+  <a class="nav-link nav-accordion-toggle {{ $navAppearanceOpen ? 'active' : '' }}" href="#nav-appearance" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navAppearanceOpen ? 'true' : 'false' }}" aria-controls="nav-appearance">
+    <i class="icon bi bi-palette" aria-hidden="true"></i>
+    <span class="item-name">{{__('messages.Personalization')}}</span>
+    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+  </a>
+  <ul class="sub-nav collapse {{ $navAppearanceOpen ? 'show' : '' }}" id="nav-appearance" data-bs-parent="#sidebar-menu">
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/theme*') ? 'active' : '' }}" href="{{ url('/studio/theme') }}"><i class="icon bi bi-palette" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Themes Appearance')}}</span></a></li>
+<li class="nav-item"><button type="button" class="nav-link lf-panel-theme-link" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample"><i class="icon bi bi-brush" aria-hidden="true"></i><span class="item-name">{{__('messages.Panel Theme')}}</span></button></li>
+  </ul>
+</li>
+
 @if(auth()->check() && auth()->user()->role === 'admin')
 @php
   $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user');
@@ -386,49 +421,6 @@ $usrhandl = Auth::user()->littlelink_name;
   </ul>
 </li>
 @endif
-<li class="nav-item nav-accordion-group">
-  <a class="nav-link nav-accordion-toggle {{ $navOverviewOpen ? 'active' : '' }}" href="#nav-overview" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navOverviewOpen ? 'true' : 'false' }}" aria-controls="nav-overview">
-    <i class="icon bi bi-house-door" aria-hidden="true"></i>
-    <span class="item-name">{{__('messages.Home')}}</span>
-    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
-  </a>
-  <ul class="sub-nav collapse {{ $navOverviewOpen ? 'show' : '' }}" id="nav-overview" data-bs-parent="#sidebar-menu">
-<li class="nav-item"><a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('panelIndex') }}"><i class="icon bi bi-speedometer2" aria-hidden="true"></i><span class="item-name">{{__('messages.Dashboard')}}</span></a></li>
-  </ul>
-</li>
-<li class="nav-item nav-accordion-group">
-  <a class="nav-link nav-accordion-toggle {{ $navLinksOpen ? 'active' : '' }}" href="#nav-links" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navLinksOpen ? 'true' : 'false' }}" aria-controls="nav-links">
-    <i class="icon bi bi-link-45deg" aria-hidden="true"></i>
-    <span class="item-name">{{__('messages.Nav Link Management')}}</span>
-    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
-  </a>
-  <ul class="sub-nav collapse {{ $navLinksOpen ? 'show' : '' }}" id="nav-links" data-bs-parent="#sidebar-menu">
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/links*') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*') ? 'active' : '' }}" href="{{ url('/studio/links') }}"><i class="icon bi bi-link-45deg" aria-hidden="true"></i><span class="item-name">{{__('messages.Links')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/page-icons') ? 'active' : '' }}" href="{{ route('showPageIcons') }}"><i class="icon bi bi-images" aria-hidden="true"></i><span class="item-name">Ícones de Página</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/blocks') ? 'active' : '' }}" href="{{ route('showBlocks') }}"><i class="icon bi bi-grid-3x3-gap" aria-hidden="true"></i><span class="item-name">Gerenciar blocos</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/add-link') ? 'active' : '' }}" href="{{ route('showButtons') }}"><i class="icon bi bi-plus-square" aria-hidden="true"></i><span class="item-name">Link Pré -Config</span></a></li>
-  </ul>
-</li>
-<li class="nav-item nav-accordion-group">
-  <a class="nav-link nav-accordion-toggle {{ $navAppearanceOpen ? 'active' : '' }}" href="#nav-appearance" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navAppearanceOpen ? 'true' : 'false' }}" aria-controls="nav-appearance">
-    <i class="icon bi bi-palette" aria-hidden="true"></i>
-    <span class="item-name">{{__('messages.Personalization')}}</span>
-    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
-  </a>
-  <ul class="sub-nav collapse {{ $navAppearanceOpen ? 'show' : '' }}" id="nav-appearance" data-bs-parent="#sidebar-menu">
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/theme*') ? 'active' : '' }}" href="{{ url('/studio/theme') }}"><i class="icon bi bi-palette" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Themes Appearance')}}</span></a></li>
-  </ul>
-</li>
-<li class="nav-item nav-accordion-group">
-  <a class="nav-link nav-accordion-toggle {{ $navAccountOpen ? 'active' : '' }}" href="#nav-account" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navAccountOpen ? 'true' : 'false' }}" aria-controls="nav-account">
-    <i class="icon bi bi-gear" aria-hidden="true"></i>
-    <span class="item-name">{{__('messages.Account Settings')}}</span>
-    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
-  </a>
-  <ul class="sub-nav collapse {{ $navAccountOpen ? 'show' : '' }}" id="nav-account" data-bs-parent="#sidebar-menu">
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/profile') ? 'active' : '' }}" href="{{ url('/studio/profile') }}"><i class="icon bi bi-gear" aria-hidden="true"></i><span class="item-name">{{__('messages.Settings')}}</span></a></li>
-  </ul>
-</li>
 </ul>
                 <!-- Sidebar Menu End -->        </div>
         </div>
@@ -538,7 +530,6 @@ $usrhandl = Auth::user()->littlelink_name;
                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="{{ url('/studio/page') }}"><i class="bi bi-person-fill"></i> {{__('messages.My Profile')}}</a></li>
                     <li><a class="dropdown-item" href="{{ url('/studio/profile') }}"><i class="bi bi-gear-fill"></i> {{__('messages.Settings')}}</a></li>
-                    <li><a class="dropdown-item" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" role="button" aria-controls="offcanvasExample"><i class="bi bi-brush-fill"></i> {{__('messages.Styling')}}</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li>
 					<form action="{{ route('logout') }}" method="post">
@@ -704,7 +695,7 @@ $usrhandl = Auth::user()->littlelink_name;
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasExample" data-bs-scroll="true" data-bs-backdrop="true" aria-labelledby="offcanvasExampleLabel">
       <div class="offcanvas-header">
         <div class="d-flex align-items-center">
-          <h3 class="offcanvas-title me-3" id="offcanvasExampleLabel">{{__('messages.Settings')}}</h3>
+          <h3 class="offcanvas-title me-3" id="offcanvasExampleLabel">{{__('messages.Panel Theme')}}</h3>
         </div>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
       </div>
