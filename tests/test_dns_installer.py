@@ -125,7 +125,7 @@ class ShellIntegration(unittest.TestCase):
                 # Heredoc expansion is identical to the one used by the installer.
                 expanded = subprocess.run(['bash','-c','cat <<NGINX\n' + content + '\nNGINX'], env=env, text=True, capture_output=True, check=True).stdout
                 config = pathlib.Path(directory) / (name + '.conf')
-                config.write_text('pid ' + directory + '/nginx.pid; error_log stderr; events {} http {\n' + expanded + '\n}\n')
+                config.write_text('pid ' + directory + '/nginx.pid; error_log stderr; events {} http { access_log off;\n' + expanded + '\n}\n')
                 result = subprocess.run(['nginx','-t','-p',directory,'-c',str(config)], text=True, capture_output=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
 
