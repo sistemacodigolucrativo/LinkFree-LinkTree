@@ -36,6 +36,15 @@ for route_name in ("socialPreview.profile", "socialPreview.site", "seo.robots",
 assert "->middleware('disableCookies')" in routes
 
 assert "WIDTH = 1200" in image and "HEIGHT = 630" in image
+assert "PROFILE_WIDTH = 1080" in image and "PROFILE_HEIGHT = 1350" in image
+assert 'drawPortrait(' in image and 'wrapForPortrait(' in image
+assert 'mobile-portrait-v2' in profile
+assert 'og:image:width" content="1080"' in profile
+assert 'og:image:height" content="1350"' in profile
+assert "route('socialPreview.profile.wide'" in profile
+assert "->name('socialPreview.profile.wide')" in routes
+assert 'profileWide(' in image
+assert 'social-card-v2|' in image
 assert "imagejpeg($canvas, null, 86)" in image
 assert "'Content-Type' => 'image/jpeg'" in image
 assert "imagecreatefromwebp" in image

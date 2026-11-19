@@ -17,7 +17,7 @@ SEO agressivo = excelência técnica, páginas relevantes, rastreamento consiste
 
 | Etapa | Entrega | Situação |
 | --- | --- | --- |
-| P0 | JPEG público 1200 × 630 com foto de perfil quando disponível | Código implementado |
+| P0 | JPEG público 1200 × 630 para Home e Twitter/X, e 1080 × 1350 para perfis no WhatsApp | Código implementado |
 | P0 | Open Graph: título, descrição, imagem JPEG, HTTPS, dimensões, alt | Código implementado |
 | P0 | Twitter Card com imagem grande e URL canônica | Código implementado |
 | P1 | SEO Home, WebSite JSON-LD e título descritivo | Código implementado |
@@ -32,7 +32,10 @@ SEO agressivo = excelência técnica, páginas relevantes, rastreamento consiste
 ## Contratos
 
 - /social-preview/site.jpg: card geral LinkFree, Content-Type image/jpeg, 1200 × 630.
-- /social-preview/profile/{id}.jpg: card do perfil público; foto JPEG/PNG/WebP/GIF quando GD suporta. Perfis bloqueados retornam 404.
+- /social-preview/profile/{id}.jpg: card Open Graph vertical (1080 × 1350 px, proporção 4:5), com foto grande e tipografia de alto contraste para dar maior área visual no WhatsApp.
+- /social-preview/profile/{id}-wide.jpg: variante horizontal (1200 × 630 px) usada pelo Twitter/X para evitar cortes indevidos.
+- Ambas as imagens usam a foto pública JPEG/PNG/WebP/GIF quando GD suporta. Perfis bloqueados retornam 404.
+- O padrão vertical aumenta a área útil na maioria das prévias móveis, mas a altura efetiva e o recorte dependem do WhatsApp. O endereço recebe novo parâmetro de versão para minimizar cache de imagens antigas.
 - /robots.txt: declara sitemap e desencoraja crawl de admin, contas, autenticação e páginas internas.
 - /sitemap.xml: índice de sitemaps no domínio principal; em domínio dedicado a um perfil, somente a URL raiz desse perfil. Respeita noindex.
 - /sitemap-home.xml: contém Home somente quando existe uma página indexável.

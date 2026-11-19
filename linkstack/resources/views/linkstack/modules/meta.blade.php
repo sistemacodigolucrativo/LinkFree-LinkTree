@@ -37,9 +37,11 @@
     $avatar = findAvatar($userinfo->id);
     $avatarModified = $avatar !== 'error.error' && is_file(base_path($avatar))
         ? (string) (@filemtime(base_path($avatar)) ?: 0) : 'default';
-    $imageVersion = substr(hash('sha256', $profileName . '|' . $plainDescription . '|'
+    // Version bump invalidates cached WhatsApp images after the layout change.
+    $imageVersion = substr(hash('sha256', 'mobile-portrait-v2|' . $profileName . '|' . $plainDescription . '|'
         . (string) $userinfo->updated_at . '|' . $avatarModified), 0, 12);
     $socialImage = route('socialPreview.profile', ['id' => $userinfo->id, 'v' => $imageVersion]);
+    $twitterImage = route('socialPreview.profile.wide', ['id' => $userinfo->id, 'v' => $imageVersion]);
     $seoTitle = $profileName . ' | ' . config('app.name', 'LinkFree');
     $robotsDirective = trim((string) config('advanced-config.robots', 'index,follow'));
     $robotsDirective = $robotsDirective ?: 'index,follow';
@@ -99,15 +101,15 @@
 <meta property="og:image:secure_url" content="{{ $socialImage }}">
 @endif
 <meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1080">
+<meta property="og:image:height" content="1350">
 <meta property="og:image:alt" content="Prévia da página pública de {{ $profileName }}">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="{{ $canonicalUrl }}">
 <meta name="twitter:title" content="{{ $profileName }}">
 <meta name="twitter:description" content="{{ $seoDescription }}">
-<meta name="twitter:image" content="{{ $socialImage }}">
+<meta name="twitter:image" content="{{ $twitterImage }}">
 <meta name="twitter:image:alt" content="Prévia da página de {{ $profileName }}">
 
 <script type="application/ld+json">{!! json_encode(

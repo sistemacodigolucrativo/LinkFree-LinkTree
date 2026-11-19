@@ -11,13 +11,18 @@ use Illuminate\Http\Request;
  */
 class SocialPreviewController extends Controller
 {
+    // Keep the widescreen variant for the Home and Twitter/X large cards.
     private const WIDTH = 1200;
     private const HEIGHT = 630;
+
+    // The main Open Graph image for profiles is portrait for larger mobile previews.
+    private const PROFILE_WIDTH = 1080;
+    private const PROFILE_HEIGHT = 1350;
 
     public function site(Request $request)
     {
         return $this->image($request, config('app.name', 'LinkFree'),
-            'Todos os seus links em um so lugar', null);
+            'Todos os seus links em um so lugar', null, false);
     }
 
     public function profile(Request $request, int $id)
@@ -48,17 +53,53 @@ class SocialPreviewController extends Controller
         );
 
         return $this->image($request, (string) $user->name,
-            $description ?: 'Confira meus links e canais de contato', $avatarPath);
+            $description ?: 'Confira meus links e canais de contato', $avatarPath, true);
     }
 
-    private function image(Request $request, string $name, string $description, ?string $avatarPath)
+    /**
+     * Widescreen alternative for platforms with a fixed landscape card ratio.
+     * Uses the same public data and permissions as the Open Graph portrait.
+     */
+    public function profileWide(Request $request, int $id)
+    {
+        $user = User::query()->select(
+            'id', 'name', 'littlelink_description', 'littlelink_name', 'block', 'updated_at'
+        )->findOrFail($id);
+
+        if ($user->block === 'yes' || empty($user->littlelink_name)) {
+            abort(404);
+        }
+
+        $avatar = findAvatar($user->id);
+        $avatarPath = null;
+        if ($avatar !== 'error.error') {
+            $avatarRoot = realpath(base_path('assets/img'));
+            $candidate = realpath(base_path($avatar));
+            if ($avatarRoot && $candidate
+                && strncmp($candidate, $avatarRoot . DIRECTORY_SEPARATOR,
+                    strlen($avatarRoot) + 1) === 0 && is_file($candidate)) {
+                $avatarPath = $candidate;
+            }
+        }
+
+        $description = html_entity_decode(
+            strip_tags((string) $user->littlelink_description),
+            ENT_QUOTES | ENT_HTML5, 'UTF-8'
+        );
+        return $this->image($request, (string) $user->name,
+            $description ?: 'Confira meus links e canais de contato', $avatarPath, false);
+    }
+
+    private function image(Request $request, string $name, string $description, ?string $avatarPath, bool $portrait)
     {
         if (!function_exists('imagecreatetruecolor') || !function_exists('imagejpeg')) {
             abort(503, 'GD image extension is required for social previews.');
         }
 
         $version = $avatarPath ? ((string) (@filemtime($avatarPath) ?: 0)) : 'brand';
-        $fingerprint = hash('sha256', $name . '|' . $description . '|' . $version);
+        // Changing the format changes the ETag, even if no user data changed.
+        $fingerprint = hash('sha256', 'social-card-v2|' . ($portrait ? 'portrait' : 'landscape')
+            . '|' . $name . '|' . $description . '|' . $version);
         $etag = '"' . substr($fingerprint, 0, 32) . '"';
         $headers = [
             'Content-Type' => 'image/jpeg',
@@ -70,11 +111,16 @@ class SocialPreviewController extends Controller
             return response('', 304, $headers);
         }
 
-        $canvas = imagecreatetruecolor(self::WIDTH, self::HEIGHT);
+        $width = $portrait ? self::PROFILE_WIDTH : self::WIDTH;
+        $height = $portrait ? self::PROFILE_HEIGHT : self::HEIGHT;
+        $canvas = imagecreatetruecolor($width, $height);
         if (!$canvas) {
             abort(503, 'Unable to allocate social preview canvas.');
         }
 
+        if ($portrait) {
+            $this->drawPortrait($canvas, $name, $description, $avatarPath);
+        } else {
         $background = imagecolorallocate($canvas, 10, 17, 13);
         $panel = imagecolorallocate($canvas, 21, 38, 27);
         $green = imagecolorallocate($canvas, 57, 247, 19);
@@ -112,6 +158,7 @@ class SocialPreviewController extends Controller
         $this->drawLines($canvas, $cleanDescription, 25, 558, 390, 570, 4, $muted, false, 40);
         imagefilledrectangle($canvas, 558, 524, 1117, 527, $stroke);
         $this->drawText($canvas, 'Um link. Todos os seus caminhos.', 21, 558, 562, $muted, false);
+        }
 
         ob_start();
         $ok = imagejpeg($canvas, null, 86);
@@ -123,6 +170,108 @@ class SocialPreviewController extends Controller
         }
         $headers['Content-Length'] = (string) strlen($binary);
         return response($binary, 200, $headers);
+    }
+
+    /**
+     * Mobile-first 4:5 poster. The person's photo is the primary content;
+     * type is deliberately large and high-contrast when downscaled by WhatsApp.
+     * The photo is contained, not cropped.
+     */
+    private function drawPortrait($canvas, string $name, string $description, ?string $avatarPath): void
+    {
+        $background = imagecolorallocate($canvas, 9, 15, 11);
+        $photoBackground = imagecolorallocate($canvas, 15, 24, 18);
+        $panel = imagecolorallocate($canvas, 21, 38, 27);
+        $green = imagecolorallocate($canvas, 87, 247, 50);
+        $white = imagecolorallocate($canvas, 250, 253, 248);
+        $muted = imagecolorallocate($canvas, 219, 229, 219);
+        $border = imagecolorallocate($canvas, 52, 83, 60);
+
+        imagefilledrectangle($canvas, 0, 0, self::PROFILE_WIDTH, self::PROFILE_HEIGHT, $background);
+        imagefilledrectangle($canvas, 28, 28, 1051, 943, $photoBackground);
+
+        $photo = $this->loadAvatar($avatarPath);
+        if ($photo) {
+            $photoWidth = imagesx($photo);
+            $photoHeight = imagesy($photo);
+            $scale = min(1008 / $photoWidth, 899 / $photoHeight);
+            $drawWidth = max(1, (int) round($photoWidth * $scale));
+            $drawHeight = max(1, (int) round($photoHeight * $scale));
+
+            imagecopyresampled(
+                $canvas, $photo,
+                (int) (36 + (1008 - $drawWidth) / 2),
+                (int) (36 + (899 - $drawHeight) / 2),
+                0, 0, $drawWidth, $drawHeight, $photoWidth, $photoHeight
+            );
+            imagedestroy($photo);
+        } else {
+            // Accessible text fallback; do not depend on SVG being supported.
+            imagefilledellipse($canvas, 540, 475, 490, 490, $green);
+            imagefilledellipse($canvas, 540, 475, 458, 458, $photoBackground);
+            $this->drawText($canvas, 'LF', 155, 430, 520, $white, true);
+            $this->drawText($canvas, 'LinkFree', 90, 290, 725, $white, true);
+        }
+
+        imagefilledrectangle($canvas, 28, 955, 1051, 1322, $panel);
+        imagefilledrectangle($canvas, 28, 955, 1051, 964, $green);
+        imagerectangle($canvas, 28, 955, 1051, 1322, $border);
+
+        $this->drawText($canvas, 'LINKFREE', 29, 76, 1031, $green, true);
+
+        $profileName = $this->cleanText($name, 105);
+        $nameLines = $this->wrapForPortrait($profileName, 64, 926, true, 2);
+        foreach ($nameLines as $index => $line) {
+            $this->drawText($canvas, $line, 64, 76, 1113 + $index * 75, $white, true);
+        }
+
+        $descriptionText = $this->cleanText($description, 240);
+        $descLines = $this->wrapForPortrait(
+            $descriptionText, 35, 926, false, count($nameLines) > 1 ? 2 : 3
+        );
+        $descriptionTop = count($nameLines) > 1 ? 1245 : 1198;
+        foreach ($descLines as $index => $line) {
+            $baseline = $descriptionTop + $index * 46;
+            if ($baseline > 1303) break;
+            $this->drawText($canvas, $line, 35, 76, $baseline, $muted, false);
+        }
+    }
+
+    /**
+     * Wrap using actual TTF metrics. Ellipsize the final line rather than
+     * allowing text to escape the image at mobile preview sizes.
+     */
+    private function wrapForPortrait(string $value, int $size, int $maxWidth, bool $bold, int $limit): array
+    {
+        $words = preg_split('/\s+/u', trim($value)) ?: [];
+        $lines = [];
+        $line = '';
+        foreach ($words as $word) {
+            if ($word === '') continue;
+            $candidate = $line === '' ? $word : $line . ' ' . $word;
+            if ($line !== '' && $this->width($candidate, $size, $bold) > $maxWidth) {
+                $lines[] = $line;
+                $line = $word;
+            } else {
+                $line = $candidate;
+            }
+        }
+        if ($line !== '') $lines[] = $line;
+        if (!$lines) return [];
+
+        $wasTruncated = count($lines) > $limit;
+        $lines = array_slice($lines, 0, $limit);
+        foreach ($lines as $index => $text) {
+            $last = $index === count($lines) - 1;
+            $needsEllipsis = $last && $wasTruncated;
+            while (mb_strlen($text, 'UTF-8') > 1 &&
+                $this->width($text . ($needsEllipsis ? '…' : ''), $size, $bold) > $maxWidth) {
+                $text = mb_substr($text, 0, -1, 'UTF-8');
+                $needsEllipsis = true;
+            }
+            $lines[$index] = $text . ($needsEllipsis ? '…' : '');
+        }
+        return $lines;
     }
 
     private function loadAvatar(?string $path)

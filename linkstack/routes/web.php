@@ -99,6 +99,8 @@ Route::get('/social-preview/site.jpg', [App\Http\Controllers\SocialPreviewContro
   ->name('socialPreview.site')->middleware('disableCookies');
 Route::get('/social-preview/profile/{id}.jpg', [App\Http\Controllers\SocialPreviewController::class, 'profile'])
   ->where('id', '[0-9]+')->name('socialPreview.profile')->middleware('disableCookies');
+Route::get('/social-preview/profile/{id}-wide.jpg', [App\Http\Controllers\SocialPreviewController::class, 'profileWide'])
+  ->where('id', '[0-9]+')->name('socialPreview.profile.wide')->middleware('disableCookies');
 
 Route::get('/demo-page', [App\Http\Controllers\HomeController::class, 'demo'])->name('demo')->middleware('disableCookies');
 
