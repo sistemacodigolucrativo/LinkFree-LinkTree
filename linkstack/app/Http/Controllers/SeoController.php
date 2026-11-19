@@ -49,7 +49,7 @@ class SeoController extends Controller
         }
 
         if ($this->customProfileDomain($request)) {
-            return $this->xml($this->urlSet([url('/')]));
+            return $this->xml($this->urlSet($this->validCustomProfile($request) ? [url('/')] : []));
         }
 
         $count = $this->publicProfiles()->count();
@@ -74,20 +74,15 @@ class SeoController extends Controller
         }
 
         if ($this->customProfileDomain($request)) {
-            return $this->xml($this->urlSet([url('/')]));
+            return $this->xml($this->urlSet($this->validCustomProfile($request) ? [url('/')] : []));
         }
 
-        // Redirect-only installations do not have an indexable homepage.
-        if (config('advanced-config.disable_home_page') === 'redirect'
-            && env('HOME_URL') === '') {
+        // Disabled or redirected homepages do not have an indexable root.
+        if (env('HOME_URL') === '' &&
+            in_array(config('advanced-config.disable_home_page'), ['true', 'redirect'], true)) {
             return $this->xml($this->urlSet([]));
         }
-
-        $homepage = env('HOME_URL') !== ''
-            ? url('/')
-            : url(config('advanced-config.custom_home_url', '/') === '/home' ? '/' : '/');
-
-        return $this->xml($this->urlSet([$homepage]));
+        return $this->xml($this->urlSet([url('/')]));
     }
 
     public function profilesSitemap(Request $request, int $page)
@@ -136,6 +131,28 @@ class SeoController extends Controller
                 && strtolower((string) ($customDomain['domain'] ?? '')) === strtolower($request->getHost())) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    private function validCustomProfile(Request $request): bool
+    {
+        foreach ((array) config('advanced-config.custom_domains', []) as $customDomain) {
+            if (!is_array($customDomain)
+                || strtolower((string) ($customDomain['domain'] ?? '')) !== strtolower($request->getHost())) {
+                continue;
+            }
+
+            $query = User::query()->where(function ($query) {
+                $query->whereNull('block')->orWhere('block', '<>', 'yes');
+            });
+            if (isset($customDomain['id'])) {
+                return $query->where('id', $customDomain['id'])->exists();
+            }
+            if (isset($customDomain['name'])) {
+                return $query->where('littlelink_name', $customDomain['name'])->exists();
+            }
+            return false;
         }
         return false;
     }
