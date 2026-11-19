@@ -44,7 +44,7 @@
                                      id="auto-vip-new-users" name="enabled" value="1"
                                      aria-label="Ativar VIP para novos cadastros"
                                      @checked($autoVipNewUsers)
-                                     onchange="this.disabled=true;this.form.submit()">
+                                     onchange="this.form.requestSubmit()">
                               <label for="auto-vip-new-users" class="form-check-label fw-semibold">
                                 {{ $autoVipNewUsers ? 'Ativado' : 'Desativado' }}
                               </label>
