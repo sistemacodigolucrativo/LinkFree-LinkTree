@@ -84,6 +84,16 @@ Route::get('/u/{id?}', [UserController::class, 'userRedirect'])->name('userRedir
 Route::get('/report', function () {return view('report');});
 Route::post('/report', [UserController::class, 'report'])->name('report');
 
+// Public discovery endpoints, kept outside authenticated/admin routes.
+Route::get('/robots.txt', [App\Http\Controllers\SeoController::class, 'robots'])
+  ->name('seo.robots')->middleware('disableCookies');
+Route::get('/sitemap.xml', [App\Http\Controllers\SeoController::class, 'sitemap'])
+  ->name('seo.sitemap')->middleware('disableCookies');
+Route::get('/sitemap-home.xml', [App\Http\Controllers\SeoController::class, 'homeSitemap'])
+  ->name('seo.sitemap.home')->middleware('disableCookies');
+Route::get('/sitemap-profiles/{page}.xml', [App\Http\Controllers\SeoController::class, 'profilesSitemap'])
+  ->where('page', '[1-9][0-9]*')->name('seo.sitemap.profiles')->middleware('disableCookies');
+
 // Public JPEG previews for crawlers. No login or user session required.
 Route::get('/social-preview/site.jpg', [App\Http\Controllers\SocialPreviewController::class, 'site'])
   ->name('socialPreview.site')->middleware('disableCookies');
