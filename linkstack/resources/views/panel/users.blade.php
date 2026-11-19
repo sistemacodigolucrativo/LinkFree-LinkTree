@@ -21,6 +21,35 @@
                       <section class="text-gray-400">
                         <h2 class="mb-4 card-header"><i class="bi bi-person"> {{__('messages.Manage Users')}}</i></h2>
                         <div class="card-body p-0 p-md-3">
+                          @if(session('success'))
+                            <div class="alert alert-success" role="status">{{ session('success') }}</div>
+                          @endif
+                          @if(session('fail'))
+                            <div class="alert alert-danger" role="alert">{{ session('fail') }}</div>
+                          @endif
+                          <form id="auto-vip-registration-form" method="POST" action="{{ route('admin.registration-vip') }}"
+                                class="d-flex flex-wrap align-items-center justify-content-between gap-3 border rounded-3 p-3 mb-4"
+                                aria-label="Configuração de novos cadastros VIP">
+                            @csrf
+                            <div class="flex-grow-1" style="min-width:220px">
+                              <h3 class="h5 mb-1">Novos cadastros como VIP</h3>
+                              <p class="small text-muted mb-0">
+                                Ativado: novos cadastros comuns, sociais e criados pelo administrador recebem VIP.
+                                Desativado: novos usuários recebem o plano padrão. Contas existentes não mudam.
+                              </p>
+                            </div>
+                            <div class="form-check form-switch d-flex align-items-center gap-2 m-0">
+                              <input type="hidden" name="enabled" value="0">
+                              <input class="form-check-input m-0" type="checkbox" role="switch"
+                                     id="auto-vip-new-users" name="enabled" value="1"
+                                     aria-label="Ativar VIP para novos cadastros"
+                                     @checked($autoVipNewUsers)
+                                     onchange="this.disabled=true;this.form.submit()">
+                              <label for="auto-vip-new-users" class="form-check-label fw-semibold">
+                                {{ $autoVipNewUsers ? 'Ativado' : 'Desativado' }}
+                              </label>
+                            </div>
+                          </form>
 
                         <div id="select-active" class="d-none">
                           <h5 class="mb-2">{{__('messages.Select Action')}}:</h5>
