@@ -462,6 +462,11 @@ server {
  client_max_body_size 20m;
  location = /skip { return 404; }
  location = /vendor/livewire/livewire/dist/livewire.js { try_files \$uri =404; }
+ # Only public Laravel sitemap routes bypass the generic .xml deny rule.
+ # Keep all other XML files (and database, backups, config) protected.
+ location = /sitemap.xml { try_files \$uri /index.php?\$query_string; }
+ location = /sitemap-home.xml { try_files \$uri /index.php?\$query_string; }
+ location ~ ^/sitemap-profiles/[1-9][0-9]*\.xml$ { try_files \$uri /index.php?\$query_string; }
  location ~ /\. { deny all; }
  location ~* \.(sqlite|sqlite3|db|log|zip|env|lock|json|md|yml|yaml|xml|conf|config|bak|sql)$ { deny all; }
  location ~* ^/(app|bootstrap|config|database|resources|routes|vendor|blocks|backups|storage/framework|storage/logs|storage/app)/ { deny all; }
