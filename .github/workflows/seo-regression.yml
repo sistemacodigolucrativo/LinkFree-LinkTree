@@ -9,6 +9,7 @@ on:
       - 'linkstack/app/Http/Controllers/SocialPreviewController.php'
       - 'linkstack/app/Http/Controllers/UserController.php'
       - 'linkstack/routes/web.php'
+      - 'instal.sh'
       - 'scripts/audit-seo.py'
       - '.github/workflows/seo-regression.yml'
   pull_request:
@@ -19,6 +20,7 @@ on:
       - 'linkstack/app/Http/Controllers/SocialPreviewController.php'
       - 'linkstack/app/Http/Controllers/UserController.php'
       - 'linkstack/routes/web.php'
+      - 'instal.sh'
       - 'scripts/audit-seo.py'
       - '.github/workflows/seo-regression.yml'
 

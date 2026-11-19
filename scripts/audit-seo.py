@@ -54,4 +54,11 @@ assert "Disallow: /admin/" in sitemap
 assert "application/xml" in sitemap and "text/plain" in sitemap
 assert "'block', 'updated_at'" in users, "Missing last-updated version data"
 
+installer = (root.parent / "instal.sh").read_text(encoding="utf-8")
+assert 'location = /sitemap.xml { rewrite ^ /index.php last; }' in installer
+assert 'location = /sitemap-home.xml { rewrite ^ /index.php last; }' in installer
+assert r'location ~ ^/sitemap-profiles/[1-9][0-9]*\.xml
+ in installer
+assert r'location ~* \.(sqlite|sqlite3|db|log|zip|env|lock|json|md|yml|yaml|xml|conf|config|bak|sql)$ { deny all; }' in installer
+
 print("PASS: SEO source contracts, social JPEG, profiles, sitemap and robots")
