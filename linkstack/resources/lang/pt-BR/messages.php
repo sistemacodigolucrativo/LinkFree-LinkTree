@@ -225,7 +225,8 @@ return array(
 	'Verified user' => 'Usuário verificado',
 	'User' => 'Usuário',
 	'Profile' => 'Perfil',
-	'Styling' => 'Estilo',
+	'Styling' => 'Tema do painel',
+	'Panel Theme' => 'Tema do painel',
 	'Logout' => 'Sair',
 
 	/*
