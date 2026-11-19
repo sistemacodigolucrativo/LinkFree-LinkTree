@@ -31,6 +31,18 @@ on:
       - 'linkstack/assets/js/sidebar-auto-close.js'
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
+      - 'scripts/audit-registration-vip.py'
+      - 'linkstack/app/Services/RegistrationVip.php'
+      - 'linkstack/app/Http/Controllers/Auth/RegisteredUserController.php'
+      - 'linkstack/app/Http/Controllers/Auth/SocialLoginController.php'
+      - 'linkstack/app/Http/Controllers/AdminController.php'
+      - 'linkstack/resources/views/panel/users.blade.php'
+      - 'linkstack/resources/views/auth/lf-variants.blade.php'
+      - 'linkstack/resources/views/auth/forgot-password.blade.php'
+      - 'linkstack/resources/views/auth/register.blade.php'
+      - 'linkstack/resources/views/auth/reset-password.blade.php'
+      - 'linkstack/assets/js/linkfree-auth.js'
+      - 'linkstack/assets/js/plugins/setting.js'
       - 'scripts/audit-responsive-mobile.py'
       - 'scripts/audit-profile-editor-gradient.py'
       - 'scripts/audit-linkfree-interactions.py'
@@ -67,6 +79,18 @@ on:
       - 'linkstack/assets/js/sidebar-auto-close.js'
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
+      - 'scripts/audit-registration-vip.py'
+      - 'linkstack/app/Services/RegistrationVip.php'
+      - 'linkstack/app/Http/Controllers/Auth/RegisteredUserController.php'
+      - 'linkstack/app/Http/Controllers/Auth/SocialLoginController.php'
+      - 'linkstack/app/Http/Controllers/AdminController.php'
+      - 'linkstack/resources/views/panel/users.blade.php'
+      - 'linkstack/resources/views/auth/lf-variants.blade.php'
+      - 'linkstack/resources/views/auth/forgot-password.blade.php'
+      - 'linkstack/resources/views/auth/register.blade.php'
+      - 'linkstack/resources/views/auth/reset-password.blade.php'
+      - 'linkstack/assets/js/linkfree-auth.js'
+      - 'linkstack/assets/js/plugins/setting.js'
       - 'scripts/audit-responsive-mobile.py'
       - 'scripts/audit-profile-editor-gradient.py'
       - 'scripts/audit-linkfree-interactions.py'
@@ -102,5 +126,13 @@ jobs:
         run: python scripts/audit-profile-editor-gradient.py
       - name: Audit premium login layout and preserved authentication
         run: python scripts/audit-login-layout.py
+      - name: Audit persistent VIP toggle and account creation
+        run: |
+          python scripts/audit-registration-vip.py
+          php -l linkstack/app/Services/RegistrationVip.php
+          php -l linkstack/app/Http/Controllers/AdminController.php
+          php -l linkstack/app/Http/Controllers/Auth/RegisteredUserController.php
+          php -l linkstack/app/Http/Controllers/Auth/SocialLoginController.php
+          php -l linkstack/routes/web.php
       - name: Test public profile top spacing and share overlay priority
         run: python scripts/audit-public-share-overlay.py
