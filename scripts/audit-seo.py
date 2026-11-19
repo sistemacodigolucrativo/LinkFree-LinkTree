@@ -44,7 +44,7 @@ assert "$user->block === 'yes'" in image
 assert "Cache-Control" in image and "ETag" in image
 
 assert "PAGE_SIZE = 4000" in sitemap
-assert "where('block', '<>', 'yes')" in sitemap
+assert "orWhere('block', '<>', 'yes')" in sitemap
 assert "whereNotNull('littlelink_name')" in sitemap
 assert "customProfileDomain($request)" in sitemap
 assert "'noindex'" in sitemap
