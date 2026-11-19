@@ -55,26 +55,12 @@ Index Of Script
     }
 
     // On Page Load Active Function
-    const checkSettingMenu = (type, name, value, data) => {
-        if(data == 'addedClass'){
-            document.querySelectorAll(`[data-setting="${type}"][data-name="${name}"].active`).forEach((el) => {
-                el.classList.remove('active')
-            });
-        }
-        if(data == 'noClass'){
-            const dataREmove = `[data-setting="${type}"][data-name="${name}"]`;
-            const dataAdd = `[data-setting="${type}"][data-name="${name}"][data-value="${value}"]`;
-            
-            document.querySelectorAll(dataREmove).forEach((el) => {
-                el.classList.remove('active')
-            });
-            document.querySelectorAll(dataAdd).forEach((el) => {
-                el.classList.add('active')
-            });
-        }
+    const checkSettingMenu = (type, name, value) => {
+        const items = document.querySelectorAll('[data-setting="' + type + '"][data-name="' + name + '"]');
+        items.forEach(el => el.classList.toggle('active', el.getAttribute('data-value') === value));
     }
 
-    // Dark mode enable & disabled function
+        // Dark mode enable & disabled function
     const darkMode = () => {
         if (document.querySelector('body').classList.contains('auto')) {
             if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -107,94 +93,98 @@ Index Of Script
         document.dispatchEvent(event);
     }
 
-    // Page on load function
+    // Restauracao deterministica das preferencias no mesmo navegador, para ambos os paineis.
+    const sidebar = document.querySelector('.sidebar-default');
+    const colorModes = ['auto', 'dark', 'light'];
+    const sidebarColorsValues = ['sidebar-white', 'sidebar-dark', 'sidebar-color', 'sidebar-transparent'];
+    const sidebarStyles = ['navs-rounded', 'navs-rounded-all', 'navs-pill', 'navs-pill-all'];
+    const sidebarTypesValues = ['sidebar-mini', 'sidebar-hover', 'sidebar-boxed'];
+
+    const safeReadTypes = () => {
+        try {
+            const parsed = JSON.parse(localStorage.getItem('sidebarType') || '[]');
+            return Array.isArray(parsed) ? parsed.filter(type => sidebarTypesValues.includes(type)) : [];
+        } catch (_) {
+            return [];
+        }
+    };
+    const applyColorMode = value => {
+        const chosen = colorModes.includes(value) ? value : 'auto';
+        document.body.classList.remove(...colorModes);
+        document.body.classList.add(chosen);
+        if (chosen === 'auto') {
+            document.body.classList.toggle('dark', !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+        }
+        checkSettingMenu('color-mode', 'color', chosen);
+    };
+    const applySidebarColor = value => {
+        if (!sidebar) return;
+        const chosen = sidebarColorsValues.includes(value) ? value : 'sidebar-white';
+        sidebar.classList.remove(...sidebarColorsValues);
+        sidebar.classList.add(chosen);
+        checkSettingMenu('sidebar', 'sidebar-color', chosen);
+    };
+    const applySidebarTypes = value => {
+        if (!sidebar) return;
+        const types = value.includes('sidebar-hover') ? ['sidebar-mini', 'sidebar-hover'] :
+                      value.includes('sidebar-boxed') ? ['sidebar-boxed'] :
+                      value.includes('sidebar-mini') ? ['sidebar-mini'] : [];
+        sidebarTypeSetting = types;
+        sidebar.classList.remove(...sidebarTypesValues);
+        sidebar.classList.add(...types);
+        document.querySelectorAll('[data-setting="sidebar"][data-name="sidebar-type"]').forEach(el => {
+            el.classList.toggle('active', types.includes(el.getAttribute('data-value')));
+        });
+    };
+    const applySidebarStyle = value => {
+        if (!sidebar) return;
+        const chosen = sidebarStyles.includes(value) ? value : 'navs-rounded-all';
+        sidebar.classList.remove(...sidebarStyles);
+        sidebar.classList.add(chosen);
+        checkSettingMenu('sidebar', 'sidebar-item', chosen);
+    };
     const updateMode = () => {
-        // Change Mode Custom Event Listners
-        document.addEventListener('ChangeMode',(e) => {
-            if (e.detail.dir === 'rtl' || e.detail.dir === 'ltr') {
-                rtlModeDefault(true)
-            }
-            if (e.detail.dark !== null || e.detail.dark !== undefined) {
-                darkMode()
-            }
-        })
-
-        // For Dark Mode
-        const colorMode =  localStorage.getItem('color-mode')
-        if(colorMode !== null && colorMode !== undefined) {
-            document.body.classList.remove('dark')
-            document.body.classList.add(colorMode)
-            darkMode()
-            checkSettingMenu('color-mode', 'color', colorMode, 'addedClass')
+        applyColorMode(localStorage.getItem('color-mode') || 'auto');
+        if (window.matchMedia) {
+            const preference = window.matchMedia('(prefers-color-scheme: dark)');
+            if (preference.addEventListener) preference.addEventListener('change', () => {
+                if (localStorage.getItem('color-mode') === 'auto') applyColorMode('auto');
+            });
         }
-
-        // For RTL Mode
-        const dirMode =  localStorage.getItem('dir-mode')
-        if(dirMode !== null && dirMode !== undefined && dirMode !== 'ltr') {
-            checkSettingMenu('dir-mode', 'dir', dirMode, 'addedClass')
-            changeMode('dir-mode', dirMode)
+        const direction = localStorage.getItem('dir-mode');
+        if (direction === 'rtl' || direction === 'ltr') {
+            document.documentElement.setAttribute('dir', direction);
+            checkSettingMenu('dir-mode', 'dir', direction);
         }
+        applySidebarColor(localStorage.getItem('sidebar'));
+        applySidebarTypes(safeReadTypes());
+        applySidebarStyle(localStorage.getItem('sidebar-style'));
 
-        // For Sidebar Color
-        const sidebarColors =  localStorage.getItem('sidebar')
-        if(sidebarColors !== null && sidebarColors !== undefined) {
-            checkSettingMenu('sidebar', 'sidebar-color', sidebarColors, 'addedClass')
-            changeMode('sidebar', sidebarColors)
+        const navbar = document.querySelector('.iq-navbar');
+        const banner = document.querySelector('.iq-navbar-header');
+        const navSetting = localStorage.getItem('navbarTypes');
+        if (navbar && banner && navSetting) {
+            navbar.classList.remove('nav-glass', 'navs-sticky', 'navs-transparent');
+            banner.classList.remove('navs-bg-color');
+            if (navSetting === 'navs-bg-color') banner.classList.add(navSetting);
+            else if (['nav-glass', 'navs-sticky', 'navs-transparent'].includes(navSetting)) navbar.classList.add(navSetting);
+            checkSettingMenu('navbar', 'navbar-type', navSetting);
         }
+    };
 
-        // For Sidebar Types
-        const sidebarTypeSession = localStorage.getItem('sidebarType')
-        if(sidebarTypeSession !== null && sidebarTypeSession !== undefined) {
-            sidebarTypeSetting = JSON.parse(sidebarTypeSession)
-            Array.from(sidebarTypeSetting,(type) => {
-                document.querySelectorAll(`[data-setting="sidebar"][data-name="sidebar-type"][data-value="${type}"]`).forEach((el) => {
-                    el.classList.add('active')
-                });
-                changeMode('sidebar', type)
-            })
-        }
+    updateMode();
 
-        // For Sidebar Active Style
-        const allActiveType =  localStorage.getItem('sidebar-style')
-        if(allActiveType !== null && allActiveType !== undefined) {
-            document.querySelector('.sidebar').classList.remove('navs-rounded-all')
-            document.querySelector('.sidebar').classList.add(`${allActiveType}`)
-            checkSettingMenu('sidebar', 'sidebar-item', allActiveType, 'addedClass')
-            changeMode('sidebar-style', allActiveType)
-        }
+        // Modo de cor: alternancia imediata, estado selecionado e persistencia.
+    const colorMode = document.querySelectorAll('[data-setting="color-mode"][data-name="color"]');
+    colorMode.forEach(mode => mode.addEventListener('click', () => {
+        const chosen = mode.getAttribute('data-value');
+        if (!colorModes.includes(chosen)) return;
+        localStorage.setItem('color-mode', chosen);
+        applyColorMode(chosen);
+        changeMode('color-mode', chosen);
+    }));
 
-        // For Navbar & Header Style
-        const allNavbarType = localStorage.getItem('navbarTypes')
-        if(allNavbarType !== null && allNavbarType !== undefined){
-            if(allNavbarType == 'nav-glass' || allNavbarType == 'navs-sticky' || allNavbarType == 'navs-transparent'){
-                document.querySelector('.iq-navbar').classList.add(`${allNavbarType}`)
-            }
-            if(allNavbarType == 'navs-bg-color'){
-                document.querySelector('.iq-navbar').classList.remove('nav-glass','navs-sticky','navs-transparent')
-                document.querySelector('.iq-navbar-header').classList.add(`${allNavbarType}`)
-            }
-            checkSettingMenu('navbar', 'navbar-type', allNavbarType, 'noClass')
-        }
-    }
-
-    updateMode()
-
-    //dark-mode & light-mode
-    const colorMode = document.querySelectorAll('[data-setting="color-mode"][data-name="color"]')
-    Array.from(colorMode, (mode) => {
-        mode.addEventListener('click', (e) => {
-            Array.from(colorMode, (el) => {
-                el.classList.remove('active')
-                document.querySelector('body').classList.remove(el.getAttribute('data-value'))
-            })
-            localStorage.setItem('color-mode', mode.getAttribute('data-value'))
-            mode.classList.add('active')
-            document.querySelector('body').classList.add(mode.getAttribute('data-value'))
-            changeMode('color-mode', mode.getAttribute('data-value'))
-        })
-    })
-
-    //rtl & ltr
+        //rtl & ltr
     const dirMode = document.querySelectorAll('[data-setting="dir-mode"][data-name="dir"]')
     Array.from(dirMode, (mode) => {
         mode.addEventListener('click', (e) => {
@@ -224,58 +214,26 @@ Index Of Script
         })
     })
 
-    // Sidebar type style
-    const sidebarTypes = document.querySelectorAll('[data-setting="sidebar"][data-name="sidebar-type"]')
-    Array.from(sidebarTypes, (sidebarType) => {
-        sidebarType.addEventListener('click', (e) => {
-            if (sidebarType.classList.contains('active')) {
-                sidebarType.classList.remove('active')
-                document.querySelector('.sidebar-default').classList.remove(sidebarType.getAttribute('data-value'))
-                const sidebarTypeIndexOf = sidebarTypeSetting.findIndex(type => type === sidebarType.getAttribute('data-value'))
-                sidebarTypeSetting.splice(sidebarTypeIndexOf, 1)
-                if (sidebarType.getAttribute('data-extra-value') !== null) {
-                    document.querySelector('.sidebar-default').classList.remove(sidebarType.getAttribute('data-extra-value'))
-                    document.querySelector(`[data-value="${sidebarType.getAttribute('data-extra-value')}"]`).classList.remove('active')
+    // Layout lateral: apenas uma modalidade por vez; Hover depende de Mini.
+    const sidebarTypes = document.querySelectorAll('[data-setting="sidebar"][data-name="sidebar-type"]');
+    sidebarTypes.forEach(type => type.addEventListener('click', () => {
+        const selected = type.getAttribute('data-value');
+        if (!sidebarTypesValues.includes(selected)) return;
+        const next = sidebarTypeSetting.includes(selected) ? [] : [selected];
+        applySidebarTypes(next);
+        localStorage.setItem('sidebarType', JSON.stringify(sidebarTypeSetting));
+    }));
 
-                    const sidebarExtraTypeIndexOf = sidebarTypeSetting.findIndex(type => type === sidebarType.getAttribute('data-extra-value'))
-                    sidebarTypeSetting.splice(sidebarExtraTypeIndexOf, 1)
-                }
-            } else {
-                Array.from(document.querySelectorAll(`[data-value="${sidebarType.getAttribute('data-value')}"]`), (el) => el.classList.add('active'))
-                document.querySelector('.sidebar-default').classList.add(sidebarType.getAttribute('data-value'))
-                if (sidebarTypeSetting.indexOf(sidebarType.getAttribute('data-value')) === -1) {
-                    sidebarTypeSetting.push(sidebarType.getAttribute('data-value'))
-                }
-                if (sidebarType.getAttribute('data-extra-value') !== null) {
-                    document.querySelector('.sidebar-default').classList.add(sidebarType.getAttribute('data-extra-value'))
-                    Array.from(document.querySelectorAll(`[data-value="${sidebarType.getAttribute('data-extra-value')}"]`), (el) => el.classList.add('active'))
-                    if(sidebarTypeSetting.indexOf(sidebarType.getAttribute('data-extra-value')) === -1) {
-                        sidebarTypeSetting.push(sidebarType.getAttribute('data-extra-value'))
-                    }
-                }
-            }
-            localStorage.setItem('sidebarType', JSON.stringify(sidebarTypeSetting))
-        })
-    })
+        // Estilo dos itens ativos: atualiza toda a familia de classes e controles.
+    const allActiveType = document.querySelectorAll('[data-setting="sidebar"][data-name="sidebar-item"]');
+    allActiveType.forEach(option => option.addEventListener('click', () => {
+        const chosen = option.getAttribute('data-value');
+        if (!sidebarStyles.includes(chosen)) return;
+        localStorage.setItem('sidebar-style', chosen);
+        applySidebarStyle(chosen);
+    }));
 
-    //Sidebar Active Style 
-    const allActiveType = document.querySelectorAll('[data-setting="sidebar"][data-name="sidebar-item"]')
-    Array.from(allActiveType, (activeStyle) => {
-        activeStyle.addEventListener('click', (e) => {
-            if(!activeStyle.classList.contains('active')){
-                Array.from(allActiveType, (el) => {
-                    el.classList.remove('active')
-                    document.querySelector('.sidebar-default').classList.remove(el.getAttribute('data-value'))
-                })
-                localStorage.setItem('sidebar-style', activeStyle.getAttribute('data-value'))
-                activeStyle.classList.add('active')
-                Array.from(document.querySelectorAll(`[data-value="${activeStyle.getAttribute('data-value')}"]`), (el) => el.classList.add('active'))
-                changeMode('sidebar', activeStyle.getAttribute('data-value'))
-            }
-        })
-    })
-
-    // Navbar Style
+        // Navbar Style
     const allNavbarType = document.querySelectorAll('[data-setting="navbar"][data-name="navbar-type"]')
     Array.from(allNavbarType, (navbarType) => {
         navbarType.addEventListener('click', (e) => {
