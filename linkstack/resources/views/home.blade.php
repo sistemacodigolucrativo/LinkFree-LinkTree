@@ -10,36 +10,67 @@
       @if(env('CUSTOM_META_TAGS') == 'true' and config('advanced-config.title') != '')
       <title>{{ config('advanced-config.title') }}</title>
       @else
-      <title>{{ config('app.name') }}</title>
+      <title>{{ config('app.name') }} | Crie sua página de links gratuita</title>
       @endif
 
-<!--#### BEGIN Meta Tags social media preview images  ####-->
-  <!-- This shows a preview for title, description and avatar image of users profiles if shared on social media sites -->
+{{-- Public landing SEO; all visual markup and sections below remain unchanged. --}}
+@php
+    $homeSeoTitle = config('app.name', 'LinkFree') . ' | Crie sua página de links gratuita';
+    $rawHomeDescription = isset($message) && $message && $message->home_message !== 'default'
+        ? html_entity_decode(strip_tags((string) $message->home_message), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        : 'Crie sua página de links grátis. Reúna redes sociais, WhatsApp, conteúdos e contatos em um único endereço personalizado.';
+    $homeSeoDescription = mb_strimwidth(
+        trim(preg_replace('/\s+/u', ' ', $rawHomeDescription) ?: ''),
+        0, 175, '…', 'UTF-8'
+    );
+    $homeCanonical = url()->current();
+    $homeImage = route('socialPreview.site');
+    $homeRobots = trim((string) config('advanced-config.robots', 'index,follow'));
+    $homeRobots = $homeRobots ?: 'index,follow';
+    if (stripos($homeRobots, 'noindex') === false && stripos($homeRobots, 'max-image-preview') === false) {
+        $homeRobots .= ',max-image-preview:large';
+    }
+    $homeSchema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'WebSite',
+        '@id' => $homeCanonical . '#website',
+        'url' => $homeCanonical,
+        'name' => config('app.name', 'LinkFree'),
+        'description' => $homeSeoDescription,
+        'publisher' => [
+            '@type' => 'Organization',
+            'name' => config('app.name', 'LinkFree'),
+            'url' => $homeCanonical,
+        ],
+    ];
+@endphp
+<meta name="description" content="{{ $homeSeoDescription }}">
+<meta name="robots" content="{{ $homeRobots }}">
+<link rel="canonical" href="{{ $homeCanonical }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ config('app.name', 'LinkFree') }}">
+<meta property="og:url" content="{{ $homeCanonical }}">
+<meta property="og:title" content="{{ $homeSeoTitle }}">
+<meta property="og:description" content="{{ $homeSeoDescription }}">
+<meta property="og:image" content="{{ $homeImage }}">
+@if(str_starts_with($homeImage, 'https://'))
+<meta property="og:image:secure_url" content="{{ $homeImage }}">
+@endif
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Prévia do LinkFree — árvore de links gratuita">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ $homeCanonical }}">
+<meta name="twitter:title" content="{{ $homeSeoTitle }}">
+<meta name="twitter:description" content="{{ $homeSeoDescription }}">
+<meta name="twitter:image" content="{{ $homeImage }}">
+<meta name="twitter:image:alt" content="LinkFree — árvore de links gratuita">
+<script type="application/ld+json">{!! json_encode(
+    $homeSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+    | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+) !!}</script>
 
-    <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="{{ url('') }}">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{env('APP_NAME')}}">
-    <meta property="og:description" content='@if($message->home_message == "default"){!!strip_tags(__('messages.HOME.MESSAGE'))!!}@else{!!$message->home_message!!}@endif'>
-    @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
-    <meta property="og:image" content="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}">
-    @else
-    <meta property="og:image" content="{{ asset('assets/linkstack/images/logo.svg') }}">
-    @endif
-
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="{{ url('') }}">
-    <meta property="twitter:url" content="{{ url('') }}">
-    <meta name="twitter:title" content="{{env('APP_NAME')}}">
-    <meta name="twitter:description" content='@if($message->home_message == "default"){!!strip_tags(__('messages.HOME.MESSAGE'))!!}@else{!!$message->home_message!!}@endif'>
-    @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
-    <meta name="twitter:image" content="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}">
-    @else
-    <meta name="twitter:image" content="{{ asset('assets/linkstack/images/logo.svg') }}">
-    @endif
-
-<!--#### END Meta Tags social media preview images  ####-->
 
       <!-- Favicon -->
       @if(file_exists(base_path("assets/linkstack/images/").findFile('favicon')))
