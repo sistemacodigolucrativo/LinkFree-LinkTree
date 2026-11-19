@@ -32,13 +32,12 @@ final class RegistrationVip
     public static function setEnabled(bool $enabled): void
     {
         $value = $enabled ? 'true' : 'false';
-        if (EnvEditor::keyExists(self::KEY)) {
-            EnvEditor::editKey(self::KEY, $value);
-        } else {
-            EnvEditor::addKey(self::KEY, $value);
-        }
-        // Nao anunciar sucesso se o filesystem impedir a persistencia.
-        if (self::enabled() !== $enabled) {
+        $saved = EnvEditor::keyExists(self::KEY)
+            ? EnvEditor::editKey(self::KEY, $value)
+            : EnvEditor::addKey(self::KEY, $value);
+
+        // Verificar retorno do editor e valor real no arquivo .env.
+        if (!$saved || !EnvEditor::keyExists(self::KEY) || self::enabled() !== $enabled) {
             throw new \RuntimeException('A configuracao AUTO_VIP_NEW_USERS nao foi persistida.');
         }
     }
