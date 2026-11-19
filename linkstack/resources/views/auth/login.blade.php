@@ -10,9 +10,13 @@ foreach($pages as $page)
 @include('layouts.lang')
 <link rel="stylesheet" href="{{ asset('assets/css/linkfree-login.css') }}?v={{ filemtime(base_path('assets/css/linkfree-login.css')) }}">
 
+@php
+  $initialAuthView = in_array($initialAuthView ?? 'login', ['login', 'forgot', 'register', 'reset'], true)
+    ? ($initialAuthView ?? 'login') : 'login';
+@endphp
 <x-auth-card>
   <x-slot name="logo"></x-slot>
-  <section class="lf-login-shell" aria-labelledby="lf-login-title">
+  <section class="lf-login-shell" data-lf-auth-initial="{{ $initialAuthView }}" aria-label="{{ config('app.name') }}">
     <aside class="lf-login-visual" aria-hidden="true">
       <div class="lf-login-visual-brand">
         <span class="lf-login-visual-brand-icon"><i class="bi bi-link-45deg"></i></span>
@@ -37,6 +41,7 @@ foreach($pages as $page)
         <span class="lf-login-brand-name">{{ config('app.name') }}</span>
       </a>
 
+      <div class="lf-auth-view" data-lf-auth-view="login" @if($initialAuthView !== 'login') hidden @endif>
       <header class="lf-login-heading">
         <span class="lf-login-kicker">{{ config('app.name') }}</span>
         <h1 id="lf-login-title">{{ __('messages.Sign In') }}</h1>
@@ -66,7 +71,7 @@ foreach($pages as $page)
             <input type="checkbox" class="form-check-input" name="remember" id="remember_me">
             <span>{{ __('messages.Remember Me') }}</span>
           </label>
-          <a href="{{ route('password.request') }}">{{ __('messages.Forgot Password?') }}</a>
+          <a data-lf-auth-target="forgot" href="{{ route('password.request') }}">{{ __('messages.Forgot Password?') }}</a>
         </div>
 
         <button type="submit" class="btn btn-primary lf-login-submit">{{ __('messages.Sign In') }}</button>
@@ -92,11 +97,14 @@ foreach($pages as $page)
         @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))
           <p class="lf-login-register">
             {{ __('messages.Don’t have an account?') }}
-            <a href="{{ route('register') }}">{{ __('messages.Click here to sign up') }}</a>
+            <a data-lf-auth-target="register" href="{{ route('register') }}">{{ __('messages.Click here to sign up') }}</a>
           </p>
         @endif
       </form>
+      </div>
+      @include('auth.lf-variants')
     </div>
   </section>
+  <script src="{{ asset('assets/js/linkfree-auth.js') }}?v={{ filemtime(base_path('assets/js/linkfree-auth.js')) }}" defer></script>
 </x-auth-card>
 </x-guest-layout>
