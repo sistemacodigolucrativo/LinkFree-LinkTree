@@ -10,6 +10,7 @@ on:
       - 'linkstack/app/Http/Controllers/UserController.php'
       - 'linkstack/routes/web.php'
       - 'instal.sh'
+      - 'scripts/audit-social-images.php'
       - 'scripts/audit-seo.py'
       - '.github/workflows/seo-regression.yml'
   pull_request:
@@ -21,6 +22,7 @@ on:
       - 'linkstack/app/Http/Controllers/UserController.php'
       - 'linkstack/routes/web.php'
       - 'instal.sh'
+      - 'scripts/audit-social-images.php'
       - 'scripts/audit-seo.py'
       - '.github/workflows/seo-regression.yml'
 
@@ -47,3 +49,5 @@ jobs:
           php -l linkstack/app/Http/Controllers/SeoController.php
           php -l linkstack/app/Http/Controllers/UserController.php
           php -l linkstack/routes/web.php
+      - name: Render and validate real JPEG dimensions with GD
+        run: php scripts/audit-social-images.php
