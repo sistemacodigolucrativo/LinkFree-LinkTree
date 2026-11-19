@@ -124,8 +124,14 @@ class ShellIntegration(unittest.TestCase):
             for name, content in [('challenge', challenge), ('site', redirect + '\n' + site)]:
                 # Heredoc expansion is identical to the one used by the installer.
                 expanded = subprocess.run(['bash','-c','cat <<NGINX\n' + content + '\nNGINX'], env=env, text=True, capture_output=True, check=True).stdout
+                # nginx -t can try to bind listen ports; use unprivileged test ports.
+                # The syntax of IPv4/IPv6 and SSL directives is unchanged.
+                expanded = (expanded.replace('listen [::]:80;', 'listen [::]:18080;')
+                            .replace('listen 80;', 'listen 18080;')
+                            .replace('listen [::]:443 ssl;', 'listen [::]:18443 ssl;')
+                            .replace('listen 443 ssl;', 'listen 18443 ssl;'))
                 config = pathlib.Path(directory) / (name + '.conf')
-                config.write_text('pid ' + directory + '/nginx.pid; error_log stderr; events {} http {\n' + expanded + '\n}\n')
+                config.write_text('pid ' + directory + '/nginx.pid; error_log stderr; events {} http { access_log off;\n' + expanded + '\n}\n')
                 result = subprocess.run(['nginx','-t','-p',directory,'-c',str(config)], text=True, capture_output=True)
                 self.assertEqual(result.returncode, 0, result.stderr)
 
