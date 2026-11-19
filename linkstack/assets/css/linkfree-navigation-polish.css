@@ -248,3 +248,35 @@ body .sidebar.sidebar-default .sidebar-body .sidebar-list #sidebar-menu
     font-size:1.2rem;
   }
 }
+
+/* Administracao: ultima secao, junto ao fim da area lateral (tambem no mobile).
+   Mantem o accordion no mesmo #sidebar-menu e a rolagem independente. */
+.sidebar.sidebar-default > .sidebar-body#sidebar-scroll-region > .sidebar-list {
+  display:flex;
+  flex-direction:column;
+  min-height:100%;
+}
+.sidebar.sidebar-default #sidebar-menu {
+  display:flex;
+  flex-direction:column;
+  flex:1 1 auto;
+  min-height:100%;
+}
+.sidebar.sidebar-default #sidebar-menu > #nav-admin-panel {
+  margin-top:auto;
+  padding-top:12px;
+  border-top:1px solid var(--lf-sidebar-divider);
+}
+.sidebar.sidebar-default #sidebar-menu .lf-panel-theme-link {
+  border:0;
+  background:transparent;
+  color:inherit;
+  text-align:start;
+  font:inherit;
+  cursor:pointer;
+}
+.sidebar.sidebar-default #sidebar-menu .lf-panel-theme-link:hover,
+.sidebar.sidebar-default #sidebar-menu .lf-panel-theme-link:focus-visible {
+  background:var(--lf-sidebar-hover-bg);
+  color:var(--lf-sidebar-fg);
+}
