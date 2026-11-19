@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\RegistrationVip;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -51,16 +52,18 @@ class RegisteredUserController extends Controller
             $block = 'no';
         }
 
-        Auth::login($user = User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'littlelink_name' => $request->littlelink_name,
             'password' => Hash::make($request->password),
-            'role' => 'user',
-        ]));
+        ]);
 
+        // A coluna role nao faz parte de $fillable: atribuir explicitamente.
+        $user->role = RegistrationVip::roleForNewUser();
         $user->block = $block;
         $user->save();
+        Auth::login($user);
 
 
             $user = $request->name;
