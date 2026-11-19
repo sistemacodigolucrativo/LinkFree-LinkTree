@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\SocialAccount;
+use App\Services\RegistrationVip;
 
 class SocialLoginController extends Controller
 {
@@ -45,6 +46,8 @@ class SocialLoginController extends Controller
                     'littlelink_name' => $social_user->getNickname(),
                     'email_verified_at' => now(),
                 ]);
+                $user->role = RegistrationVip::roleForNewUser();
+                $user->save();
             }
 
             // Create Social Accounts
