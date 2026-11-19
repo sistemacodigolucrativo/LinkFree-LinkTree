@@ -127,6 +127,23 @@ class AdminController extends Controller
     return view("panel/users", ['autoVipNewUsers' => RegistrationVip::enabled()]);
   }
 
+  // Preferencia global de novos cadastros; administradores apenas (middleware na rota).
+  public function updateRegistrationVip(Request $request)
+  {
+    $request->validate(['enabled' => 'required|boolean']);
+
+    try {
+      RegistrationVip::setEnabled($request->boolean('enabled'));
+    } catch (\Throwable $exception) {
+      report($exception);
+      return redirect()->route('showUsers')->with('fail', 'Não foi possível salvar a configuração VIP. Verifique a permissão de escrita no arquivo .env.');
+    }
+
+    return redirect()->route('showUsers')->with('success', $request->boolean('enabled')
+      ? 'Novos cadastros serão criados como VIP.'
+      : 'Novos cadastros voltarão a ser criados como usuários comuns.');
+  }
+
   // Send test mail
   public function SendTestMail(Request $request)
   {
