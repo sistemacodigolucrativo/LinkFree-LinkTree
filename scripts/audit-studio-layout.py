@@ -116,18 +116,27 @@ require('id="navbarSupportedContent"' in sidebar and 'id="navbarDropdown"' in si
 require('id="sidebar-scroll-region"' in sidebar and
         'class="sidebar-body pt-0 data-scrollbar"' not in sidebar,
         "Sidebar usa rolagem vertical independente sem conflito com o plugin")
-for group in ("admin-navigation", "nav-overview", "nav-links", "nav-appearance", "nav-account"):
+for group in ("admin-navigation", "nav-overview", "nav-links", "nav-appearance"):
     require('id="' + group + '" data-bs-parent="#sidebar-menu"' in sidebar,
             "Acordeão principal com fechamento exclusivo: " + group)
 for group in ("admin-users-menu", "admin-site-menu", "admin-themes-menu", "admin-system-menu"):
     require('id="' + group + '" data-bs-parent="#admin-navigation"' in sidebar,
             "Subcategoria administrativa com fechamento exclusivo: " + group)
-require(sidebar.count('class="nav-link nav-accordion-toggle') == 9,
-        "Nove categorias restantes usam gatilhos de acordeão")
+require(sidebar.count('class="nav-link nav-accordion-toggle') == 8,
+        "Oito categorias de acordeão após retirar Configurações de conta")
 require('id="nav-admin-panel"' in sidebar and "auth()->user()->role === 'admin'" in sidebar,
         "Menu administrativo agrupado e restrito a administradores")
-require(sidebar.index('id="nav-admin-panel"') < sidebar.index('messages.Dashboard'),
-        "Administração está no topo do menu lateral")
+require(sidebar.index('id="nav-admin-panel"') > sidebar.index('id="nav-appearance"') and
+        sidebar.index('id="nav-admin-panel"') < sidebar.index('<!-- Sidebar Menu End -->'),
+        "Administração ao final da navegação lateral, restrita a administradores")
+require('id="nav-account"' not in sidebar and 'id="nav-account"' not in sidebar,
+        "Configurações de conta removidas da barra lateral")
+require('lf-panel-theme-link' in sidebar and 'messages.Panel Theme' in sidebar and
+        sidebar.count('lf-panel-theme-link') == 1,
+        "Tema do painel aparece uma vez em Personalização")
+require("messages.Styling" not in sidebar and
+        'href="{{ url(\'/studio/profile\') }}"' in sidebar,
+        "Bolha de perfil mantém Configurações e não duplica Tema do painel")
 require('id="mail-drop"' not in sidebar and "url('/update')" in sidebar,
         "Atualizações administrativas movidas ao menu Admin")
 
