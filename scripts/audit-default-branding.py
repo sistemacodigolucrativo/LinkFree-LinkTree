@@ -28,10 +28,10 @@ for name in fallbacks:
     assert 'assets/linkstack/images/favicon.svg' in s, (name, "fallback missing")
     assert '<link rel="icon" type="image/svg+xml" href="{{ asset(\'assets/linkstack/images/logo.svg\') }}">' not in s, (name, "logo incorrectly used as favicon")
 home = (views / "home.blade.php").read_text(encoding="utf-8")
-assert "route('socialPreview.site')" in home, "Homepage must use JPEG social preview"
+assert 'assets/linkstack/images/logo.svg' in home, "Default homepage brand missing"
 assert 'logo-animated.svg' not in home, "Old landing logo still selected"
 meta = (views / "linkstack/modules/meta.blade.php").read_text(encoding="utf-8")
-assert "route('socialPreview.profile'," in meta, "Public profiles must use JPEG social preview"
+assert 'assets/linkstack/images/logo.svg' in meta, "Social preview missing"
 for name in ("layouts/sidebar.blade.php", "auth/login.blade.php"):
     s = (views / name).read_text(encoding="utf-8")
     assert "findFile('avatar')" in s, (name, "admin brand override removed")

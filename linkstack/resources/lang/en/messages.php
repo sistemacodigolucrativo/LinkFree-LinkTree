@@ -394,8 +394,6 @@ return [
     'Export user data' => 'Export user data',
     'Export your user data' => 'Export your user data to transfer to a different instance.',
     'Export all data' => 'Export all data',
-    'Export failed' => 'Unable to generate the export file. Please try again.',
-    'Invalid import file' => 'The import file is incomplete, corrupted, or contains invalid links. Your previous links were preserved.',
     'Export links only' => 'Export links only',
     'Import user data' => 'Import user data',
     'import.user.alert' => 'Are you sure you want to import this file? This action will replace all your current data, including links!',

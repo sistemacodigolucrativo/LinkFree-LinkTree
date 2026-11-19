@@ -10,67 +10,36 @@
       @if(env('CUSTOM_META_TAGS') == 'true' and config('advanced-config.title') != '')
       <title>{{ config('advanced-config.title') }}</title>
       @else
-      <title>{{ config('app.name') }} | Crie sua página de links gratuita</title>
+      <title>{{ config('app.name') }}</title>
       @endif
 
-{{-- Public landing SEO; all visual markup and sections below remain unchanged. --}}
-@php
-    $homeSeoTitle = config('app.name', 'LinkFree') . ' | Crie sua página de links gratuita';
-    $rawHomeDescription = isset($message) && $message && $message->home_message !== 'default'
-        ? html_entity_decode(strip_tags((string) $message->home_message), ENT_QUOTES | ENT_HTML5, 'UTF-8')
-        : 'Crie sua página de links grátis. Reúna redes sociais, WhatsApp, conteúdos e contatos em um único endereço personalizado.';
-    $homeSeoDescription = mb_strimwidth(
-        trim(preg_replace('/\s+/u', ' ', $rawHomeDescription) ?: ''),
-        0, 175, '…', 'UTF-8'
-    );
-    $homeCanonical = url()->current();
-    $homeImage = route('socialPreview.site');
-    $homeRobots = trim((string) config('advanced-config.robots', 'index,follow'));
-    $homeRobots = $homeRobots ?: 'index,follow';
-    if (stripos($homeRobots, 'noindex') === false && stripos($homeRobots, 'max-image-preview') === false) {
-        $homeRobots .= ',max-image-preview:large';
-    }
-    $homeSchema = [
-        '@context' => 'https://schema.org',
-        '@type' => 'WebSite',
-        '@id' => $homeCanonical . '#website',
-        'url' => $homeCanonical,
-        'name' => config('app.name', 'LinkFree'),
-        'description' => $homeSeoDescription,
-        'publisher' => [
-            '@type' => 'Organization',
-            'name' => config('app.name', 'LinkFree'),
-            'url' => $homeCanonical,
-        ],
-    ];
-@endphp
-<meta name="description" content="{{ $homeSeoDescription }}">
-<meta name="robots" content="{{ $homeRobots }}">
-<link rel="canonical" href="{{ $homeCanonical }}">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="{{ config('app.name', 'LinkFree') }}">
-<meta property="og:url" content="{{ $homeCanonical }}">
-<meta property="og:title" content="{{ $homeSeoTitle }}">
-<meta property="og:description" content="{{ $homeSeoDescription }}">
-<meta property="og:image" content="{{ $homeImage }}">
-@if(str_starts_with($homeImage, 'https://'))
-<meta property="og:image:secure_url" content="{{ $homeImage }}">
-@endif
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Prévia do LinkFree — árvore de links gratuita">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="{{ $homeCanonical }}">
-<meta name="twitter:title" content="{{ $homeSeoTitle }}">
-<meta name="twitter:description" content="{{ $homeSeoDescription }}">
-<meta name="twitter:image" content="{{ $homeImage }}">
-<meta name="twitter:image:alt" content="LinkFree — árvore de links gratuita">
-<script type="application/ld+json">{!! json_encode(
-    $homeSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-    | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
-) !!}</script>
+<!--#### BEGIN Meta Tags social media preview images  ####-->
+  <!-- This shows a preview for title, description and avatar image of users profiles if shared on social media sites -->
 
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="{{ url('') }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{env('APP_NAME')}}">
+    <meta property="og:description" content='@if($message->home_message == "default"){!!strip_tags(__('messages.HOME.MESSAGE'))!!}@else{!!$message->home_message!!}@endif'>
+    @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
+    <meta property="og:image" content="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}">
+    @else
+    <meta property="og:image" content="{{ asset('assets/linkstack/images/logo.svg') }}">
+    @endif
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="{{ url('') }}">
+    <meta property="twitter:url" content="{{ url('') }}">
+    <meta name="twitter:title" content="{{env('APP_NAME')}}">
+    <meta name="twitter:description" content='@if($message->home_message == "default"){!!strip_tags(__('messages.HOME.MESSAGE'))!!}@else{!!$message->home_message!!}@endif'>
+    @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
+    <meta name="twitter:image" content="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}">
+    @else
+    <meta name="twitter:image" content="{{ asset('assets/linkstack/images/logo.svg') }}">
+    @endif
+
+<!--#### END Meta Tags social media preview images  ####-->
 
       <!-- Favicon -->
       @if(file_exists(base_path("assets/linkstack/images/").findFile('favicon')))
@@ -129,8 +98,6 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 @media(max-width:767px){.lf-phone{animation:lf-float-mobile 6s ease-in-out infinite}.lf-footer .footer-body{flex-direction:column;align-items:center;text-align:center}.lf-footer .left-panel{flex:0 1 auto;justify-content:center}.lf-footer .right-panel{flex:0 1 auto}.lf-links .lf-actions{align-items:center}.lf-card-art{height:125px}}
 @keyframes lf-float-mobile{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @media(prefers-reduced-motion:reduce){.lf-phone{animation:none}.lf-card,.lf-step,.lf-art-float{transition:none}}
-.lf-visual-section{padding:28px 0 88px}.lf-visual{position:relative;overflow:hidden;border:1px solid #334735;border-radius:26px;background:#101c12;box-shadow:0 24px 70px #0007}.lf-visual img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}.lf-visual figcaption{position:absolute;left:24px;bottom:24px;max-width:290px;padding:12px 16px;color:white;font-size:.88rem;line-height:1.4;border:1px solid #ffffff30;border-radius:14px;background:#0b160dd9;backdrop-filter:blur(10px)}@media(max-width:767px){.lf-visual-section{padding:10px 0 55px}.lf-visual{border-radius:18px}.lf-visual figcaption{position:static;max-width:none;border:0;border-radius:0;background:#142017;font-size:.8rem}.lf-visual img{aspect-ratio:4/3;object-position:center}}
-.lf-theme-showcase{background:radial-gradient(circle at 50% 40%,#1c3020,#101713 62%)}.lf-theme-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:22px;align-items:stretch}.lf-theme-tile{margin:0;overflow:hidden;background:#151f18;border:1px solid #344537;border-radius:22px;box-shadow:0 18px 50px #0003;transition:transform .35s ease,border-color .35s ease}.lf-theme-tile:hover{transform:translateY(-7px);border-color:#7aaa56}.lf-theme-image{height:310px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:18px;background:radial-gradient(circle at center,#344a35,#101813 75%)}.lf-theme-image img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 14px 18px #0007);transition:transform .45s ease}.lf-theme-tile:hover img{transform:scale(1.04)}.lf-theme-tile figcaption{display:flex;flex-direction:column;gap:4px;padding:18px 20px;color:#fff}.lf-theme-tile figcaption span,.lf-theme-note{color:#aab4ab;font-size:.9rem}.lf-theme-note{text-align:center;margin:24px 0 0}.lf-theme-showcase[id]{scroll-margin-top:95px}@media(max-width:767px){.lf-theme-gallery{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:14px}.lf-theme-image{height:250px}.lf-theme-showcase .lf-heading{text-align:center}}@media(prefers-reduced-motion:reduce){.lf-theme-tile,.lf-theme-image img{transition:none}}
 </style>
   </head>
 
@@ -143,7 +110,7 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 <header class="lf-nav"><div class="lf-container lf-nav-inner">
 <a class="lf-brand" href="{{ url('/') }}">@if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))<img src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" alt="">@else<img src="{{ asset('assets/linkstack/images/favicon.svg') }}" alt="">@endif <span>{{ config('app.name') }}</span></a>
 <button class="lf-menu" type="button" aria-expanded="false" aria-controls="lf-navigation">Menu ☰</button>
-<nav class="lf-links" id="lf-navigation" aria-label="Navegação principal"><a href="#recursos">Recursos</a><a href="#temas">Temas</a><a href="#como-funciona">Como funciona</a><a href="#duvidas">Dúvidas</a><div class="lf-actions">
+<nav class="lf-links" id="lf-navigation" aria-label="Navegação principal"><a href="#recursos">Recursos</a><a href="#como-funciona">Como funciona</a><a href="#duvidas">Dúvidas</a><div class="lf-actions">
 @auth<a class="lf-button" href="{{ url('dashboard') }}">Meu painel</a>@else
 @if(Route::has('login'))<a href="{{ route('login') }}">Entrar</a>@endif
 @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">Criar minha página</a>@endif
@@ -153,24 +120,11 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 @auth<a class="lf-button" href="{{ url('dashboard') }}">Acessar meu painel</a>@else
 @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">Criar minha página</a>@elseif(Route::has('login'))<a class="lf-button" href="{{ route('login') }}">Entrar</a>@endif
 @endauth<a class="lf-button alt" href="#como-funciona">Como funciona</a></div><p class="lf-note">Uma página para compartilhar onde você estiver.</p></div><div class="lf-reveal lf-phone-wrap"><div class="lf-phone"><iframe title="Exemplo de página de links" src="{{ url('/demo-page') }}?preview=home" loading="lazy"></iframe></div></div></div></section>
-<section class="lf-visual-section"><div class="lf-container"><figure class="lf-visual lf-reveal"><img src="{{ asset('assets/linkstack/images/linkfree-apresentacao.webp') }}" alt="Ilustração de uma página de links em um celular, conectando diferentes conteúdos" loading="lazy" width="1200" height="800"><figcaption>Uma página para reunir seus links e compartilhar o que importa.</figcaption></figure></div></section>
 <section class="lf-section" id="recursos"><div class="lf-container"><div class="lf-heading lf-reveal"><span class="lf-eyebrow">Tudo começa com um link</span><h2>Seu mundo, organizado do seu jeito</h2><p>Apresente o que você faz e ajude as pessoas a encontrarem seus conteúdos, produtos e canais de contato.</p></div><div class="lf-cards">
-<article class="lf-card lf-reveal"><span class="lf-icon">↗</span><h3>Seus links reunidos</h3><p>Adicione seus destinos importantes em uma única página, pronta para compartilhar na bio e onde mais quiser.</p></article>
-<article class="lf-card lf-reveal"><span class="lf-icon">✦</span><h3>Uma página com sua identidade</h3><p>Escolha um tema e personalize a apresentação para criar uma página que combine com você.</p></article>
-<article class="lf-card lf-reveal"><span class="lf-icon">▦</span><h3>Mais formas de se conectar</h3><p>Organize links, textos e informações de contato para orientar seus visitantes.</p></article>
+<article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="63" y="25" width="114" height="70" rx="14" fill="#253b28" stroke="#71945f"/><rect x="78" y="38" width="84" height="9" rx="4.5" fill="#a5f33d"/><rect x="78" y="55" width="84" height="9" rx="4.5" fill="#799c71"/><rect x="78" y="72" width="58" height="9" rx="4.5" fill="#799c71"/></g><circle cx="50" cy="34" r="4" fill="#a5f33d"/><circle cx="190" cy="85" r="3" fill="#a5f33d"/></svg></div><span class="lf-icon">↗</span><h3>Seus links reunidos</h3><p>Adicione seus destinos importantes em uma única página, pronta para compartilhar na bio e onde mais quiser.</p></article>
+<article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="78" y="18" width="84" height="84" rx="16" fill="#253b28" stroke="#71945f"/><circle cx="120" cy="45" r="14" fill="#a5f33d"/><path d="M96 80c2-14 10-21 24-21s22 7 24 21" fill="#799c71"/><circle cx="167" cy="32" r="12" fill="#a5f33d"/><path d="M167 26v12m-6-6h12" stroke="#1d3018" stroke-width="2"/></g></svg></div><span class="lf-icon">✦</span><h3>Uma página com sua identidade</h3><p>Escolha um tema e personalize a apresentação para criar uma página que combine com você.</p></article>
+<article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="70" y="29" width="100" height="62" rx="14" fill="#253b28" stroke="#71945f"/><rect x="85" y="44" width="70" height="9" rx="4.5" fill="#a5f33d"/><rect x="85" y="61" width="44" height="7" rx="3.5" fill="#799c71"/><circle cx="154" cy="76" r="17" fill="#a5f33d"/><path d="M148 76h12m-5-5 5 5-5 5" stroke="#1d3018" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div><span class="lf-icon">▦</span><h3>Mais formas de se conectar</h3><p>Organize links, textos e informações de contato para orientar seus visitantes.</p></article>
 </div></div></section>
-<section class="lf-section lf-theme-showcase" id="temas"><div class="lf-container">
-<div class="lf-heading lf-reveal"><span class="lf-eyebrow">Dê forma à sua presença</span><h2>Uma página com o seu estilo</h2><p>Conheça exemplos de temas disponíveis e escolha uma apresentação que combine com você.</p></div>
-<div class="lf-theme-gallery">
-<figure class="lf-theme-tile lf-reveal"><div class="lf-theme-image"><img src="{{ asset('assets/linkstack/images/themes/default.png') }}" alt="Prévia do tema Default" loading="lazy"></div><figcaption><strong>Default</strong><span>Um visual para começar</span></figcaption></figure>
-@if(file_exists(base_path('themes/PolySleek/preview.png')))
-<figure class="lf-theme-tile lf-reveal"><div class="lf-theme-image"><img src="{{ asset('themes/PolySleek/preview.png') }}" alt="Prévia do tema PolySleek" loading="lazy"></div><figcaption><strong>PolySleek</strong><span>Um estilo para sua página</span></figcaption></figure>
-@endif
-@if(file_exists(base_path('themes/galaxy/preview.png')))
-<figure class="lf-theme-tile lf-reveal"><div class="lf-theme-image"><img src="{{ asset('themes/galaxy/preview.png') }}" alt="Prévia do tema Galaxy" loading="lazy"></div><figcaption><strong>Galaxy</strong><span>Outra forma de se apresentar</span></figcaption></figure>
-@endif
-</div><p class="lf-theme-note">As prévias são ilustrativas e a disponibilidade dos temas pode variar.</p>
-</div></section>
 <section class="lf-section alt" id="como-funciona"><div class="lf-container lf-split"><div class="lf-reveal"><span class="lf-eyebrow">Simples de começar</span><h2>Da sua ideia para o mundo</h2><p>Crie um ponto de encontro para sua presença digital e mantenha seus links organizados em um só lugar.</p></div><div class="lf-steps">
 <div class="lf-step lf-reveal"><span class="lf-number">01</span><div><strong>Crie sua conta</strong><p>Comece pelo cadastro e acesse seu painel.</p></div></div>
 <div class="lf-step lf-reveal"><span class="lf-number">02</span><div><strong>Monte sua página</strong><p>Adicione seus links e personalize a apresentação.</p></div></div>

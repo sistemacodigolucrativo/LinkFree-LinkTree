@@ -155,57 +155,39 @@ gitrepo merge-base --is-ancestor "$BASE" "$TARGET" || {
   exit 1
 }
 
-# Renomeacoes contam como inclusao e exclusao para evitar arquivos obsoletos.
-mapfile -t changed < <(gitrepo diff --no-renames --name-only --diff-filter=ACMT "$BASE" "$TARGET" -- linkstack/)
-mapfile -t deleted < <(gitrepo diff --no-renames --name-only --diff-filter=D "$BASE" "$TARGET" -- linkstack/)
+mapfile -t changed < <(gitrepo diff --name-only --diff-filter=ACMRT "$BASE" "$TARGET" -- linkstack/)
+mapfile -t deleted < <(gitrepo diff --name-only --diff-filter=D "$BASE" "$TARGET" -- linkstack/)
+if (( ${#deleted[@]} )); then
+  echo 'AVISO: ha exclusoes no projeto. Este script nao remove arquivos da producao:' >&2
+  printf '  %s\n' "${deleted[@]}" >&2
+  exit 1
+fi
+
 files=()
-removed=()
 protected=()
 manual=()
-# A mesma lista segura de caminhos aplica-se a atualizacao e exclusao.
-for operation in update delete; do
-  if [[ "$operation" == update ]]; then candidates=("${changed[@]}"); else candidates=("${deleted[@]}"); fi
-  for path in "${candidates[@]}"; do
-    rel="${path#linkstack/}"
-    case "$rel" in
-      database/migrations/*) manual+=("$rel"); continue ;;
-      .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*) protected+=("$rel"); continue ;;
-      composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) manual+=("$rel"); continue ;;
-      app/*|config/*|routes/*|resources/*|assets/*|blocks/*|bootstrap/*|docs/*|index.php|.htaccess|server.php|web.config|mix-manifest.json|version.json)
-        if [[ "$operation" == update ]]; then files+=("$rel"); else removed+=("$rel"); fi ;;
-      *) manual+=("$rel") ;;
-    esac
-  done
+for path in "${changed[@]}"; do
+  rel="${path#linkstack/}"
+  case "$rel" in
+    database/migrations/*) manual+=("$rel"); continue ;; # Alteracao de esquema requer migracao e backup coordenados.
+    .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*) protected+=("$rel"); continue ;;
+    composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) manual+=("$rel"); continue ;;
+    app/*|config/*|routes/*|resources/*|assets/*|blocks/*|bootstrap/*|docs/*|index.php|.htaccess|server.php|web.config|mix-manifest.json|version.json)
+      files+=("$rel") ;;
+    *) manual+=("$rel") ;;
+  esac
 done
 
 printf '\nVersao instalada (referencia): %.12s\n' "$BASE"
 printf 'Versao disponivel:             %.12s\n' "$TARGET"
 printf 'Arquivos de codigo para publicar: %s\n' "${#files[@]}"
 ((${#files[@]} == 0)) || printf '  %s\n' "${files[@]}"
-printf 'Arquivos obsoletos para remover (com backup): %s\n' "${#removed[@]}"
-((${#removed[@]} == 0)) || printf '  %s\n' "${removed[@]}"
-((${#protected[@]} == 0)) || { echo 'Arquivos protegidos permanecem intactos:'; printf '  %s\n' "${protected[@]}"; }
+((${#protected[@]} == 0)) || { echo 'Arquivos protegidos nao serao copiados:'; printf '  %s\n' "${protected[@]}"; }
 if ((${#manual[@]})); then
   echo 'Mudancas que exigem revisao manual (dependencias/estrutura):' >&2
   printf '  %s\n' "${manual[@]}" >&2
   exit 1
 fi
-
-# Nao seguir links simbolicos no arquivo ou em pastas ancestrais.
-check_safe_path() {
-  local destination="$1" relative="$2" part="$2"
-  if [[ -L "$destination/$relative" ]]; then
-    echo "CONFLITO: arquivo simbolico no destino: $destination/$relative" >&2
-    exit 1
-  fi
-  while [[ "$part" == */* ]]; do
-    part="${part%/*}"
-    if [[ -L "$destination/$part" ]]; then
-      echo "CONFLITO: pasta simbolica no destino: $destination/$part" >&2
-      exit 1
-    fi
-  done
-}
 
 # Evita sobrescrever modificacoes feitas diretamente em dev/producao.
 # Todo arquivo alterado deve corresponder ao commit anterior, ou estar ausente se for novo.
@@ -217,7 +199,10 @@ for rel in "${files[@]}"; do
     # O diretorio DEV pode nao existir numa instalacao criada pelo instal.sh;
     # sera inicializado somente em --deploy com fontes de codigo, sem dados.
     [[ "$dest" != "$DEV" || -d "$DEV" ]] || continue
-    check_safe_path "$dest" "$rel"
+    if [[ -L "$dest/$rel" ]]; then
+      echo "CONFLITO: destino e link simbolico: $dest/$rel" >&2
+      exit 1
+    fi
     if [[ "$old_exists" == true ]]; then
       if [[ ! -f "$dest/$rel" ]] || ! gitrepo show "$BASE:$old_path" | cmp -s - "$dest/$rel"; then
         echo "CONFLITO: $dest/$rel difere da versao base ($BASE). Nao sobrescrevi." >&2
@@ -226,23 +211,6 @@ for rel in "${files[@]}"; do
     elif [[ -e "$dest/$rel" ]]; then
       echo "CONFLITO: arquivo novo ja existe no destino: $dest/$rel" >&2
       exit 1
-    fi
-  done
-done
-
-# Exclusao so e autorizada se o arquivo for identico ao commit anterior.
-# Arquivo ja ausente pode ser ignorado, sem remover dados nao gerenciados.
-for rel in "${removed[@]}"; do
-  old_path="linkstack/$rel"
-  gitrepo cat-file -e "$BASE:$old_path" || { echo "BASE sem arquivo removido: $rel" >&2; exit 1; }
-  for dest in "$DEV" "$PROD"; do
-    [[ "$dest" != "$DEV" || -d "$DEV" ]] || continue
-    check_safe_path "$dest" "$rel"
-    if [[ -e "$dest/$rel" ]]; then
-      if [[ ! -f "$dest/$rel" ]] || ! gitrepo show "$BASE:$old_path" | cmp -s - "$dest/$rel"; then
-        echo "CONFLITO: arquivo a remover difere do commit anterior: $dest/$rel. Nada sera apagado." >&2
-        exit 1
-      fi
     fi
   done
 done
@@ -273,7 +241,7 @@ if [[ ! -d "$DEV" ]]; then
   rm -f "$stage_list"
 fi
 
-if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 && ${#removed[@]} -eq 0 ]]; then
+if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 ]]; then
   install -d -m 700 "$STATE_DIR"
   if [[ ! -s "$LAST_FILE" ]]; then printf '%s\n' "$BASE" > "$LAST_FILE"; fi
   echo 'Repositorio ja atualizado, nenhum arquivo pendente de publicacao.'
@@ -300,11 +268,9 @@ fi
 : > "$backup/new-prod.txt"
 : > "$backup/files.txt"
 ((${#files[@]} == 0)) || printf '%s\n' "${files[@]}" > "$backup/files.txt"
-: > "$backup/removed.txt"
-((${#removed[@]} == 0)) || printf '%s\n' "${removed[@]}" > "$backup/removed.txt"
 printf '%s\n' "$BASE" > "$backup/base-sha.txt"
 printf '%s\n' "$TARGET" > "$backup/target-sha.txt"
-for rel in "${files[@]}" "${removed[@]}"; do
+for rel in "${files[@]}"; do
   for label in dev prod; do
     if [[ "$label" == dev ]]; then source_dir="$DEV"; else source_dir="$PROD"; fi
     if [[ -f "$source_dir/$rel" ]]; then
@@ -329,7 +295,7 @@ rollback() {
         [[ -n "$rel" ]] || continue
         rm -f -- "$destination/$rel"
       done < "$backup/new-$label.txt"
-      if [[ -s "$backup/files.txt" || -s "$backup/removed.txt" ]]; then
+      if [[ -s "$backup/files.txt" ]]; then
         rsync -a --no-owner --no-group "$backup/$label/" "$destination/" || true
       fi
     done
@@ -353,22 +319,14 @@ for rel in "${files[@]}"; do
   esac
 done
 
-# Ativa restauracao de backup mesmo em deploys com somente exclusoes.
-if ((${#files[@]} || ${#removed[@]})); then deploy_started=true; fi
 if ((${#files[@]})); then
+  deploy_started=true
+  # Rsync apenas dos arquivos alterados: sem --delete, sem tocar em storage, .env ou DB.
   rsync -a --chmod=F644,D755 --chown=ubuntu:ubuntu \
     --files-from="$backup/files.txt" "$REPO/linkstack/" "$DEV/"
   rsync -a --chmod=F644,D755 --no-owner --no-group \
     --files-from="$backup/files.txt" "$REPO/linkstack/" "$PROD/"
 fi
-
-# Remocao seletiva, apos validacao e backup. Nunca usar --delete global:
-# .env, banco, uploads, temas e dependencias sao persistentes.
-for rel in "${removed[@]}"; do
-  rm -f -- "$DEV/$rel"
-  rm -f -- "$PROD/$rel"
-  printf 'Arquivo obsoleto removido de DEV e PROD: %s\n' "$rel"
-done
 
 # Nunca executar config:cache, route:cache ou optimize neste projeto.
 (cd "$PROD" && runuser -u www-data -- php artisan config:clear && runuser -u www-data -- php artisan route:clear && runuser -u www-data -- php artisan view:clear)
