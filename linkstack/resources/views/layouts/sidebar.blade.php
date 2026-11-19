@@ -12,6 +12,24 @@ $usrhandl = Auth::user()->littlelink_name;
       <title>{{env('APP_NAME')}}</title>
 
       <script src="{{asset('assets/js/detect-dark-mode.js')}}"></script>
+      {{-- Fundo visivel antes de baixar CSS/JS: impede flash branco nas trocas de pagina. --}}
+      <style>
+        html{background:#f5f7fc}
+        html.lf-prepaint-dark{background:#222738}
+        html,body{min-height:100%;min-height:100dvh}
+        body{background-color:inherit}
+        /* O loader do template cobria toda a tela com branco ao navegar. */
+        #loading{display:none!important}
+        @view-transition{navigation:auto}
+      </style>
+      <script>
+        (function(){
+          var mode='auto';
+          try{mode=localStorage.getItem('color-mode')||'auto'}catch(_){}
+          var dark=mode==='dark'||(mode==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if(dark)document.documentElement.classList.add('lf-prepaint-dark');
+        })();
+      </script>
 
       <base href="{{url()->current()}}" />
 
