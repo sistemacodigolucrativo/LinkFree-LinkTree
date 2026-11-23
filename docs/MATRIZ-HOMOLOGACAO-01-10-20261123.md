@@ -1,10 +1,10 @@
 # LinkFree — Matriz de homologação conjunta 01–10
 
-Preparação em 23/11/2026. **Nenhum teste abaixo é declarado executado nesta fase**.
+**Atualização operacional (23/11/2026):** a M13 foi publicada na VPS (`3f20bf95e75f`), com migrações 000002–000004 concluídas e homologação técnica pública/read-only aprovada com 0 falhas e 0 revisões manuais. Ver [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md). **Esta matriz é a bateria funcional 01–10, ainda não executada; os checks do deploy não substituem os TCs abaixo.**
 
 ## Protocolo
 
-Executar após concluir implementações e aprovar rollout seguro, primeiro em staging SQLite isolado, depois na VPS com autorização. Perfis: visitante, Free, VIP, admin, bloqueado, cadastro normal e social. Para cada TC registrar ambiente, SHA, data, esperado, observado, status, prova sanitizada e issue. Nunca expor senha, cookie, OAuth, .env ou dados reais. Status possíveis: APROVADO, REPROVADO, NÃO EXECUTADO, NÃO APLICÁVEL (justificado).
+Executar após a publicação técnica M13, inicialmente em staging SQLite isolado para cenários com dados de teste e ações potencialmente destrutivas; depois validar na VPS com autorização e contas de homologação. Perfis: visitante, Free, VIP, admin, bloqueado, cadastro normal e social. Para cada TC registrar ambiente, SHA, data, esperado, observado, status, prova sanitizada e issue. Nunca expor senha, cookie, OAuth, .env ou dados reais. Status possíveis: APROVADO, REPROVADO, NÃO EXECUTADO, NÃO APLICÁVEL (justificado).
 
 ## Pendências e cenários
 

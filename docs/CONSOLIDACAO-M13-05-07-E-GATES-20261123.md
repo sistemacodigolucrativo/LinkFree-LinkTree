@@ -1,59 +1,59 @@
 # LinkFree — Consolidação de M13 (pendências 05–07)
 
-Data: 2026-11-23. Estado: **código reunido para revisão; NÃO autorizado para produção**.
+Data-base: 23/11/2026. **Estado atual: integrado à main e publicado na VPS; homologação funcional 01–10 pendente.**
 
-## Evidências e origem
+A fonte operacional atual é o [registro de produção M13](STATUS-PRODUCAO-M13-20261123.md). As referências às branches e PRs abaixo são histórico de implementação, não mudanças ainda aguardando merge.
 
-- main na revisão: 54add49d30a878fb8efedfaec193c7af607a5a0d (produção conforme último log do operador).
-- PR #11 (indicações): implementation/linkfree-indicacoes-05-20261123 → main.
-- PR #12 (selo verificado): implementation/linkfree-selo-verificado-06-20261123 → branch da PR #11.
-- PR #13 (denúncias): implementation/linkfree-denuncias-07-20261123 → branch da PR #12.
-- Branch unificada de preparação: integration/linkfree-pendencias-05-07-pre-homologacao-20261123, criada a partir do código completo da PR #13, commit e3c17ae6aa1ba23c16115ce5b089d67370596880.
-- Diff acumulado anterior à preparação: 30 arquivos, 11 commits em relação à main.
-- Workflows mais recentes da PR #13 (SHA e3c17ae6aa1b): PHP syntax lint e auditoria automatizada de layout aprovados.
-- As três PRs empilhadas não foram integradas à main e **nenhuma migração nova foi aplicada na VPS**.
+## Integração confirmada
 
-## Situação de cada pendência
+- Repositório: `sistemacodigolucrativo/LinkFree-LinkTree`.
+- `main` publicada: `3f20bf95e75fb93cb6abfef3aaa388c9798b664d`.
+- PR #11: indicações; integrada ao histórico da main.
+- PR #12: selo verificado; branch empilhada, posteriormente **encerrada sem merge individual**, pois o conteúdo foi incluído na PR de consolidação.
+- PR #13: denúncias; branch empilhada, posteriormente **encerrada sem merge individual**, pois o conteúdo foi incluído na PR de consolidação.
+- PR #14: consolidação completa 05–07 e deploy protegido; **integrada à main** no SHA acima.
+- Publicação via `bash /root/atualizar-linkstack.sh --deploy-m13` confirmada pelo log fornecido pelo operador; 23 arquivos de aplicação publicados.
 
-| Nº | Estado verificável |
-|---|---|
-| 01–03 | Verificações técnicas read-only da VPS aprovadas no SHA 54add49d30a8; testes finais não executados |
-| 04 | Implementação e testes isolados anteriores; cadastro real e OAuth real da VPS ainda não comprovados |
-| 05 | Código de indicações implementado na PR #11; sem deploy |
-| 06 | Código de selo verificado implementado na PR #12; sem deploy |
-| 07 | Código de denúncias implementado na PR #13; sem deploy |
-| 08–10 | Homologação funcional, UI/compatibilidade e produção pendentes |
+## Evidências técnicas disponíveis
 
-**Não inferir homologação funcional a partir de PHP lint, CI estático ou HTTP público.**
+| Item | Estado comprovado | Limitação |
+|---|---|---|
+| 01 — Schema/consentimento | Migração de consentimento presente; SQLite íntegro; novas migrações 000002–000004 concluídas | Regressão funcional da base pendente |
+| 02 — Backup/deploy | Backup SQLite antes de migrar e publicação com SHA correto | Exercício de restauração ainda pendente |
+| 03 — Permissões/persistência | Inspeção read-only do PHP-FPM, storage e banco aprovada | Testes de gravação real pendentes |
+| 04 — Cadastro/consentimento | Código e formulário público publicados; CSRF e checkbox visíveis | Cadastro real e OAuth externo pendentes |
+| 05 — Indicações | Código + tabelas `referral_codes` e `referrals` publicados | Exercícios com convite e históricos pendentes |
+| 06 — Selo verificado | Código, colunas em `users` e tabelas de solicitação/auditoria publicados | Fluxo admin/membro e selo legado pendentes |
+| 07 — Denúncias | Código e tabelas `abuse_reports` e `abuse_report_events` publicados | Recebimento/moderação reais pendentes |
+| 08–10 | Homologação técnica pública/read-only aprovada | Bateria funcional, UX e aceite final não executados |
 
-## Bloqueio P0 — deploy e migrações
+A homologação automática após deploy apontou **0 falhas e 0 avisos**. Os workflows estáticos do GitHub para o commit de integração também foram aprovados. Esses resultados **não demonstram** funcionamento dos fluxos autenticados.
 
-O script scripts/atualizar-linkstack.sh da main autoriza automaticamente só a migração de consentimento 000001. Todas as demais mudanças em database/migrations/* são recusadas por segurança. Portanto, o comando de deploy **não pode publicar 05–07 como estão**.
+## Bloqueio histórico de migrations: resolvido na publicação M13
 
-Migrações obrigatórias:
-1. 2026_11_23_000002_create_referral_tables.php: referral_codes, referrals.
-2. 2026_11_23_000003_create_profile_verification_workflow.php: users.verified_at, users.verification_visible, verification_requests, verification_audit_events.
-3. 2026_11_23_000004_create_abuse_reports_tables.php: abuse_reports e abuse_report_events.
+Antes da PR #14, `scripts/atualizar-linkstack.sh` admitia automaticamente apenas a migração 000001; as migrations M13 eram bloqueadas. A PR #14 incluiu modo explícito `--deploy-m13`, allowlist nominal 000002–000004, backup SQLite e verificações pós-migração.
 
-**Resolução necessária antes de publicação:** revisar e aprovar alteração específica e restrita do fluxo de deploy para admitir nominalmente as três migrations, depois de validar backup consistente e restauração em ambiente isolado. Exigir: origem e commit conhecidos; banco SQLite correto; integridade; permissão www-data; migrations verificadas em cópia; backup SQLite online e storage; execução aditiva antes de copiar os novos controllers; verificação do esquema; publicação e smoke; falha fechada. Nunca contornar o bloqueio removendo migrations ou atualizando banco de produção manualmente.
+O operador executou preflight `--check`, depois `--deploy-m13`. O relatório informou:
 
-Incluído `scripts/preflight-m13-readonly.sh` para inspeção **somente de leitura** do esquema já existente. Um resultado pendente (exit code 3) é esperado na VPS antes das migrations. O script não prepara nem executa deploy.
+- Migrações 000002, 000003 e 000004: `DONE`.
+- Código publicado: 23 arquivos.
+- SHA: `3f20bf95e75f`.
+- Backup SQLite: `/var/backups/linkfree-deploy/20261123-231449-jORt0u/sqlite-before-deploy.sqlite`.
+- Smoke automatizado read-only: aprovado com 0 falhas e 0 revisões manuais.
 
-## Riscos P1 / decisões necessárias
+**Não há necessidade de repetir a migração M13.** Mantenha o backup protegido. Nova alteração de schema deverá ser planejada separadamente.
 
-- Selo: plano VIP não concede mais selo; decidir como tratar perfis historicamente exibidos como verificados. A migração NÃO concede aprovação retroativa.
-- Denúncias: reter dados apenas pelo período definido, ajustar política LGPD e acesso/retenção de históricos.
-- OAuth: verificar sessão de convite e consentimento entre os redirecionamentos reais.
-- SQLite: confirmar FKs, concorrência e transações no banco isolado.
-- Interface: verificar badge de selo Livewire, visualização pública, modo escuro/claro, telas autenticadas e responsividade.
+## Riscos e trabalho ainda pendentes
 
-## Sequência de liberação recomendada
+1. **Selo legado:** VIP não concede selo automaticamente; identificar e revisar contas que usavam o mecanismo anterior.
+2. **LGPD/denúncias:** política de retenção, acesso, eventuais pedidos de titulares e tratamento de texto livre.
+3. **Cadastro e OAuth:** cadastro real, sessão de convite/consentimento e login de contas existentes.
+4. **Concorrência e SQLite:** transações, integridade após exclusões, idempotência e acesso simultâneo.
+5. **UX/segurança:** painel admin/membro autenticado, badges, exibição pública, temas, dispositivos e acessibilidade.
+6. **Recuperação:** teste de restauração em ambiente isolado, sem substituição do banco de produção.
 
-1. Revisão da PR de integração e validação dos critérios de `docs/MATRIZ-HOMOLOGACAO-01-10-20261123.md`.
-2. Fechamento do P0 de deploy em branch/PR separada e validação em SQLite isolado, com backup restaurável.
-3. Aprovação de política de migração de selo antigo e retenção das denúncias.
-4. Preparar contas, evidências e ambiente de staging.
-5. Após autorização: merge controlado, deploy com migrações coordenadas, checks técnicos e testes funcionais 01–10 (primeiro staging e depois produção).
-6. Aprovar somente com resultados e evidências; nenhum rollback destrutivo de consentimentos ou dados de usuários.
+## Próxima fase
 
-**Nesta fase, não executar merge, deploy, migrações ou testes autenticados na VPS.**
+Executar a [matriz de homologação conjunta 01–10](MATRIZ-HOMOLOGACAO-01-10-20261123.md) no momento definido pelo responsável. Registrar falhas e evidências; distinguir verificações técnicas já aprovadas de cenários funcionais ainda não executados. Não declarar todas as pendências encerradas apenas porque o código está publicado.
+
+**Atualização deste arquivo é documental; não representa novo deploy, merge de código ou execução de testes funcionais.**

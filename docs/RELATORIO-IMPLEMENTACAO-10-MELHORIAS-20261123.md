@@ -1,6 +1,8 @@
 # Relatório de implementação — LinkFree (23/11/2026)
 
-> **Atualização:** a PR #8 foi integrada à `main` no commit `5996df6c2f76673797e767a346bf2edc289d881c`. O texto abaixo documenta o estado **histórico** da branch de implementação antes do merge. A preparação posterior para migrar consentimento com backup e os testes integrados de cadastro constam em [Fechamento das pendências 01–04](FECHAMENTO-PENDENCIAS-01-04-20261123.md). A migração e o deploy ainda não foram executados na VPS.
+> **Situação operacional posterior (23/11/2026):** PR #14 integrada à `main` e M13 publicada na VPS no commit `3f20bf95e75f`. Migrações 000002–000004 concluídas; homologação técnica automática read-only com 0 falhas e 0 revisões manuais. A validação funcional 01–10 continua pendente. Leia [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md). O restante deste arquivo documenta etapas históricas de preparação, não o estado atual.
+
+> **Atualização:** a PR #8 foi integrada à `main` no commit `5996df6c2f76673797e767a346bf2edc289d881c`. O texto abaixo documenta o estado **histórico** da branch de implementação antes do merge. A preparação posterior para migrar consentimento com backup e os testes integrados de cadastro constam em [Fechamento das pendências 01–04](FECHAMENTO-PENDENCIAS-01-04-20261123.md). O texto original abaixo foi escrito antes do deploy e permanece como registro histórico; a execução posterior está no documento operacional indicado acima.
 
 ## Visão geral
 
@@ -59,7 +61,7 @@ Os testes de sintaxe/contratos **não equivalem** a teste funcional com login re
 - Central admin e páginas de erro acessíveis e responsivas; testes de status HTTP reais.
 - Home e painel de personalização continuam operacionais, sem regressão HTTP 500.
 
-**4. ESCOPO AINDA PENDENTE**
+**4. ESCOPO QUE ESTAVA PENDENTE NA VERSÃO ORIGINAL DO RELATÓRIO**
 - M13: indicações com atribuição, fila de solicitações de selo e caixa administrativa de denúncias exigem fluxos de dados, moderação, formulários, políticas e migrações próprias. Não foram criados atalhos fictícios ou permissões desprotegidas.
 - Testes de integração com DB real, Playwright autenticado e validação cross-browser ainda não realizados.
 - Não existe evidência de execução de deploy.

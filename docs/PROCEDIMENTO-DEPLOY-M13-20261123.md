@@ -1,6 +1,18 @@
 # LinkFree — liberação controlada M13 (indicações, selos, denúncias)
 
-Data: 23/11/2026. Documento operacional. **Não executar como um único comando de deploy sem revisão da saída do preflight.**
+Data: 23/11/2026. **Procedimento registrado como executado na VPS**, conforme log fornecido pelo operador. A sequência abaixo documenta a publicação M13 que já ocorreu; **não repita** `--deploy-m13` nem as migrações 000002–000004. Consulte [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md).
+
+## Evidências da execução concluída
+
+- `main`: `3f20bf95e75f`, PR #14 integrada.
+- Instalador atualizado, com backup do script anterior: `/root/linkfree-deploy-scripts-backup/atualizar-linkstack-20261123T231405Z.sh`.
+- `--check`: passou; identificou 23 arquivos para atualização, M13 reconhecida e nenhum conflito.
+- `--deploy-m13`: migrações 000002, 000003 e 000004 concluídas com `DONE`, seguidas pela publicação dos 23 arquivos.
+- Backup SQLite: `/var/backups/linkfree-deploy/20261123-231449-jORt0u/sqlite-before-deploy.sqlite`.
+- Pós-deploy read-only automático: **0 falhas, 0 pendências de revisão manual**, HTTP público e esquema/SQLite aprovados tecnicamente.
+- **Ainda não homologado:** cadastro real, OAuth, painéis autenticados e fluxos de indicação/selo/denúncia; matriz funcional 01–10 pendente.
+
+**Os Gates 1–5 abaixo permanecem como registro do procedimento utilizado e referência para auditorias, não como uma nova ordem de execução.**
 
 ## O que muda
 
@@ -15,7 +27,7 @@ Migrations desconhecidas, conjunto parcial, divergência de arquivo de banco/mig
 
 ## Gate 1 — CI e revisão no GitHub
 
-- Confirmar branch `main` com a PR #14 integrada e o hash esperado.
+- **Concluído em 23/11/2026:** a `main` recebeu a PR #14 no SHA `3f20bf95e75f`; conferir histórico antes de qualquer manutenção futura.
 - Exigir aprovação dos workflows: **M13 isolated migration and guarded deploy checks**, **Consent migration, persistence and deploy safeguards**, **Deploy unificado e homologacao**, **LinkFree PHP syntax lint**, e regressão de layout.
 - Teste da migration M13 usa SQLite temporário no runner GitHub Actions. **Não executa migração no banco real**, não substitui teste end-to-end nem procedimento de restauração.
 - Confirmar tratamento do selo legado e risco de alteração do VIP antes da divulgação das novas regras.
@@ -73,4 +85,4 @@ Conferir SHA, integridade, backup e HTTP público. Comparar com a main verificad
 - Não executar `php artisan migrate` manualmente fora do procedimento autorizado.
 - A PR #14 consolida as PRs #11–#13; não mesclar as três em duplicidade depois de integrar a consolidação.
 - É recomendável interromper temporariamente novos cadastros durante a transição, se a janela de implantação exigir, com estratégia de retorno segura; o procedimento não pausa serviços automaticamente.
-- O operador é responsável por inspecionar a saída da VPS; nenhum ambiente remoto foi alterado pela criação desta documentação.
+- O operador executou o procedimento e forneceu o log; esta atualização documental não executou nova ação na VPS.

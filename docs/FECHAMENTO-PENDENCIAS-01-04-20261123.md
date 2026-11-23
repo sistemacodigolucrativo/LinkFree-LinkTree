@@ -1,5 +1,7 @@
 # LinkFree — Fechamento técnico das pendências 01–04 (23/11/2026)
 
+> **Situação operacional posterior (23/11/2026):** PR #14 integrada à `main` e M13 publicada na VPS no commit `3f20bf95e75f`. Migrações 000002–000004 concluídas; homologação técnica automática read-only com 0 falhas e 0 revisões manuais. A validação funcional 01–10 continua pendente. Leia [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md). O restante deste arquivo documenta etapas históricas de preparação, não o estado atual.
+
 > **Atualização operacional posterior:** a migração foi executada na VPS (status `Ran`) e a publicação chegou ao SHA `f8f3ddc82437502d829dddeae4d5ab375cb9a54d`. O modo de deploy agora é automatizado para migrações aditivas previamente autorizadas, e o alias existente foi contemplado por um instalador dedicado. Consulte [Homologação e deploy unificado](HOMOLOGACAO-DEPLOY-UNIFICADO-20261123.md). As instruções de `--deploy-consent` abaixo registram o procedimento histórico e não devem ser repetidas.
 
 ## Situação e limites de acesso

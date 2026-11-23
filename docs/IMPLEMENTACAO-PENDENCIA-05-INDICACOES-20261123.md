@@ -2,7 +2,7 @@
 
 ## Situação
 
-Implementação proposta na branch `implementation/linkfree-indicacoes-05-20261123`, sem merge na main e sem deploy na VPS. Testes funcionais e homologação serão realizados com as pendências 01–10 após concluir todas as implementações, conforme orientação do responsável.
+**Publicado na `main` e na VPS em 23/11/2026**, como parte da PR #14, commit `3f20bf95e75f`. A migração `2026_11_23_000002_create_referral_tables` foi executada com status `DONE` (log do operador). Os fluxos de convite e histórico **ainda não foram homologados funcionalmente**. Consulte [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md).
 
 ## Fluxos implementados
 
@@ -22,7 +22,7 @@ Implementação proposta na branch `implementation/linkfree-indicacoes-05-202611
 
 ## Operação / riscos
 
-- **Não publicar código antes da migração.** O deploy da main não é automaticamente alterado nesta branch. Planejar backup íntegro do banco, migração aditiva com a mesma rotina de deploy homologada, e validação técnica no momento oportuno.
+- **Publicação já realizada com migração antes do código.** O operador executou `--deploy-m13` após `--check`, com backup SQLite íntegro relatado em `/var/backups/linkfree-deploy/20261123-231449-jORt0u`. Não repetir o modo de migração nesta versão.
 - Fluxo social depende da sessão atravessar o redirecionamento OAuth; testes reais ainda pendentes.
 - URL base usa `route()` e precisa refletir HTTPS/domínio configurado no servidor.
 - Para cadastro de contas antigas, o link não é retroativamente aplicado. Sem incentivos financeiros automáticos.
@@ -38,8 +38,8 @@ Implementação proposta na branch `implementation/linkfree-indicacoes-05-202611
 - Exclusão de indicador/convidado preserva integridade conforme o comportamento documentado.
 - Backup, migração, deploy, smoke test e homologação final apenas quando todas as funcionalidades estiverem prontas.
 
-## Próximos módulos
+## Estado das pendências relacionadas
 
-- Pendência 06: solicitações e gestão de selo verificado.
-- Pendência 07: caixa de denúncias e moderação.
-- Pendências 08–10: testes e homologação final.
+- Pendências 06 e 07: implementadas e publicadas na mesma M13 (funcionalidade ainda não homologada).
+- Pendências 01–10: testes funcionais integrados pendentes, conforme decisão do responsável.
+- Ver [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md).

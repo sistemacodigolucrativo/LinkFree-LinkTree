@@ -2,7 +2,7 @@
 
 ## Estado
 
-Implementada **no código** da branch implementation/linkfree-denuncias-07-20261123, sobre as branches das pendências 05 (indicações) e 06 (selo verificado). **Sem merge na main, sem deploy na VPS e sem homologação funcional.** O responsável decidiu testar as pendências 01–10 em conjunto após todas as implementações.
+**Implementada e publicada na VPS em 23/11/2026** pela PR #14, integrada à `main` (`3f20bf95e75f`). A migração `2026_11_23_000004_create_abuse_reports_tables` foi executada com `DONE`. A PR #13 foi encerrada sem merge individual para evitar duplicação. **Não houve homologação funcional** de recebimento de denúncias nem de moderação autenticada. Ver [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md).
 
 ## Integração com o projeto existente
 
@@ -37,7 +37,7 @@ A implementação integra esses recursos existentes, sem criar um formulário p�
 - Justificativa obrigatória para resolução/arquivamento; retorno para análise, reabertura, notas e atualização concorrente.
 - Exclusão de denunciado, denunciante e administrador mantendo histórico.
 - Compatibilidade mobile/tablet/desktop, temas claro/escuro, acessibilidade, navegadores e persistência após recarregar.
-- Antes de publicar as pendências 05, 06 e 07, executar backup íntegro e migrações aditivas em ambiente apropriado com homologação técnica.
+- **Publicação concluída:** backup SQLite de 23/11/2026, migrations 000002–000004 executadas antes do código e homologação técnica read-only aprovada. Continuam pendentes os cenários funcionais de denúncias.
 
 ## Verificações técnicas automáticas (não substituem homologação)
 
@@ -49,7 +49,7 @@ A implementação integra esses recursos existentes, sem criar um formulário p�
 ## Estado das pendências
 
 - 01–04: implementações anteriores; validações funcionais finais pendentes.
-- 05: indicações implementadas em PR #11.
-- 06: selo verificado implementado em PR #12 (empilhada sobre #11).
-- 07: central de denúncias implementada nesta branch/PR, empilhada sobre #12.
-- 08–10: testes e homologação final, reservados para depois do desenvolvimento integral.
+- 05: indicações implementadas e publicadas na M13 (`main`, PR #14); testes funcionais pendentes.
+- 06: selo verificado implementado e publicado na M13 (`main`, PR #14); testes funcionais pendentes.
+- 07: central de denúncias implementada e publicada na M13 (`main`, PR #14); testes funcionais pendentes.
+- 08–10: testes e homologação final ainda não executados, conforme planejamento.

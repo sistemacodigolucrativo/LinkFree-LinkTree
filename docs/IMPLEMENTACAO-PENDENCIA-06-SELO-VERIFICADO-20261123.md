@@ -1,5 +1,9 @@
 # Pendência 06 — Selo verificado (23/11/2026)
 
+## Situação atual
+
+**Implantado no código de produção** pelo merge da PR #14 na `main` (`3f20bf95e75f`) e pelo deploy `--deploy-m13` em 23/11/2026. A migração `2026_11_23_000003_create_profile_verification_workflow` retornou `DONE`. O sistema **não foi homologado em fluxos reais**: solicitações, decisões do Admin, badge e exibição/ocultação do membro continuam na matriz 01–10. Ver [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md).
+
 ## Requisitos confirmados
 
 - O membro solicita a verificação ao administrador; não pode aprovar a si próprio.
@@ -29,6 +33,6 @@
 
 ## Operação e pendências de teste
 
-**Não executar merge/deploy antes de planejar e aplicar as migrações (05 e 06) com backup e validação do banco.** PR empilhada na branch da pendência 05. A main da produção permanece inalterada.
+**Registro posterior:** a publicação M13 foi efetuada após backup e migrações 000002–000004, com verificação técnica read-only aprovada (0 falhas). A PR #12 foi encerrada sem merge individual porque o conteúdo foi incluído na PR #14. **Não repetir a migração.** Os selos que antes apareciam pela regra VIP exigem revisão administrativa; nenhuma concessão retroativa automática foi feita.
 
 Testes funcionais 01–10 ficam reservados para depois da implementação de todos os módulos conforme decisão do responsável. Verificar especialmente: permissão de usuário comum/VIP/admin; exibição, ocultação, revogação; fila, reenvio, rejeição com motivo, concessão direta; preservação de temas e visual do selo; acesso externo, mobile, coexistência de solicitações e exclusão de membros; SQL SQLite e integridade.

@@ -1,5 +1,7 @@
 # LinkFree — homologação técnica e deploy unificado (23/11/2026)
 
+> **Situação operacional posterior (23/11/2026):** PR #14 integrada à `main` e M13 publicada na VPS no commit `3f20bf95e75f`. Migrações 000002–000004 concluídas; homologação técnica automática read-only com 0 falhas e 0 revisões manuais. A validação funcional 01–10 continua pendente. Leia [Estado operacional M13 e evidências de produção](STATUS-PRODUCAO-M13-20261123.md). O restante deste arquivo documenta etapas históricas de preparação, não o estado atual.
+
 ## Evidências confirmadas
 
 ### Produção — banco e versão publicados
