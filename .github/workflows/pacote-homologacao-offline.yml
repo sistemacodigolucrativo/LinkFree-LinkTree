@@ -1,0 +1,148 @@
+name: Gerar ZIP offline da homologacao LinkFree
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/pacote-homologacao-offline.yml'
+      - 'docs/HOMOLOGACAO-ASSISTIDA-01-10-*.md'
+      - 'docs/MATRIZ-HOMOLOGACAO-01-10-20261123.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  empacotar:
+    name: Empacotar os 43 testes e documentos oficiais
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout da main
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Construir e validar o ZIP offline
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile, ZIP_DEFLATED
+          import hashlib
+          import json
+          import re
+          import os
+
+          docs = [
+              'docs/HOMOLOGACAO-ASSISTIDA-01-10-MANUAL-OPERACIONAL.md',
+              'docs/HOMOLOGACAO-ASSISTIDA-01-10-PROMPT-IA.md',
+              'docs/HOMOLOGACAO-ASSISTIDA-01-10-REGISTRO.md',
+              'docs/MATRIZ-HOMOLOGACAO-01-10-20261123.md',
+              'docs/STATUS-PRODUCAO-M13-20261123.md',
+              'docs/IMPLEMENTACAO-PENDENCIA-05-INDICACOES-20261123.md',
+              'docs/IMPLEMENTACAO-PENDENCIA-06-SELO-VERIFICADO-20261123.md',
+              'docs/IMPLEMENTACAO-PENDENCIA-07-DENUNCIAS-20261123.md',
+              'docs/CONSOLIDACAO-M13-05-07-E-GATES-20261123.md',
+              'docs/PROCEDIMENTO-DEPLOY-M13-20261123.md',
+              'docs/FECHAMENTO-PENDENCIAS-01-04-20261123.md',
+              'docs/HOMOLOGACAO-DEPLOY-UNIFICADO-20261123.md',
+              'docs/RELATORIO-IMPLEMENTACAO-10-MELHORIAS-20261123.md',
+          ]
+          source = [
+              'linkstack/routes/web.php',
+              'linkstack/app/Http/Controllers/ReferralController.php',
+              'linkstack/app/Http/Controllers/VerificationController.php',
+              'linkstack/app/Http/Controllers/AbuseReportController.php',
+              'linkstack/app/Services/ReferralService.php',
+              'linkstack/app/Services/UserLinkLimit.php',
+              'linkstack/resources/views/studio/referrals.blade.php',
+              'linkstack/resources/views/studio/verification.blade.php',
+              'linkstack/resources/views/report.blade.php',
+          ]
+          all_files = docs + source
+          for name in all_files:
+              if not Path(name).is_file():
+                  raise SystemExit('Arquivo obrigatório ausente: ' + name)
+          manual = Path(docs[0]).read_text(encoding='utf-8')
+          progress = Path(docs[2]).read_text(encoding='utf-8')
+          ids = re.findall(r'^### (TC-\d{2}-[A-Z])', manual, re.M)
+          rows = re.findall(r'^\| (TC-\d{2}-[A-Z]) \| NÃO EXECUTADO', progress, re.M)
+          if len(ids) != 43 or len(set(ids)) != 43 or ids != rows:
+              raise SystemExit('O manual e o registro não correspondem aos 43 testes.')
+          readme = """# PACOTE OFFLINE DE HOMOLOGAÇÃO — LINKFREE-LINKTREE
+
+          Este ZIP contém os arquivos originais do repositório GitHub para a IA trabalhar OFFLINE.
+          Não é preciso abrir links do GitHub para ler o manual, o prompt e a matriz.
+
+          LEIA NESTA ORDEM:
+          1. docs/HOMOLOGACAO-ASSISTIDA-01-10-PROMPT-IA.md
+          2. docs/HOMOLOGACAO-ASSISTIDA-01-10-MANUAL-OPERACIONAL.md
+          3. docs/HOMOLOGACAO-ASSISTIDA-01-10-REGISTRO.md
+          4. docs/MATRIZ-HOMOLOGACAO-01-10-20261123.md
+          5. docs/STATUS-PRODUCAO-M13-20261123.md
+          6. docs/IMPLEMENTACAO-PENDENCIA-05-INDICACOES-20261123.md
+          7. docs/IMPLEMENTACAO-PENDENCIA-06-SELO-VERIFICADO-20261123.md
+          8. docs/IMPLEMENTACAO-PENDENCIA-07-DENUNCIAS-20261123.md
+          9. Demais documentos da pasta docs/ para contexto adicional.
+
+          A pasta codigo_referencia/ contém apenas arquivos de código relevantes
+          para conferir rotas e comportamentos, sem credenciais, banco nem .env.
+
+          MENSAGEM PARA ENVIAR À PRÓXIMA IA:
+          "Leia TODOS os arquivos deste ZIP, principalmente o PROMPT-IA e o MANUAL.
+          Quero iniciar a homologação assistida do LinkFree das pendências 01–10,
+          um teste por vez, começando pelo TC-01-A. Diga onde devo entrar, o que
+          devo fazer e qual é o resultado esperado; aguarde meu relato em minhas
+          próprias palavras, classifique segundo os critérios e registre o progresso.
+          Não aprove teste sem evidência nem execute ações destrutivas na produção."
+
+          PRODUÇÃO: código M13 publicado no commit 3f20bf95e75f (23/11/2026).
+          Teste técnico read-only aprovado; homologação funcional NÃO concluída.
+          Total: 43 casos oficiais, todos inicialmente NÃO EXECUTADOS.
+          """
+          readme = '\n'.join(line.lstrip() for line in readme.splitlines()) + '\n'
+          manifest = {
+              'package': 'LinkFree homologacao assistida 01-10',
+              'repository': 'sistemacodigolucrativo/LinkFree-LinkTree',
+              'source_revision': os.environ.get('GITHUB_SHA'),
+              'production_code_sha': '3f20bf95e75fb93cb6abfef3aaa388c9798b664d',
+              'official_tests': 43,
+              'status': 'homologacao funcional pendente',
+              'files': {},
+          }
+          Path('dist').mkdir(exist_ok=True)
+          output = Path('dist/LINKFREE-HOMOLOGACAO-01-10-COMPLETA.zip')
+          with ZipFile(output, 'w', compression=ZIP_DEFLATED, compresslevel=9) as z:
+              z.writestr('LEIA-ME-PRIMEIRO.md', readme)
+              for name in docs:
+                  b = Path(name).read_bytes()
+                  z.writestr(name, b)
+                  manifest['files'][name] = {
+                      'bytes': len(b),
+                      'sha256': hashlib.sha256(b).hexdigest(),
+                  }
+              for name in source:
+                  b = Path(name).read_bytes()
+                  dest = 'codigo_referencia/' + name
+                  z.writestr(dest, b)
+                  manifest['files'][dest] = {
+                      'bytes': len(b),
+                      'sha256': hashlib.sha256(b).hexdigest(),
+                  }
+              z.writestr('MANIFESTO.json', json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+          with ZipFile(output, 'r') as z:
+              if z.testzip():
+                  raise SystemExit('ZIP falhou na validação CRC')
+              if len(z.namelist()) != len(all_files) + 2:
+                  raise SystemExit('Quantidade inesperada de arquivos no ZIP')
+          print('SUCESSO: 43 testes, ' + str(len(docs)) + ' documentos, ' +
+                str(len(source)) + ' fontes, ZIP=' + str(output) +
+                ' (' + str(output.stat().st_size) + ' bytes)')
+          PY
+      - name: Publicar artefato ZIP para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: LINKFREE-HOMOLOGACAO-01-10-COMPLETA
+          path: dist/LINKFREE-HOMOLOGACAO-01-10-COMPLETA.zip
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
