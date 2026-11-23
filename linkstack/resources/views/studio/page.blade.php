@@ -352,6 +352,19 @@
                               <label class="form-check-label" for="tablinks">{{__('messages.Enable')}}</label>
                             </div>
 
+                    <fieldset class="border rounded-3 p-3 mt-4" style="max-width:850px">
+                      <legend class="fs-6 fw-bold">{{ __('messages.lf_privacy_stats') }}</legend>
+                      <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="search_noindex" id="lf-noindex" value="1"
+                          @checked((bool) \App\Models\UserData::getData(auth()->id(), 'search_noindex'))>
+                        <label class="form-check-label" for="lf-noindex">{{ __('messages.lf_noindex') }}</label>
+                      </div>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="public_visit_count" id="lf-visit-counter" value="1"
+                          @checked((bool) \App\Models\UserData::getData(auth()->id(), 'public_visit_count'))>
+                        <label class="form-check-label" for="lf-visit-counter">{{ __('messages.lf_public_counter') }}</label>
+                      </div>
+                    </fieldset>
                     <button id="submit-btn" type="submit" class="mt-3 ml-3 btn btn-primary">{{__('messages.Save')}}</button>
                 </form>
 

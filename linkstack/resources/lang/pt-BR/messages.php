@@ -1059,4 +1059,13 @@ return array(
     'lf_wa_message' => 'Mensagem pré-preenchida',
     'lf_wa_preview' => 'Prévia do WhatsApp',
     'lf_wa_invalid_phone' => 'Informe código do país e número válidos (8 a 15 dígitos no total).',
+    'lf_privacy_stats' => 'Privacidade e estatísticas da página',
+    'lf_noindex' => 'Pedir que mecanismos de busca não indexem minha página (noindex)',
+    'lf_public_counter' => 'Exibir contador de visitas na página pública',
+    'lf_public_visits_label' => ':count visitas à página',
+    'lf_visitor_report' => 'Relatório de origem dos visitantes',
+    'lf_visitor_last30' => 'Últimos 30 dias',
+    'lf_visitor_source' => 'Origem',
+    'lf_visitor_count' => 'Visitas',
+    'lf_visitor_note' => 'Fontes estimadas por referência e UTM. Links sem origem informada aparecem como acesso direto.',
 );

@@ -108,6 +108,7 @@ Route::get('/studio/links', [UserController::class, $LinkPage])->name($LinkPage)
 Route::get('/studio/page-icons', [UserController::class, 'showIcons'])->name('showPageIcons');
 Route::get('/studio/blocks', [UserController::class, 'showBlocks'])->name('showBlocks');
 Route::get('/studio/theme', [UserController::class, 'showTheme'])->name('showTheme');
+Route::get('/studio/visitors', [UserController::class, 'showVisitorReports'])->name('studio.visitors');
 Route::get('/studio/theme-preview/{theme}', [\App\Http\Controllers\ThemePreviewController::class, 'show'])->name('themePreview')->where('theme', '[A-Za-z][A-Za-z0-9_-]*');
 Route::post('/studio/theme', [UserController::class, 'editTheme'])->name('editTheme');
 Route::get('/deleteLink/{id}', [UserController::class, 'deleteLink'])->name('deleteLink')->middleware('link-id');

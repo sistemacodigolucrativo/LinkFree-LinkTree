@@ -125,7 +125,7 @@ class UserController extends Controller
             }
         }
 
-        return view('linkstack.linkstack', ['userinfo' => $userinfo, 'information' => $information, 'links' => $links, 'littlelink_name' => $littlelink_name]);
+        return $this->renderPublicProfile($request, $userinfo, $information, $links, $littlelink_name);
     }
 
     //Show littlelink page as home page if set in config
@@ -163,7 +163,7 @@ class UserController extends Controller
             }
         }
 
-        return view('linkstack.linkstack', ['userinfo' => $userinfo, 'information' => $information, 'links' => $links, 'littlelink_name' => $littlelink_name]);
+        return $this->renderPublicProfile($request, $userinfo, $information, $links, $littlelink_name);
     }
 
     //Redirect to user page
@@ -181,6 +181,37 @@ class UserController extends Controller
         }
 
         return redirect(url('@'.$user));
+    }
+
+    // Visitas publicas e SEO compartilham o contador ja usado pelo dashboard.
+    private function renderPublicProfile(Request $request, User $userinfo, $information, $links, string $littlelink_name)
+    {
+        $visitCount = 0;
+        try {
+            $counter = visits('App\\Models\\User', $littlelink_name);
+            $counted = $counter->increment();
+            if ($counted) {
+                \App\Services\VisitAttribution::record((int) $userinfo->id, $request);
+            }
+            $visitCount = (int) $counter->count();
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+        $showVisitCount = (bool) UserData::getData($userinfo->id, 'public_visit_count');
+        $noIndex = (bool) UserData::getData($userinfo->id, 'search_noindex');
+        $response = response()->view('linkstack.linkstack', compact('userinfo', 'information', 'links', 'littlelink_name', 'visitCount', 'showVisitCount', 'noIndex'));
+        if ($noIndex) $response->header('X-Robots-Tag', 'noindex, follow');
+        return $response;
+    }
+
+    // Relatorios avancados: permissao obrigatoria no servidor.
+    public function showVisitorReports()
+    {
+        abort_unless(in_array(Auth::user()->role, ['vip', 'admin'], true), 403);
+        return view('studio.visitor-reports', [
+            'sources' => \App\Services\VisitAttribution::summary((int) Auth::id(), 30),
+            'visitsTotal' => (int) visits('App\\Models\\User', Auth::user()->littlelink_name)->count(),
+        ]);
     }
 
     //Show add/update form
@@ -712,7 +743,9 @@ class UserController extends Controller
         } else {
             UserData::saveData($userId, 'links-new-tab', false);
         }
-    
+        UserData::saveData($userId, 'search_noindex', $request->boolean('search_noindex'));
+        UserData::saveData($userId, 'public_visit_count', $request->boolean('public_visit_count'));
+
         return Redirect('/studio/page');
     }
 

@@ -1163,4 +1163,13 @@ return [
     'lf_wa_message' => 'Pre-filled message',
     'lf_wa_preview' => 'WhatsApp preview',
     'lf_wa_invalid_phone' => 'Enter a valid country code and number (8 to 15 digits total).',
+    'lf_privacy_stats' => 'Page privacy and statistics',
+    'lf_noindex' => 'Ask search engines not to index my page (noindex)',
+    'lf_public_counter' => 'Show visit count on my public page',
+    'lf_public_visits_label' => ':count page visits',
+    'lf_visitor_report' => 'Visitor origin report',
+    'lf_visitor_last30' => 'Last 30 days',
+    'lf_visitor_source' => 'Source',
+    'lf_visitor_count' => 'Visits',
+    'lf_visitor_note' => 'Sources estimated from referrers and UTM. Missing information is classified as direct traffic.',
 ];

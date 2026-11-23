@@ -1,4 +1,7 @@
 <meta charset="utf-8">
+@if(!empty($noIndex))
+<meta name="robots" content="noindex, follow">
+@endif
 
 {{-- Fediverse rel="me" links --}}
 @php
