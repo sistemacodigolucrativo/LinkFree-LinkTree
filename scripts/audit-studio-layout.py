@@ -272,3 +272,15 @@ require('body .main-content .footer .footer-body' in nav_css,
         "Rodape adaptativo nos paineis")
 require('lf-vip-switch' in users_view and 'id="auto-vip-new-users"' in users_view,
         "Toggle VIP em card compacto")
+
+admin_theme_css = (views.parents[1] / "assets/css/linkfree-admin-management.css").read_text(encoding="utf-8")
+block_index = (views / "admin" / "linktype" / "index.blade.php").read_text(encoding="utf-8")
+require("lf-admin-themes-page" in admin_themes and "mt-n5 py-0" not in admin_themes,
+        "Gerenciar temas sem margem negativa que sobrepoe boas-vindas no mobile")
+require("lf-theme-preview" in admin_themes and "lf-theme-preview" in github_view,
+        "Cards de temas locais e GitHub compartilham imagem 16:9")
+require("lf-type-card" in block_index and "lf-type-hero" in block_index and
+        "grid" not in block_index.split("lf-type-hero")[0],
+        "Tipos de bloco em cards responsivos com operacoes preservadas")
+require("lf-block-types-page" in admin_theme_css and "lf-admin-themes-page" in admin_theme_css,
+        "Design system aplicado a tipos de bloco e catalogo de temas")

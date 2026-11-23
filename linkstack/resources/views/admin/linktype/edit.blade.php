@@ -1,12 +1,16 @@
 @extends('layouts.sidebar')
+@push('sidebar-stylesheets')
+<link rel="stylesheet" href="{{ asset('assets/css/linkfree-admin-management.css') }}?v={{ filemtime(base_path('assets/css/linkfree-admin-management.css')) }}">
+@endpush
 
 @section('content')
+<div class="container-fluid content-inner py-2 lf-block-types-page">
 
-<div class='card'>
+<div class="card lf-type-form rounded-4">
     <div class='card-header'>
-        <h4 class='card-title'>Edit Link Type</h4>
+        <h4 class='card-title'>Editar tipo de bloco</h4>
     </div>
-    <div class='card-body'>
+    <div class="card-body p-3 p-md-4">
 
         <!-- if there are creation errors, they will show here -->
         @if ($errors->any())
@@ -29,7 +33,7 @@
 
 
             <div class="form-group">
-                <label for="icon">Icon</label>
+                <label for="icon">Ícone</label>
                 <input type='text' value="{{$linktype->icon}}" name='icon' class="form-control @error('icon') is-invalid @enderror">
                 <a href="https://icons.getbootstrap.com/" target="_blank">View Icons Here</a>
 
@@ -40,7 +44,7 @@
 
 
             <div class="form-group">
-                <label for="typename">Short Name</label>
+                <label for="typename">Identificador curto</label>
                 <input type='text' value="{{$linktype->typename}}" name='typename' readonly class="form-control @error('typename') is-invalid @enderror">
 
 
@@ -51,7 +55,7 @@
             </div>
 
             <div class="form-group">
-                <label for="field-title">Title</label>
+                <label for="field-title">Título</label>
                 <input type='text' name='title' value="{{$linktype->title}}" class='form-control @error("title") is-invalid @enderror'>
 
                 @error('title')
@@ -61,7 +65,7 @@
             </div>
 
             <div class="form-group">
-                <label for="field-description">Description</label>
+                <label for="field-description">Descrição</label>
                 <textarea name='description' class="form-control @error('description') is-invalid @enderror" rows='3' id="field-description">{{$linktype->description}}</textarea>
 
 
@@ -73,7 +77,7 @@
             </div>
 
             <div class="form-group">
-                <label for="field-params">Parms</label>
+                <label for="field-params">Parâmetros</label>
                 <textarea name='params' class="form-control  @error('params') is-invalid @enderror" rows='20' id="field-params">{{$linktype->params}}</textarea>
 
 
@@ -86,10 +90,11 @@
 
 
             <div>
-                <button type="submit" class="mt-3 ml-3 btn btn-info">Save</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
 
             </div>
         </form>
     </div>
+</div>
 </div>
 @endsection

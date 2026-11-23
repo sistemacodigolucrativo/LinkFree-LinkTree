@@ -1,12 +1,16 @@
 @extends('layouts.sidebar')
+@push('sidebar-stylesheets')
+<link rel="stylesheet" href="{{ asset('assets/css/linkfree-admin-management.css') }}?v={{ filemtime(base_path('assets/css/linkfree-admin-management.css')) }}">
+@endpush
 
 @section('content')
+<div class="container-fluid content-inner py-2 lf-block-types-page">
 
-<div class='card'>
+<div class="card lf-type-form rounded-4">
     <div class='card-header'>
-        <h4 class='card-title'>Create New Link Type</h4>
+        <h4 class='card-title'>Novo tipo de bloco</h4>
     </div>
-    <div class='card-body'>
+    <div class="card-body p-3 p-md-4">
 
         <!-- if there are creation errors, they will show here -->
         @if ($errors->any())
@@ -28,7 +32,7 @@
 
 
             <div class="form-group">
-                <label for="field-icon">Icon</label>
+                <label for="field-icon">Ícone</label>
                 <input type='text' value="{{@old('icon')}}" name='icon' class="form-control @error('icon') is-invalid @enderror" id="field-icon">
                 <a href="https://icons.getbootstrap.com/" target="_blank">View Icons Here</a>
 
@@ -39,7 +43,7 @@
 
 
             <div class="form-group">
-                <label for="field-typename">Short Name</label>
+                <label for="field-typename">Identificador curto</label>
                 <input type='text' value="{{@old('typename')}}" name='typename' class="form-control @error('typename') is-invalid @enderror" id="field-typename">
 
                 @error('typename')
@@ -49,7 +53,7 @@
             </div>
 
             <div class="form-group">
-                <label for="field-title">Title</label>
+                <label for="field-title">Título</label>
                 <input type='text' name='title' value="{{@old('title')}}" class='form-control @error("title") is-invalid @enderror' id="field-title">
                 @error('title')
                     <span class="text-danger">{{ $message }}</span>
@@ -58,7 +62,7 @@
             </div>
 
             <div class="form-group">
-                <label for="field-description">Description</label>
+                <label for="field-description">Descrição</label>
                 <textarea name='description'  class="form-control @error('description') is-invalid @enderror" rows='3' id="field-description">{{@old('description')}}</textarea>
 
 
@@ -69,7 +73,7 @@
             </div>
 
             <div class="form-group">
-                <label for="field-params">Parms</label>
+                <label for="field-params">Parâmetros</label>
                 <textarea name='params' class="form-control  @error('params') is-invalid @enderror" rows='20' id="field-params">{{@old('params')}}</textarea>
 
 
@@ -81,10 +85,11 @@
 
 
             <div>
-                <button type="submit" class="mt-3 ml-3 btn btn-info">Save</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
 
             </div>
         </form>
     </div>
+</div>
 </div>
 @endsection

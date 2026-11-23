@@ -1,6 +1,9 @@
 @extends('layouts.sidebar')
+@push('sidebar-stylesheets')
+<link rel="stylesheet" href="{{ asset('assets/css/linkfree-admin-management.css') }}?v={{ filemtime(base_path('assets/css/linkfree-admin-management.css')) }}">
+@endpush
 @section('content')
-<div class="container-fluid content-inner py-0">
+<div class="container-fluid content-inner py-2 lf-admin-themes-page">
   <div class="card"><div class="card-body">
     <h1 class="h3">Temas GitHub</h1>
     <p>Selecione temas do repositório configurado. As categorias Premium e VIP são equivalentes neste catálogo.</p>
@@ -64,9 +67,9 @@
     <div class="row g-3">
       @forelse($themes as $theme)
         <div class="col-12 col-sm-6 col-xl-4">
-          <article class="card h-100 border">
-            <img loading="lazy" class="card-img-top" style="aspect-ratio:16/9;object-fit:contain" src="{{ route('githubThemes.thumbnail', [$category, $theme['name']]) }}" alt="Pré-visualização do tema {{ $theme['name'] }}">
-            <div class="card-body d-flex flex-column">
+          <article class="lf-theme-card d-flex flex-column">
+            <img loading="lazy" class="lf-theme-preview" src="{{ route('githubThemes.thumbnail', [$category, $theme['name']]) }}" alt="Pré-visualização do tema {{ $theme['name'] }}">
+            <div class="lf-theme-card-body">
               <h2 class="h5" style="overflow-wrap:anywhere">{{ $theme['name'] }}</h2>
               <p>
                 @if($theme['current']) Atualizado

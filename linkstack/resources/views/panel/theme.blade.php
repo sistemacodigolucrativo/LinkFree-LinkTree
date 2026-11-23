@@ -1,6 +1,9 @@
 @extends('layouts.sidebar')
+@push('sidebar-stylesheets')
+<link rel="stylesheet" href="{{ asset('assets/css/linkfree-admin-management.css') }}?v={{ filemtime(base_path('assets/css/linkfree-admin-management.css')) }}">
+@endpush
 @section('content')
-<div class="container-fluid content-inner mt-n5 py-0">
+<div class="container-fluid content-inner py-2 lf-admin-themes-page">
 
 <section class="card rounded mb-3" id="admin-theme-management" aria-label="Gerenciamento administrativo de temas">
 <div class="card-body">
@@ -51,24 +54,28 @@
             $hasImage = is_file(base_path('themes/'.$theme.'/preview.png'));
           @endphp
           <div class="col-12 col-sm-6 col-xl-4">
-            <article class="border rounded p-3 h-100 d-flex flex-column">
-              <h2 class="h5 mb-3" style="overflow-wrap:anywhere">{{ $theme }}</h2>
-              @if($hasDemo)
-                <iframe loading="lazy" sandbox="allow-same-origin" title="Prévia renderizada de {{ $theme }}" class="w-100 border rounded" style="height:310px" src="{{ route('themePreview', ['theme' => $theme]) }}"></iframe>
-              @elseif($hasImage)
-                <img loading="lazy" class="w-100 border rounded" style="height:310px;object-fit:contain" src="{{ asset('themes/'.$theme.'/preview.png') }}" alt="Prévia de {{ $theme }}">
+            <article class="lf-theme-card d-flex flex-column">
+              @if($hasImage)
+                <img loading="lazy" class="lf-theme-preview" src="{{ asset('themes/'.$theme.'/preview.png') }}" alt="Pré-visualização do tema {{ $theme }}">
+              @elseif($hasDemo)
+                <iframe loading="lazy" sandbox="allow-same-origin" title="Prévia renderizada de {{ $theme }}" class="lf-theme-preview" src="{{ route('themePreview', ['theme' => $theme]) }}"></iframe>
               @else
-                <div class="border rounded d-grid text-muted text-center align-items-center" style="height:310px">Prévia indisponível</div>
+                <div class="lf-theme-preview lf-theme-preview-empty" role="img" aria-label="Prévia indisponível"><i class="bi bi-image" aria-hidden="true"></i> Prévia indisponível</div>
               @endif
-              <div class="mt-auto pt-3">
-                @if($inUse)
-                  <p class="small text-muted mb-2">Tema em uso. Altere o tema dos usuários antes de excluir.</p>
-                @endif
-                <form class="theme-delete-form" method="post" action="{{ route('deleteTheme') }}" data-theme="{{ $theme }}">
-                  @csrf
-                  <input type="hidden" name="deltheme" value="{{ $theme }}">
-                  <button type="submit" class="btn btn-danger w-100" @disabled($inUse)>Excluir {{ $theme }}</button>
-                </form>
+              <div class="lf-theme-card-body">
+                <h2 class="lf-theme-card-title">{{ $theme }}</h2>
+                <p class="lf-theme-card-meta">{{ $inUse ? 'Em uso por um ou mais usuários' : 'Tema instalado' }}</p>
+                <div class="lf-theme-actions">
+                  @if($hasDemo)
+                    <a class="btn btn-outline-primary" href="{{ route('themePreview', ['theme' => $theme]) }}" target="_blank" rel="noopener noreferrer">Abrir prévia</a>
+                  @endif
+                  <form class="theme-delete-form flex-grow-1" method="post" action="{{ route('deleteTheme') }}" data-theme="{{ $theme }}">
+                    @csrf
+                    <input type="hidden" name="deltheme" value="{{ $theme }}">
+                    <button type="submit" class="btn btn-danger w-100" @disabled($inUse)>Excluir</button>
+                  </form>
+                </div>
+                @if($inUse)<p class="lf-theme-card-meta mb-0">Para excluir, primeiro altere o tema dos usuários.</p>@endif
               </div>
             </article>
           </div>
