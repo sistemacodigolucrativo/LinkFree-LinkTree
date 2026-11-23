@@ -40,12 +40,12 @@ check('id="auto-vip-new-users"' in users and 'role="switch"' in users and
       "this.form.requestSubmit()" in users,
       'Accessible CSRF-protected switch on admin users page')
 check("RegistrationVip::roleForNewUser()" in manual and
-      "$user->role = RegistrationVip::roleForNewUser();" in manual and
+      "$created->role = RegistrationVip::roleForNewUser();" in manual and
       "event(new Registered($user));" in manual and
       "$user = $request->name;" not in manual,
       'Public registration sets new role and fires Registered with a User object')
 check("if (!$user) {" in social and
-      "$user->role = RegistrationVip::roleForNewUser();" in social,
+      "$created->role = RegistrationVip::roleForNewUser();" in social,
       'Social login changes role only on account creation')
 check("$user->role = RegistrationVip::roleForNewUser();" in admin and
       "return redirect(\"admin/edit-user/\" . $user->id);" in admin,
