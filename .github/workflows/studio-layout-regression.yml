@@ -32,6 +32,23 @@ on:
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-public-site-editor.py'
+      - 'scripts/audit-new-improvements.php'
+      - 'scripts/audit-new-improvements.py'
+      - 'linkstack/app/Services/ThemeOptions.php'
+      - 'linkstack/app/Services/UserLinkLimit.php'
+      - 'linkstack/app/Services/WhatsAppLink.php'
+      - 'linkstack/app/Services/VisitAttribution.php'
+      - 'linkstack/app/Services/ConsentReceipt.php'
+      - 'linkstack/app/Models/Link.php'
+      - 'linkstack/resources/views/studio/visitor-reports.blade.php'
+      - 'linkstack/resources/views/linkstack/modules/theme.blade.php'
+      - 'linkstack/resources/views/linkstack/modules/meta.blade.php'
+      - 'linkstack/resources/views/maintenance.blade.php'
+      - 'linkstack/database/migrations/2026_11_23_000001_create_registration_consents_table.php'
+      - 'linkstack/resources/views/errors/linkfree.blade.php'
+      - 'linkstack/resources/views/errors/404.blade.php'
+      - 'linkstack/resources/views/errors/500.blade.php'
+      - 'linkstack/resources/views/errors/503.blade.php'
       - 'scripts/audit-blade-compile.php'
       - 'linkstack/app/Services/PublicSiteContent.php'
       - 'linkstack/resources/views/panel/site.blade.php'
@@ -88,6 +105,23 @@ on:
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-public-site-editor.py'
+      - 'scripts/audit-new-improvements.php'
+      - 'scripts/audit-new-improvements.py'
+      - 'linkstack/app/Services/ThemeOptions.php'
+      - 'linkstack/app/Services/UserLinkLimit.php'
+      - 'linkstack/app/Services/WhatsAppLink.php'
+      - 'linkstack/app/Services/VisitAttribution.php'
+      - 'linkstack/app/Services/ConsentReceipt.php'
+      - 'linkstack/app/Models/Link.php'
+      - 'linkstack/resources/views/studio/visitor-reports.blade.php'
+      - 'linkstack/resources/views/linkstack/modules/theme.blade.php'
+      - 'linkstack/resources/views/linkstack/modules/meta.blade.php'
+      - 'linkstack/resources/views/maintenance.blade.php'
+      - 'linkstack/database/migrations/2026_11_23_000001_create_registration_consents_table.php'
+      - 'linkstack/resources/views/errors/linkfree.blade.php'
+      - 'linkstack/resources/views/errors/404.blade.php'
+      - 'linkstack/resources/views/errors/500.blade.php'
+      - 'linkstack/resources/views/errors/503.blade.php'
       - 'scripts/audit-blade-compile.php'
       - 'linkstack/app/Services/PublicSiteContent.php'
       - 'linkstack/resources/views/panel/site.blade.php'
@@ -150,6 +184,11 @@ jobs:
           php -l linkstack/app/Services/PublicSiteContent.php
           php -l linkstack/app/Http/Controllers/AdminController.php
           php -l linkstack/routes/web.php
+      - name: Audit ten new scoped enhancements
+        run: |
+          python scripts/audit-new-improvements.py
+          php scripts/audit-new-improvements.php
+          for path in linkstack/app/Services/ThemeOptions.php linkstack/app/Services/UserLinkLimit.php linkstack/app/Services/WhatsAppLink.php linkstack/app/Services/VisitAttribution.php linkstack/app/Services/ConsentReceipt.php linkstack/app/Models/Link.php linkstack/app/Http/Controllers/Auth/SocialLoginController.php linkstack/app/Http/Controllers/Auth/RegisteredUserController.php linkstack/database/migrations/2026_11_23_000001_create_registration_consents_table.php; do php -l "$path"; done
       - name: Audit persistent VIP toggle and account creation
         run: |
           python scripts/audit-registration-vip.py
