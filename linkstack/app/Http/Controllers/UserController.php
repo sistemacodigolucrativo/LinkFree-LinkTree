@@ -222,6 +222,16 @@ class UserController extends Controller
         $linkType = LinkType::findByTypename($request->typename);
         $LinkTitle = $request->title;
         $LinkURL = $request->link;
+        if ($request->input('typename') === 'predefined' && $request->input('button') === 'whatsapp') {
+            $data = $request->validate([
+                'wa_country' => 'required|string|max:4',
+                'wa_phone' => 'required|string|max:24',
+                'wa_message' => 'nullable|string|max:1000',
+            ]);
+            $LinkURL = \App\Services\WhatsAppLink::build(
+                $data['wa_country'], $data['wa_phone'], (string) ($data['wa_message'] ?? '')
+            );
+        }
 
         // Step 3: Load Link Type Logic
         if($request->typename == 'predefined' || $request->typename == 'link') {

@@ -1158,4 +1158,9 @@ return [
     'lf_limit_reached' => 'You reached the 5-link limit. Ask an administrator for Premium access to create unlimited links.',
     'lf_link_usage' => 'Links used: :count of :max.',
     'lf_upgrade_info' => 'VIP accounts have unlimited links.',
+    'lf_wa_country' => 'Country code',
+    'lf_wa_phone' => 'WhatsApp number',
+    'lf_wa_message' => 'Pre-filled message',
+    'lf_wa_preview' => 'WhatsApp preview',
+    'lf_wa_invalid_phone' => 'Enter a valid country code and number (8 to 15 digits total).',
 ];

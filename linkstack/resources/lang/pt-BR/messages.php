@@ -1054,4 +1054,9 @@ return array(
     'lf_limit_reached' => 'Você atingiu o limite de 5 links. Solicite acesso Premium ao administrador para criar links ilimitados.',
     'lf_link_usage' => 'Links utilizados: :count de :max.',
     'lf_upgrade_info' => 'Contas VIP possuem links ilimitados.',
+    'lf_wa_country' => 'Código do país',
+    'lf_wa_phone' => 'Número do WhatsApp',
+    'lf_wa_message' => 'Mensagem pré-preenchida',
+    'lf_wa_preview' => 'Prévia do WhatsApp',
+    'lf_wa_invalid_phone' => 'Informe código do país e número válidos (8 a 15 dígitos no total).',
 );
