@@ -39,6 +39,13 @@ A implementação integra esses recursos existentes, sem criar um formulário p�
 - Compatibilidade mobile/tablet/desktop, temas claro/escuro, acessibilidade, navegadores e persistência após recarregar.
 - Antes de publicar as pendências 05, 06 e 07, executar backup íntegro e migrações aditivas em ambiente apropriado com homologação técnica.
 
+## Verificações técnicas automáticas (não substituem homologação)
+
+- PHP syntax lint do GitHub Actions, ampliado para os controllers, service, model e migrations das pendências 05–07, **aprovado** no commit e1e68275 (run 45283888684).
+- Auditoria automatizada de layout **aprovada** no commit f50278e7 (run 45283785970), depois da correção do balanceamento HTML de studio/page.blade.php herdada da Pendência 06. A correção também foi registrada na branch 06, onde a auditoria de layout passou (run 45283780390).
+- A mudança posterior no workflow de lint não altera os templates. Os resultados de execução posterior devem ser consultados separadamente.
+- Esses checks verificam principalmente sintaxe, contratos estáticos e layout; **cadastro real, moderação real, SQLite, OAuth, multi-browser, acessibilidade funcional e VPS** permanecem para o ciclo final 01–10.
+
 ## Estado das pendências
 
 - 01–04: implementações anteriores; validações funcionais finais pendentes.
