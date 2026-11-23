@@ -6,7 +6,7 @@ shell=(base/'scripts/atualizar-linkstack.sh').read_text(encoding='utf-8')
 mig='database/migrations/2026_11_23_000001_create_registration_consents_table.php'
 assert f"CONSENT_MIGRATION='{mig}'" in shell
 assert 'database/migrations/*) manual+=' in shell, 'unrelated migrations must stay blocked'
-assert 'if [[ "$MODE" == --deploy || "$MODE" == --deploy-consent ]]' in shell, 'known additive migration must be safe with plain deploy'
+assert '[[ "$MODE" == --deploy || "$MODE" == --deploy-consent ]]' in shell, 'known additive migration must be safe with plain deploy'
 assert '--deploy-consent' in shell, 'legacy consent mode should remain supported'
 assert 'cd /' in shell, 'must avoid www-data cwd in /root'
 assert 'sqlite3 "$PROD/database/database.sqlite" ".backup' in shell
