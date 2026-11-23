@@ -7,11 +7,12 @@
   <h2 class="h5 mb-2" id="lf-admin-shortcuts-title">{{ __('messages.lf_admin_shortcuts') }}</h2>
   <p class="small text-muted mb-3">{{ __('messages.lf_admin_existing_help') }}</p>
   @php
-    // Somente rotas existentes; nao simular modulos de indicacao ou filas que ainda nao possuem backend.
+    // Somente rotas existentes; selos e denúncias seguem pendentes.
     $sections = [
       __('messages.lf_admin_users') => [
         ['route' => 'showUsers', 'icon' => 'bi-people', 'label' => __('messages.Manage Users')],
         ['route' => 'createNewUser', 'icon' => 'bi-person-plus', 'label' => __('messages.Nav Admin New User')],
+         ['route' => 'admin.referrals', 'icon' => 'bi-people', 'label' => 'Indicações'],
       ],
       __('messages.lf_admin_site') => [
         ['route' => 'showSite', 'icon' => 'bi-globe', 'label' => __('messages.Site Customization')],
@@ -43,7 +44,7 @@
    </div>
    @endforeach
   </div>
-  <p class="small text-muted mb-0 mt-3">{{ __('messages.lf_admin_pending_modules') }}</p>
+  <p class="small text-muted mb-0 mt-3">Pendências administrativas restantes: solicitações de selo verificado e gerenciamento de denúncias.</p>
  </div>
 </section>
 <style>

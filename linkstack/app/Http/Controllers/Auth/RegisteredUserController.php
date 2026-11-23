@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\RegistrationVip;
 use App\Services\ConsentReceipt;
+use App\Services\ReferralService;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -65,9 +66,11 @@ class RegisteredUserController extends Controller
             $created->block = $block;
             $created->save();
             ConsentReceipt::record($created, 'email');
+            ReferralService::record($created, $request->session());
             return $created;
         });
         Auth::login($user);
+        $request->session()->forget(ReferralService::SESSION_KEY);
 
 
             $registeredName = $request->name;

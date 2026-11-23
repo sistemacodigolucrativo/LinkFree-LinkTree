@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -77,6 +79,19 @@ class User extends Authenticatable implements MustVerifyEmail
     
                     $user->id = $randomId;
                 }
+            }
+        });
+
+        // Older administrator deletion flows temporarily disable FK checks.
+        // Clean referral links and anonymize referrer history before deletion.
+        static::deleting(function (User $user) {
+            if (Schema::hasTable('referrals')) {
+                DB::table('referrals')->where('invited_user_id', $user->id)->delete();
+                DB::table('referrals')->where('referrer_user_id', $user->id)
+                    ->update(['referrer_user_id' => null]);
+            }
+            if (Schema::hasTable('referral_codes')) {
+                DB::table('referral_codes')->where('user_id', $user->id)->delete();
             }
         });
     }

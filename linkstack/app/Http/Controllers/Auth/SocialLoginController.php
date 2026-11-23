@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\SocialAccount;
 use App\Services\RegistrationVip;
 use App\Services\ConsentReceipt;
+use App\Services\ReferralService;
 use Illuminate\Support\Facades\DB;
 
 class SocialLoginController extends Controller
@@ -41,6 +42,7 @@ class SocialLoginController extends Controller
             // If Social Account Exist then Find User and Login
             if ($account) {
                 auth()->login($account->user);
+                session()->forget(ReferralService::SESSION_KEY);
                 return redirect('/studio/index');
             }
 
@@ -69,6 +71,7 @@ class SocialLoginController extends Controller
                     $created->role = RegistrationVip::roleForNewUser();
                     $created->save();
                     ConsentReceipt::record($created, 'social');
+                    ReferralService::record($created, request()->session());
                     return $created;
                 });
                 session()->forget('lf_social_consent');
@@ -82,6 +85,7 @@ class SocialLoginController extends Controller
 
             // Login
             auth()->login($user);
+            session()->forget(ReferralService::SESSION_KEY);
             return redirect('/studio/index');
         } catch (\Exception $e) {
             return redirect()->route('login')->withErrors($e->getMessage());
