@@ -14,7 +14,7 @@ assert 'bash "$work/homologar.sh" --read-only' in installer
 assert "cd /" in installer
 assert "LINKFREE_BOOTSTRAP" in installer
 assert "mv -f -- \"$work\" \"$DEST\"" in installer
-assert 'if [[ "$MODE" == --deploy || "$MODE" == --deploy-consent ]]' in deploy
+assert '[[ "$MODE" == --deploy || "$MODE" == --deploy-consent ]]' in deploy
 assert 'database/migrations/*) manual+=' in deploy, 'unknown migrations must be blocked'
 assert 'sqlite-before-deploy.sqlite' in deploy
 assert 'storage-app/linkfree' in deploy
