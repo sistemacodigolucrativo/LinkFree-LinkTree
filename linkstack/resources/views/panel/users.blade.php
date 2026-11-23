@@ -5,7 +5,14 @@
 @section('content')
 
 <style>
-  [x-cloak] { display: none !important; }
+  [x-cloak] { display:none!important }
+  .lf-vip-switch{padding:12px 15px;background:var(--lf-raised);border:1px solid var(--lf-border)}
+  .lf-vip-switch-copy{min-width:0;flex:1 1 195px}
+  .lf-vip-switch-copy strong{font-size:.91rem;line-height:1.3}
+  .lf-vip-switch-copy small{font-size:.8rem;line-height:1.4}
+  .lf-vip-switch .form-switch{flex:0 0 auto}
+  .lf-vip-switch .form-check-input{width:2.35rem;height:1.25rem;cursor:pointer}
+  @media(max-width:400px){.lf-vip-switch{padding:11px}.lf-vip-switch-copy{flex-basis:100%}}
 </style>
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
@@ -28,28 +35,24 @@
                             <div class="alert alert-danger" role="alert">{{ session('fail') }}</div>
                           @endif
                           <form id="auto-vip-registration-form" method="POST" action="{{ route('admin.registration-vip') }}"
-                                class="d-flex flex-wrap align-items-center justify-content-between gap-3 border rounded-3 p-3 mb-4"
-                                aria-label="Configuração de novos cadastros VIP">
-                            @csrf
-                            <div class="flex-grow-1" style="min-width:220px">
-                              <h3 class="h5 mb-1">Novos cadastros como VIP</h3>
-                              <p class="small text-muted mb-0">
-                                Ativado: novos cadastros comuns, sociais e criados pelo administrador recebem VIP.
-                                Desativado: novos usuários recebem o plano padrão. Contas existentes não mudam.
-                              </p>
-                            </div>
-                            <div class="form-check form-switch d-flex align-items-center gap-2 m-0">
-                              <input type="hidden" name="enabled" value="0">
-                              <input class="form-check-input m-0" type="checkbox" role="switch"
-                                     id="auto-vip-new-users" name="enabled" value="1"
-                                     aria-label="Ativar VIP para novos cadastros"
-                                     @checked($autoVipNewUsers)
-                                     onchange="this.form.requestSubmit()">
-                              <label for="auto-vip-new-users" class="form-check-label fw-semibold">
-                                {{ $autoVipNewUsers ? 'Ativado' : 'Desativado' }}
-                              </label>
-                            </div>
-                          </form>
+  class="lf-vip-switch d-flex flex-wrap align-items-center justify-content-between gap-2 rounded-3 mb-3"
+  aria-label="Configuração de novos cadastros VIP">
+  @csrf
+  <div class="lf-vip-switch-copy">
+    <strong class="d-block">Novos cadastros VIP</strong>
+    <small class="text-muted d-block">Conceder VIP automaticamente a novas contas.</small>
+  </div>
+  <div class="form-check form-switch d-flex align-items-center gap-2 m-0">
+    <input type="hidden" name="enabled" value="0">
+    <input class="form-check-input m-0" type="checkbox" role="switch"
+      id="auto-vip-new-users" name="enabled" value="1"
+      aria-label="Ativar VIP para novos cadastros" @checked($autoVipNewUsers)
+      onchange="this.form.requestSubmit()">
+    <label for="auto-vip-new-users" class="form-check-label fw-semibold">
+      {{ $autoVipNewUsers ? 'Ativado' : 'Desativado' }}
+    </label>
+  </div>
+</form>
 
                         <div id="select-active" class="d-none">
                           <h5 class="mb-2">{{__('messages.Select Action')}}:</h5>

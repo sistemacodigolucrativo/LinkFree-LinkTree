@@ -331,20 +331,15 @@ $usrhandl = Auth::user()->littlelink_name;
                 <!-- Sidebar Menu Start -->
                 <ul class="navbar-nav iq-main-menu" id="sidebar-menu">
 @php
-  $navOverviewOpen = request()->is('dashboard');
   $navLinksOpen = request()->is('studio/links*') || request()->is('studio/page-icons') || request()->is('studio/blocks') || request()->is('studio/add-link') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*');
   $navAppearanceOpen = request()->is('studio/theme') || request()->is('studio/theme-preview/*');
 @endphp
 
-<li class="nav-item nav-accordion-group">
-  <a class="nav-link nav-accordion-toggle {{ $navOverviewOpen ? 'active' : '' }}" href="#nav-overview" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navOverviewOpen ? 'true' : 'false' }}" aria-controls="nav-overview">
-    <i class="icon bi bi-house-door" aria-hidden="true"></i>
-    <span class="item-name">{{__('messages.Home')}}</span>
-    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
+<li class="nav-item">
+  <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('panelIndex') }}">
+    <i class="icon bi bi-speedometer2" aria-hidden="true"></i>
+    <span class="item-name">Painel de Controle</span>
   </a>
-  <ul class="sub-nav collapse {{ $navOverviewOpen ? 'show' : '' }}" id="nav-overview" data-bs-parent="#sidebar-menu">
-<li class="nav-item"><a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('panelIndex') }}"><i class="icon bi bi-speedometer2" aria-hidden="true"></i><span class="item-name">{{__('messages.Dashboard')}}</span></a></li>
-  </ul>
 </li>
 <li class="nav-item nav-accordion-group">
   <a class="nav-link nav-accordion-toggle {{ $navLinksOpen ? 'active' : '' }}" href="#nav-links" data-bs-toggle="collapse" role="button" aria-expanded="{{ $navLinksOpen ? 'true' : 'false' }}" aria-controls="nav-links">
@@ -356,7 +351,6 @@ $usrhandl = Auth::user()->littlelink_name;
 <li class="nav-item"><a class="nav-link {{ request()->is('studio/links*') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*') ? 'active' : '' }}" href="{{ url('/studio/links') }}"><i class="icon bi bi-link-45deg" aria-hidden="true"></i><span class="item-name">{{__('messages.Links')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('studio/page-icons') ? 'active' : '' }}" href="{{ route('showPageIcons') }}"><i class="icon bi bi-images" aria-hidden="true"></i><span class="item-name">Ícones de Página</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('studio/blocks') ? 'active' : '' }}" href="{{ route('showBlocks') }}"><i class="icon bi bi-grid-3x3-gap" aria-hidden="true"></i><span class="item-name">Gerenciar blocos</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('studio/add-link') ? 'active' : '' }}" href="{{ route('showButtons') }}"><i class="icon bi bi-plus-square" aria-hidden="true"></i><span class="item-name">Link Pré -Config</span></a></li>
   </ul>
 </li>
 <li class="nav-item nav-accordion-group">

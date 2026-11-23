@@ -116,14 +116,14 @@ require('id="navbarSupportedContent"' in sidebar and 'id="navbarDropdown"' in si
 require('id="sidebar-scroll-region"' in sidebar and
         'class="sidebar-body pt-0 data-scrollbar"' not in sidebar,
         "Sidebar usa rolagem vertical independente sem conflito com o plugin")
-for group in ("admin-navigation", "nav-overview", "nav-links", "nav-appearance"):
+for group in ("admin-navigation", "nav-links", "nav-appearance"):
     require('id="' + group + '" data-bs-parent="#sidebar-menu"' in sidebar,
             "Acordeão principal com fechamento exclusivo: " + group)
 for group in ("admin-users-menu", "admin-site-menu", "admin-themes-menu", "admin-system-menu"):
     require('id="' + group + '" data-bs-parent="#admin-navigation"' in sidebar,
             "Subcategoria administrativa com fechamento exclusivo: " + group)
-require(sidebar.count('class="nav-link nav-accordion-toggle') == 8,
-        "Oito categorias de acordeão após retirar Configurações de conta")
+require(sidebar.count('class="nav-link nav-accordion-toggle') == 7,
+        "Sete categorias de acordeão após simplificar Inicio e Conta")
 require('id="nav-admin-panel"' in sidebar and "auth()->user()->role === 'admin'" in sidebar,
         "Menu administrativo agrupado e restrito a administradores")
 require(sidebar.index('id="nav-admin-panel"') > sidebar.index('id="nav-appearance"') and
@@ -261,3 +261,14 @@ require('id="sidebar-scroll-region"' in sidebar and
         "Rolagem e acordeão exclusivo preservados")
 
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")
+
+require('id="nav-overview"' not in sidebar and 'Painel de Controle' in sidebar and
+        "route('panelIndex')" in sidebar, "Painel de Controle acessivel diretamente")
+require('Link Pré -Config' not in sidebar and "Route::get('/studio/add-link'" in web_routes,
+        "Link Pre-Config retirado apenas do menu sem apagar rota")
+require('#offcanvasExample .offcanvas-body' in nav_css and 'overflow-x:hidden!important' in nav_css,
+        "Tema do painel sem rolagem horizontal")
+require('body .main-content .footer .footer-body' in nav_css,
+        "Rodape adaptativo nos paineis")
+require('lf-vip-switch' in users_view and 'id="auto-vip-new-users"' in users_view,
+        "Toggle VIP em card compacto")
