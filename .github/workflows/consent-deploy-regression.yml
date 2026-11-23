@@ -1,0 +1,51 @@
+name: Consent migration, persistence and deploy safeguards
+on:
+  push:
+    paths:
+      - 'scripts/atualizar-linkstack.sh'
+      - 'scripts/audit-consent-deploy.py'
+      - 'scripts/audit-consent-storage-sqlite.php'
+      - 'linkstack/database/migrations/2026_11_23_000001_create_registration_consents_table.php'
+      - 'linkstack/app/Services/ConsentReceipt.php'
+      - 'linkstack/app/Services/ThemeOptions.php'
+      - 'linkstack/app/Services/VisitAttribution.php'
+      - 'linkstack/app/Http/Controllers/Auth/RegisteredUserController.php'
+      - 'linkstack/app/Http/Controllers/Auth/SocialLoginController.php'
+      - '.github/workflows/consent-deploy-regression.yml'
+  pull_request:
+    paths:
+      - 'scripts/atualizar-linkstack.sh'
+      - 'scripts/audit-consent-deploy.py'
+      - 'scripts/audit-consent-storage-sqlite.php'
+      - 'linkstack/database/migrations/2026_11_23_000001_create_registration_consents_table.php'
+      - 'linkstack/app/Services/ConsentReceipt.php'
+      - 'linkstack/app/Services/ThemeOptions.php'
+      - 'linkstack/app/Services/VisitAttribution.php'
+      - 'linkstack/app/Http/Controllers/Auth/RegisteredUserController.php'
+      - 'linkstack/app/Http/Controllers/Auth/SocialLoginController.php'
+      - '.github/workflows/consent-deploy-regression.yml'
+
+jobs:
+  isolated-consent-and-storage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify script syntax and deploy safety contracts
+        run: |
+          bash -n scripts/atualizar-linkstack.sh
+          python3 scripts/audit-consent-deploy.py
+      - name: Ensure SQLite PHP driver is installed
+        run: |
+          if ! php -m | grep -qi '^pdo_sqlite$'; then
+            sudo apt-get update
+            sudo apt-get install -y php-sqlite3
+          fi
+          php -m | grep -iE '^(pdo_sqlite|sqlite3)$'
+      - name: Run migration, registration rejection and persistence using temporary SQLite
+        run: php scripts/audit-consent-storage-sqlite.php
+      - name: Lint consent PHP files
+        run: |
+          php -l linkstack/app/Services/ConsentReceipt.php
+          php -l linkstack/database/migrations/2026_11_23_000001_create_registration_consents_table.php
+          php -l scripts/audit-consent-storage-sqlite.php

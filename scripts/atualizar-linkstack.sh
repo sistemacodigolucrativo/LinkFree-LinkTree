@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LinkFree-LinkTree: atualizacao seletiva GitHub -> desenvolvimento -> producao.
-# Uso: sudo bash atualizar-linkstack.sh --check | --deploy
+# Uso: sudo bash atualizar-linkstack.sh --check | --deploy | --deploy-consent
 # Primeiro acesso: prepara clone persistente e estágio de código (sem dados privados).
 set -Eeuo pipefail
 umask 077
@@ -15,8 +15,8 @@ BACKUP_ROOT=/var/backups/linkfree-deploy
 SITE=https://linkfree.website
 
 MODE="${1:-}"
-if [[ "$MODE" != --check && "$MODE" != --deploy ]]; then
-  echo 'Uso: bash atualizar-linkstack.sh --check | --deploy' >&2
+if [[ "$MODE" != --check && "$MODE" != --deploy && "$MODE" != --deploy-consent ]]; then
+  echo 'Uso: bash atualizar-linkstack.sh --check | --deploy | --deploy-consent' >&2
   exit 2
 fi
 if (( EUID != 0 )); then echo 'Execute como root (sudo).' >&2; exit 1; fi
@@ -25,7 +25,7 @@ if ! command -v rsync >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive
   apt-get update && apt-get install -y rsync
 fi
-for cmd in git rsync php flock runuser cmp mktemp cp python3; do
+for cmd in git rsync php flock runuser cmp mktemp cp python3 find; do
   command -v "$cmd" >/dev/null || { echo "Dependencia ausente: $cmd" >&2; exit 1; }
 done
 [[ -d "$PROD" && -f "$PROD/artisan" && -f "$PROD/.env" ]] || {
@@ -166,10 +166,13 @@ fi
 files=()
 protected=()
 manual=()
+CONSENT_MIGRATION='database/migrations/2026_11_23_000001_create_registration_consents_table.php'
+consent_migration=false
 for path in "${changed[@]}"; do
   rel="${path#linkstack/}"
   case "$rel" in
-    database/migrations/*) manual+=("$rel"); continue ;; # Alteracao de esquema requer migracao e backup coordenados.
+    "$CONSENT_MIGRATION") consent_migration=true; continue ;; # ÚNICA migração permitida com --deploy-consent.
+    database/migrations/*) manual+=("$rel"); continue ;; # As demais permanecem bloqueadas.
     .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*) protected+=("$rel"); continue ;;
     composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) manual+=("$rel"); continue ;;
     app/*|config/*|routes/*|resources/*|assets/*|blocks/*|bootstrap/*|docs/*|index.php|.htaccess|server.php|web.config|mix-manifest.json|version.json)
@@ -187,6 +190,54 @@ if ((${#manual[@]})); then
   echo 'Mudancas que exigem revisao manual (dependencias/estrutura):' >&2
   printf '  %s\n' "${manual[@]}" >&2
   exit 1
+fi
+
+# A migração do consentimento exige conferência explícita e backup online.
+if [[ "$consent_migration" == true ]]; then
+  if [[ "$MODE" == --deploy ]]; then
+    echo 'Migração de consentimento: rode --check e, após revisão, --deploy-consent.' >&2; exit 1
+  fi
+  [[ -f "$PROD/database/database.sqlite" && ! -L "$PROD/database/database.sqlite" ]] || {
+    echo 'SQLite esperado não encontrado em database/database.sqlite.' >&2; exit 1;
+  }
+  db_driver="$(sed -n 's/^[[:space:]]*DB_CONNECTION=//p' "$PROD/.env" | tail -n1 | tr -d '" \r')"
+  [[ "$db_driver" == sqlite ]] || { echo 'DB_CONNECTION não é sqlite. Revisão manual.' >&2; exit 1; }
+  db_path="$(sed -n 's/^[[:space:]]*DB_DATABASE=//p' "$PROD/.env" | tail -n1 | tr -d '"\r')"
+  case "$db_path" in
+    ''|database/database.sqlite|"$PROD/database/database.sqlite") ;;
+    *) echo 'DB_DATABASE aponta para outro banco. Operação bloqueada.' >&2; exit 1 ;;
+  esac
+  command -v sqlite3 >/dev/null || { echo 'sqlite3 obrigatório para backup online.' >&2; exit 1; }
+  php -m | grep -qi '^pdo_sqlite$' || { echo 'Extensão pdo_sqlite ausente.' >&2; exit 1; }
+  runuser -u www-data -- test -r "$PROD/database/database.sqlite" || { echo 'www-data não lê SQLite.' >&2; exit 1; }
+  [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" 'PRAGMA quick_check;')" == ok ]] || {
+    echo 'Integridade do SQLite não confirmada.' >&2; exit 1;
+  }
+  legal_ok="$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT CASE WHEN EXISTS (SELECT 1 FROM pages WHERE length(trim(coalesce(terms, ''))) > 0 AND length(trim(coalesce(privacy, ''))) > 0) THEN 'ok' ELSE 'missing' END;" 2>/dev/null || :)"
+  [[ "$legal_ok" == ok ]] || { echo 'Termos/Privacidade não estão preenchidos na tabela pages.' >&2; exit 1; }
+  [[ ! -L "$PROD/$CONSENT_MIGRATION" ]] || { echo 'Migração via symlink recusada.' >&2; exit 1; }
+  gitrepo cat-file -e "$TARGET:linkstack/$CONSENT_MIGRATION" || { echo 'Migração ausente do commit remoto.' >&2; exit 1; }
+  if [[ -e "$PROD/$CONSENT_MIGRATION" ]] && ! gitrepo show "$TARGET:linkstack/$CONSENT_MIGRATION" | cmp -s - "$PROD/$CONSENT_MIGRATION"; then
+    echo 'Migração instalada diverge do commit remoto.' >&2; exit 1
+  fi
+fi
+if [[ -d "$PROD/storage/app/linkfree" ]]; then
+  [[ ! -L "$PROD/storage/app/linkfree" ]] || { echo 'Storage symlink recusado.' >&2; exit 1; }
+  runuser -u www-data -- test -w "$PROD/storage/app/linkfree" || { echo 'Configurações sem escrita por www-data.' >&2; exit 1; }
+  if [[ -d "$PROD/storage/app/linkfree/visit-sources" ]]; then
+    [[ ! -L "$PROD/storage/app/linkfree/visit-sources" ]] || { echo 'Visit-sources symlink recusado.' >&2; exit 1; }
+    runuser -u www-data -- test -w "$PROD/storage/app/linkfree/visit-sources" || { echo 'Relatórios sem escrita por www-data.' >&2; exit 1; }
+  fi
+  # Arquivos antigos podem estar em propriedade de root: recusar antes de sobrescrever.
+  if [[ -n "$(find "$PROD/storage/app/linkfree" -type l -print -quit)" ]]; then
+    echo 'Symlink dentro de storage/app/linkfree: revisão manual obrigatória.' >&2; exit 1
+  fi
+  unreadable="$(runuser -u www-data -- find "$PROD/storage/app/linkfree" -type f ! -readable -print -quit)"
+  [[ -z "$unreadable" ]] || { echo "Arquivo de configuração sem leitura por www-data: $unreadable" >&2; exit 1; }
+  unwritable_locks="$(runuser -u www-data -- find "$PROD/storage/app/linkfree" -name '*.lock' -type f ! -writable -print -quit)"
+  [[ -z "$unwritable_locks" ]] || { echo "Arquivo de lock sem escrita por www-data: $unwritable_locks" >&2; exit 1; }
+else
+  runuser -u www-data -- test -w "$PROD/storage/app" || { echo 'www-data não pode criar storage/app/linkfree.' >&2; exit 1; }
 fi
 
 # Evita sobrescrever modificacoes feitas diretamente em dev/producao.
@@ -219,7 +270,11 @@ if [[ "$MODE" == --check ]]; then
   [[ -d "$DEV" ]] || echo "O estagio de codigo $DEV sera criado no primeiro --deploy (sem .env ou banco)."
   echo 'SIMULACAO CONCLUIDA: os destinos existentes passaram na verificacao de conflito.'
   echo 'Nenhum arquivo da aplicacao foi modificado.'
-  echo 'Para publicar: bash atualizar-linkstack.sh --deploy'
+  if [[ "$consent_migration" == true ]]; then
+    echo 'Para publicar a migração: bash atualizar-linkstack.sh --deploy-consent'
+  else
+    echo 'Para publicar: bash atualizar-linkstack.sh --deploy'
+  fi
   exit 0
 fi
 
@@ -241,7 +296,7 @@ if [[ ! -d "$DEV" ]]; then
   rm -f "$stage_list"
 fi
 
-if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 ]]; then
+if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 && "$consent_migration" != true ]]; then
   install -d -m 700 "$STATE_DIR"
   if [[ ! -s "$LAST_FILE" ]]; then printf '%s\n' "$BASE" > "$LAST_FILE"; fi
   echo 'Repositorio ja atualizado, nenhum arquivo pendente de publicacao.'
@@ -263,6 +318,13 @@ if [[ -f "$PROD/database/database.sqlite" ]]; then
   echo "Backup SQLite gerado: $backup/sqlite-before-deploy.sqlite"
 else
   echo 'Aviso: SQLite nao encontrado. Para MySQL/MariaDB, providencie backup consistente separado.'
+fi
+# Backup também das configurações privadas, sem modificar nem apagar dados.
+if [[ -d "$PROD/storage/app/linkfree" ]]; then
+  mkdir -p "$backup/storage-app"
+  cp -a -- "$PROD/storage/app/linkfree" "$backup/storage-app/linkfree" || {
+    echo 'Falha no backup de storage/app/linkfree.' >&2; exit 1;
+  }
 fi
 : > "$backup/new-dev.txt"
 : > "$backup/new-prod.txt"
@@ -318,6 +380,33 @@ for rel in "${files[@]}"; do
     *.js) if command -v node >/dev/null; then node --check "$REPO/linkstack/$rel" >/dev/null; fi ;;
   esac
 done
+
+# Executa uma única migração aditiva antes de publicar o código de cadastro.
+if [[ "$MODE" == --deploy-consent && "$consent_migration" != true ]]; then
+  echo '--deploy-consent só é válido com a migração de consentimento pendente.' >&2; exit 1
+fi
+if [[ "$consent_migration" == true ]]; then
+  [[ "$MODE" == --deploy-consent ]] || { echo 'Falta autorização explícita da migração.' >&2; exit 1; }
+  mkdir -p "$PROD/database/migrations"
+  if [[ ! -f "$PROD/$CONSENT_MIGRATION" ]]; then
+    gitrepo show "$TARGET:linkstack/$CONSENT_MIGRATION" > "$backup/consent-migration.php"
+    php -l "$backup/consent-migration.php" >/dev/null
+    install -m 644 "$backup/consent-migration.php" "$PROD/$CONSENT_MIGRATION"
+  fi
+  (cd "$PROD" && runuser -u www-data -- php artisan migrate --path="$CONSENT_MIGRATION" --force --no-interaction)
+  [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT COUNT(*) FROM sqlite_master WHERE name='registration_consents' AND type='table';")" == 1 ]] || {
+    echo 'Tabela de consentimento ausente: código NÃO publicado.' >&2; exit 1;
+  }
+fi
+# Só cria diretórios que não existem; nunca executa chown recursivo.
+if [[ ! -d "$PROD/storage/app/linkfree" ]]; then
+  install -d -m 750 -o www-data -g www-data "$PROD/storage/app/linkfree"
+fi
+if [[ ! -d "$PROD/storage/app/linkfree/visit-sources" ]]; then
+  install -d -m 750 -o www-data -g www-data "$PROD/storage/app/linkfree/visit-sources"
+fi
+runuser -u www-data -- test -w "$PROD/storage/app/linkfree" || { echo 'Sem acesso às configurações.' >&2; exit 1; }
+runuser -u www-data -- test -w "$PROD/storage/app/linkfree/visit-sources" || { echo 'Sem acesso aos relatórios.' >&2; exit 1; }
 
 if ((${#files[@]})); then
   deploy_started=true
