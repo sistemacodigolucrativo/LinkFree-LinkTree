@@ -365,9 +365,12 @@ $usrhandl = Auth::user()->littlelink_name;
   </ul>
 </li>
 
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/referrals*') ? 'active' : '' }}" href="{{ route('studio.referrals') }}"><i class="icon bi bi-people" aria-hidden="true"></i><span class="item-name">Minhas indicações</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('studio/verification*') ? 'active' : '' }}" href="{{ route('studio.verification') }}"><i class="icon bi bi-patch-check" aria-hidden="true"></i><span class="item-name">Selo verificado</span></a></li>
+
 @if(auth()->check() && auth()->user()->role === 'admin')
 @php
-  $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user');
+  $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user') || request()->is('admin/referrals*') || request()->is('admin/verification*') || request()->is('admin/reports*');
   $adminSiteOpen = request()->is('admin/site*') || request()->is('admin/pages*');
   $adminThemesOpen = request()->is('admin/theme') || request()->is('admin/github-themes*') || request()->is('admin/linktype*');
   $adminSystemOpen = request()->is('admin/config') || request()->is('admin/backups') || request()->is('admin/advanced-config') || request()->is('admin/env') || request()->is('admin/phpinfo') || request()->is('update');
@@ -390,6 +393,9 @@ $usrhandl = Auth::user()->littlelink_name;
   <ul class="sub-nav collapse {{ $adminUsersOpen ? 'show' : '' }}" id="admin-users-menu" data-bs-parent="#admin-navigation">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') ? 'active' : '' }}" href="{{ route('showUsers') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">{{__('messages.Manage Users')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/new-user') ? 'active' : '' }}" href="{{ route('createNewUser') }}"><i class="icon bi bi-person-plus" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin New User')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/referrals*') ? 'active' : '' }}" href="{{ route('admin.referrals') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">Indicações</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/verification*') ? 'active' : '' }}" href="{{ route('admin.verification') }}"><i class="icon bi bi-patch-check" aria-hidden="true"></i><span class="item-name">Solicitações de selo</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/reports*') ? 'active' : '' }}" href="{{ route('admin.abuse-reports.index') }}"><i class="icon bi bi-flag" aria-hidden="true"></i><span class="item-name">Central de denúncias</span></a></li>
   </ul>
 </li>
     <li class="nav-item nav-accordion-group nav-accordion-admin">

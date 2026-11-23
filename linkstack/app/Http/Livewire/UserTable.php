@@ -103,6 +103,23 @@ class UserTable extends DataTableComponent
                     }
                 })
                 ->html(),
+            Column::make('Selo', 'verified_at')
+                ->sortable()
+                ->format(function ($value, $row) {
+                    $approved = $value !== null;
+                    $url = e(route('admin.verification.toggle', ['user' => $row->id]));
+                    $label = $approved ? 'Aprovado' : 'Não aprovado';
+                    $color = $approved ? 'bg-success' : 'bg-secondary';
+                    return '<form method="POST" action="' . $url . '" class="text-center">'
+                        . csrf_field()
+                        . '<input type="hidden" name="approved" value="' . ($approved ? '0' : '1') . '">'
+                        . '<button type="submit" class="border-0 bg-transparent p-0" title="'
+                        . ($approved ? 'Revogar selo' : 'Conceder selo')
+                        . '" aria-label="' . ($approved ? 'Revogar selo' : 'Conceder selo')
+                        . ' para o membro ID ' . (int) $row->id . '">'
+                        . '<span class="badge rounded-pill ' . $color . ' px-3 py-2">'
+                        . $label . '</span></button></form>';
+                })->html(),
             Column::make(__('messages.Created at'), "created_at")
                 ->sortable()
                 ->format(function ($value) {

@@ -1,0 +1,17 @@
+name: M13 read-only preflight syntax
+on:
+  push:
+    paths:
+      - 'scripts/preflight-m13-readonly.sh'
+      - '.github/workflows/m13-preflight-static.yml'
+  pull_request:
+    paths:
+      - 'scripts/preflight-m13-readonly.sh'
+      - '.github/workflows/m13-preflight-static.yml'
+jobs:
+  bash-syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify preflight script syntax
+        run: bash -n scripts/preflight-m13-readonly.sh

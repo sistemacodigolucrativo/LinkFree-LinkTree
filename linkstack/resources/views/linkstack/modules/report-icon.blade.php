@@ -1,4 +1,4 @@
-@if($userinfo->role == 'user' and env('ENABLE_REPORT_ICON') == true)
+@if(env('ENABLE_REPORT_ICON') == true)
 <style>
     .report-pill-container {
       position: fixed;
@@ -72,7 +72,7 @@
 </svg></div>
     </button>
     <div class="report-expanding-pill">
-      <a href="{{url('report?'.$userinfo->id)}}" target="_blank" class="report-text" hidden>Report abuse</a>
+      <a href="{{ route('report.form', ['user' => $userinfo->id]) }}" target="_blank" rel="noopener noreferrer" class="report-text" hidden>Denunciar abuso</a>
     </div>
   </div>
 

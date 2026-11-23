@@ -52,22 +52,7 @@
 
   </head>
 
-@php
 
-if (($_SERVER['QUERY_STRING'] ?? '') != '') {
-
-    try {
-
-    $id = ($_SERVER['QUERY_STRING'] ?? '');
-    $user = \App\Models\User::where('id', $id)->first();
-    $name = $user->littlelink_name;
-    if ($name != null)$url = url('') . '/@' . $name;
-
-    } catch (\Exception $e) {}
-
-}
-
-@endphp
 
   <body>
     <div class="container-fluid">
@@ -76,6 +61,14 @@ if (($_SERVER['QUERY_STRING'] ?? '') != '') {
                 <div class="card shadow-lg card--bg-gray card--customized align-self-center">
                     <div class="card-body">
                         <h1 class="card-title">{{ __('messages.report_violation') }}</h1>
+
+                    @if($errors->any())
+                      <div class="alert alert-danger" role="alert">
+                        @foreach($errors->all() as $error)
+                          <div>{{ $error }}</div>
+                        @endforeach
+                      </div>
+                    @endif
 
                     @if(session('success'))
                         <div class="alert alert-left alert-success alert-dismissible fade show mb-3" role="alert">
@@ -91,15 +84,20 @@ if (($_SERVER['QUERY_STRING'] ?? '') != '') {
                         </div>
                     @endif
 
-                        <form action="{{ url('report') }}" enctype="multipart/form-data" method="post">
+                        <form action="{{ route('report') }}" method="post">
                             @csrf
-                            <input type="hidden" name="id" value="{{$id ?? null}}">
-                            <input type="hidden" name="name" value="{{$name ?? null}}">
+                            @if($target)
+                              <input type="hidden" name="user_id" value="{{ $target->id }}">
+                            @endif
+                            <div style="position:absolute;left:-9999px" aria-hidden="true">
+                              <label for="website">Deixe este campo vazio</label>
+                              <input type="text" id="website" name="website" value="" tabindex="-1" autocomplete="off">
+                            </div>
                             <div class="mb-2 control-wrapper">
                                 <div class="label-container">
                                     <label for="url" class="form-label">{{ __('messages.url_label') }}*</label>
                                 </div>
-                                <input type="url" class="form-control" id="url" name="url" value="{{ $url ?? null }}">
+                                <input type="url" class="form-control" id="url" name="url" value="{{ old('url', $targetUrl ?? '') }}" maxlength="2048" required @if($target) readonly @endif>
                                 <div class="display-msg"></div>
                             </div>
                             <div class="mb-2 control-wrapper">
@@ -107,20 +105,10 @@ if (($_SERVER['QUERY_STRING'] ?? '') != '') {
                                     <label for="report-type" class="form-label">{{ __('messages.report_type_label') }}*</label>
                                 </div>
                                 <select id="report-type" class="form-control" name="report-type" required>
-                                    <option></option>
-                                    <option value="{{ __('messages.hate_speech') }}">{{ __('messages.hate_speech') }}</option>
-                                    <option value="{{ __('messages.violence_threats') }}">{{ __('messages.violence_threats') }}</option>
-                                    <option value="{{ __('messages.illegal_activities') }}">{{ __('messages.illegal_activities') }}</option>
-                                    <option value="{{ __('messages.copyright_infringement') }}">{{ __('messages.copyright_infringement') }}</option>
-                                    <option value="{{ __('messages.misinformation_fake_news') }}">{{ __('messages.misinformation_fake_news') }}</option>
-                                    <option value="{{ __('messages.identity_theft') }}">{{ __('messages.identity_theft') }}</option>
-                                    <option value="{{ __('messages.drug_related_content') }}">{{ __('messages.drug_related_content') }}</option>
-                                    <option value="{{ __('messages.weapons_harmful_objects') }}">{{ __('messages.weapons_harmful_objects') }}</option>
-                                    <option value="{{ __('messages.child_exploitation') }}">{{ __('messages.child_exploitation') }}</option>
-                                    <option value="{{ __('messages.fraud_scams') }}">{{ __('messages.fraud_scams') }}</option>
-                                    <option value="{{ __('messages.privacy_violation') }}">{{ __('messages.privacy_violation') }}</option>
-                                    <option value="{{ __('messages.impersonation') }}">{{ __('messages.impersonation') }}</option>
-                                    <option value="{{ __('messages.other_specify') }}">{{ __('messages.other_specify') }}</option>
+                                    <option value="">Selecione o motivo</option>
+                                    @foreach($categories as $key => $label)
+                                      <option value="{{ $key }}" @selected(old('report-type') === $key)>{{ $label }}</option>
+                                    @endforeach
                                 </select>
                                 <div class="display-msg"></div>
                             </div>
@@ -128,7 +116,8 @@ if (($_SERVER['QUERY_STRING'] ?? '') != '') {
                                 <div class="label-container">
                                     <label for="message" class="form-label">{{ __('messages.additional_comments_label') }}</label>
                                 </div>
-                                <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+                                <textarea class="form-control" id="message" name="message" rows="3" maxlength="2000">{{ old('message') }}</textarea>
+                                <p class="small text-muted">Não envie senhas, documentos ou informações pessoais desnecessárias.</p>
                                 <div class="display-msg"></div>
                             </div>
                             <button type="submit" class="btn btn-primary">{{ __('messages.submit_button') }}</button>

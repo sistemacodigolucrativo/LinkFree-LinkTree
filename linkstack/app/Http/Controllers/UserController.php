@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Response;
 use JeroenDesloovere\VCard\VCard;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ReportSubmissionMail;
 use GeoSot\EnvEditor\Facades\EnvEditor;
 
 use Auth;
@@ -96,7 +94,7 @@ class UserController extends Controller
             return abort(404);
         }
      
-        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block')->where('id', $id)->first();
+        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible')->where('id', $id)->first();
         $information = User::select('name', 'littlelink_name', 'littlelink_description', 'theme')->where('id', $id)->get();
         
         if ($userinfo->block == 'yes') {
@@ -138,7 +136,7 @@ class UserController extends Controller
             return abort(404);
         }
      
-        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block')->where('id', $id)->first();
+        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible')->where('id', $id)->first();
         $information = User::select('name', 'littlelink_name', 'littlelink_description', 'theme')->where('id', $id)->get();
         
         $links = DB::table('links')
@@ -701,7 +699,6 @@ class UserController extends Controller
         $pageDescription = preg_replace("/<a([^>]*)>/i", "<a $1 rel=\"noopener noreferrer nofollow\">", $pageDescription);
         $pageDescription = strip_tags_except_allowed_protocols($pageDescription);
         $name = $request->name;
-        $checkmark = $request->checkmark;
         $sharebtn = $request->sharebtn;
         $tablinks = $request->tablinks;
 
@@ -727,11 +724,10 @@ class UserController extends Controller
             $profilePhoto->move(base_path('assets/img'), $fileName);
         }
     
-        if ($checkmark == "on") {
-            UserData::saveData($userId, 'checkmark', true);
-        } else {
-            UserData::saveData($userId, 'checkmark', false);
-        }
+        // A visibilidade do selo somente pode ser alterada se concedido pelo admin.
+        User::where('id', $userId)->whereNotNull('verified_at')->update([
+            'verification_visible' => $request->boolean('verification_visible'),
+        ]);
     
         if ($sharebtn == "on") {
             UserData::saveData($userId, 'disable-sharebtn', false);
@@ -1128,20 +1124,6 @@ class UserController extends Controller
         }
     }
     
-
-    // Hanle reports
-    function report(Request $request)
-    {
-        $formData = $request->all();
-    
-        try {
-            Mail::to(env('ADMIN_EMAIL'))->send(new ReportSubmissionMail($formData));
-            
-            return redirect('report')->with('success', __('messages.report_success'));
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', __('messages.report_error'));
-        }
-    }
 
     //Edit/save page icons
     public function editIcons(Request $request)

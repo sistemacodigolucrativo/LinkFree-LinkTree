@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReferralController;
+use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\AbuseReportController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\LinkTypeViewController;
 use App\Http\Controllers\PagesController;
@@ -70,6 +73,7 @@ Route::get('/panel/diagnose', function () {
 
 //Public route
 $custom_prefix = config('advanced-config.custom_url_prefix');
+Route::get('/invite/{code}', [ReferralController::class, 'visit'])->name('referrals.visit')->where('code', '[A-Fa-f0-9]{24}');
 Route::get('/going/{id?}', [UserController::class, 'clickNumber'])->where('link', '.*')->name('clickNumber')->middleware('disableCookies');
 Route::get('/info/{id?}', [AdminController::class, 'redirectInfo'])->name('redirectInfo');
 if($custom_prefix != ""){Route::get('/' . $custom_prefix . '{littlelink}', [UserController::class, 'littlelink'])->name('littlelink.custom-prefix');}
@@ -81,8 +85,8 @@ Route::get('/theme/@{littlelink}', [UserController::class, 'theme'])->name('them
 Route::get('/vcard/{id?}', [UserController::class, 'vcard'])->name('vcard');
 Route::get('/u/{id?}', [UserController::class, 'userRedirect'])->name('userRedirect');
 
-Route::get('/report', function () {return view('report');});
-Route::post('/report', [UserController::class, 'report'])->name('report');
+Route::get('/report', [AbuseReportController::class, 'form'])->name('report.form');
+Route::post('/report', [AbuseReportController::class, 'store'])->name('report')->middleware('throttle:5,10');
 
 Route::get('/demo-page', [App\Http\Controllers\HomeController::class, 'demo'])->name('demo')->middleware('disableCookies');
 
@@ -110,6 +114,11 @@ Route::get('/studio/blocks', [UserController::class, 'showBlocks'])->name('showB
 Route::get('/studio/theme', [UserController::class, 'showTheme'])->name('showTheme');
 Route::post('/studio/theme-options', [UserController::class, 'saveThemeOptions'])->name('studio.theme-options');
 Route::get('/studio/visitors', [UserController::class, 'showVisitorReports'])->name('studio.visitors');
+Route::get('/studio/referrals', [ReferralController::class, 'index'])->name('studio.referrals');
+Route::get('/studio/verification', [VerificationController::class, 'member'])->name('studio.verification');
+Route::post('/studio/verification/request', [VerificationController::class, 'apply'])->name('studio.verification.apply')->middleware('throttle:5,60');
+Route::post('/studio/verification/visibility', [VerificationController::class, 'visibility'])->name('studio.verification.visibility');
+Route::post('/studio/referrals/code', [ReferralController::class, 'createCode'])->name('studio.referrals.code')->middleware('throttle:10,1');
 Route::get('/studio/theme-preview/{theme}', [\App\Http\Controllers\ThemePreviewController::class, 'show'])->name('themePreview')->where('theme', '[A-Za-z][A-Za-z0-9_-]*');
 Route::post('/studio/theme', [UserController::class, 'editTheme'])->name('editTheme');
 Route::get('/deleteLink/{id}', [UserController::class, 'deleteLink'])->name('deleteLink')->middleware('link-id');
@@ -164,6 +173,13 @@ Route::group([
     Route::get('/panel/index', function(){return redirect(url('dashboard'));});
     Route::get('/admin/overview', [AdminController::class, 'index'])->name('adminOverview');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('showUsers');
+    Route::get('/admin/referrals', [ReferralController::class, 'adminIndex'])->name('admin.referrals');
+    Route::get('/admin/verification', [VerificationController::class, 'admin'])->name('admin.verification');
+    Route::get('/admin/reports', [AbuseReportController::class, 'index'])->name('admin.abuse-reports.index');
+    Route::get('/admin/reports/{id}', [AbuseReportController::class, 'show'])->whereNumber('id')->name('admin.abuse-reports.show');
+    Route::post('/admin/reports/{id}/status', [AbuseReportController::class, 'update'])->whereNumber('id')->name('admin.abuse-reports.update');
+    Route::post('/admin/verification/requests/{id}/review', [VerificationController::class, 'review'])->whereNumber('id')->name('admin.verification.review');
+    Route::post('/admin/users/{user}/verification', [VerificationController::class, 'toggle'])->whereNumber('user')->name('admin.verification.toggle');
     Route::post('/admin/users/registration-vip', [AdminController::class, 'updateRegistrationVip'])->name('admin.registration-vip');
     Route::get('/admin/links/{id}', [AdminController::class, 'showLinksUser'])->name('showLinksUser');
     Route::get('/admin/deleteLink/{id}', [AdminController::class, 'deleteLinkUser'])->name('deleteLinkUser');

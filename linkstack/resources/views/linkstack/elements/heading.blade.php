@@ -1,3 +1,2 @@
-<?php use App\Models\UserData; ?>
 <!-- Your Name -->
-        <h1 class="fadein dynamic-contrast">{{ $info->name }}@if(($userinfo->role == 'vip' or $userinfo->role == 'admin') and theme('disable_verification_badge') != "true" and env('HIDE_VERIFICATION_CHECKMARK') != true and UserData::getData($userinfo->id, 'checkmark') != false)<span title="{{__('messages.Verified user')}}">@include('components.verify-svg')@endif</span></h1>
+<h1 class="fadein dynamic-contrast">{{ $info->name }}@if(!empty($userinfo->verified_at) && (bool) $userinfo->verification_visible && theme('disable_verification_badge') != "true" && env('HIDE_VERIFICATION_CHECKMARK') != true)<span title="{{ __('messages.Verified user') }}" aria-label="{{ __('messages.Verified user') }}">@include('components.verify-svg')</span>@endif</h1>

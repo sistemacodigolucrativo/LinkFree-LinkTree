@@ -20,12 +20,12 @@ umask 077
 cd /
 if (( EUID != 0 )); then echo 'Execute como root.' >&2; exit 1; fi
 if (( $# != 1 )); then
-  echo 'Uso: atualizar-linkstack.sh --check | --deploy | --homologar' >&2
+  echo 'Uso: atualizar-linkstack.sh --check | --deploy | --deploy-m13 | --homologar' >&2
   exit 2
 fi
 mode="$1"
 case "$mode" in
-  --check|--deploy|--deploy-consent|--homologar) ;;
+  --check|--deploy|--deploy-consent|--deploy-m13|--homologar) ;;
   *) echo "Modo não autorizado: $mode" >&2; exit 2 ;;
 esac
 REPO=/home/ubuntu/src-Projects/LinkFree-LinkTree
@@ -56,7 +56,7 @@ runuser -u ubuntu -- git -C "$REPO" show "$sha:scripts/atualizar-linkstack.sh" >
 bash -n "$work/deploy.sh"
 echo "DEPLOY LINKFREE: script revisado da main $(printf '%s' "$sha" | cut -c1-12)"
 bash "$work/deploy.sh" "$mode"
-if [[ "$mode" == --deploy || "$mode" == --deploy-consent ]]; then
+if [[ "$mode" == --deploy || "$mode" == --deploy-consent || "$mode" == --deploy-m13 ]]; then
   echo 'Verificando site, banco e arquivos persistentes após publicação...'
   runuser -u ubuntu -- git -C "$REPO" show "$sha:scripts/homologar-linkfree.sh" > "$work/homologar.sh"
   bash -n "$work/homologar.sh"
