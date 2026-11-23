@@ -1,5 +1,7 @@
 # Relatório de implementação — LinkFree (23/11/2026)
 
+> **Atualização:** a PR #8 foi integrada à `main` no commit `5996df6c2f76673797e767a346bf2edc289d881c`. O texto abaixo documenta o estado **histórico** da branch de implementação antes do merge. A preparação posterior para migrar consentimento com backup e os testes integrados de cadastro constam em [Fechamento das pendências 01–04](FECHAMENTO-PENDENCIAS-01-04-20261123.md). A migração e o deploy ainda não foram executados na VPS.
+
 ## Visão geral
 
 Branch: `implementation/linkfree-10-melhorias-20261123`.
