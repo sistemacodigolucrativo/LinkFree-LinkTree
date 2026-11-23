@@ -95,6 +95,19 @@ class User extends Authenticatable implements MustVerifyEmail
             if (Schema::hasTable('referral_codes')) {
                 DB::table('referral_codes')->where('user_id', $user->id)->delete();
             }
+            if (Schema::hasTable('abuse_reports')) {
+                // Preserve case history when an account is removed by legacy admin flows.
+                DB::table('abuse_reports')->where('reported_user_id', $user->id)
+                    ->update(['reported_user_id' => null]);
+                DB::table('abuse_reports')->where('reporter_user_id', $user->id)
+                    ->update(['reporter_user_id' => null]);
+                DB::table('abuse_reports')->where('reviewed_by', $user->id)
+                    ->update(['reviewed_by' => null]);
+            }
+            if (Schema::hasTable('abuse_report_events')) {
+                DB::table('abuse_report_events')->where('actor_user_id', $user->id)
+                    ->update(['actor_user_id' => null]);
+            }
             if (Schema::hasTable('verification_audit_events')) {
                 DB::table('verification_audit_events')->where('user_id', $user->id)->delete();
                 DB::table('verification_audit_events')->where('actor_id', $user->id)->update(['actor_id' => null]);

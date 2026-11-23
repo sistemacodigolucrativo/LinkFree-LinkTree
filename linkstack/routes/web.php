@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\AbuseReportController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\LinkTypeViewController;
 use App\Http\Controllers\PagesController;
@@ -84,8 +85,8 @@ Route::get('/theme/@{littlelink}', [UserController::class, 'theme'])->name('them
 Route::get('/vcard/{id?}', [UserController::class, 'vcard'])->name('vcard');
 Route::get('/u/{id?}', [UserController::class, 'userRedirect'])->name('userRedirect');
 
-Route::get('/report', function () {return view('report');});
-Route::post('/report', [UserController::class, 'report'])->name('report');
+Route::get('/report', [AbuseReportController::class, 'form'])->name('report.form');
+Route::post('/report', [AbuseReportController::class, 'store'])->name('report')->middleware('throttle:5,10');
 
 Route::get('/demo-page', [App\Http\Controllers\HomeController::class, 'demo'])->name('demo')->middleware('disableCookies');
 
@@ -174,6 +175,9 @@ Route::group([
     Route::get('/admin/users', [AdminController::class, 'users'])->name('showUsers');
     Route::get('/admin/referrals', [ReferralController::class, 'adminIndex'])->name('admin.referrals');
     Route::get('/admin/verification', [VerificationController::class, 'admin'])->name('admin.verification');
+    Route::get('/admin/reports', [AbuseReportController::class, 'index'])->name('admin.abuse-reports.index');
+    Route::get('/admin/reports/{id}', [AbuseReportController::class, 'show'])->whereNumber('id')->name('admin.abuse-reports.show');
+    Route::post('/admin/reports/{id}/status', [AbuseReportController::class, 'update'])->whereNumber('id')->name('admin.abuse-reports.update');
     Route::post('/admin/verification/requests/{id}/review', [VerificationController::class, 'review'])->whereNumber('id')->name('admin.verification.review');
     Route::post('/admin/users/{user}/verification', [VerificationController::class, 'toggle'])->whereNumber('user')->name('admin.verification.toggle');
     Route::post('/admin/users/registration-vip', [AdminController::class, 'updateRegistrationVip'])->name('admin.registration-vip');

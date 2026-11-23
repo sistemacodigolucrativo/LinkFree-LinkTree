@@ -370,7 +370,7 @@ $usrhandl = Auth::user()->littlelink_name;
 
 @if(auth()->check() && auth()->user()->role === 'admin')
 @php
-  $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user') || request()->is('admin/referrals*') || request()->is('admin/verification*');
+  $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user') || request()->is('admin/referrals*') || request()->is('admin/verification*') || request()->is('admin/reports*');
   $adminSiteOpen = request()->is('admin/site*') || request()->is('admin/pages*');
   $adminThemesOpen = request()->is('admin/theme') || request()->is('admin/github-themes*') || request()->is('admin/linktype*');
   $adminSystemOpen = request()->is('admin/config') || request()->is('admin/backups') || request()->is('admin/advanced-config') || request()->is('admin/env') || request()->is('admin/phpinfo') || request()->is('update');
@@ -395,6 +395,7 @@ $usrhandl = Auth::user()->littlelink_name;
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/new-user') ? 'active' : '' }}" href="{{ route('createNewUser') }}"><i class="icon bi bi-person-plus" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin New User')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/referrals*') ? 'active' : '' }}" href="{{ route('admin.referrals') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">Indicações</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/verification*') ? 'active' : '' }}" href="{{ route('admin.verification') }}"><i class="icon bi bi-patch-check" aria-hidden="true"></i><span class="item-name">Solicitações de selo</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/reports*') ? 'active' : '' }}" href="{{ route('admin.abuse-reports.index') }}"><i class="icon bi bi-flag" aria-hidden="true"></i><span class="item-name">Central de denúncias</span></a></li>
   </ul>
 </li>
     <li class="nav-item nav-accordion-group nav-accordion-admin">
