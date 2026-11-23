@@ -49,7 +49,13 @@ jobs:
           home="$(fetch_code /)"
           login="$(fetch_code /login)"
           missing="$(fetch_code /__lf_test_http_404_nao_existente)"
-          echo "Home: $home | Login: $login | Página inexistente: $missing"
+          register="$(curl --silent --show-error --connect-timeout 8 --max-time 25 --proto '=https' \
+            --output /tmp/lf-live-register.html --write-out '%{http_code}' "$site/register")"
+          echo "Home: $home | Login: $login | Cadastro: $register | Página inexistente: $missing"
           test "$home" = 200
           test "$login" = 200
+          test "$register" = 200
+          grep -q 'name="accept_terms"' /tmp/lf-live-register.html
+          grep -q 'name="_token"' /tmp/lf-live-register.html
+          echo "Formulário real: aceite obrigatório e token CSRF presentes"
           test "$missing" = 404
