@@ -123,7 +123,13 @@ final class ThemeOptions
     public static function userValues(int $userId): array
     {
         $stored = UserData::getData($userId, 'theme_options');
-        return is_array($stored) ? array_intersect_key($stored, self::allowed()) : [];
+        if (!is_array($stored)) return [];
+        $allowed = self::allowed();
+        try {
+            return self::validated(array_intersect_key($stored, $allowed), $allowed);
+        } catch (ValidationException $exception) {
+            return [];
+        }
     }
 
     public static function saveForUser(int $userId, array $input): void
@@ -133,6 +139,8 @@ final class ThemeOptions
         $previous = UserData::getData($userId, 'theme_options');
         $previous = is_array($previous) ? $previous : [];
         $next = array_replace($previous, $valid);
+        // Revalida cores combinadas previamente salvas, nao apenas os campos enviados.
+        self::validated(array_intersect_key($next, $allowed), $allowed);
         UserData::saveData($userId, 'theme_options', $next);
     }
 
