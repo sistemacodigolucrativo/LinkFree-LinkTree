@@ -33,6 +33,7 @@ on:
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-public-site-editor.py'
       - 'scripts/audit-new-improvements.php'
+      - 'scripts/audit-auth-blade-boot.php'
       - 'scripts/audit-new-improvements.py'
       - 'linkstack/app/Services/ThemeOptions.php'
       - 'linkstack/app/Services/UserLinkLimit.php'
@@ -106,6 +107,7 @@ on:
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-public-site-editor.py'
       - 'scripts/audit-new-improvements.php'
+      - 'scripts/audit-auth-blade-boot.php'
       - 'scripts/audit-new-improvements.py'
       - 'linkstack/app/Services/ThemeOptions.php'
       - 'linkstack/app/Services/UserLinkLimit.php'
@@ -184,6 +186,8 @@ jobs:
           php -l linkstack/app/Services/PublicSiteContent.php
           php -l linkstack/app/Http/Controllers/AdminController.php
           php -l linkstack/routes/web.php
+      - name: Compile authentication views with bootstrapped Laravel
+        run: php scripts/audit-auth-blade-boot.php
       - name: Audit ten new scoped enhancements
         run: |
           python scripts/audit-new-improvements.py
