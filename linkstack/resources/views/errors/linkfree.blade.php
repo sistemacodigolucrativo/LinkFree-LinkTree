@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <title>{{ $statusCode }} — {{ config('app.name', 'LinkFree') }}</title>
+  @if(function_exists('findFile') && file_exists(base_path('assets/linkstack/images/'.findFile('favicon'))))
+  <link rel="icon" type="image/png" href="{{ asset('assets/linkstack/images/'.findFile('favicon')) }}">
+  @else
   <link rel="icon" type="image/svg+xml" href="{{ asset('assets/linkstack/images/favicon.svg') }}">
+  @endif
   <style>
     :root{color-scheme:light dark;--bg:#f2f7f4;--fg:#18362b;--surface:#fff;--muted:#4d645a;--accent:#276641;--stroke:#c5d6cc}
     @media(prefers-color-scheme:dark){:root{--bg:#101c17;--fg:#e5f5e9;--surface:#1a2b23;--muted:#c2d4c7;--accent:#b3ecbb;--stroke:#475a4e}}
