@@ -77,6 +77,9 @@ A bateria de homologação funcional 01–10 **continua não executada**, confor
 
 - [Consolidação 05–07 e riscos](CONSOLIDACAO-M13-05-07-E-GATES-20261123.md).
 - [Matriz de homologação 01–10](MATRIZ-HOMOLOGACAO-01-10-20261123.md).
+- [Manual de homologação assistida — 43 casos](HOMOLOGACAO-ASSISTIDA-01-10-MANUAL-OPERACIONAL.md).
+- [Prompt para IA condutora](HOMOLOGACAO-ASSISTIDA-01-10-PROMPT-IA.md).
+- [Registro dos resultados — modelo sem dados pessoais](HOMOLOGACAO-ASSISTIDA-01-10-REGISTRO.md).
 - [Procedimento histórico do deploy M13](PROCEDIMENTO-DEPLOY-M13-20261123.md).
 - [Indicações](IMPLEMENTACAO-PENDENCIA-05-INDICACOES-20261123.md).
 - [Selo verificado](IMPLEMENTACAO-PENDENCIA-06-SELO-VERIFICADO-20261123.md).
