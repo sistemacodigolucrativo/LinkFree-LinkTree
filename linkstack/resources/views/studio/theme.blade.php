@@ -123,6 +123,45 @@
 
 @endforeach
 
+@php
+  $lfFields = \App\Services\ThemeOptions::fields();
+  $lfOptions = \App\Services\ThemeOptions::allowed();
+  $lfValues = \App\Services\ThemeOptions::userValues(auth()->id());
+  $lfDefaults = ['background_color'=>'#f7f9fc','text_color'=>'#111827','button_color'=>'#1c653d','button_text'=>'#ffffff'];
+@endphp
+@if(count($lfOptions))
+ <section class="card rounded-4 mt-3 mb-4" aria-labelledby="lf-theme-member-title">
+  <div class="card-body p-3 p-md-4">
+   <h2 id="lf-theme-member-title" class="h5">{{ __('messages.lf_theme_member_title') }}</h2>
+   <p class="text-muted">{{ __('messages.lf_theme_member_help') }}</p>
+   @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+   <form method="post" action="{{ route('studio.theme-options') }}">
+    @csrf
+    <div class="row g-3">
+    @foreach($lfOptions as $key => $enabled)
+      @php $definition = $lfFields[$key]; @endphp
+      <div class="col-12 col-md-6">
+       <label class="form-label fw-semibold" for="lf-custom-{{ $key }}">{{ __('messages.'.$definition['label']) }}</label>
+       @if($definition['kind'] === 'color')
+         <input type="color" class="form-control form-control-color" id="lf-custom-{{ $key }}" name="{{ $key }}"
+            value="{{ old($key, $lfValues[$key] ?? $lfDefaults[$key] ?? '#000000') }}">
+       @else
+         <select class="form-select" id="lf-custom-{{ $key }}" name="{{ $key }}">
+         @foreach($definition['choices'] as $choice)
+           <option value="{{ $choice }}" @selected(old($key, $lfValues[$key] ?? '') === $choice)>{{ __('messages.lf_theme_choice_'.$choice) }}</option>
+         @endforeach
+         </select>
+       @endif
+      </div>
+    @endforeach
+    </div>
+    <p class="form-text">{{ __('messages.lf_theme_contrast_help') }}</p>
+    <button class="btn btn-primary mt-3" type="submit">{{ __('messages.Save') }}</button>
+   </form>
+  </div>
+ </section>
+@endif
+
 <script src="{{ asset('assets/external-dependencies/jquery-1.12.4.min.js') }}"></script>
 </section>
 </div>

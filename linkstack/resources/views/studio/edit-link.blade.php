@@ -24,7 +24,11 @@
                         <h3 class="card-header"><i class="bi bi-journal-plus"> @if($LinkID !== 0) {{__('messages.Edit')}} @else {{__('messages.Add')}} @endif {{__('messages.Block')}}</i></h3>
 
                         <div class='card-body'>
-                            <form action="{{ route('addLink') }}" method="post" id="my-form">
+                            @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+@if(auth()->user()->role === 'user')
+ <p class="small text-muted">{{ __('messages.lf_link_usage', ['count' => \App\Services\UserLinkLimit::count(auth()->id()), 'max' => \App\Services\UserLinkLimit::FREE_LIMIT]) }}</p>
+@endif
+<form action="{{ route('addLink') }}" method="post" id="my-form">
                                 @method('POST')
                                 @csrf
                                 <input type='hidden' name='linkid' value="{{ $LinkID }}" />

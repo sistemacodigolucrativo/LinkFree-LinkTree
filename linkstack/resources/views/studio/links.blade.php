@@ -1,6 +1,15 @@
 @extends('layouts.sidebar')
 
 @section('content')
+@if(auth()->user()->role === 'user')
+<div class="alert alert-info d-flex flex-wrap gap-2 align-items-center" role="status">
+  <span>{{ __('messages.lf_link_usage', ['count' => \App\Services\UserLinkLimit::count(auth()->id()), 'max' => \App\Services\UserLinkLimit::FREE_LIMIT]) }}</span>
+  <span>{{ __('messages.lf_upgrade_info') }}</span>
+</div>
+@endif
+@if(session('error'))<div class="alert alert-danger" role="alert">{{ session('error') }}</div>@endif
+@if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
+
 
 <?php use App\Models\Button;
 

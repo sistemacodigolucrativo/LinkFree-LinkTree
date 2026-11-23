@@ -104,4 +104,10 @@ $customBackgroundExists = file_exists($customBackgroundPath)
 @push('linkstack-body-end')
 @if(theme('enable_custom_code') == "true" and theme('enable_custom_body_end') == "true" and env('ALLOW_CUSTOM_CODE_IN_THEMES') == 'true')@include($GLOBALS['themeName'] . '.extra.custom-body-end')@endif
 @endpush
+@php $lfStyle = \App\Services\ThemeOptions::css((int) $userinfo->id); @endphp
+@if($lfStyle !== '')
+@push('linkstack-head-end')
+<style id="lf-user-theme-options">{!! $lfStyle !!}</style>
+@endpush
+@endif
 @include('linkstack.modules.dynamic-contrast')

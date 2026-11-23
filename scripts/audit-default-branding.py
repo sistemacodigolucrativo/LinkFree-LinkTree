@@ -24,6 +24,9 @@ fallbacks = (
 )
 for name in fallbacks:
     s = (views / name).read_text(encoding="utf-8")
+    if name == "maintenance.blade.php":
+        assert "@include('errors.linkfree'" in s, "Maintenance error page template not referenced"
+        s = (views / "errors/linkfree.blade.php").read_text(encoding="utf-8")
     assert "findFile('favicon')" in s, (name, "custom favicon removed")
     assert 'assets/linkstack/images/favicon.svg' in s, (name, "fallback missing")
     assert '<link rel="icon" type="image/svg+xml" href="{{ asset(\'assets/linkstack/images/logo.svg\') }}">' not in s, (name, "logo incorrectly used as favicon")

@@ -125,7 +125,7 @@ class UserController extends Controller
             }
         }
 
-        return view('linkstack.linkstack', ['userinfo' => $userinfo, 'information' => $information, 'links' => $links, 'littlelink_name' => $littlelink_name]);
+        return $this->renderPublicProfile($request, $userinfo, $information, $links, $littlelink_name);
     }
 
     //Show littlelink page as home page if set in config
@@ -163,7 +163,7 @@ class UserController extends Controller
             }
         }
 
-        return view('linkstack.linkstack', ['userinfo' => $userinfo, 'information' => $information, 'links' => $links, 'littlelink_name' => $littlelink_name]);
+        return $this->renderPublicProfile($request, $userinfo, $information, $links, $littlelink_name);
     }
 
     //Redirect to user page
@@ -181,6 +181,38 @@ class UserController extends Controller
         }
 
         return redirect(url('@'.$user));
+    }
+
+    // Visitas publicas e SEO compartilham o contador ja usado pelo dashboard.
+    private function renderPublicProfile(Request $request, User $userinfo, $information, $links, string $littlelink_name)
+    {
+        $visitCount = 0;
+        try {
+            $counter = visits('App\\Models\\User', $littlelink_name);
+            $counted = $counter->increment();
+            if ($counted) {
+                \App\Services\VisitAttribution::record((int) $userinfo->id, $request);
+            }
+            $visitCount = (int) $counter->count();
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+        // UserData retorna a string "null" em perfis sem dados: compare estritamente com true.
+        $showVisitCount = UserData::getData($userinfo->id, 'public_visit_count') === true;
+        $noIndex = UserData::getData($userinfo->id, 'search_noindex') === true;
+        $response = response()->view('linkstack.linkstack', compact('userinfo', 'information', 'links', 'littlelink_name', 'visitCount', 'showVisitCount', 'noIndex'));
+        if ($noIndex) $response->header('X-Robots-Tag', 'noindex, follow');
+        return $response;
+    }
+
+    // Relatorios avancados: permissao obrigatoria no servidor.
+    public function showVisitorReports()
+    {
+        abort_unless(in_array(Auth::user()->role, ['vip', 'admin'], true), 403);
+        return view('studio.visitor-reports', [
+            'sources' => \App\Services\VisitAttribution::summary((int) Auth::id(), 30),
+            'visitsTotal' => (int) visits('App\\Models\\User', Auth::user()->littlelink_name)->count(),
+        ]);
     }
 
     //Show add/update form
@@ -222,6 +254,16 @@ class UserController extends Controller
         $linkType = LinkType::findByTypename($request->typename);
         $LinkTitle = $request->title;
         $LinkURL = $request->link;
+        if ($request->input('typename') === 'predefined' && $request->input('button') === 'whatsapp') {
+            $data = $request->validate([
+                'wa_country' => 'required|string|max:4',
+                'wa_phone' => 'required|string|max:24',
+                'wa_message' => 'nullable|string|max:1000',
+            ]);
+            $LinkURL = \App\Services\WhatsAppLink::build(
+                $data['wa_country'], $data['wa_phone'], (string) ($data['wa_message'] ?? '')
+            );
+        }
 
         // Step 3: Load Link Type Logic
         if($request->typename == 'predefined' || $request->typename == 'link') {
@@ -310,9 +352,12 @@ class UserController extends Controller
             $OrigLink->update($updatedValues);
             $message = "Link updated";
         } else {
-            $link = new Link($filteredLinkData);
-            $link->user_id = $userId;
-            $link->save();
+            DB::transaction(function () use ($filteredLinkData, $userId) {
+                User::whereKey($userId)->lockForUpdate()->firstOrFail();
+                $link = new Link($filteredLinkData);
+                $link->user_id = $userId;
+                $link->save();
+            });
             $message = "Link added";
         }
 
@@ -699,7 +744,9 @@ class UserController extends Controller
         } else {
             UserData::saveData($userId, 'links-new-tab', false);
         }
-    
+        UserData::saveData($userId, 'search_noindex', $request->boolean('search_noindex'));
+        UserData::saveData($userId, 'public_visit_count', $request->boolean('public_visit_count'));
+
         return Redirect('/studio/page');
     }
 
@@ -807,6 +854,13 @@ class UserController extends Controller
 
 
         return Redirect(!empty($zipfile) && Auth::user()->role === 'admin' ? '/admin/theme' : '/studio/theme')->with("success", $message);
+    }
+
+    // Backend filtra campos desabilitados pelo administrador.
+    public function saveThemeOptions(Request $request)
+    {
+        \App\Services\ThemeOptions::saveForUser((int) Auth::id(), $request->except('_token'));
+        return redirect()->route('showTheme')->with('success', __('messages.lf_theme_saved'));
     }
 
     //Show user (name, email, password)
@@ -972,6 +1026,13 @@ class UserController extends Controller
             $file = $request->file('import');
             $jsonString = $file->get();
             $userData = json_decode($jsonString, true);
+            if (!is_array($userData) || !isset($userData['links']) || !is_array($userData['links'])) {
+                throw new \InvalidArgumentException('Invalid import structure');
+            }
+            if (auth()->user()->role === 'user'
+                && \App\Services\UserLinkLimit::countImportable($userData['links']) > \App\Services\UserLinkLimit::FREE_LIMIT) {
+                return redirect('studio/profile')->with('error', __('messages.lf_limit_reached'));
+            }
     
             // Update the authenticated user's profile data if defined in the JSON file
             $user = auth()->user();
@@ -1011,6 +1072,8 @@ class UserController extends Controller
                 }
             }
 
+            DB::transaction(function () use ($user, $userData) {
+            User::whereKey($user->id)->lockForUpdate()->firstOrFail();
             $user->save();
     
             // Delete all links for the authenticated user
@@ -1058,6 +1121,7 @@ class UserController extends Controller
                 // Save the new link to the database
                 $newLink->save();
             }
+            });
             return redirect('studio/profile')->with('success', __('messages.Profile updated successfully!'));
         } catch (\Exception $e) {
             return redirect('studio/profile')->with('error', __('messages.An error occurred while updating your profile.'));
