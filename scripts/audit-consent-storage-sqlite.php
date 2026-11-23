@@ -26,6 +26,7 @@ register_shutdown_function(function () use ($db, $storage) {
     };
     $clear($storage, $clear);
 });
+try {
 $app->useStoragePath($storage);
 config([
     'database.default' => 'sqlite',
@@ -112,12 +113,15 @@ try {
 verify(\App\Models\User::where('email','no-consent@example.test')->doesntExist(), 'Nenhum usuário criado sem aceite');
 
 // Exercita o controller Laravel completo com SQLite isolado e autenticação simulada.
-\Illuminate\Support\Facades\Auth::shouldReceive('login')->times(3);
+// A autenticação real usa sessão em memória, sem Mockery/dev dependencies.
+$session = app('session')->driver();
+$session->start();
 \Illuminate\Support\Facades\Event::fake([\Illuminate\Auth\Events\Registered::class]);
 $accepted = \Illuminate\Http\Request::create('/register','POST',[
     'name'=>'Cadastro válido','email'=>'accepted@example.test',
     'littlelink_name'=>'accepted-consent','password'=>'TestPassword!123','accept_terms'=>'1',
 ]);
+$accepted->setLaravelSession($session);
 app()->instance('request',$accepted);
 $response=(new \App\Http\Controllers\Auth\RegisteredUserController())->store($accepted);
 verify($response->getStatusCode() === 302,'Cadastro comum com aceite conclui sem exceção');
@@ -133,17 +137,27 @@ $schema->create('social_accounts', function ($table) {
     $table->string('provider_id');
     $table->timestamps();
 });
-$socialPerson = \Mockery::mock();
-$socialPerson->shouldReceive('getId')->andReturn('mock-social-user-id-1');
-$socialPerson->shouldReceive('getEmail')->andReturn('social@example.test');
-$socialPerson->shouldReceive('getName')->andReturn('Cadastro Social');
-$socialPerson->shouldReceive('getAvatar')->andReturn(null);
-$socialPerson->shouldReceive('getNickname')->andReturn('social-consent');
-$driver = \Mockery::mock();
-$driver->shouldReceive('user')->times(3)->andReturn($socialPerson);
-\Socialite::shouldReceive('driver')->with('github')->andReturn($driver);
-$session = app('session')->driver();
-$session->start();
+// Um provedor social local determinístico evita chamadas externas e dependências dev.
+$socialPerson = new class {
+    public function getId(){ return 'mock-social-user-id-1'; }
+    public function getEmail(){ return 'social@example.test'; }
+    public function getName(){ return 'Cadastro Social'; }
+    public function getAvatar(){ return null; }
+    public function getNickname(){ return 'social-consent'; }
+};
+$driver = new class($socialPerson) {
+    private object $person;
+    public function __construct(object $person){ $this->person=$person; }
+    public function user(){ return $this->person; }
+};
+\Socialite::swap(new class($driver) {
+    private object $driver;
+    public function __construct(object $driver){ $this->driver=$driver; }
+    public function driver(string $provider){
+        if ($provider!=='github') throw new \RuntimeException('Unexpected fake provider');
+        return $this->driver;
+    }
+});
 $socialController = new \App\Http\Controllers\Auth\SocialLoginController();
 $callbackRequest = \Illuminate\Http\Request::create('/social-auth/github/callback','GET');
 $callbackRequest->setLaravelSession($session);
@@ -180,3 +194,7 @@ verify($counts['instagram']===1,'Relatório de origem persiste e volta a ser lid
 $raw=file_get_contents($storage.'/app/linkfree/visit-sources/'.$user->id.'.json');
 verify(strpos($raw,'test-consent')===false && strpos($raw,'@example.test')===false, 'Agregados não armazenam identificadores pessoais');
 echo "CONSENT AND STORAGE SQLITE INTEGRATION PASS\n";
+} catch (\Throwable $exception) {
+    fwrite(STDERR, "CONSENT AND STORAGE SQLITE INTEGRATION FAILED: ".$exception->getMessage()."\n");
+    exit(1);
+}
