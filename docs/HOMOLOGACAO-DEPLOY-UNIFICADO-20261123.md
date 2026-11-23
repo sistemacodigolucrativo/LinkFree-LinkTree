@@ -14,9 +14,10 @@ Esses registros confirmam versão e migração. Não comprovam isoladamente a ap
 O GitHub Actions executou HTTP GET sobre o site real, sem contas e sem alteração deliberada de dados:
 - `https://linkfree.website/`: HTTP **200**.
 - `https://linkfree.website/login`: HTTP **200**.
+- `https://linkfree.website/register`: HTTP **200**, formulário contém `accept_terms` e token CSRF `_token`.
 - Rota intencionalmente inexistente: HTTP **404**.
 
-Run de referência: https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45273994598
+Run de referência: https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45274549304
 
 ### Testes isolados Laravel/SQLite
 O workflow anterior de consentimento verificou a migração, gravação e hash de aceite, transações com rollback, cadastro normal com/sem aceite, OAuth simulado com/sem aceite e login social sem duplicação, além de leitura/escrita do storage.
