@@ -1213,4 +1213,11 @@ return [
     'lf_theme_choice_compact' => 'Compact',
     'lf_theme_choice_normal' => 'Normal',
     'lf_theme_choice_relaxed' => 'Relaxed',
+    'lf_admin_shortcuts' => 'Administration quick access',
+    'lf_admin_existing_help' => 'Open existing administrative tools without creating duplicate modules.',
+    'lf_admin_users' => 'Users and permissions',
+    'lf_admin_site' => 'Content and branding',
+    'lf_admin_themes' => 'Themes and components',
+    'lf_admin_system' => 'System and security',
+    'lf_admin_pending_modules' => 'Verification requests, referrals and an abuse-report inbox are separate modules not yet implemented. Existing manual verification and email-based reports remain available.',
 ];
