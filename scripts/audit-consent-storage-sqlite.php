@@ -110,6 +110,64 @@ try {
     verify(isset($exception->errors()['accept_terms']), 'Cadastro rejeita requisição sem aceite no servidor');
 }
 verify(\App\Models\User::where('email','no-consent@example.test')->doesntExist(), 'Nenhum usuário criado sem aceite');
+
+// Exercita o controller Laravel completo com SQLite isolado e autenticação simulada.
+\Illuminate\Support\Facades\Auth::shouldReceive('login')->times(3);
+\Illuminate\Support\Facades\Event::fake([\Illuminate\Auth\Events\Registered::class]);
+$accepted = \Illuminate\Http\Request::create('/register','POST',[
+    'name'=>'Cadastro válido','email'=>'accepted@example.test',
+    'littlelink_name'=>'accepted-consent','password'=>'TestPassword!123','accept_terms'=>'1',
+]);
+app()->instance('request',$accepted);
+$response=(new \App\Http\Controllers\Auth\RegisteredUserController())->store($accepted);
+verify($response->getStatusCode() === 302,'Cadastro comum com aceite conclui sem exceção');
+$created=\App\Models\User::where('email','accepted@example.test')->first();
+verify($created !== null && $created->role === 'user','Cadastro tradicional cria usuário sem alterar role indevidamente');
+verify(\Illuminate\Support\Facades\DB::table('registration_consents')->where('user_id',$created->id)->where('method','email')->count()===1,
+    'Cadastro tradicional grava exatamente um comprovante');
+
+$schema->create('social_accounts', function ($table) {
+    $table->bigIncrements('id');
+    $table->unsignedBigInteger('user_id');
+    $table->string('provider_name');
+    $table->string('provider_id');
+    $table->timestamps();
+});
+$socialPerson = \Mockery::mock();
+$socialPerson->shouldReceive('getId')->andReturn('mock-social-user-id-1');
+$socialPerson->shouldReceive('getEmail')->andReturn('social@example.test');
+$socialPerson->shouldReceive('getName')->andReturn('Cadastro Social');
+$socialPerson->shouldReceive('getAvatar')->andReturn(null);
+$socialPerson->shouldReceive('getNickname')->andReturn('social-consent');
+$driver = \Mockery::mock();
+$driver->shouldReceive('user')->times(3)->andReturn($socialPerson);
+\Socialite::shouldReceive('driver')->with('github')->andReturn($driver);
+$session = app('session')->driver();
+$session->start();
+$socialController = new \App\Http\Controllers\Auth\SocialLoginController();
+$callbackRequest = \Illuminate\Http\Request::create('/social-auth/github/callback','GET');
+$callbackRequest->setLaravelSession($session);
+app()->instance('request',$callbackRequest);
+$missing = $socialController->providerCallback('github');
+verify(str_contains($missing->getTargetUrl(), '/register'), 'OAuth bloqueia conta nova sem aceite');
+verify(\App\Models\User::where('email','social@example.test')->doesntExist(), 'OAuth não grava conta sem aceite');
+$acceptRequest = \Illuminate\Http\Request::create('/social-auth/github/consent','POST',['accept_terms'=>'1']);
+$acceptRequest->setLaravelSession($session);
+app()->instance('request',$acceptRequest);
+$consentResponse = $socialController->consent($acceptRequest,'github');
+verify($consentResponse->getStatusCode()===200, 'OAuth recebe autorização explícita antes do provedor');
+app()->instance('request',$callbackRequest);
+$socialResult=$socialController->providerCallback('github');
+verify(str_contains($socialResult->getTargetUrl(), '/studio/index'), 'OAuth conclui criação com aceite');
+$socialUser=\App\Models\User::where('email','social@example.test')->first();
+verify($socialUser!==null, 'Novo usuário OAuth foi persistido');
+verify(\Illuminate\Support\Facades\DB::table('registration_consents')->where('user_id',$socialUser->id)->where('method','social')->count()===1,
+    'Novo usuário OAuth grava recibo exclusivo de consentimento');
+$existingResult=$socialController->providerCallback('github');
+verify(str_contains($existingResult->getTargetUrl(), '/studio/index'),'OAuth mantém login de conta já existente');
+verify(\Illuminate\Support\Facades\DB::table('registration_consents')->where('user_id',$socialUser->id)->count()===1,
+    'Login social existente não duplica comprovante');
+
 \App\Services\ThemeOptions::savePermissions(['font_family'=>'1','spacing'=>'1']);
 verify(\App\Services\ThemeOptions::permissions()['font_family'] === true, 'Permissão de personalização persistida em JSON');
 verify(\App\Services\ThemeOptions::permissions()['button_color'] === false, 'Controles não liberados permanecem inativos');
