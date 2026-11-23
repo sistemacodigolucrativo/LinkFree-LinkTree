@@ -62,6 +62,18 @@
         <span>{{ __('messages.Remember Me') }}</span>
       </label>
     </div>
+    <div class="lf-login-field">
+      <label class="d-flex align-items-start gap-2" for="lf-accept-terms" style="font-size:.86rem;line-height:1.5">
+        <input type="checkbox" class="form-check-input mt-1" id="lf-accept-terms" name="accept_terms"
+          value="1" required @checked(old('accept_terms') == 1)>
+        <span>
+          {{ __('messages.lf_accept_intro') }}
+          <a href="{{ route('pagesTerms') }}" target="_blank" rel="noopener noreferrer">{{ __('messages.lf_terms') }}</a>
+          {{ __('messages.lf_and') }}
+          <a href="{{ route('pagesPrivacy') }}" target="_blank" rel="noopener noreferrer">{{ __('messages.lf_privacy') }}</a>.
+        </span>
+      </label>
+    </div>
     <button id="submit-btn" type="submit" class="btn btn-primary lf-login-submit">{{ __('messages.Sign Up') }}</button>
     @if(env('ENABLE_SOCIAL_LOGIN') == 'true')
       <div class="lf-login-divider"><span>{{ __('messages.or sign in with other accounts?') }}</span></div>
@@ -86,6 +98,28 @@
     </p>
   </form>
   @include('auth.url-validation')
+  <script>
+  (function(){
+    // Novo cadastro social: o aceite explicitamente marcado e enviado por POST com CSRF.
+    document.addEventListener('click', async function(event){
+      const link=event.target.closest('[data-lf-auth-view="register"] .lf-login-social a');
+      if(!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      const checkbox=document.getElementById('lf-accept-terms');
+      if(!checkbox || !checkbox.checked){if(checkbox)checkbox.reportValidity();return;}
+      const match=new URL(link.href).pathname.match(/social-auth\/([^/]+)$/);
+      if(!match)return;
+      try{
+        const url=@json(url('/social-auth'))+'/'+encodeURIComponent(match[1])+'/consent';
+        const result=await fetch(url,{method:'POST',credentials:'same-origin',
+          headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':@json(csrf_token())},
+          body:JSON.stringify({accept_terms:1})});
+        if(!result.ok)throw new Error('Consent failed');
+        window.location.assign((await result.json()).redirect);
+      }catch(error){alert(@json(__('messages.lf_accept_required')));}
+    });
+  })();
+  </script>
 </div>
 @endif
 

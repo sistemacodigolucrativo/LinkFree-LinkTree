@@ -152,6 +152,7 @@ Route::get('/studio/linkparamform_part/{typeid}/{linkid}', [LinkTypeViewControll
 //Social login route
 Route::get('/social-auth/{provider}/callback', [SocialLoginController::class, 'providerCallback']);
 Route::get('/social-auth/{provider}', [SocialLoginController::class, 'redirectToProvider'])->name('social.redirect');
+Route::post('/social-auth/{provider}/consent', [SocialLoginController::class, 'consent'])->name('social.consent');
 
 Route::middleware(['auth', 'blocked', 'impersonate'])->group(function () {
 //Admin route

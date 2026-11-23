@@ -1172,4 +1172,9 @@ return [
     'lf_visitor_source' => 'Source',
     'lf_visitor_count' => 'Visits',
     'lf_visitor_note' => 'Sources estimated from referrers and UTM. Missing information is classified as direct traffic.',
+    'lf_accept_intro' => 'I have read and accept the',
+    'lf_terms' => 'Terms of Use',
+    'lf_and' => 'and the',
+    'lf_privacy' => 'Privacy Policy',
+    'lf_accept_required' => 'You must accept the Terms of Use and Privacy Policy to create an account.',
 ];

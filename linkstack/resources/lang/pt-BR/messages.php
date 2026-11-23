@@ -1068,4 +1068,9 @@ return array(
     'lf_visitor_source' => 'Origem',
     'lf_visitor_count' => 'Visitas',
     'lf_visitor_note' => 'Fontes estimadas por referência e UTM. Links sem origem informada aparecem como acesso direto.',
+    'lf_accept_intro' => 'Li e aceito os',
+    'lf_terms' => 'Termos de Uso',
+    'lf_and' => 'e a',
+    'lf_privacy' => 'Política de Privacidade',
+    'lf_accept_required' => 'Você precisa aceitar os Termos de Uso e a Política de Privacidade para criar sua conta.',
 );
