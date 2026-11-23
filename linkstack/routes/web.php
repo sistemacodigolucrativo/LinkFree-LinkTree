@@ -215,9 +215,11 @@ Route::group([
 
 // Displays Maintenance Mode page
 if(env('MAINTENANCE_MODE') == 'true'){
-Route::get('/{any}', function () {
-  return view('maintenance');
-  })->where('any', '.*');
+    Route::any('/{any?}', function () {
+        return response()->view('maintenance', [], 503)
+            ->header('Retry-After', '300')
+            ->header('Cache-Control', 'no-store');
+    })->where('any', '.*');
 }
 
 require __DIR__.'/auth.php';

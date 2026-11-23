@@ -1073,4 +1073,11 @@ return array(
     'lf_and' => 'e a',
     'lf_privacy' => 'Política de Privacidade',
     'lf_accept_required' => 'Você precisa aceitar os Termos de Uso e a Política de Privacidade para criar sua conta.',
+    'lf_error_back' => 'Voltar ao início',
+    'lf_error_404_title' => 'Página não encontrada',
+    'lf_error_404_text' => 'O endereço solicitado não existe ou foi alterado.',
+    'lf_error_500_title' => 'Não foi possível carregar esta página',
+    'lf_error_500_text' => 'Ocorreu uma falha temporária. Tente novamente em alguns instantes.',
+    'lf_error_503_title' => 'Serviço temporariamente indisponível',
+    'lf_error_503_text' => 'Estamos realizando melhorias. Por favor, tente novamente mais tarde.',
 );

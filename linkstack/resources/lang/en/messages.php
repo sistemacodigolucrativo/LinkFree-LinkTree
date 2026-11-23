@@ -1177,4 +1177,11 @@ return [
     'lf_and' => 'and the',
     'lf_privacy' => 'Privacy Policy',
     'lf_accept_required' => 'You must accept the Terms of Use and Privacy Policy to create an account.',
+    'lf_error_back' => 'Back to home',
+    'lf_error_404_title' => 'Page not found',
+    'lf_error_404_text' => 'This address does not exist or has changed.',
+    'lf_error_500_title' => 'We could not load this page',
+    'lf_error_500_text' => 'A temporary error occurred. Please try again shortly.',
+    'lf_error_503_title' => 'Service temporarily unavailable',
+    'lf_error_503_text' => 'We are working on improvements. Please try again later.',
 ];
