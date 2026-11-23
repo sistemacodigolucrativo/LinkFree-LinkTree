@@ -9,6 +9,9 @@ final class VisitAttribution
     public static function source(Request $request): string
     {
         $utm = strtolower(preg_replace('/[^a-z0-9_-]/', '', substr((string) $request->query('utm_source', ''), 0, 40)));
+        if ($utm === '' && ($request->query('utm_campaign') !== null || $request->query('utm_medium') !== null)) {
+            return 'campanha';
+        }
         if ($utm !== '') return match (true) {
             str_contains($utm, 'instagram') => 'instagram',
             str_contains($utm, 'whatsapp') => 'whatsapp',
