@@ -31,6 +31,13 @@ on:
       - 'linkstack/assets/js/sidebar-auto-close.js'
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
+      - 'scripts/audit-public-site-editor.py'
+      - 'linkstack/app/Services/PublicSiteContent.php'
+      - 'linkstack/resources/views/panel/site.blade.php'
+      - 'linkstack/assets/css/linkfree-admin-management.css'
+      - 'linkstack/resources/views/admin/linktype/index.blade.php'
+      - 'linkstack/resources/views/admin/linktype/create.blade.php'
+      - 'linkstack/resources/views/admin/linktype/edit.blade.php'
       - 'scripts/audit-registration-vip.py'
       - 'linkstack/app/Services/RegistrationVip.php'
       - 'linkstack/app/Http/Controllers/Auth/RegisteredUserController.php'
@@ -79,6 +86,13 @@ on:
       - 'linkstack/assets/js/sidebar-auto-close.js'
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
+      - 'scripts/audit-public-site-editor.py'
+      - 'linkstack/app/Services/PublicSiteContent.php'
+      - 'linkstack/resources/views/panel/site.blade.php'
+      - 'linkstack/assets/css/linkfree-admin-management.css'
+      - 'linkstack/resources/views/admin/linktype/index.blade.php'
+      - 'linkstack/resources/views/admin/linktype/create.blade.php'
+      - 'linkstack/resources/views/admin/linktype/edit.blade.php'
       - 'scripts/audit-registration-vip.py'
       - 'linkstack/app/Services/RegistrationVip.php'
       - 'linkstack/app/Http/Controllers/Auth/RegisteredUserController.php'
@@ -126,6 +140,12 @@ jobs:
         run: python scripts/audit-profile-editor-gradient.py
       - name: Audit premium login layout and preserved authentication
         run: python scripts/audit-login-layout.py
+      - name: Verify sectional public site editor
+        run: |
+          python scripts/audit-public-site-editor.py
+          php -l linkstack/app/Services/PublicSiteContent.php
+          php -l linkstack/app/Http/Controllers/AdminController.php
+          php -l linkstack/routes/web.php
       - name: Audit persistent VIP toggle and account creation
         run: |
           python scripts/audit-registration-vip.py
