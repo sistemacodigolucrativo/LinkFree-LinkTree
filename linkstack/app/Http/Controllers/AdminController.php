@@ -28,6 +28,7 @@ use App\Models\Button;
 use App\Models\Link;
 use App\Models\Page;
 use App\Models\UserData;
+use App\Services\PublicSiteContent;
 use App\Services\RegistrationVip;
 
 class AdminController extends Controller
@@ -442,11 +443,56 @@ class AdminController extends Controller
     return back();
   }
 
-  //Show home message for edit
-  public function showSite()
+  // Editor de paginas publicas em categorias independentes.
+  public function showSite(Request $request)
   {
-    $message = Page::select("home_message")->first();
-    return view("panel/site", $message);
+    $sections = PublicSiteContent::sections();
+    $selected = (string) $request->query('section', 'identity');
+    if ($selected !== 'identity' && !isset($sections[$selected])) {
+      abort(404);
+    }
+    $page = Page::select('home_message')->first();
+    return view('panel/site', [
+      'home_message' => $page->home_message ?? 'default',
+      'siteSections' => $sections,
+      'siteSection' => $selected,
+      'siteValues' => PublicSiteContent::values(),
+    ]);
+  }
+
+  // Salva somente o grupo enviado, sem alterar os demais ou os perfis individuais.
+  public function editPublicSiteContent(Request $request)
+  {
+    $section = (string) $request->input('section', '');
+    $sections = PublicSiteContent::sections();
+    if (!isset($sections[$section])) {
+      abort(404);
+    }
+
+    $rules = [];
+    foreach ($sections[$section]['fields'] as $key => $field) {
+      $rules[$key] = ($field['type'] ?? 'text') === 'checkbox'
+        ? 'sometimes|boolean'
+        : 'nullable|string|max:'.(int) ($field['max'] ?? 250);
+    }
+    $validated = $request->validate($rules);
+    $values = [];
+    foreach ($sections[$section]['fields'] as $key => $field) {
+      $values[$key] = ($field['type'] ?? 'text') === 'checkbox'
+        ? $request->boolean($key)
+        : trim((string) ($validated[$key] ?? ''));
+    }
+
+    try {
+      PublicSiteContent::saveSection($section, $values);
+    } catch (\Throwable $exception) {
+      report($exception);
+      return redirect()->route('showSite', ['section' => $section])
+        ->with('fail', 'Não foi possível gravar a seção. Verifique as permissões de storage.');
+    }
+
+    return redirect()->route('showSite', ['section' => $section])
+      ->with('success', 'Seção atualizada com sucesso.');
   }
 
   //Save home message, logo and favicon

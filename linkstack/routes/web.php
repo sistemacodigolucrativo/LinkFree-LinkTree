@@ -179,6 +179,7 @@ Route::group([
     Route::get('/admin/env', [AdminController::class, 'showFileEditor'])->name('showEnvEditor');
     Route::post('/admin/env', [AdminController::class, 'editENV'])->name('editENV');
     Route::get('/admin/site', [AdminController::class, 'showSite'])->name('showSite');
+    Route::post('/admin/site/content', [AdminController::class, 'editPublicSiteContent'])->name('admin.site.content');
     Route::post('/admin/site', [AdminController::class, 'editSite'])->name('editSite');
     Route::get('/admin/site/delavatar', [AdminController::class, 'delAvatar'])->name('delAvatar');
     Route::get('/admin/site/delfavicon', [AdminController::class, 'delFavicon'])->name('delFavicon');

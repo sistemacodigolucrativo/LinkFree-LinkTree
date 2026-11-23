@@ -65,3 +65,46 @@
 @media(prefers-reduced-motion:reduce){
  .lf-admin-themes-page .lf-theme-card,.lf-block-types-page .lf-type-card{transition:none}
 }
+
+/* Editor modular das paginas publicas. */
+.lf-site-settings-page{width:100%;max-width:100%;min-width:0;margin-top:0!important;padding:clamp(12px,2vw,24px)!important}
+.lf-site-settings-page .card{min-width:0}
+.lf-site-settings-nav{
+  display:flex;flex-wrap:wrap;gap:8px;padding:12px;
+  background:var(--lf-raised);border:1px solid var(--lf-border);border-radius:15px
+}
+.lf-site-settings-nav a{
+  display:inline-flex;align-items:center;min-height:42px;min-width:0;
+  padding:8px 13px;border:1px solid var(--lf-border);border-radius:10px;
+  background:var(--lf-surface);color:var(--lf-text);
+  font-weight:600;font-size:.88rem;line-height:1.35;
+  text-decoration:none;overflow-wrap:anywhere
+}
+.lf-site-settings-nav a:is(:hover,:focus-visible){
+  background:var(--lf-hover);border-color:var(--lf-focus)
+}
+.lf-site-settings-nav a.is-active{
+  color:var(--lf-link);background:var(--lf-surface);
+  border:2px solid var(--lf-focus)
+}
+.lf-site-form-card{overflow:hidden;max-width:100%;border:1px solid var(--lf-border);background:var(--lf-surface)}
+.lf-site-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.lf-site-field{min-width:0;max-width:100%;align-self:start}
+.lf-site-field-wide{grid-column:1/-1}
+.lf-site-field :is(input,textarea){max-width:100%;min-width:0}
+.lf-site-field textarea{line-height:1.6;resize:vertical}
+.lf-site-visibility{display:flex;align-items:center;gap:12px;min-height:44px;padding-left:2.75rem}
+.lf-site-visibility .form-check-input{width:2.4rem;height:1.3rem;cursor:pointer}
+.lf-site-actions{display:flex;flex-wrap:wrap;gap:10px}
+.lf-site-actions .btn{min-height:43px}
+@media(max-width:767.98px){
+  .lf-site-settings-page{padding:12px!important}
+  .lf-site-settings-nav{gap:6px;padding:9px}
+  .lf-site-settings-nav a{flex:1 1 145px;justify-content:center;text-align:center}
+  .lf-site-fields{grid-template-columns:minmax(0,1fr);gap:14px}
+  .lf-site-field-wide{grid-column:auto}
+}
+@media(max-width:400px){
+ .lf-site-settings-nav a{flex-basis:100%}
+ .lf-site-actions .btn{width:100%}
+}
