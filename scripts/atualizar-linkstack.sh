@@ -25,7 +25,7 @@ if ! command -v rsync >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive
   apt-get update && apt-get install -y rsync
 fi
-for cmd in git rsync php flock runuser cmp mktemp cp python3; do
+for cmd in git rsync php flock runuser cmp mktemp cp python3 find; do
   command -v "$cmd" >/dev/null || { echo "Dependencia ausente: $cmd" >&2; exit 1; }
 done
 [[ -d "$PROD" && -f "$PROD/artisan" && -f "$PROD/.env" ]] || {
@@ -225,8 +225,17 @@ if [[ -d "$PROD/storage/app/linkfree" ]]; then
   [[ ! -L "$PROD/storage/app/linkfree" ]] || { echo 'Storage symlink recusado.' >&2; exit 1; }
   runuser -u www-data -- test -w "$PROD/storage/app/linkfree" || { echo 'Configurações sem escrita por www-data.' >&2; exit 1; }
   if [[ -d "$PROD/storage/app/linkfree/visit-sources" ]]; then
+    [[ ! -L "$PROD/storage/app/linkfree/visit-sources" ]] || { echo 'Visit-sources symlink recusado.' >&2; exit 1; }
     runuser -u www-data -- test -w "$PROD/storage/app/linkfree/visit-sources" || { echo 'Relatórios sem escrita por www-data.' >&2; exit 1; }
   fi
+  # Arquivos antigos podem estar em propriedade de root: recusar antes de sobrescrever.
+  if [[ -n "$(find "$PROD/storage/app/linkfree" -type l -print -quit)" ]]; then
+    echo 'Symlink dentro de storage/app/linkfree: revisão manual obrigatória.' >&2; exit 1
+  fi
+  unreadable="$(runuser -u www-data -- find "$PROD/storage/app/linkfree" -type f ! -readable -print -quit)"
+  [[ -z "$unreadable" ]] || { echo "Arquivo de configuração sem leitura por www-data: $unreadable" >&2; exit 1; }
+  unwritable_locks="$(runuser -u www-data -- find "$PROD/storage/app/linkfree" -name '*.lock' -type f ! -writable -print -quit)"
+  [[ -z "$unwritable_locks" ]] || { echo "Arquivo de lock sem escrita por www-data: $unwritable_locks" >&2; exit 1; }
 else
   runuser -u www-data -- test -w "$PROD/storage/app" || { echo 'www-data não pode criar storage/app/linkfree.' >&2; exit 1; }
 fi
