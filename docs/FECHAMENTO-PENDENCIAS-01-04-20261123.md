@@ -34,15 +34,20 @@ O script existente usa `/home/ubuntu/src-Projects/LinkFree-LinkTree` como clone 
 
 ### Execução no servidor (SOMENTE após conferência)
 
-Primeiro atualizar **apenas o script de deploy** a partir do código publicado no GitHub e verificar se não houve alterações locais conflitantes. Não executar script baixado de uma URL sem revisar.
+Após o merge da PR, atualizar **somente a referência remota**, sem modificar os arquivos rastreados no clone (o script exige `git status` limpo). Extrair a versão revisada do script para um local privado fora do repositório. Conferir seu conteúdo antes de executá-la.
 
 ```bash
-# Recomendado: confirmar script atualizado na cópia de administração e conferir modo.
-sudo bash /home/ubuntu/src-Projects/LinkFree-LinkTree/scripts/atualizar-linkstack.sh --check
+sudo -u ubuntu git -C /home/ubuntu/src-Projects/LinkFree-LinkTree fetch origin main
+sudo -u ubuntu git -C /home/ubuntu/src-Projects/LinkFree-LinkTree show origin/main:scripts/atualizar-linkstack.sh | sudo install -m 700 /dev/stdin /root/linkfree-consent-deploy.sh
 
-# Apenas depois de ler a saída do --check, validar backup/Termos/SQLite:
-sudo bash /home/ubuntu/src-Projects/LinkFree-LinkTree/scripts/atualizar-linkstack.sh --deploy-consent
+# Primeira etapa: conferir o resultado, sem publicar o código.
+sudo bash /root/linkfree-consent-deploy.sh --check
+
+# Segunda etapa, após revisão do backup e da saída do check:
+sudo bash /root/linkfree-consent-deploy.sh --deploy-consent
 ```
+
+A última linha exige aprovação operacional baseada no resultado real do `--check`. Não executá-la se houver qualquer advertência, caminho divergente ou falha de pré-requisito.
 
 **Essas linhas são procedimentos futuros, não execuções realizadas.** Para `--check`, o script já realiza `git fetch`, mas não modifica os arquivos da aplicação.
 
