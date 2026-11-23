@@ -2,6 +2,55 @@
 @section('content')
 <div class="container-fluid content-inner py-0 admin-overview-page">
 <h1 class="h3 mb-3">{{__('messages.Nav Admin Overview')}}</h1>
+<section class="card rounded-4 mb-3" aria-labelledby="lf-admin-shortcuts-title">
+ <div class="card-body p-3 p-md-4">
+  <h2 class="h5 mb-2" id="lf-admin-shortcuts-title">{{ __('messages.lf_admin_shortcuts') }}</h2>
+  <p class="small text-muted mb-3">{{ __('messages.lf_admin_existing_help') }}</p>
+  @php
+    // Somente rotas existentes; nao simular modulos de indicacao ou filas que ainda nao possuem backend.
+    $sections = [
+      __('messages.lf_admin_users') => [
+        ['route' => 'showUsers', 'icon' => 'bi-people', 'label' => __('messages.Manage Users')],
+        ['route' => 'createNewUser', 'icon' => 'bi-person-plus', 'label' => __('messages.Nav Admin New User')],
+      ],
+      __('messages.lf_admin_site') => [
+        ['route' => 'showSite', 'icon' => 'bi-globe', 'label' => __('messages.Site Customization')],
+        ['route' => 'showSitePage', 'icon' => 'bi-file-earmark-text', 'label' => __('messages.Footer Pages')],
+      ],
+      __('messages.lf_admin_themes') => [
+        ['route' => 'showThemes', 'icon' => 'bi-brush', 'label' => __('messages.Nav Admin Theme Manager')],
+        ['route' => 'githubThemes', 'icon' => 'bi-github', 'label' => __('messages.Nav Admin GitHub Themes')],
+      ],
+      __('messages.lf_admin_system') => [
+        ['route' => 'showConfig', 'icon' => 'bi-sliders', 'label' => __('messages.Config')],
+        ['route' => 'showBackups', 'icon' => 'bi-database', 'label' => __('messages.Nav Admin Backups')],
+      ],
+    ];
+  @endphp
+  <div class="row g-3">
+   @foreach($sections as $title => $items)
+   <div class="col-12 col-md-6 col-xl-3">
+    <div class="lf-admin-section border rounded-3 p-3 h-100">
+     <h3 class="h6 fw-bold">{{ $title }}</h3>
+     <div class="d-grid gap-2">
+      @foreach($items as $item)
+       <a class="btn btn-outline-primary text-start" href="{{ route($item['route']) }}">
+        <i class="bi {{ $item['icon'] }}" aria-hidden="true"></i> {{ $item['label'] }}
+       </a>
+      @endforeach
+     </div>
+    </div>
+   </div>
+   @endforeach
+  </div>
+  <p class="small text-muted mb-0 mt-3">{{ __('messages.lf_admin_pending_modules') }}</p>
+ </div>
+</section>
+<style>
+.admin-overview-page .lf-admin-section{min-width:0;background:var(--lf-surface)}
+.admin-overview-page .lf-admin-section .btn{white-space:normal;overflow-wrap:anywhere;min-height:42px}
+.admin-overview-page .lf-admin-section .btn:focus-visible{outline:3px solid var(--lf-focus);outline-offset:2px}
+</style>
 @if(auth()->user()->role === 'admin' && !config('linkstack.single_user_mode'))
 <div class="row">
        <div class="col-lg-12">
