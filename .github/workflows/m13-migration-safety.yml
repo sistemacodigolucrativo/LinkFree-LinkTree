@@ -1,0 +1,47 @@
+name: M13 isolated migration and guarded deploy checks
+on:
+  push:
+    paths:
+      - 'scripts/atualizar-linkstack.sh'
+      - 'scripts/instalar-deploy-unificado.sh'
+      - 'scripts/audit-m13-deploy.py'
+      - 'scripts/audit-m13-schema-sqlite.php'
+      - 'linkstack/database/migrations/2026_11_23_000002_create_referral_tables.php'
+      - 'linkstack/database/migrations/2026_11_23_000003_create_profile_verification_workflow.php'
+      - 'linkstack/database/migrations/2026_11_23_000004_create_abuse_reports_tables.php'
+      - '.github/workflows/m13-migration-safety.yml'
+  pull_request:
+    paths:
+      - 'scripts/atualizar-linkstack.sh'
+      - 'scripts/instalar-deploy-unificado.sh'
+      - 'scripts/audit-m13-deploy.py'
+      - 'scripts/audit-m13-schema-sqlite.php'
+      - 'linkstack/database/migrations/2026_11_23_000002_create_referral_tables.php'
+      - 'linkstack/database/migrations/2026_11_23_000003_create_profile_verification_workflow.php'
+      - 'linkstack/database/migrations/2026_11_23_000004_create_abuse_reports_tables.php'
+      - '.github/workflows/m13-migration-safety.yml'
+jobs:
+  isolated-schema:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify release checks and shell syntax
+        run: |
+          bash -n scripts/atualizar-linkstack.sh
+          bash -n scripts/instalar-deploy-unificado.sh
+          python3 scripts/audit-m13-deploy.py
+      - name: Ensure PHP SQLite driver
+        run: |
+          if ! php -m | grep -qi '^pdo_sqlite$'; then
+            sudo apt-get update
+            sudo apt-get install -y php-sqlite3
+          fi
+      - name: Test new schema on isolated SQLite
+        run: php scripts/audit-m13-schema-sqlite.php
+      - name: PHP lint
+        run: |
+          php -l scripts/audit-m13-schema-sqlite.php
+          php -l linkstack/database/migrations/2026_11_23_000002_create_referral_tables.php
+          php -l linkstack/database/migrations/2026_11_23_000003_create_profile_verification_workflow.php
+          php -l linkstack/database/migrations/2026_11_23_000004_create_abuse_reports_tables.php
