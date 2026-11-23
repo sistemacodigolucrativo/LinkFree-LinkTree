@@ -125,7 +125,21 @@ login="$(http_get '/login')"
 if [[ "$login" == 200 ]]; then pass 'Login público HTTPS respondeu 200'; else fail "Login respondeu HTTP $login"; fi
 register="$(http_get '/register')"
 case "$register" in
-  200) pass 'Página de registro acessível por HTTPS' ;;
+  200)
+    pass 'Página de registro acessível por HTTPS'
+    form="$(mktemp /tmp/lf-register-smoke-XXXXXX)"
+    if curl --silent --show-error --max-time 25 --connect-timeout 8 --proto '=https' \
+        --output "$form" "$SITE/register"; then
+      if grep -q 'name="accept_terms"' "$form" && grep -q 'name="_token"' "$form"; then
+        pass 'Cadastro público exibe aceite explícito e proteção CSRF'
+      else
+        fail 'Cadastro público não exibiu checkbox de aceite e token CSRF'
+      fi
+    else
+      fail 'Não foi possível inspecionar o formulário de cadastro'
+    fi
+    rm -f -- "$form"
+    ;;
   301|302|303|307|308) warn "Registro redireciona (HTTP $register); checar rota customizada e formulário" ;;
   404) warn 'Registro público retorna 404; checar se cadastro está desativado' ;;
   *) fail "Registro respondeu HTTP $register" ;;
