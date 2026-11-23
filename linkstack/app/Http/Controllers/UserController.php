@@ -855,6 +855,13 @@ class UserController extends Controller
         return Redirect(!empty($zipfile) && Auth::user()->role === 'admin' ? '/admin/theme' : '/studio/theme')->with("success", $message);
     }
 
+    // Backend filtra campos desabilitados pelo administrador.
+    public function saveThemeOptions(Request $request)
+    {
+        \App\Services\ThemeOptions::saveForUser((int) Auth::id(), $request->except('_token'));
+        return redirect()->route('showTheme')->with('success', __('messages.lf_theme_saved'));
+    }
+
     //Show user (name, email, password)
     public function showProfile(request $request)
     {

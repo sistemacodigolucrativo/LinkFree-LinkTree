@@ -128,6 +128,13 @@ class AdminController extends Controller
     return view("panel/users", ['autoVipNewUsers' => RegistrationVip::enabled()]);
   }
 
+  // Administrador decide quais campos estao liberados aos usuarios.
+  public function updateThemeOptions(Request $request)
+  {
+    \App\Services\ThemeOptions::savePermissions($request->all());
+    return redirect()->route('showThemes')->with('success', __('messages.lf_theme_saved'));
+  }
+
   // Preferencia global de novos cadastros; administradores apenas (middleware na rota).
   public function updateRegistrationVip(Request $request)
   {

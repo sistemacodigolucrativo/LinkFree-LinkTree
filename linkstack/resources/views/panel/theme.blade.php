@@ -31,6 +31,29 @@
 <a href="https://linkstack.org/themes/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary mt-3">{{__('messages.Download themes')}}</a>
 </div></section>
 
+<section class="card rounded-4 mb-3" aria-labelledby="lf-theme-admin-options">
+ <div class="card-body p-3 p-md-4">
+  <h2 class="h5" id="lf-theme-admin-options">{{ __('messages.lf_theme_admin_title') }}</h2>
+  <p class="text-muted">{{ __('messages.lf_theme_admin_help') }}</p>
+  <form method="post" action="{{ route('admin.theme-options') }}">
+   @csrf
+   <div class="row g-3">
+    @php $lfAllowed = \App\Services\ThemeOptions::permissions(); @endphp
+    @foreach(\App\Services\ThemeOptions::fields() as $field => $definition)
+    <div class="col-12 col-sm-6 col-lg-4">
+     <div class="form-check form-switch border rounded-3 p-3 ps-5 h-100">
+      <input class="form-check-input" type="checkbox" id="lf-admin-{{ $field }}"
+       name="{{ $field }}" value="1" @checked($lfAllowed[$field] ?? false)>
+      <label class="form-check-label" for="lf-admin-{{ $field }}">{{ __('messages.'.$definition['label']) }}</label>
+     </div>
+    </div>
+    @endforeach
+   </div>
+   <button type="submit" class="btn btn-primary mt-3">{{ __('messages.Save') }}</button>
+  </form>
+ </div>
+</section>
+
   <div class="card rounded" id="admin-installed-themes">
     <div class="card-body">
       <h1 class="h3 mb-2"><i class="bi bi-brush"></i> {{ __('messages.Delete a theme') }}</h1>
