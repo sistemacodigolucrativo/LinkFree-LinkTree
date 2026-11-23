@@ -20,6 +20,8 @@ if [[ "$MODE" != --check && "$MODE" != --deploy && "$MODE" != --deploy-consent ]
   exit 2
 fi
 if (( EUID != 0 )); then echo 'Execute como root (sudo).' >&2; exit 1; fi
+# runuser -u www-data não consegue voltar a /root: use um cwd público sem alterar arquivos.
+cd /
 # O instal.sh nao instala rsync: obtenha-o no primeiro deploy, sem prompts Y/N.
 if ! command -v rsync >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive
@@ -171,7 +173,7 @@ consent_migration=false
 for path in "${changed[@]}"; do
   rel="${path#linkstack/}"
   case "$rel" in
-    "$CONSENT_MIGRATION") consent_migration=true; continue ;; # ÚNICA migração permitida com --deploy-consent.
+    "$CONSENT_MIGRATION") consent_migration=true; continue ;; # Migração aditiva conhecida, admitida no fluxo normal.
     database/migrations/*) manual+=("$rel"); continue ;; # As demais permanecem bloqueadas.
     .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*) protected+=("$rel"); continue ;;
     composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) manual+=("$rel"); continue ;;
@@ -194,9 +196,8 @@ fi
 
 # A migração do consentimento exige conferência explícita e backup online.
 if [[ "$consent_migration" == true ]]; then
-  if [[ "$MODE" == --deploy ]]; then
-    echo 'Migração de consentimento: rode --check e, após revisão, --deploy-consent.' >&2; exit 1
-  fi
+  # --deploy e --deploy-consent utilizam o MESMO preflight e backup.
+  # Migrações desconhecidas continuam bloqueadas.
   [[ -f "$PROD/database/database.sqlite" && ! -L "$PROD/database/database.sqlite" ]] || {
     echo 'SQLite esperado não encontrado em database/database.sqlite.' >&2; exit 1;
   }
@@ -271,7 +272,7 @@ if [[ "$MODE" == --check ]]; then
   echo 'SIMULACAO CONCLUIDA: os destinos existentes passaram na verificacao de conflito.'
   echo 'Nenhum arquivo da aplicacao foi modificado.'
   if [[ "$consent_migration" == true ]]; then
-    echo 'Para publicar a migração: bash atualizar-linkstack.sh --deploy-consent'
+    echo 'Migração reconhecida: o comando deploy aplicará backup e migração automaticamente.'
   else
     echo 'Para publicar: bash atualizar-linkstack.sh --deploy'
   fi
@@ -386,7 +387,7 @@ if [[ "$MODE" == --deploy-consent && "$consent_migration" != true ]]; then
   echo '--deploy-consent só é válido com a migração de consentimento pendente.' >&2; exit 1
 fi
 if [[ "$consent_migration" == true ]]; then
-  [[ "$MODE" == --deploy-consent ]] || { echo 'Falta autorização explícita da migração.' >&2; exit 1; }
+  [[ "$MODE" == --deploy || "$MODE" == --deploy-consent ]] || { echo 'Modo inválido para migração.' >&2; exit 1; }
   mkdir -p "$PROD/database/migrations"
   if [[ ! -f "$PROD/$CONSENT_MIGRATION" ]]; then
     gitrepo show "$TARGET:linkstack/$CONSENT_MIGRATION" > "$backup/consent-migration.php"
@@ -424,4 +425,5 @@ completed=true
 printf '\nPUBLICACAO CONCLUIDA: %.12s\n' "$TARGET"
 echo "Backup: $backup"
 echo "Site: $SITE"
-echo 'Confira no navegador com sessao autenticada: /dashboard, /studio/profile e /admin/config.'
+echo 'O smoke test não autenticado é executado pelo instalador unificado (deploy).'
+echo 'Confira com sessão autenticada: /dashboard, /studio/profile e /admin/config.'

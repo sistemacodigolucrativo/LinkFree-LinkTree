@@ -1,5 +1,7 @@
 # LinkFree — Fechamento técnico das pendências 01–04 (23/11/2026)
 
+> **Atualização operacional posterior:** a migração foi executada na VPS (status `Ran`) e a publicação chegou ao SHA `f8f3ddc82437502d829dddeae4d5ab375cb9a54d`. O modo de deploy agora é automatizado para migrações aditivas previamente autorizadas, e o alias existente foi contemplado por um instalador dedicado. Consulte [Homologação e deploy unificado](HOMOLOGACAO-DEPLOY-UNIFICADO-20261123.md). As instruções de `--deploy-consent` abaixo registram o procedimento histórico e não devem ser repetidas.
+
 ## Situação e limites de acesso
 
 Repositório: `sistemacodigolucrativo/LinkFree-LinkTree`.

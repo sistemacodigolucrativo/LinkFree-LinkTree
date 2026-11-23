@@ -1,0 +1,61 @@
+name: Deploy unificado e homologacao
+on:
+  push:
+    paths:
+      - 'scripts/atualizar-linkstack.sh'
+      - 'scripts/instalar-deploy-unificado.sh'
+      - 'scripts/homologar-linkfree.sh'
+      - 'scripts/audit-consent-deploy.py'
+      - 'scripts/audit-deploy-unificado.py'
+      - '.github/workflows/deploy-unificado.yml'
+  pull_request:
+    paths:
+      - 'scripts/atualizar-linkstack.sh'
+      - 'scripts/instalar-deploy-unificado.sh'
+      - 'scripts/homologar-linkfree.sh'
+      - 'scripts/audit-consent-deploy.py'
+      - 'scripts/audit-deploy-unificado.py'
+      - '.github/workflows/deploy-unificado.yml'
+jobs:
+  script-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validar sintaxe e invariantes de dados
+        run: |
+          bash -n scripts/atualizar-linkstack.sh
+          bash -n scripts/instalar-deploy-unificado.sh
+          bash -n scripts/homologar-linkfree.sh
+          python3 scripts/audit-consent-deploy.py
+          python3 scripts/audit-deploy-unificado.py
+      - name: Compilar sintaxe do bootstrap embutido
+        run: |
+          awk '/^cat > "\$work" <<\x27LINKFREE_BOOTSTRAP\x27$/ {on=1;next} on && /^LINKFREE_BOOTSTRAP$/ {exit} on {print}' scripts/instalar-deploy-unificado.sh > /tmp/linkfree-bootstrap-test.sh
+          test -s /tmp/linkfree-bootstrap-test.sh
+          bash -n /tmp/linkfree-bootstrap-test.sh
+  public-https-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Confirmar HTTP público sem autenticação e sem writes
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          site=https://linkfree.website
+          fetch_code() {
+            curl --silent --show-error --connect-timeout 8 --max-time 25               --proto '=https' --output /dev/null --write-out '%{http_code}' "$site$1"
+          }
+          home="$(fetch_code /)"
+          login="$(fetch_code /login)"
+          missing="$(fetch_code /__lf_test_http_404_nao_existente)"
+          register="$(curl --silent --show-error --connect-timeout 8 --max-time 25 --proto '=https' \
+            --output /tmp/lf-live-register.html --write-out '%{http_code}' "$site/register")"
+          echo "Home: $home | Login: $login | Cadastro: $register | Página inexistente: $missing"
+          test "$home" = 200
+          test "$login" = 200
+          test "$register" = 200
+          grep -q 'name="accept_terms"' /tmp/lf-live-register.html
+          grep -q 'name="_token"' /tmp/lf-live-register.html
+          echo "Formulário real: aceite obrigatório e token CSRF presentes"
+          test "$missing" = 404
