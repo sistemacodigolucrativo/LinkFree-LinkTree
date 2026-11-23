@@ -197,8 +197,9 @@ class UserController extends Controller
         } catch (\Throwable $exception) {
             report($exception);
         }
-        $showVisitCount = (bool) UserData::getData($userinfo->id, 'public_visit_count');
-        $noIndex = (bool) UserData::getData($userinfo->id, 'search_noindex');
+        // UserData retorna a string "null" em perfis sem dados: compare estritamente com true.
+        $showVisitCount = UserData::getData($userinfo->id, 'public_visit_count') === true;
+        $noIndex = UserData::getData($userinfo->id, 'search_noindex') === true;
         $response = response()->view('linkstack.linkstack', compact('userinfo', 'information', 'links', 'littlelink_name', 'visitCount', 'showVisitCount', 'noIndex'));
         if ($noIndex) $response->header('X-Robots-Tag', 'noindex, follow');
         return $response;
