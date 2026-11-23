@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LinkFree-LinkTree: atualizacao seletiva GitHub -> desenvolvimento -> producao.
-# Uso: sudo bash atualizar-linkstack.sh --check | --deploy | --deploy-consent
+# Uso: sudo bash atualizar-linkstack.sh --check | --deploy | --deploy-consent | --deploy-m13
 # Primeiro acesso: prepara clone persistente e estágio de código (sem dados privados).
 set -Eeuo pipefail
 umask 077
@@ -15,8 +15,8 @@ BACKUP_ROOT=/var/backups/linkfree-deploy
 SITE=https://linkfree.website
 
 MODE="${1:-}"
-if [[ "$MODE" != --check && "$MODE" != --deploy && "$MODE" != --deploy-consent ]]; then
-  echo 'Uso: bash atualizar-linkstack.sh --check | --deploy | --deploy-consent' >&2
+if [[ "$MODE" != --check && "$MODE" != --deploy && "$MODE" != --deploy-consent && "$MODE" != --deploy-m13 ]]; then
+  echo 'Uso: bash atualizar-linkstack.sh --check | --deploy | --deploy-consent | --deploy-m13' >&2
   exit 2
 fi
 if (( EUID != 0 )); then echo 'Execute como root (sudo).' >&2; exit 1; fi
@@ -170,10 +170,16 @@ protected=()
 manual=()
 CONSENT_MIGRATION='database/migrations/2026_11_23_000001_create_registration_consents_table.php'
 consent_migration=false
+# Allowlist fechada: somente três migrations M13 conhecidas.
+M13_MIGRATION_05='database/migrations/2026_11_23_000002_create_referral_tables.php'
+M13_MIGRATION_06='database/migrations/2026_11_23_000003_create_profile_verification_workflow.php'
+M13_MIGRATION_07='database/migrations/2026_11_23_000004_create_abuse_reports_tables.php'
+m13_pending=()
 for path in "${changed[@]}"; do
   rel="${path#linkstack/}"
   case "$rel" in
     "$CONSENT_MIGRATION") consent_migration=true; continue ;; # Migração aditiva conhecida, admitida no fluxo normal.
+    "$M13_MIGRATION_05"|"$M13_MIGRATION_06"|"$M13_MIGRATION_07") m13_pending+=("$rel"); continue ;;
     database/migrations/*) manual+=("$rel"); continue ;; # As demais permanecem bloqueadas.
     .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*) protected+=("$rel"); continue ;;
     composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) manual+=("$rel"); continue ;;
@@ -194,8 +200,25 @@ if ((${#manual[@]})); then
   exit 1
 fi
 
-# A migração do consentimento exige conferência explícita e backup online.
-if [[ "$consent_migration" == true ]]; then
+# A M13 exige modo explícito: deploy normal não pode alterar seu esquema.
+if (( ${#m13_pending[@]} > 0 )); then
+  if [[ "$MODE" != --check && "$MODE" != --deploy-m13 ]]; then
+    echo 'M13 detectada. Use --check primeiro; em janela autorizada use --deploy-m13.' >&2
+    exit 1
+  fi
+  [[ "$consent_migration" == false ]] || {
+    echo 'Consentimento e M13 no mesmo salto: revisar separadamente.' >&2; exit 1;
+  }
+  (( ${#m13_pending[@]} == 3 )) || {
+    echo 'Conjunto incompleto de migrations M13; esperadas 000002, 000003, 000004.' >&2; exit 1;
+  }
+elif [[ "$MODE" == --deploy-m13 ]]; then
+  echo 'Sem migrations M13 pendentes nesta revisão; --deploy-m13 não se aplica.' >&2
+  exit 1
+fi
+
+# As migrations conhecidas exigem preflight de banco, inclusive no modo --check.
+if [[ "$consent_migration" == true || ${#m13_pending[@]} -gt 0 ]]; then
   # --deploy e --deploy-consent utilizam o MESMO preflight e backup.
   # Migrações desconhecidas continuam bloqueadas.
   [[ -f "$PROD/database/database.sqlite" && ! -L "$PROD/database/database.sqlite" ]] || {
@@ -220,6 +243,21 @@ if [[ "$consent_migration" == true ]]; then
   gitrepo cat-file -e "$TARGET:linkstack/$CONSENT_MIGRATION" || { echo 'Migração ausente do commit remoto.' >&2; exit 1; }
   if [[ -e "$PROD/$CONSENT_MIGRATION" ]] && ! gitrepo show "$TARGET:linkstack/$CONSENT_MIGRATION" | cmp -s - "$PROD/$CONSENT_MIGRATION"; then
     echo 'Migração instalada diverge do commit remoto.' >&2; exit 1
+  fi
+  for migration in "${m13_pending[@]}"; do
+    [[ ! -L "$PROD/$migration" ]] || { echo "Symlink recusado: $migration" >&2; exit 1; }
+    gitrepo cat-file -e "$TARGET:linkstack/$migration" || { echo "Migration ausente do remoto: $migration" >&2; exit 1; }
+    if [[ -e "$PROD/$migration" ]] && ! gitrepo show "$TARGET:linkstack/$migration" | cmp -s - "$PROD/$migration"; then
+      echo "Migration divergente instalada: $migration" >&2; exit 1
+    fi
+  done
+  [[ -z "$(sqlite3 -readonly "$PROD/database/database.sqlite" 'PRAGMA foreign_key_check;' 2>/dev/null)" ]] || {
+    echo 'SQLite contém foreign keys inválidas.' >&2; exit 1;
+  }
+  if (( ${#m13_pending[@]} > 0 )); then
+    [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='registration_consents';")" == 1 ]] || {
+      echo 'Tabela de consentimento necessária antes da M13.' >&2; exit 1;
+    }
   fi
 fi
 if [[ -d "$PROD/storage/app/linkfree" ]]; then
@@ -271,7 +309,9 @@ if [[ "$MODE" == --check ]]; then
   [[ -d "$DEV" ]] || echo "O estagio de codigo $DEV sera criado no primeiro --deploy (sem .env ou banco)."
   echo 'SIMULACAO CONCLUIDA: os destinos existentes passaram na verificacao de conflito.'
   echo 'Nenhum arquivo da aplicacao foi modificado.'
-  if [[ "$consent_migration" == true ]]; then
+  if (( ${#m13_pending[@]} > 0 )); then
+    echo 'M13 reconhecida. Após aprovação e backup, use: bash /root/atualizar-linkstack.sh --deploy-m13'
+  elif [[ "$consent_migration" == true ]]; then
     echo 'Migração reconhecida: o comando deploy aplicará backup e migração automaticamente.'
   else
     echo 'Para publicar: bash atualizar-linkstack.sh --deploy'
@@ -297,7 +337,7 @@ if [[ ! -d "$DEV" ]]; then
   rm -f "$stage_list"
 fi
 
-if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 && "$consent_migration" != true ]]; then
+if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 && "$consent_migration" != true && ${#m13_pending[@]} -eq 0 ]]; then
   install -d -m 700 "$STATE_DIR"
   if [[ ! -s "$LAST_FILE" ]]; then printf '%s\n' "$BASE" > "$LAST_FILE"; fi
   echo 'Repositorio ja atualizado, nenhum arquivo pendente de publicacao.'
@@ -398,6 +438,46 @@ if [[ "$consent_migration" == true ]]; then
   [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT COUNT(*) FROM sqlite_master WHERE name='registration_consents' AND type='table';")" == 1 ]] || {
     echo 'Tabela de consentimento ausente: código NÃO publicado.' >&2; exit 1;
   }
+fi
+# Migrations M13, permitidas apenas no modo autorizado, com backup pronto.
+if [[ "$MODE" == --deploy-m13 ]]; then
+  [[ -f "$backup/sqlite-before-deploy.sqlite" ]] || { echo 'Backup SQLite ausente. Não migrar.' >&2; exit 1; }
+  [[ "$(sqlite3 "$backup/sqlite-before-deploy.sqlite" 'PRAGMA quick_check;')" == ok ]] || {
+    echo 'Backup SQLite íntegro não confirmado.' >&2; exit 1;
+  }
+  mkdir -p "$PROD/database/migrations"
+  for migration in "$M13_MIGRATION_05" "$M13_MIGRATION_06" "$M13_MIGRATION_07"; do
+    gitrepo show "$TARGET:linkstack/$migration" > "$backup/${migration##*/}"
+    php -l "$backup/${migration##*/}" >/dev/null
+    if [[ ! -f "$PROD/$migration" ]]; then
+      install -m 644 "$backup/${migration##*/}" "$PROD/$migration"
+    fi
+    (cd "$PROD" && runuser -u www-data -- php artisan migrate --path="$migration" --force --no-interaction)
+  done
+  for table in referral_codes referrals verification_requests verification_audit_events abuse_reports abuse_report_events; do
+    [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name='$table';")" == 1 ]] || {
+      echo "Tabela M13 ausente: $table" >&2; exit 1;
+    }
+  done
+  for column in verified_at verification_visible; do
+    [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT COUNT(*) FROM pragma_table_info('users') WHERE name='$column';")" == 1 ]] || {
+      echo "Coluna ausente: users.$column" >&2; exit 1;
+    }
+  done
+  for migration in "${m13_pending[@]}"; do
+    migration_name="${migration##*/}"
+    migration_name="${migration_name%.php}"
+    [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT COUNT(*) FROM migrations WHERE migration='$migration_name';")" == 1 ]] || {
+      echo "Migration M13 não registrada como Ran: $migration_name" >&2; exit 1;
+    }
+  done
+  [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" 'PRAGMA quick_check;')" == ok ]] || {
+    echo 'Falha no quick_check após migração M13.' >&2; exit 1;
+  }
+  [[ -z "$(sqlite3 -readonly "$PROD/database/database.sqlite" 'PRAGMA foreign_key_check;')" ]] || {
+    echo 'Falha no foreign_key_check após migração M13.' >&2; exit 1;
+  }
+  echo 'Migrations 000002–000004 aplicadas e esquema verificado, antes de publicar código.'
 fi
 # Só cria diretórios que não existem; nunca executa chown recursivo.
 if [[ ! -d "$PROD/storage/app/linkfree" ]]; then
