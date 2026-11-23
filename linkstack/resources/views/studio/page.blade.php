@@ -337,6 +337,8 @@
                     @endif
                     @endforeach
 
+                    {{-- Container comum: não depende de aprovação do selo. --}}
+                    <div class="form-group col-lg-8">
                     <div class="form-group col-lg-8">
                       <h5 style="margin-top:50px">{{__('messages.Show share button')}}</h5>
                       <p class="text-muted">{{__('messages.disablesharebutton')}}</p>
