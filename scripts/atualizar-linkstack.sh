@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LinkFree-LinkTree: atualizacao seletiva GitHub -> desenvolvimento -> producao.
-# Uso: sudo bash atualizar-linkstack.sh --check | --deploy
+# Uso: sudo bash atualizar-linkstack.sh --check | --deploy | --deploy-consent
 # Primeiro acesso: prepara clone persistente e estágio de código (sem dados privados).
 set -Eeuo pipefail
 umask 077
@@ -15,8 +15,8 @@ BACKUP_ROOT=/var/backups/linkfree-deploy
 SITE=https://linkfree.website
 
 MODE="${1:-}"
-if [[ "$MODE" != --check && "$MODE" != --deploy ]]; then
-  echo 'Uso: bash atualizar-linkstack.sh --check | --deploy' >&2
+if [[ "$MODE" != --check && "$MODE" != --deploy && "$MODE" != --deploy-consent ]]; then
+  echo 'Uso: bash atualizar-linkstack.sh --check | --deploy | --deploy-consent' >&2
   exit 2
 fi
 if (( EUID != 0 )); then echo 'Execute como root (sudo).' >&2; exit 1; fi
@@ -166,10 +166,13 @@ fi
 files=()
 protected=()
 manual=()
+CONSENT_MIGRATION='database/migrations/2026_11_23_000001_create_registration_consents_table.php'
+consent_migration=false
 for path in "${changed[@]}"; do
   rel="${path#linkstack/}"
   case "$rel" in
-    database/migrations/*) manual+=("$rel"); continue ;; # Alteracao de esquema requer migracao e backup coordenados.
+    "$CONSENT_MIGRATION") consent_migration=true; continue ;; # Apenas esta migração, com --deploy-consent.
+    database/migrations/*) manual+=("$rel"); continue ;; # Outras migrações bloqueadas.
     .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*) protected+=("$rel"); continue ;;
     composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) manual+=("$rel"); continue ;;
     app/*|config/*|routes/*|resources/*|assets/*|blocks/*|bootstrap/*|docs/*|index.php|.htaccess|server.php|web.config|mix-manifest.json|version.json)
@@ -187,6 +190,201 @@ if ((${#manual[@]})); then
   echo 'Mudancas que exigem revisao manual (dependencias/estrutura):' >&2
   printf '  %s\n' "${manual[@]}" >&2
   exit 1
+fi
+
+# Migração excepcional: verificar banco e dados legais antes da publicação.
+if [[ "$consent_migration" == true ]]; then
+  if [[ "$MODE" == --deploy ]]; then
+    echo 'Migração de consentimento exige --check e --deploy-consent.' >&2; exit 1
+  fi
+  [[ -f "$PROD/database/database.sqlite" && ! -L "$PROD/database/database.sqlite" ]] || {
+    echo 'Banco SQLite esperado ausente ou symlink.' >&2; exit 1;
+  }
+  db_driver="$(sed -n 's/^[[:space:]]*DB_CONNECTION=//p' "$PROD/.env" | tail -n1 | tr -d ' "')" 
+  [[ "$db_driver" == sqlite ]] || { echo 'Banco não é SQLite. Revisão manual.' >&2; exit 1; }
+  db_name="$(sed -n 's/^[[:space:]]*DB_DATABASE=//p' "$PROD/.env" | tail -n1 | tr -d '"')"
+  case "$db_name" in
+    ''|database/database.sqlite|"$PROD/database/database.sqlite") ;;
+    *) echo 'DB_DATABASE difere do SQLite esperado.' >&2; exit 1 ;;
+  esac
+  command -v sqlite3 >/dev/null || { echo 'sqlite3 obrigatório.' >&2; exit 1; }
+  php -m | grep -qi '^pdo_sqlite
+# Todo arquivo alterado deve corresponder ao commit anterior, ou estar ausente se for novo.
+for rel in "${files[@]}"; do
+  old_path="linkstack/$rel"
+  old_exists=false
+  if gitrepo cat-file -e "$BASE:$old_path" 2>/dev/null; then old_exists=true; fi
+  for dest in "$DEV" "$PROD"; do
+    # O diretorio DEV pode nao existir numa instalacao criada pelo instal.sh;
+    # sera inicializado somente em --deploy com fontes de codigo, sem dados.
+    [[ "$dest" != "$DEV" || -d "$DEV" ]] || continue
+    if [[ -L "$dest/$rel" ]]; then
+      echo "CONFLITO: destino e link simbolico: $dest/$rel" >&2
+      exit 1
+    fi
+    if [[ "$old_exists" == true ]]; then
+      if [[ ! -f "$dest/$rel" ]] || ! gitrepo show "$BASE:$old_path" | cmp -s - "$dest/$rel"; then
+        echo "CONFLITO: $dest/$rel difere da versao base ($BASE). Nao sobrescrevi." >&2
+        exit 1
+      fi
+    elif [[ -e "$dest/$rel" ]]; then
+      echo "CONFLITO: arquivo novo ja existe no destino: $dest/$rel" >&2
+      exit 1
+    fi
+  done
+done
+
+if [[ "$MODE" == --check ]]; then
+  [[ -d "$DEV" ]] || echo "O estagio de codigo $DEV sera criado no primeiro --deploy (sem .env ou banco)."
+  echo 'SIMULACAO CONCLUIDA: os destinos existentes passaram na verificacao de conflito.'
+  echo 'Nenhum arquivo da aplicacao foi modificado.'
+  if [[ "$consent_migration" == true ]]; then
+    echo 'Para esta atualização: bash atualizar-linkstack.sh --deploy-consent'
+  else
+    echo 'Para publicar: bash atualizar-linkstack.sh --deploy'
+  fi
+  exit 0
+fi
+
+# Cria o estagio de desenvolvimento com APENAS os arquivos de codigo da
+# revisao instalada. Nao copia .env, usuarios, SQLite, uploads ou storage.
+if [[ ! -d "$DEV" ]]; then
+  echo "Preparando estagio de codigo isolado em $DEV..."
+  stage_list=$(mktemp)
+  while IFS= read -r path; do
+    rel="${path#linkstack/}"
+    case "$rel" in
+      .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*|composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) ;;
+      app/*|config/*|routes/*|resources/*|assets/*|blocks/*|bootstrap/*|docs/*|index.php|.htaccess|server.php|web.config|mix-manifest.json|version.json) printf '%s\n' "$rel" >> "$stage_list";;
+    esac
+  done < <(gitrepo ls-tree -r --name-only "$BASE" -- linkstack/)
+  install -d -o ubuntu -g ubuntu -m 755 "$DEV"
+  rsync -a --files-from="$stage_list" "$PROD/" "$DEV/"
+  chown -R ubuntu:ubuntu "$DEV"
+  rm -f "$stage_list"
+fi
+
+if [[ "$LOCAL_HEAD" == "$TARGET" && ${#files[@]} -eq 0 ]]; then
+  install -d -m 700 "$STATE_DIR"
+  if [[ ! -s "$LAST_FILE" ]]; then printf '%s\n' "$BASE" > "$LAST_FILE"; fi
+  echo 'Repositorio ja atualizado, nenhum arquivo pendente de publicacao.'
+  exit 0
+fi
+
+mkdir -p "$STATE_DIR" "$BACKUP_ROOT"
+if [[ ! -s "$LAST_FILE" ]]; then printf '%s\n' "$BASE" > "$LAST_FILE"; fi
+backup="$(mktemp -d "$BACKUP_ROOT/$(date +%Y%m%d-%H%M%S)-XXXXXX")"
+mkdir -p "$backup/dev" "$backup/prod"
+# O instalador deste servidor utiliza SQLite. Crie um snapshot consistente
+# sem interromper o site: SQLite .backup utiliza a API de backup online.
+if [[ -f "$PROD/database/database.sqlite" ]]; then
+  command -v sqlite3 >/dev/null || { echo 'sqlite3 ausente: backup SQLite obrigatório não realizado.' >&2; exit 1; }
+  sqlite3 "$PROD/database/database.sqlite" ".backup '$backup/sqlite-before-deploy.sqlite'" ||
+    { echo 'Falha no backup SQLite; publicacao bloqueada.' >&2; exit 1; }
+  check_sqlite=$(sqlite3 "$backup/sqlite-before-deploy.sqlite" 'PRAGMA quick_check;')
+  [[ "$check_sqlite" == ok ]] || { echo "Integridade do backup SQLite falhou: $check_sqlite" >&2; exit 1; }
+  echo "Backup SQLite gerado: $backup/sqlite-before-deploy.sqlite"
+else
+  echo 'Aviso: SQLite nao encontrado. Para MySQL/MariaDB, providencie backup consistente separado.'
+fi
+: > "$backup/new-dev.txt"
+: > "$backup/new-prod.txt"
+: > "$backup/files.txt"
+((${#files[@]} == 0)) || printf '%s\n' "${files[@]}" > "$backup/files.txt"
+printf '%s\n' "$BASE" > "$backup/base-sha.txt"
+printf '%s\n' "$TARGET" > "$backup/target-sha.txt"
+for rel in "${files[@]}"; do
+  for label in dev prod; do
+    if [[ "$label" == dev ]]; then source_dir="$DEV"; else source_dir="$PROD"; fi
+    if [[ -f "$source_dir/$rel" ]]; then
+      mkdir -p "$backup/$label/$(dirname "$rel")"
+      cp -a -- "$source_dir/$rel" "$backup/$label/$rel"
+    else
+      printf '%s\n' "$rel" >> "$backup/new-$label.txt"
+    fi
+  done
+done
+
+deploy_started=false
+completed=false
+rollback() {
+  status=$?
+  trap - EXIT
+  if [[ "$deploy_started" == true && "$completed" != true ]]; then
+    echo 'ERRO: restaurando arquivos anteriores de desenvolvimento e producao...' >&2
+    for label in dev prod; do
+      if [[ "$label" == dev ]]; then destination="$DEV"; else destination="$PROD"; fi
+      while IFS= read -r rel; do
+        [[ -n "$rel" ]] || continue
+        rm -f -- "$destination/$rel"
+      done < "$backup/new-$label.txt"
+      if [[ -s "$backup/files.txt" ]]; then
+        rsync -a --no-owner --no-group "$backup/$label/" "$destination/" || true
+      fi
+    done
+    (cd "$PROD" && runuser -u www-data -- php artisan config:clear && runuser -u www-data -- php artisan route:clear && runuser -u www-data -- php artisan view:clear) || true
+  fi
+  if [[ "$completed" != true ]]; then echo "Backup de recuperacao: $backup"; fi
+  exit "$status"
+}
+trap rollback EXIT
+
+# O repositorio local e atualizado somente por fast-forward.
+gitrepo merge --ff-only --quiet "origin/$BRANCH"
+
+# Analise sintatica antes de publicar na producao.
+for rel in "${files[@]}"; do
+  [[ -f "$REPO/linkstack/$rel" && ! -L "$REPO/linkstack/$rel" ]] || { echo "Arquivo de codigo ausente ou symlink: $rel" >&2; exit 1; }
+  case "$rel" in
+    *.blade.php) ;; # Blade e compilado pelo Laravel, nao por php -l puro.
+    *.php) php -l "$REPO/linkstack/$rel" >/dev/null ;;
+    *.js) if command -v node >/dev/null; then node --check "$REPO/linkstack/$rel" >/dev/null; fi ;;
+  esac
+done
+
+if ((${#files[@]})); then
+  deploy_started=true
+  # Rsync apenas dos arquivos alterados: sem --delete, sem tocar em storage, .env ou DB.
+  rsync -a --chmod=F644,D755 --chown=ubuntu:ubuntu \
+    --files-from="$backup/files.txt" "$REPO/linkstack/" "$DEV/"
+  rsync -a --chmod=F644,D755 --no-owner --no-group \
+    --files-from="$backup/files.txt" "$REPO/linkstack/" "$PROD/"
+fi
+
+# Nunca executar config:cache, route:cache ou optimize neste projeto.
+(cd "$PROD" && runuser -u www-data -- php artisan config:clear && runuser -u www-data -- php artisan route:clear && runuser -u www-data -- php artisan view:clear)
+printf '%s\n' "$TARGET" > "$LAST_FILE"
+completed=true
+printf '\nPUBLICACAO CONCLUIDA: %.12s\n' "$TARGET"
+echo "Backup: $backup"
+echo "Site: $SITE"
+echo 'Confira no navegador com sessao autenticada: /dashboard, /studio/profile e /admin/config.'
+ || { echo 'pdo_sqlite obrigatório.' >&2; exit 1; }
+  runuser -u www-data -- test -r "$PROD/database/database.sqlite" || {
+    echo 'Sem acesso de leitura ao banco.' >&2; exit 1;
+  }
+  [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" 'PRAGMA quick_check;')" == ok ]] || {
+    echo 'SQLite não passou na verificação de integridade.' >&2; exit 1;
+  }
+  legal_ok="$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT CASE WHEN EXISTS (SELECT 1 FROM pages WHERE length(trim(coalesce(terms, ''))) > 0 AND length(trim(coalesce(privacy, ''))) > 0) THEN 'ok' ELSE 'missing' END;" 2>/dev/null || :)"
+  [[ "$legal_ok" == ok ]] || { echo 'Termos ou Política de Privacidade não estão publicados.' >&2; exit 1; }
+  [[ ! -L "$PROD/$CONSENT_MIGRATION" ]] || { echo 'Migração symlink recusada.' >&2; exit 1; }
+  gitrepo cat-file -e "$TARGET:linkstack/$CONSENT_MIGRATION" || {
+    echo 'Migração ausente no commit remoto.' >&2; exit 1;
+  }
+  if [[ -e "$PROD/$CONSENT_MIGRATION" ]] && ! gitrepo show "$TARGET:linkstack/$CONSENT_MIGRATION" | cmp -s - "$PROD/$CONSENT_MIGRATION"; then
+    echo 'Migração local diverge do commit remoto; revisão obrigatória.' >&2; exit 1
+  fi
+fi
+# Inspecionar diretórios de dados sem modificar permissões dos arquivos preexistentes.
+if [[ -d "$PROD/storage/app/linkfree" ]]; then
+  [[ ! -L "$PROD/storage/app/linkfree" ]] || { echo 'Storage symlink recusado.' >&2; exit 1; }
+  runuser -u www-data -- test -w "$PROD/storage/app/linkfree" || { echo 'Sem escrita em storage/app/linkfree.' >&2; exit 1; }
+  if [[ -d "$PROD/storage/app/linkfree/visit-sources" ]]; then
+    runuser -u www-data -- test -w "$PROD/storage/app/linkfree/visit-sources" || { echo 'Sem escrita em visit-sources.' >&2; exit 1; }
+  fi
+else
+  runuser -u www-data -- test -w "$PROD/storage/app" || { echo 'Não é possível criar storage/app/linkfree.' >&2; exit 1; }
 fi
 
 # Evita sobrescrever modificacoes feitas diretamente em dev/producao.
