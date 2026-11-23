@@ -1109,4 +1109,11 @@ return array(
     'lf_theme_choice_compact' => 'Compacto',
     'lf_theme_choice_normal' => 'Normal',
     'lf_theme_choice_relaxed' => 'Espaçado',
+    'lf_admin_shortcuts' => 'Acesso rápido à administração',
+    'lf_admin_existing_help' => 'Acesse diretamente as ferramentas administrativas já disponíveis, sem duplicar funcionalidades.',
+    'lf_admin_users' => 'Usuários e permissões',
+    'lf_admin_site' => 'Conteúdo e identidade',
+    'lf_admin_themes' => 'Temas e componentes',
+    'lf_admin_system' => 'Sistema e segurança',
+    'lf_admin_pending_modules' => 'Solicitações de selo, indicações e caixa de denúncias são módulos independentes ainda não implantados; o sistema de verificação manual e denúncias por e-mail existentes permanecem disponíveis.',
 );
