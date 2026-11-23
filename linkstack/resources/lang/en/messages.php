@@ -1155,4 +1155,7 @@ return [
     'next' => 'Next &raquo;',
 
 
+    'lf_limit_reached' => 'You reached the 5-link limit. Ask an administrator for Premium access to create unlimited links.',
+    'lf_link_usage' => 'Links used: :count of :max.',
+    'lf_upgrade_info' => 'VIP accounts have unlimited links.',
 ];

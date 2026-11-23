@@ -310,9 +310,12 @@ class UserController extends Controller
             $OrigLink->update($updatedValues);
             $message = "Link updated";
         } else {
-            $link = new Link($filteredLinkData);
-            $link->user_id = $userId;
-            $link->save();
+            DB::transaction(function () use ($filteredLinkData, $userId) {
+                User::whereKey($userId)->lockForUpdate()->firstOrFail();
+                $link = new Link($filteredLinkData);
+                $link->user_id = $userId;
+                $link->save();
+            });
             $message = "Link added";
         }
 
@@ -972,6 +975,13 @@ class UserController extends Controller
             $file = $request->file('import');
             $jsonString = $file->get();
             $userData = json_decode($jsonString, true);
+            if (!is_array($userData) || !isset($userData['links']) || !is_array($userData['links'])) {
+                throw new \InvalidArgumentException('Invalid import structure');
+            }
+            if (auth()->user()->role === 'user'
+                && \App\Services\UserLinkLimit::countImportable($userData['links']) > \App\Services\UserLinkLimit::FREE_LIMIT) {
+                return redirect('studio/profile')->with('error', __('messages.lf_limit_reached'));
+            }
     
             // Update the authenticated user's profile data if defined in the JSON file
             $user = auth()->user();
@@ -1011,6 +1021,8 @@ class UserController extends Controller
                 }
             }
 
+            DB::transaction(function () use ($user, $userData) {
+            User::whereKey($user->id)->lockForUpdate()->firstOrFail();
             $user->save();
     
             // Delete all links for the authenticated user
@@ -1058,6 +1070,7 @@ class UserController extends Controller
                 // Save the new link to the database
                 $newLink->save();
             }
+            });
             return redirect('studio/profile')->with('success', __('messages.Profile updated successfully!'));
         } catch (\Exception $e) {
             return redirect('studio/profile')->with('error', __('messages.An error occurred while updating your profile.'));

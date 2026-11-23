@@ -1051,4 +1051,7 @@ return array(
 
 	'Add new link' => 'Adicionar novo link',
 
+    'lf_limit_reached' => 'Você atingiu o limite de 5 links. Solicite acesso Premium ao administrador para criar links ilimitados.',
+    'lf_link_usage' => 'Links utilizados: :count de :max.',
+    'lf_upgrade_info' => 'Contas VIP possuem links ilimitados.',
 );

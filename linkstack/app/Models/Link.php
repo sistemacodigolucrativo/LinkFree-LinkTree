@@ -16,6 +16,10 @@ class Link extends Model
         parent::boot();
 
         static::creating(function ($link) {
+            if ($link->user_id) {
+                $owner = \App\Models\User::find($link->user_id);
+                if ($owner) \App\Services\UserLinkLimit::ensureAllowed($owner, $link);
+            }
           if (config('linkstack.disable_random_link_ids') != 'true') {
             $numberOfDigits = config('linkstack.link_id_length') ?? 9;
 
