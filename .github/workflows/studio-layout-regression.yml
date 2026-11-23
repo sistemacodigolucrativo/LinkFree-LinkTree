@@ -32,6 +32,7 @@ on:
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-public-site-editor.py'
+      - 'scripts/audit-blade-compile.php'
       - 'linkstack/app/Services/PublicSiteContent.php'
       - 'linkstack/resources/views/panel/site.blade.php'
       - 'linkstack/assets/css/linkfree-admin-management.css'
@@ -87,6 +88,7 @@ on:
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-public-site-editor.py'
+      - 'scripts/audit-blade-compile.php'
       - 'linkstack/app/Services/PublicSiteContent.php'
       - 'linkstack/resources/views/panel/site.blade.php'
       - 'linkstack/assets/css/linkfree-admin-management.css'
@@ -140,6 +142,8 @@ jobs:
         run: python scripts/audit-profile-editor-gradient.py
       - name: Audit premium login layout and preserved authentication
         run: python scripts/audit-login-layout.py
+      - name: Compile Blade templates and lint generated PHP
+        run: php scripts/audit-blade-compile.php
       - name: Verify sectional public site editor
         run: |
           python scripts/audit-public-site-editor.py
