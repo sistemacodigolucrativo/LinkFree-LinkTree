@@ -47,6 +47,8 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'verified_at' => 'datetime',
+        'verification_visible' => 'boolean',
     ];
 
     public function visits()
@@ -92,6 +94,14 @@ class User extends Authenticatable implements MustVerifyEmail
             }
             if (Schema::hasTable('referral_codes')) {
                 DB::table('referral_codes')->where('user_id', $user->id)->delete();
+            }
+            if (Schema::hasTable('verification_audit_events')) {
+                DB::table('verification_audit_events')->where('user_id', $user->id)->delete();
+                DB::table('verification_audit_events')->where('actor_id', $user->id)->update(['actor_id' => null]);
+            }
+            if (Schema::hasTable('verification_requests')) {
+                DB::table('verification_requests')->where('user_id', $user->id)->delete();
+                DB::table('verification_requests')->where('reviewed_by', $user->id)->update(['reviewed_by' => null]);
             }
         });
     }

@@ -324,15 +324,16 @@
                         <textarea class="form-control @if(env('ALLOW_USER_HTML') === true) ckeditor @endif" name="pageDescription" rows="3" id="field-pageDescription">{{ $page->littlelink_description ?? '' }}</textarea>
                     </div>
 
-                    @if(auth()->user()->role == 'admin' || auth()->user()->role == 'vip')
+                    @if(auth()->user()->verified_at !== null)
                         <div class="form-group col-lg-8">
-                        <h5 style="margin-top:50px"> {{__('messages.Show checkmark')}}</h5>
-                        <p class="text-muted">{{__('messages.disableverified')}}</p>
+                          <h5 style="margin-top:50px">Selo verificado</h5>
+                          <p class="text-muted">Seu selo foi aprovado pelo administrador. Escolha se ele aparece na sua página pública.</p>
                           <div class="mb-3 form-check form-switch">
-                            <input name="checkmark" class="switch toggle-btn" type="checkbox" id="checkmark" <?php if(UserData::getData(Auth::user()->id, 'checkmark') == true){echo 'checked';} ?> />
-                            <label class="form-check-label" for="checkmark">{{__('messages.Enable')}}</label>
+                            <input name="verification_visible" value="1" class="switch toggle-btn" type="checkbox" id="verification-visible"
+                                   @checked((bool) auth()->user()->verification_visible) />
+                            <label class="form-check-label" for="verification-visible">Exibir selo</label>
                           </div>
-                        <input type="hidden" name="_token" value="{{csrf_token()}}">
+                        </div>
                     @endif
                     @endforeach
 

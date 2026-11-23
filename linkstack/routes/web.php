@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReferralController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\LinkTypeViewController;
 use App\Http\Controllers\PagesController;
@@ -113,6 +114,9 @@ Route::get('/studio/theme', [UserController::class, 'showTheme'])->name('showThe
 Route::post('/studio/theme-options', [UserController::class, 'saveThemeOptions'])->name('studio.theme-options');
 Route::get('/studio/visitors', [UserController::class, 'showVisitorReports'])->name('studio.visitors');
 Route::get('/studio/referrals', [ReferralController::class, 'index'])->name('studio.referrals');
+Route::get('/studio/verification', [VerificationController::class, 'member'])->name('studio.verification');
+Route::post('/studio/verification/request', [VerificationController::class, 'apply'])->name('studio.verification.apply')->middleware('throttle:5,60');
+Route::post('/studio/verification/visibility', [VerificationController::class, 'visibility'])->name('studio.verification.visibility');
 Route::post('/studio/referrals/code', [ReferralController::class, 'createCode'])->name('studio.referrals.code')->middleware('throttle:10,1');
 Route::get('/studio/theme-preview/{theme}', [\App\Http\Controllers\ThemePreviewController::class, 'show'])->name('themePreview')->where('theme', '[A-Za-z][A-Za-z0-9_-]*');
 Route::post('/studio/theme', [UserController::class, 'editTheme'])->name('editTheme');
@@ -169,6 +173,9 @@ Route::group([
     Route::get('/admin/overview', [AdminController::class, 'index'])->name('adminOverview');
     Route::get('/admin/users', [AdminController::class, 'users'])->name('showUsers');
     Route::get('/admin/referrals', [ReferralController::class, 'adminIndex'])->name('admin.referrals');
+    Route::get('/admin/verification', [VerificationController::class, 'admin'])->name('admin.verification');
+    Route::post('/admin/verification/requests/{id}/review', [VerificationController::class, 'review'])->whereNumber('id')->name('admin.verification.review');
+    Route::post('/admin/users/{user}/verification', [VerificationController::class, 'toggle'])->whereNumber('user')->name('admin.verification.toggle');
     Route::post('/admin/users/registration-vip', [AdminController::class, 'updateRegistrationVip'])->name('admin.registration-vip');
     Route::get('/admin/links/{id}', [AdminController::class, 'showLinksUser'])->name('showLinksUser');
     Route::get('/admin/deleteLink/{id}', [AdminController::class, 'deleteLinkUser'])->name('deleteLinkUser');

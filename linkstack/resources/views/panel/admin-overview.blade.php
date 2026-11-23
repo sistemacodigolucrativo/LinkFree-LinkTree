@@ -13,6 +13,7 @@
         ['route' => 'showUsers', 'icon' => 'bi-people', 'label' => __('messages.Manage Users')],
         ['route' => 'createNewUser', 'icon' => 'bi-person-plus', 'label' => __('messages.Nav Admin New User')],
          ['route' => 'admin.referrals', 'icon' => 'bi-people', 'label' => 'Indicações'],
+         ['route' => 'admin.verification', 'icon' => 'bi-patch-check', 'label' => 'Solicitações de selo'],
       ],
       __('messages.lf_admin_site') => [
         ['route' => 'showSite', 'icon' => 'bi-globe', 'label' => __('messages.Site Customization')],
@@ -44,7 +45,7 @@
    </div>
    @endforeach
   </div>
-  <p class="small text-muted mb-0 mt-3">Pendências administrativas restantes: solicitações de selo verificado e gerenciamento de denúncias.</p>
+  <p class="small text-muted mb-0 mt-3">Pendência administrativa restante: gerenciamento de denúncias.</p>
  </div>
 </section>
 <style>
