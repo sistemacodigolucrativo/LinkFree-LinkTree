@@ -10,7 +10,7 @@ Aprovado pelo operador em 24/11/2026. Fonte de continuidade para ChatGPT, Codex 
 | Fase | Responsável | Entrega / gate | Estado |
 |---|---|---|---|
 | H1 | ChatGPT | Triagem dos 43 IDs com provas, responsabilidades e lacunas | Concluída documentalmente; [matriz de continuidade](MATRIZ-CONTINUIDADE-43-CASOS-20261124.md) |
-| H2 | Codex | Boot de aplicação restaurada, recuperação verificável e ambiente de teste sintético segregado | PARCIAL: boot e staging comprovados; rollback falhou em fixture; [relatório H2](H2-RECUPERACAO-STAGING-20261124.md) |
+| H2 | Codex | Boot de aplicação restaurada, recuperação verificável e ambiente de teste sintético segregado | PARCIAL: boot/staging comprovados e correção candidata de rollback retestada; PR #19 não integrada/publicada e recuperação integral sem prova; [H2 histórico](H2-RECUPERACAO-STAGING-20261124.md), [reteste independente](H2-RETESTE-INDEPENDENTE-ROLLBACK-20261124.md) |
 | H3 | Codex + ChatGPT | Testes residuais da matriz; primeiro fixtures TC-03-B/08-D | Pendente H2 |
 | H4 | ChatGPT | Auditar resultados, PRs de defeitos confirmados e retestes de impacto | Pendente |
 | H5 | Operador + ChatGPT | Testes físicos, integrações que exijam intervenção e decisões | Pendente |
