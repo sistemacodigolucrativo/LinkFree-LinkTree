@@ -1,0 +1,101 @@
+{
+  "candidato": "46b33169f06ca4e1902b8d5e5b83519b1bd5050f",
+  "escopo": "fragmento candidato com Laravel real no staging; falhas injetadas em funções shell",
+  "cenarios": [
+    {
+      "case": "normal",
+      "exit": 42,
+      "expected_exit": 42,
+      "incomplete": false,
+      "success_message": true,
+      "content": true,
+      "metadata": true,
+      "new_files_removed": true,
+      "config_cache_removed": true,
+      "route_cache_removed": true,
+      "compiled_views_remaining": 0,
+      "sqlite": "ok",
+      "synthetic_write": 1,
+      "pass": true
+    },
+    {
+      "case": "missing",
+      "exit": 74,
+      "expected_exit": 74,
+      "incomplete": true,
+      "success_message": false,
+      "sqlite": "ok",
+      "synthetic_write": 1,
+      "pass": true
+    },
+    {
+      "case": "rsync_fail",
+      "exit": 74,
+      "expected_exit": 74,
+      "incomplete": true,
+      "success_message": false,
+      "sqlite": "ok",
+      "synthetic_write": 1,
+      "pass": true
+    },
+    {
+      "case": "rsync_noop",
+      "exit": 74,
+      "expected_exit": 74,
+      "incomplete": true,
+      "success_message": false,
+      "sqlite": "ok",
+      "synthetic_write": 1,
+      "pass": true
+    },
+    {
+      "case": "remove_fail",
+      "exit": 74,
+      "expected_exit": 74,
+      "incomplete": true,
+      "success_message": false,
+      "sqlite": "ok",
+      "synthetic_write": 1,
+      "pass": true
+    },
+    {
+      "case": "cache_fail",
+      "exit": 74,
+      "expected_exit": 74,
+      "incomplete": true,
+      "success_message": false,
+      "sqlite": "ok",
+      "synthetic_write": 1,
+      "pass": true
+    },
+    {
+      "case": "unsafe_path",
+      "exit": 74,
+      "expected_exit": 74,
+      "incomplete": true,
+      "success_message": false,
+      "sqlite": "ok",
+      "synthetic_write": 1,
+      "pass": true
+    }
+  ],
+  "backup_manifesto": {
+    "arquivos": 130,
+    "validos": 130
+  },
+  "arquivos_git_anteriores_nao_alterados_no_deploy": {
+    "comparados": 9101,
+    "diferentes": 0,
+    "ausentes": 0
+  },
+  "configuracao_avancada_backup_boot": true,
+  "copia_real_removida": true,
+  "staging": {
+    "contas_sinteticas": 4,
+    "somente_example_test": true,
+    "sqlite": "ok",
+    "fk_violacoes": 0,
+    "http_login": 200,
+    "chave_diferente_producao": true
+  }
+}
