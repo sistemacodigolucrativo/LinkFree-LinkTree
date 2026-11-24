@@ -214,7 +214,7 @@ Route::group([
     Route::get('/update/theme', [AdminController::class, 'updateThemes'])->name('updateThemes');
     Route::get('/admin/config', [AdminController::class, 'showConfig'])->name('showConfig');
     Route::post('/admin/config', [AdminController::class, 'editConfig'])->name('editConfig');
-    Route::get('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail');
+    Route::post('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail');
     Route::post('/auth-as/{id}', [AdminController::class, 'authAsID'])->name('authAsID');
     Route::get('/theme-updater', function () {return view('studio/theme-updater', []);});
     Route::get('/update', function () {return view('update', []);});

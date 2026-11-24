@@ -13,6 +13,8 @@
   .lf-vip-switch .form-switch{flex:0 0 auto}
   .lf-vip-switch .form-check-input{width:2.35rem;height:1.25rem;cursor:pointer}
   @media(max-width:400px){.lf-vip-switch{padding:11px}.lf-vip-switch-copy{flex-basis:100%}}
+  /* Contrast: approved state badges need readable text. */
+  .user-block .badge.bg-success, .user-email .badge.bg-success { color:#09140b!important; font-weight:700; }
 </style>
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
@@ -71,6 +73,15 @@
                         <a href="{{ url('') }}/admin/new-user">+ {{__('messages.Add new user')}}</a>
 
                         <script type="text/javascript">
+function labelLivewirePerPage() {
+  const select = document.getElementById('perPage');
+  if (select && !select.getAttribute('aria-label')) select.setAttribute('aria-label','Registros por página');
+}
+document.addEventListener('DOMContentLoaded',labelLivewirePerPage);
+document.addEventListener('livewire:load',function(){
+  labelLivewirePerPage();
+  if (window.Livewire && typeof Livewire.hook === 'function') Livewire.hook('message.processed',labelLivewirePerPage);
+});
 document.addEventListener('click', function(e) {
  const button=e.target.closest('.confirmation,.user-email,.user-block');
  if(!button) return;
