@@ -46,7 +46,7 @@ checks["Admin delete user form is CSRF protected"] = "@method('DELETE')" in read
 checks["Admin impersonation UI uses POST"] = 'method="POST" action="{{ route(\'authAsID\'' in read("linkstack/resources/views/components/table-components/action.blade.php")
 
 checks["Test email is POST with CSRF"] = "Route::get('/send-test-email'" not in routes and "Route::post('/send-test-email'" in routes and "@csrf" in read("linkstack/resources/views/components/config/config.blade.php")
-checks["Public report reminder uses inherited readable text"] = '<p class="small" style="color:inherit">' in read("linkstack/resources/views/report.blade.php")
+checks["Public report reminder uses accessible text color"] = '<p class="small" style="color:#334155!important">' in read("linkstack/resources/views/report.blade.php")
 checks["Profile avatars have alt"] = read("linkstack/resources/views/studio/page.blade.php").count('alt="Foto do perfil"') == 3
 checks["Livewire pagination select has label hook"] = "labelLivewirePerPage" in read("linkstack/resources/views/panel/users.blade.php")
 checks["Verification tables are keyboard focusable"] = read("linkstack/resources/views/panel/verification.blade.php").count('tabindex="0" role="region"') == 2
