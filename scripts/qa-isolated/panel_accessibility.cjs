@@ -69,10 +69,12 @@ async function run(){
         assert.equal(await light.getAttribute('aria-pressed'),String(scheme==='light'));
         await dark.focus();
         assert(await dark.evaluate(el=>document.activeElement===el),'Dark scheme button could not receive keyboard focus');
+        // Observe the actual browser events for diagnosis, without changing them.
+        await page.evaluate(()=>{window.lfQaSchemeEvents=[];for(const name of ['keydown','keyup','click'])document.addEventListener(name,event=>{if(event.target.closest?.('[data-setting="color-mode"]'))window.lfQaSchemeEvents.push({type:event.type,key:event.key||null,defaultPrevented:event.defaultPrevented});},{capture:true});});
         await dark.press('Space');
         try{
           await page.waitForFunction(()=>document.body.classList.contains('dark')&&localStorage.getItem('color-mode')==='dark',null,{timeout:8000});
-        }catch(e){throw Error('Space failed to select dark scheme: '+JSON.stringify(await page.evaluate(()=>({body:document.body.className,mode:localStorage.getItem('color-mode'),active:document.activeElement?.outerHTML.slice(0,220)}))));}
+        }catch(e){throw Error('Space failed to select dark scheme: '+JSON.stringify(await page.evaluate(()=>({body:document.body.className,mode:localStorage.getItem('color-mode'),active:document.activeElement?.outerHTML.slice(0,220),events:window.lfQaSchemeEvents}))));}
         assert.equal(await dark.getAttribute('aria-pressed'),'true');
         assert.equal(await light.getAttribute('aria-pressed'),'false');
         await page.keyboard.press('Tab');
@@ -80,7 +82,7 @@ async function run(){
         await light.press('Enter');
         try{
           await page.waitForFunction(()=>document.body.classList.contains('light')&&!document.body.classList.contains('dark')&&localStorage.getItem('color-mode')==='light',null,{timeout:8000});
-        }catch(e){throw Error('Enter failed to select light scheme: '+JSON.stringify(await page.evaluate(()=>({body:document.body.className,mode:localStorage.getItem('color-mode'),active:document.activeElement?.outerHTML.slice(0,220)}))));}
+        }catch(e){throw Error('Enter failed to select light scheme: '+JSON.stringify(await page.evaluate(()=>({body:document.body.className,mode:localStorage.getItem('color-mode'),active:document.activeElement?.outerHTML.slice(0,220),events:window.lfQaSchemeEvents}))));}
         assert.equal(await light.getAttribute('aria-pressed'),'true');
         toggle={keyboard:true,pressedState:true};
         await panel.locator('button[data-bs-dismiss=offcanvas]').click();
