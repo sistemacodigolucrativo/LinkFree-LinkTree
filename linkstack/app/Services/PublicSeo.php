@@ -105,11 +105,12 @@ final class PublicSeo
 
     public static function avatar(?int $id = null): ?string
     {
-        if ($id !== null) {
+        if ($id !== null && is_dir(base_path('assets/img'))) {
             $avatar = self::raster(findAvatar($id), 'assets/img');
             if ($avatar !== null) return $avatar;
         }
-        return self::raster('assets/linkstack/images/' . findFile('avatar'), 'assets/linkstack/images');
+        return self::raster('assets/linkstack/images/' . findFile('avatar'), 'assets/linkstack/images')
+            ?? self::raster('assets/linkstack/images/social-brand.png', 'assets/linkstack/images');
     }
 
     public static function version(string $name, string $description, ?string $avatar, string $updated = ''): string

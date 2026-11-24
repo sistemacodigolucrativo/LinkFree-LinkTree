@@ -34,7 +34,10 @@ home = (views / "home.blade.php").read_text(encoding="utf-8")
 assert 'assets/linkstack/images/logo.svg' in home, "Default homepage brand missing"
 assert 'logo-animated.svg' not in home, "Old landing logo still selected"
 meta = (views / "linkstack/modules/meta.blade.php").read_text(encoding="utf-8")
-assert 'assets/linkstack/images/logo.svg' in meta, "Social preview missing"
+assert "route('socialPreview.profile'" in meta and 'image/jpeg' in meta, "Dynamic social preview missing"
+seo = (root / "app/Services/PublicSeo.php").read_text(encoding="utf-8")
+assert "findFile('avatar')" in seo and "social-brand.png" in seo, "Brand fallback missing"
+assert (images / "social-brand.png").read_bytes().startswith(b"\x89PNG\r\n\x1a\n"), "Raster brand asset missing"
 for name in ("layouts/sidebar.blade.php", "auth/login.blade.php"):
     s = (views / name).read_text(encoding="utf-8")
     assert "findFile('avatar')" in s, (name, "admin brand override removed")

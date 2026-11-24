@@ -98,7 +98,6 @@ class SocialPreviewController extends Controller
         $this->drawLines($canvas, $cleanDescription, 25, 558, 390, 570, 4, $muted, false, 40);
         imagefilledrectangle($canvas, 558, 524, 1117, 527, $stroke);
         $this->drawText($canvas, 'Um link. Todos os seus caminhos.', 21, 558, 562, $muted, false);
-        
         ob_start();
         $ok = imagejpeg($canvas, null, 86);
         $binary = ob_get_clean();
@@ -196,7 +195,7 @@ class SocialPreviewController extends Controller
         $font = $this->font($bold);
         if ($font && function_exists('imagettfbbox')) {
             $bounds = imagettfbbox($size, 0, $font, $text);
-            return (int) abs($bounds[2] - $bounds[0]);
+            if (is_array($bounds)) return (int) (max($bounds[0], $bounds[2], $bounds[4], $bounds[6]) - min($bounds[0], $bounds[2], $bounds[4], $bounds[6]));
         }
         return strlen($text) * imagefontwidth(5);
     }

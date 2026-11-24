@@ -1,0 +1,123 @@
+name: SEO and social cards regression (isolated)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'linkstack/app/Services/PublicSeo.php'
+      - 'linkstack/app/Http/Controllers/SeoController.php'
+      - 'linkstack/app/Http/Controllers/SocialPreviewController.php'
+      - 'linkstack/app/Http/Controllers/UserController.php'
+      - 'linkstack/resources/views/**'
+      - 'linkstack/routes/web.php'
+      - 'linkstack/assets/linkstack/images/**'
+      - 'instal.sh'
+      - 'scripts/qa-isolated/seo_acceptance.py'
+      - 'scripts/audit-default-branding.py'
+      - '.github/workflows/seo-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  seo-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install and verify GD, SQLite and mbstring
+        run: |
+          version=$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')
+          missing=()
+          for ext in gd mbstring pdo_sqlite; do
+            if ! php -m | grep -qi "^$ext$"; then
+              case "$ext" in
+                pdo_sqlite) missing+=("php$version-sqlite3");;
+                *) missing+=("php$version-$ext");;
+              esac
+            fi
+          done
+          if (( ${#missing[@]} )); then sudo apt-get update -qq && sudo apt-get install -y "${missing[@]}"; fi
+          php -r 'foreach(["gd","mbstring","pdo_sqlite"] as $ext) if(!extension_loaded($ext)) exit(1);'
+      - name: Static guardrails and PHP syntax
+        run: |
+          bash -n instal.sh
+          python3 scripts/audit-default-branding.py
+          python3 scripts/audit-public-site-editor.py
+          php -l linkstack/app/Services/PublicSeo.php
+          php -l linkstack/app/Http/Controllers/SeoController.php
+          php -l linkstack/app/Http/Controllers/SocialPreviewController.php
+          php -l linkstack/app/Http/Controllers/UserController.php
+          php -l linkstack/routes/web.php
+      - name: Prepare strictly isolated synthetic application
+        shell: bash
+        run: |
+          set -euo pipefail
+          export QA_APP_ROOT=/tmp/linkfree-audit/linkstack
+          install -d /tmp/linkfree-audit "$QA_APP_ROOT"
+          rsync -a --exclude='.env' --exclude='*.sqlite' --exclude='*.sqlite3' --exclude='*.db' --exclude=INSTALLING --exclude=INSTALLERLOCK linkstack/ "$QA_APP_ROOT/"
+          install -d "$QA_APP_ROOT"/database "$QA_APP_ROOT"/storage/framework/{cache,sessions,views} "$QA_APP_ROOT"/storage/logs "$QA_APP_ROOT"/assets/favicon/icons
+          touch "$QA_APP_ROOT/database/audit.sqlite"
+          KEY=$(php -r 'echo "base64:".base64_encode(random_bytes(32));')
+          cat > "$QA_APP_ROOT/.env" <<EOF
+          APP_NAME=LinkFreeQA
+          APP_ENV=local
+          APP_DEBUG=false
+          APP_KEY=$KEY
+          APP_URL=http://127.0.0.1:18765
+          DB_CONNECTION=sqlite
+          DB_DATABASE=/tmp/linkfree-audit/linkstack/database/audit.sqlite
+          DB_FOREIGN_KEYS=true
+          SESSION_DRIVER=file
+          CACHE_DRIVER=array
+          QUEUE_CONNECTION=sync
+          LOG_CHANNEL=stderr
+          MAIL_MAILER=log
+          MAIL_FROM_ADDRESS=qa@example.test
+          ALLOW_REGISTRATION=true
+          REGISTER_AUTH=auth
+          FORCE_ROUTE_HTTPS=false
+          HOME_URL=
+          CUSTOM_META_TAGS=false
+          MAINTENANCE_MODE=false
+          EOF
+          test "$(grep -c 'APP_ENV=local' "$QA_APP_ROOT/.env")" = 1
+          cd "$QA_APP_ROOT"
+          php artisan migrate --force --no-interaction > /tmp/linkfree-audit/migrations.log
+          QA_APP_ROOT="$QA_APP_ROOT" php "$GITHUB_WORKSPACE/scripts/qa-isolated/seed.php"
+          php -r '$path="config/advanced-config.php"; $c=require is_file($path)?$path:"storage/templates/advanced-config.php"; $c["custom_domains"]=[["domain"=>"seo-profile.test","name"=>"auditadmin"]]; $c["robots"]="index,follow"; $c["disable_home_page"]="false"; file_put_contents($path,"<?php return ".var_export($c,true).";");'
+          mkdir -p assets/img
+          php -r '$im=imagecreatetruecolor(120,120);imagefill($im,0,0,imagecolorallocate($im,180,40,70));imagepng($im,"assets/img/2.png");'
+      - name: Start localhost-only Laravel server
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/linkfree-audit/linkstack
+          php artisan serve --host=127.0.0.1 --port=18765 > /tmp/linkfree-audit/server.log 2>&1 &
+          echo $! > /tmp/linkfree-audit/server.pid
+          for i in $(seq 1 45); do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:18765/login; then
+              echo "Local isolated app ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Local server did not start"
+          tail -n 30 /tmp/linkfree-audit/server.log
+          exit 1
+      - name: Validate rendered metadata, JPEG, sitemap and privacy
+        env:
+          QA_EXPECTED_SITE: http://127.0.0.1:18765
+        run: |
+          python3 scripts/qa-isolated/seo_acceptance.py
+          cd /tmp/linkfree-audit/linkstack
+          php -r '$path="config/advanced-config.php";$c=require $path;$c["robots"]="noindex,follow";file_put_contents($path,"<?php return ".var_export($c,true).";");'
+          SEO_TEST_MODE=global-noindex python3 "$GITHUB_WORKSPACE/scripts/qa-isolated/seo_acceptance.py"
+          php -r '$path="config/advanced-config.php";$c=require $path;$c["robots"]="index,follow";file_put_contents($path,"<?php return ".var_export($c,true).";");'
+          sed -i 's/^HOME_URL=.*/HOME_URL=auditfree/' .env
+          python3 -c 'import sqlite3; d=sqlite3.connect("database/audit.sqlite"); d.execute("UPDATE users SET name=? WHERE id=2",("auditfree",)); d.commit()'
+          SEO_TEST_MODE=home-profile python3 "$GITHUB_WORKSPACE/scripts/qa-isolated/seo_acceptance.py"
+      - name: Stop disposable server
+        if: always()
+        run: |
+          if test -f /tmp/linkfree-audit/server.pid; then kill "$(cat /tmp/linkfree-audit/server.pid)" || true; fi
