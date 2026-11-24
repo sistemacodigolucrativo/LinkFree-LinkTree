@@ -78,9 +78,15 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
       criticalOrSerious:issues.filter(v=>['critical','serious'].includes(v.impact)).length,
       targetedRegressions:priority.length,remainingContrast:issues.filter(v=>v.rule==='color-contrast').length}
   };
+  try {
+    report.interactions = await require('./browser_interactions.cjs').run();
+  } catch (e) {
+    report.interactions = {status:'ERROR', results:[], error:String(e.message).slice(0,300)};
+  }
   fs.writeFileSync(output,JSON.stringify(report,null,2));
+  console.log('BROWSER INTERACTION SUMMARY',JSON.stringify(report.interactions));
   console.log('A11Y SUMMARY',JSON.stringify(report.summary));
-  if(errors.length || priority.length) {
+  if(errors.length || priority.length || report.interactions.status !== 'PASS') {
     process.exitCode=1;
   } else {
     console.log('PASS targeted accessibility regressions. Contrast and other WCAG findings remain in JSON.');

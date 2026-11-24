@@ -51,6 +51,11 @@ checks["Profile avatars have alt"] = read("linkstack/resources/views/studio/page
 checks["Livewire pagination select has label hook"] = "labelLivewirePerPage" in read("linkstack/resources/views/panel/users.blade.php")
 checks["Verification tables are keyboard focusable"] = read("linkstack/resources/views/panel/verification.blade.php").count('tabindex="0" role="region"') == 2
 
+checks["Admin user creation is POST only"] = "Route::get('/admin/new-user'" not in routes and "Route::post('/admin/new-user', [AdminController::class, 'createNewUser'])->name('createNewUser')->middleware('max.users');" in routes
+for file in ("layouts/sidebar.blade.php", "panel/admin-overview.blade.php", "panel/users.blade.php"):
+    content = read("linkstack/resources/views/" + file)
+    checks["Admin user creation form: " + file] = bool(re.search(r'<form method="POST" action="\{\{ route\(\'createNewUser\'\) \}\}"[^>]*>\s*@csrf', content)) and '/admin/new-user">' not in content and 'href="{{ route(\'createNewUser\') }}">' not in content
+
 for name, passed in checks.items():
     print(("PASS" if passed else "FAIL") + " " + name)
 if not all(checks.values()):

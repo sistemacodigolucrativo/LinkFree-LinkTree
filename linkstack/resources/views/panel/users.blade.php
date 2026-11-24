@@ -70,7 +70,7 @@
 
                         <p id="user-action-status" role="status" aria-live="polite"></p><livewire:user-table />
 
-                        <a href="{{ url('') }}/admin/new-user">+ {{__('messages.Add new user')}}</a>
+                        <form method="POST" action="{{ route('createNewUser') }}" class="m-0">@csrf<button type="submit" class="btn btn-link p-0">+ {{__('messages.Add new user')}}</button></form>
 
                         <script type="text/javascript">
 function labelLivewirePerPage() {

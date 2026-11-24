@@ -37,9 +37,15 @@
      <h3 class="h6 fw-bold">{{ $title }}</h3>
      <div class="d-grid gap-2">
       @foreach($items as $item)
-       <a class="btn btn-outline-primary text-start" href="{{ route($item['route']) }}">
-        <i class="bi {{ $item['icon'] }}" aria-hidden="true"></i> {{ $item['label'] }}
-       </a>
+       @if($item['route'] === 'createNewUser')
+        <form method="POST" action="{{ route('createNewUser') }}" class="d-grid m-0">@csrf
+         <button type="submit" class="btn btn-outline-primary text-start"><i class="bi {{ $item['icon'] }}" aria-hidden="true"></i> {{ $item['label'] }}</button>
+        </form>
+       @else
+        <a class="btn btn-outline-primary text-start" href="{{ route($item['route']) }}">
+         <i class="bi {{ $item['icon'] }}" aria-hidden="true"></i> {{ $item['label'] }}
+        </a>
+       @endif
       @endforeach
      </div>
     </div>

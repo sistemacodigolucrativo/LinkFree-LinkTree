@@ -87,7 +87,7 @@ def get_mutations():
         '/admin/deleteLink/102','/admin/users/block/no/2',
         '/admin/users/verify/vip/2','/admin/users/verify-mail/true/2',
         '/admin/delete-user/3','/admin/site/delavatar',
-        '/admin/site/delfavicon','/send-test-email','/auth-as/2'
+        '/admin/site/delfavicon','/send-test-email','/auth-as/2','/admin/new-user'
     ]
     snapshot = (value('SELECT COUNT(*) FROM links'), value('SELECT COUNT(*) FROM users'),
                 value('SELECT role FROM users WHERE id=2'),
@@ -187,6 +187,25 @@ def forms():
     return 'Rendered member and admin HTML include DELETE method override and CSRF'
 
 check('TC-04-D','Rendered delete controls preserve CSRF and DELETE semantics',forms)
+
+def admin_create_user():
+    before = value('SELECT COUNT(*) FROM users')
+    status, _, _ = admin.request('POST', '/admin/new-user', {}, json_response=True)
+    expect(status == 419, f'Admin creation without CSRF returned {status}')
+    expect(value('SELECT COUNT(*) FROM users') == before, 'Account created without CSRF')
+    token = member.token('/studio/links')
+    status, _, _ = member.request('POST', '/admin/new-user', {'_token':token}, json_response=True)
+    expect(status in (302, 403), f'Non-admin creation returned {status}')
+    expect(value('SELECT COUNT(*) FROM users') == before, 'Non-admin created account')
+    token = admin.token('/admin/users')
+    status, headers, _ = admin.request('POST', '/admin/new-user', {'_token':token})
+    expect(status == 302 and '/admin/edit-user/' in headers.get('Location',''), f'Admin creation did not redirect: {status}')
+    expect(value('SELECT COUNT(*) FROM users') == before + 1, 'Expected exactly one new account')
+    new_id = int(headers['Location'].rstrip('/').split('/')[-1])
+    expect(value("SELECT COUNT(*) FROM users WHERE id=? AND name LIKE 'Admin-Created-%'", (new_id,)) == 1, 'Created account missing')
+    return {'csrfDenied':419,'nonAdminDenied':True,'createdExactlyOne':True,'redirectedToEditor':True}
+
+check('TC-04-D','Admin account creation requires POST, CSRF and administrator privileges',admin_create_user)
 
 output=Path(os.environ.get('QA_OUTPUT','/tmp/linkfree-audit/http-results.json')).resolve()
 assert output.is_relative_to(Path('/tmp/linkfree-audit'))
