@@ -87,7 +87,7 @@ def get_mutations():
         '/admin/deleteLink/102','/admin/users/block/no/2',
         '/admin/users/verify/vip/2','/admin/users/verify-mail/true/2',
         '/admin/delete-user/3','/admin/site/delavatar',
-        '/admin/site/delfavicon','/send-test-email','/auth-as/2','/admin/new-user'
+        '/admin/site/delfavicon','/send-test-email','/auth-as/2','/admin/new-user','/admin/delete-table-user/4'
     ]
     snapshot = (value('SELECT COUNT(*) FROM links'), value('SELECT COUNT(*) FROM users'),
                 value('SELECT role FROM users WHERE id=2'),
@@ -133,9 +133,10 @@ check('TC-04-D','Owner middleware blocks cross-account link deletion',owner_isol
 
 def valid_delete_member():
     tok = member.token('/studio/links')
-    status,_,body = member.request('DELETE','/deleteLink/101',{'_token':tok},json_response=True)
+    status,_,body = member.request('DELETE','/deleteLink/101',{'_token':tok,'id':105},json_response=True)
     expect(status == 200, f'expected JSON 200, got {status} {body[:90]}')
     expect(value('SELECT COUNT(*) FROM links WHERE id=101')==0,'Own link remained after DELETE')
+    expect(value('SELECT COUNT(*) FROM links WHERE id=105')==1,'Body override deleted foreign link')
     obj=json.loads(body)
     expect(obj.get('deleted') is True and str(obj.get('id'))=='101','Unexpected delete response')
     return 'DELETE + CSRF returns JSON success and removes only requested row'
@@ -369,6 +370,36 @@ def page_icon_and_brand():
     return 'page icon native DELETE override, ownership/CSRF; brand admin only and fallback preserved'
 
 check('TC-04-D','Page icon and site branding removal',page_icon_and_brand)
+
+def block_editor_isolation():
+    status,_,html=member.request('GET','/studio/linkparamform_part/predefined/104')
+    expect(status==200 and 'QA synthetic 104' in html,'Owner editor denied')
+    status,_,html=member.request('GET','/studio/linkparamform_part/predefined/105')
+    expect(status==403 and 'QA synthetic 105' not in html,'Foreign block editor disclosed data')
+    expect(member.request('GET','/studio/linkparamform_part/predefined/0')[0]==200,'New block form denied')
+    expect(member.request('GET','/studio/linkparamform_part/predefined/999999999')[0]==404,'Missing block not rejected')
+    expect(member.request('GET','/studio/linkparamform_part/unknown-type/0')[0]==404,'Unknown block type not rejected')
+    return 'own/new forms work; foreign, missing and unknown blocks denied'
+
+check('TC-04-D','Block editor owner authorization and valid type',block_editor_isolation)
+
+def maintenance_get_guards():
+    # No old updater or backup view may be entered, even in the disposable runner.
+    import hashlib
+    def snapshot():
+        paths=[ROOT/'.env',ROOT/'storage/update.zip',ROOT/'backups/CANUPDATE',ROOT/'resources/views/components/pre-update.blade.php']
+        return [(p.is_file(),hashlib.sha256(p.read_bytes()).hexdigest() if p.is_file() else None) for p in paths]
+    before=snapshot()
+    for url in ('/update','/backup'):
+        status,_,html=admin.request('GET',url)
+        expect(status==200 and 'procedimento controlado' in html,'Read-only maintenance navigation failed: '+url)
+    for url in ('/update?updating','/update?preparing','/update?backup','/update?backups','/update?finishing','/update?error','/backup?backup','/backup?backups'):
+        status,_,_=admin.request('GET',url)
+        expect(status==403,'Legacy query stage not denied: '+url)
+    expect(snapshot()==before,'Maintenance request changed protected fixture files')
+    return 'read-only landing works; legacy update/backup stages denied without writes'
+
+check('TC-04-D','Legacy updater and backup GET execution blocked',maintenance_get_guards)
 
 def account_deletion():
     # Synthetic social account proves FK cascades are not bypassed.

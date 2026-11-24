@@ -221,8 +221,16 @@ Route::group([
     Route::post('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail');
     Route::post('/auth-as/{id}', [AdminController::class, 'authAsID'])->name('authAsID');
     Route::get('/theme-updater', function () {return view('studio/theme-updater', []);});
-    Route::get('/update', function () {return view('update', []);});
-    Route::get('/backup', function () {return view('backup', []);});
+    // Legacy views execute server updates and backup cleanup from query strings.
+    // Keep navigation read-only; operational changes use the controlled VPS procedure.
+    Route::get('/update', function () {
+        abort_if(request()->server('QUERY_STRING', '') !== '', 403);
+        return view('panel.maintenance-operations', ['operation' => 'update']);
+    });
+    Route::get('/backup', function () {
+        abort_if(request()->server('QUERY_STRING', '') !== '', 403);
+        return view('panel.maintenance-operations', ['operation' => 'backup']);
+    });
 
     Route::group(['namespace'=>'App\Http\Controllers\Admin', 'prefix'=>'admin', 'as'=>'admin'],function() {
         //Route::resource('/admin/linktype', LinkTypeController::class);
