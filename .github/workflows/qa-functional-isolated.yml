@@ -100,3 +100,87 @@ jobs:
           path: /tmp/linkfree-audit/http-results.json
           if-no-files-found: warn
           retention-days: 30
+
+  browser-a11y:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install PHP SQLite driver if absent
+        run: |
+          if ! php -m | grep -qi '^pdo_sqlite$'; then
+            sudo apt-get update -qq
+            sudo apt-get install -y php-sqlite3
+          fi
+      - name: Prepare ephemeral app with synthetic accounts
+        shell: bash
+        run: |
+          set -euo pipefail
+          QA_APP_ROOT=/tmp/linkfree-audit/linkstack
+          install -d "$QA_APP_ROOT"
+          rsync -a --exclude='.env' --exclude='*.sqlite' --exclude='*.sqlite3' --exclude='*.db' linkstack/ "$QA_APP_ROOT/"
+          install -d "$QA_APP_ROOT"/database "$QA_APP_ROOT"/storage/framework/{cache,sessions,views} "$QA_APP_ROOT"/storage/logs "$QA_APP_ROOT"/assets/favicon/icons
+          touch "$QA_APP_ROOT/database/audit.sqlite"
+          KEY=$(php -r 'echo "base64:".base64_encode(random_bytes(32));')
+          cat > "$QA_APP_ROOT/.env" <<EOF
+          APP_NAME=LinkFreeQA
+          APP_ENV=local
+          APP_DEBUG=false
+          APP_KEY=$KEY
+          APP_URL=http://127.0.0.1:18765
+          DB_CONNECTION=sqlite
+          DB_DATABASE=/tmp/linkfree-audit/linkstack/database/audit.sqlite
+          DB_FOREIGN_KEYS=true
+          SESSION_DRIVER=file
+          CACHE_DRIVER=array
+          QUEUE_CONNECTION=sync
+          LOG_CHANNEL=stderr
+          MAIL_MAILER=log
+          MAIL_FROM_ADDRESS=qa@example.test
+          ALLOW_REGISTRATION=true
+          REGISTER_AUTH=auth
+          FORCE_ROUTE_HTTPS=false
+          EOF
+          cd "$QA_APP_ROOT"
+          php artisan migrate --force --no-interaction > /tmp/linkfree-audit/migrations.log
+          QA_APP_ROOT="$QA_APP_ROOT" php "$GITHUB_WORKSPACE/scripts/qa-isolated/seed.php"
+      - name: Install isolated browser tooling
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/linkfree-qa-node
+          cd /tmp/linkfree-qa-node
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund playwright @axe-core/playwright
+          ./node_modules/.bin/playwright install --with-deps chromium > /tmp/linkfree-audit/browser-install.log 2>&1
+      - name: Start localhost-only app for browser audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/linkfree-audit/linkstack
+          php artisan serve --host=127.0.0.1 --port=18765 > /tmp/linkfree-audit/server.log 2>&1 &
+          echo $! > /tmp/linkfree-audit/server.pid
+          for i in $(seq 1 45); do
+            STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 2 http://127.0.0.1:18765/login || true)
+            if [ "$STATUS" = 200 ]; then
+              echo "Local synthetic app ready for browser"
+              exit 0
+            fi
+            sleep 1
+          done
+          tail -n 30 /tmp/linkfree-audit/server.log
+          exit 1
+      - name: Scan anonymous, member and admin pages with axe-core Chromium
+        env:
+          QA_EXPECTED_SITE: http://127.0.0.1:18765
+        run: node scripts/qa-isolated/browser_a11y.cjs
+      - name: Upload complete a11y evidence, including residual contrast findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linkfree-qa-browser-a11y-synthetic
+          path: /tmp/linkfree-audit/browser-a11y-results.json
+          if-no-files-found: warn
+          retention-days: 30
