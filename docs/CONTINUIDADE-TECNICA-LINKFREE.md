@@ -1,5 +1,7 @@
 # Continuidade técnica LinkFree-LinkTree
 
+> **H2 — ensaio integral:** candidato PR #19 passou em publicação sintética e falhas de rollback; novo backup online restaurou em isolamento, mas consistência entre recursos não é atômica e janela de manutenção está pendente. H2 parcial; H3 não iniciada. [Relatório](homologacao-correcoes/H2-ENSAIO-INTEGRAL-E-BACKUP-20261124.md).
+
 > **H2 — reteste independente:** candidato PR #19 passou no cenário P1 e em falhas injetadas, com limpeza real de caches no staging; segue sem integração/deploy. Backup seletivo e recuperação integral ainda têm lacunas. H2 parcial; H3 não iniciada. [Relatório complementar](homologacao-correcoes/H2-RETESTE-INDEPENDENTE-ROLLBACK-20261124.md).
 
 > **H2 — atualização 24/11/2026:** recuperação e staging sintético executados em ambiente fechado; rollback oficial falhou em fixture de mesmo tamanho/mtime. H2 parcial, H3 não iniciada; consultar [relatório H2](homologacao-correcoes/H2-RECUPERACAO-STAGING-20261124.md).
