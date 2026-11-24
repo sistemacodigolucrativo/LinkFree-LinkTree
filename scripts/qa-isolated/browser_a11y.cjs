@@ -91,7 +91,11 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
   catch(e) { report.profileMatrix = {status:'ERROR',error:String(e.stack||e).slice(0,2500)}; }
   fs.writeFileSync(output,JSON.stringify(report,null,2));
   console.log('PUBLIC A11Y MATRIX',JSON.stringify(report.profileMatrix));
-  if(errors.length || issues.length || report.interactions.status !== 'PASS' || report.profileMatrix.status !== 'PASS') {
+  try { report.formMatrix = await require('./panel_accessibility.cjs').run(); }
+  catch(e) { report.formMatrix = {status:'ERROR',error:String(e.stack||e).slice(0,1800)}; }
+  fs.writeFileSync(output,JSON.stringify(report,null,2));
+  console.log('PANEL A11Y MATRIX',JSON.stringify(report.formMatrix));
+  if(errors.length || issues.length || report.interactions.status !== 'PASS' || report.profileMatrix.status !== 'PASS' || report.formMatrix.status !== 'PASS') {
     process.exitCode=1;
   } else {
     console.log('PASS scoped automated accessibility matrix and interaction regression. Human/device acceptance is separate.');

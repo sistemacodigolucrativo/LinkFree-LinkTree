@@ -57,7 +57,11 @@ Index Of Script
     // On Page Load Active Function
     const checkSettingMenu = (type, name, value) => {
         const items = document.querySelectorAll('[data-setting="' + type + '"][data-name="' + name + '"]');
-        items.forEach(el => el.classList.toggle('active', el.getAttribute('data-value') === value));
+        items.forEach(el => {
+            const selected = el.getAttribute('data-value') === value;
+            el.classList.toggle('active', selected);
+            if (el.hasAttribute('aria-pressed')) el.setAttribute('aria-pressed', String(selected));
+        });
     }
 
         // Dark mode enable & disabled function

@@ -60,3 +60,6 @@ SHA de código 6d865f4d309c232d28d5bab84f031b024b54dbaa. Instaladores [SQLite 4/
 
 ## 17. STEP 03 encerrado / STEP 04 e 05 iniciados
 Evidência final: [run 45443009426](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426), HTTP 20/20, interações 6/6, dois instaladores 4/4, lint/layout/regressão verdes. Código 6d865f4d; e09e3033 contém apenas documentação. STEP 03 concluído no escopo isolado. STEP 04 protege legibilidade do perfil e amplia matriz de navegador; STEP 05 revisão em paralelo. [Relatório STEP 04/05](homologacao-correcoes/STEP-04-05-ACESSIBILIDADE-REVISAO-20261124.md). Reaproveitar evidências por SHA/escopo; retestar superfícies alteradas. Não declarar WCAG integral nem Safari/iOS real por emulação. Sem merge/deploy.
+
+### Continuidade STEP 04/05
+[Execução 45448305974](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45448305974): 12 páginas sem violações axe, HTTP 20/20, browser 6/6. Matriz ampliada falhou em três assertivas de texto uppercase PolySleek; corrigidas. Cenário imagem real, contraste numérico/hover, labels de formulários e matriz de 6 cenários complementares em preparação. [Plano revisão/deploy/rollback](homologacao-correcoes/STEP-05-PLANO-REVISAO-DEPLOY-ROLLBACK-20261124.md). Não declarar encerrado antes dos logs do novo SHA.

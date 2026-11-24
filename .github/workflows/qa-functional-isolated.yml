@@ -10,6 +10,8 @@ on:
       - 'linkstack/resources/views/**'
       - 'linkstack/assets/js/main-dashboard.js'
       - 'linkstack/assets/js/public-contrast.js'
+      - 'linkstack/assets/js/plugins/setting.js'
+      - 'linkstack/assets/css/**'
       - 'linkstack/assets/linkstack/css/**'
       - 'linkstack/themes/**'
       - 'linkstack/app/Services/ThemeOptions.php'
@@ -23,6 +25,8 @@ on:
       - 'linkstack/resources/views/**'
       - 'linkstack/assets/js/main-dashboard.js'
       - 'linkstack/assets/js/public-contrast.js'
+      - 'linkstack/assets/js/plugins/setting.js'
+      - 'linkstack/assets/css/**'
       - 'linkstack/assets/linkstack/css/**'
       - 'linkstack/themes/**'
       - 'linkstack/app/Services/ThemeOptions.php'
@@ -111,7 +115,7 @@ jobs:
 
   browser-a11y:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
