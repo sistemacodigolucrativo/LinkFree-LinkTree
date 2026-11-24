@@ -1,4 +1,7 @@
 # Continuidade técnica LinkFree-LinkTree
+
+> **Atualização operacional 24/11/2026 19:07 UTC:** deploy normal concluído na VPS, SHA `6e55da55e57203da2606a4b1ca1c83865c0f760d`; preflight e homologação read-only aprovados. Recuperação integral e aceite funcional continuam pendentes. Ver [relatório operacional](homologacao-correcoes/STEP-06-RELATORIO-OPERACIONAL-VPS-20261124.md). O texto posterior preserva o estado histórico anterior ao deploy.
+
 Atualização: 2026-11-24. Estado atual confirmado por API GitHub, sem acesso SSH à VPS.
 
 **ESTADO ATUAL — STEP 06:** PR #16 integrada à main, merge de aplicação [`1b71b747e2c2b803eaffc6c63b64b90c408e8f4e`](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/commit/1b71b747e2c2b803eaffc6c63b64b90c408e8f4e). PHP e layout pós-merge aprovados. Deploy ainda não executado; preflight, backup, autorização específica e homologação permanecem pendentes. Consultar o [registro operacional STEP 06](homologacao-correcoes/STEP-06-INTEGRACAO-PUBLICACAO-20261124.md). Os estados anteriores abaixo constituem histórico e não substituem este registro.

@@ -1,4 +1,7 @@
 # STEP 06 — integração, publicação e homologação final
+
+> **Atualização operacional 24/11/2026 19:07 UTC:** deploy normal concluído na VPS, SHA `6e55da55e57203da2606a4b1ca1c83865c0f760d`; preflight e homologação read-only aprovados. Recuperação integral e aceite funcional continuam pendentes. Ver [relatório operacional](STEP-06-RELATORIO-OPERACIONAL-VPS-20261124.md). O texto posterior preserva o estado histórico anterior ao deploy.
+
 Data: 24/11/2026. Projeto [LinkFree-LinkTree](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree).
 ## Estado vigente
 **Integração concluída. Publicação e homologação em produção pendentes.** O operador autorizou o merge e a postergação da verificação em dispositivos físicos e inspeção humana até o aceite definitivo. Não autorizou separadamente o deploy. Nenhuma operação SSH, backup real, mudança de banco, migração ou serviço foi executada nesta sessão.
