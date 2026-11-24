@@ -14,7 +14,7 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
   const issues = [], pages = [], errors = [];
   const browser = await chromium.launch({headless:true});
   async function makeContext() {
-    const ctx = await browser.newContext({viewport:{width:390,height:844}});
+    const ctx = await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce',serviceWorkers:'block'});
     await ctx.route('**/*', route => {
       try {
         const url = new URL(route.request().url());
@@ -37,6 +37,7 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
   async function scan(page, location, role) {
     const res = await page.goto(base+location,{waitUntil:'domcontentloaded',timeout:30000});
     if (!res || res.status()!==200) throw new Error('Unexpected status '+location+' '+res?.status());
+    if(location.startsWith('/@')) await page.locator('body[data-lf-contrast-ready="true"]').waitFor({timeout:10000});
     await page.waitForTimeout(500);
     const axe = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa']).analyze();
     const found=axe.violations.map(v=>({
@@ -72,7 +73,7 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
   const report={
     origin:'127.0.0.1 local isolated app, synthetic data only',
     sourceSha:process.env.GITHUB_SHA||'',
-    status:'NOT a complete WCAG or human acceptance; all recorded issues remain open',
+    status:'Automated scoped WCAG checks only; not complete WCAG or human/device acceptance',
     pages,issues,errors,
     summary:{pages:pages.length,errors:errors.length,axeRules:issues.length,
       criticalOrSerious:issues.filter(v=>['critical','serious'].includes(v.impact)).length,
@@ -86,9 +87,13 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
   fs.writeFileSync(output,JSON.stringify(report,null,2));
   console.log('BROWSER INTERACTION SUMMARY',JSON.stringify(report.interactions));
   console.log('A11Y SUMMARY',JSON.stringify(report.summary));
-  if(errors.length || priority.length || report.interactions.status !== 'PASS') {
+  try { report.profileMatrix = await require('./public_accessibility.cjs').run(); }
+  catch(e) { report.profileMatrix = {status:'ERROR',error:String(e.stack||e).slice(0,2500)}; }
+  fs.writeFileSync(output,JSON.stringify(report,null,2));
+  console.log('PUBLIC A11Y MATRIX',JSON.stringify(report.profileMatrix));
+  if(errors.length || issues.length || report.interactions.status !== 'PASS' || report.profileMatrix.status !== 'PASS') {
     process.exitCode=1;
   } else {
-    console.log('PASS targeted accessibility regressions. Contrast and other WCAG findings remain in JSON.');
+    console.log('PASS scoped automated accessibility matrix and interaction regression. Human/device acceptance is separate.');
   }
 })().catch(e=>{console.error(String(e.stack||e));process.exitCode=1;});

@@ -1,0 +1,13 @@
+# PR #16 — STEP 04 / STEP 05
+Data: 2026-11-24. Base de trabalho: e09e3033e34d7c3cf11a874508f230fd21ea54a2; base de produção não verificada por SSH. STEP 03 concluído, CI 45443009426 (20/20 HTTP, 6/6 browser, 4/4 em cada instalador).
+## Reutilização de testes
+Manter os 12 scans Chromium, 6 interações e 20 casos HTTP como baseline; a execução anterior comprovou 11/12 sem violações, perfil /@auditfree com 3 nós. Não reexecutar testes históricos PR #15 indiscriminadamente. O CI existente roda regressão ao alterar a view pública; o novo teste amplia lacunas, não substitui evidências. Instaladores não tiveram alteração nesta etapa, mas workflow atual os repete como gate de integração.
+## STEP 04 — candidato inicial
+- Hipóteses de causa: a animação fadein altera opacidade por 3s, e os botões sintéticos não possuem classe de marca conhecida; auditoria anterior fez scan após 500ms. Não considerar causa única confirmada sem reteste. Fallback neutro nos botões sem regra, opacidade de entrada legível e foco visível com dupla borda; responsividade localizada.
+- Reaproveitar a validação de pares em ThemeOptions (4.5:1) e complementar na renderização com guard de cores computadas, incluindo preferências parciais/outline, gradiente conhecido e superfície local opaca quando fundo não pode ser avaliado. Não gravar ou substituir preferências do membro. Não prometer contraste de todo tema de terceiros/HTML arbitrário, imagens ou leitor de tela sem validação específica.
+- Matriz nova: 3 motores (Chromium/Firefox/WebKit), 7 cenários por motor (default claro/escuro, PolySleek, galaxy, parcial, legível, outline), 320/390/1280px, foco por Tab, overflow e axe. WebKit Linux não equivale a Safari/iOS real. Scanner passa a reprovar qualquer violação encontrada nas 12 páginas, não apenas lista direcionada.
+- Pendente: logs, diagnóstico e ajuste de falhas, navegação por teclado nos formulários/painéis, comparação de temas reais e validação humana/dispositivos físicos. Verificar contraste e foco também em estados interativos e com imagem de fundo. Não declarar WCAG integral.
+## STEP 05 — inventário preliminar
+Comparação main 342fce9b → e09e3033: 25 commits, 43 arquivos. Grupos: workflows e testes, segurança dos controllers/rotas/middleware, UI admin/membro/publica, três relatórios. Revisar diff e compatibilidade de deploy e recuperação sem executar. Gates: resultados do SHA candidato, nenhuma falha crítica no escopo, riscos manuais documentados, plano de implantação/rollback, autorização expressa separada para merge e deploy. PR #15 e main preservadas.
+## Estado
+STEP 04 iniciado, candidato em validação; STEP 05 iniciado (inventário e reuso de evidências). Sem merge/deploy/VPS.

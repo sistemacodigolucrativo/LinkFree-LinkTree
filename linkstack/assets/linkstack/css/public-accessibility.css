@@ -1,0 +1,36 @@
+/* Public profiles only. Do not change member/admin palettes or saved preferences. */
+body.lf-public-profile,
+body.lf-public-profile .fadein,
+body.lf-public-profile .button-entrance {
+  /* Entrance opacity must not temporarily make the text unreadable. */
+  opacity: 1 !important;
+}
+body.lf-public-profile .button-entrance .button {
+  box-sizing: border-box;
+  max-width: calc(100% - 24px);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+body.lf-public-profile :is(a,button,input,select,textarea,[tabindex]):focus-visible {
+  outline: 3px solid #fff !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 5px #172033 !important;
+}
+body.lf-public-profile .button-hover:focus-visible { transform: none; }
+@media (max-width: 400px) {
+  body.lf-public-profile .button-hover:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.lf-public-profile, body.lf-public-profile * {
+    animation-duration: .001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media (forced-colors: active) {
+  body.lf-public-profile :is(a,button,input,select,textarea,[tabindex]):focus-visible {
+    outline: 3px solid Highlight !important;
+    box-shadow: none !important;
+  }
+}

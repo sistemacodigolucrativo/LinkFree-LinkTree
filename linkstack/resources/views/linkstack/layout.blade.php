@@ -3,8 +3,12 @@
 <head>
    @stack('linkstack-head')
    @stack('linkstack-head-end')
+   @isset($userinfo)
+   <link rel="stylesheet" href="{{ asset('assets/linkstack/css/public-accessibility.css') }}">
+   <script defer src="{{ asset('assets/js/public-contrast.js') }}"></script>
+   @endisset
 </head>
-<body>
+<body @isset($userinfo) class="lf-public-profile" @endisset>
    @stack('linkstack-body-start')
    <div class="container">
       <div class="row">

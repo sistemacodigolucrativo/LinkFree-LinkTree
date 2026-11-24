@@ -57,3 +57,6 @@ O candidato c82c5f56 comprovou os controles de GET/CSRF e inicialização de ban
 - MariaDB testado como serviço efêmero de CI; nenhuma conexão de produção. Contraste residual do perfil público pertence ao STEP 04. A matriz histórica PR #15 não foi reclassificada.
 
 **Estado do STEP 03:** Implementações e testes específicos concluídos; aguardar evidência dos retestes finais HTTP/browser do SHA acima para declarar encerramento integral.
+
+## Encerramento formal — STEP 03
+Candidato de código `6d865f4d309c232d28d5bab84f031b024b54dbaa`, merge sintético de CI `1ebaeebca62bca6665532aab62e62913bd3b388a`: [HTTP 20/20](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426/job/138619036042), [interações 6/6](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426/job/138619036510), SQLite/MariaDB 4/4 cada; lint, layout e regressão aprovados. Diff até e09e3033 somente dois documentos. **STEP 03 concluído no escopo técnico isolado**. Riscos operacionais anteriores mantidos; sem autorização de merge/deploy. TC-09-B segue aberto no STEP 04.

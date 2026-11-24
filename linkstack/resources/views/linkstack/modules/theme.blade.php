@@ -110,4 +110,4 @@ $customBackgroundExists = file_exists($customBackgroundPath)
 <style id="lf-user-theme-options">{!! $lfStyle !!}</style>
 @endpush
 @endif
-@include('linkstack.modules.dynamic-contrast')
+{{-- The public contrast guard handles solid, gradient and image backgrounds. --}}
