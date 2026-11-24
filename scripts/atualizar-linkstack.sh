@@ -27,7 +27,7 @@ if ! command -v rsync >/dev/null 2>&1; then
   export DEBIAN_FRONTEND=noninteractive
   apt-get update && apt-get install -y rsync
 fi
-for cmd in git rsync php flock runuser cmp mktemp cp python3 find; do
+for cmd in git rsync php flock runuser cmp mktemp cp python3 find realpath stat grep; do
   command -v "$cmd" >/dev/null || { echo "Dependencia ausente: $cmd" >&2; exit 1; }
 done
 [[ -d "$PROD" && -f "$PROD/artisan" && -f "$PROD/.env" ]] || {
@@ -379,6 +379,7 @@ for rel in "${files[@]}"; do
     if [[ -f "$source_dir/$rel" ]]; then
       mkdir -p "$backup/$label/$(dirname "$rel")"
       cp -a -- "$source_dir/$rel" "$backup/$label/$rel"
+      cmp -s -- "$source_dir/$rel" "$backup/$label/$rel" || { echo "Backup de codigo divergente: $label/$rel" >&2; exit 1; }
     else
       printf '%s\n' "$rel" >> "$backup/new-$label.txt"
     fi
@@ -387,22 +388,75 @@ done
 
 deploy_started=false
 completed=false
+# Compare contents independently of rsync quick-check (size/mtime).
+verify_published_files() {
+  local destination="$1" rel
+  for rel in "${files[@]}"; do
+    if [[ ! -f "$destination/$rel" || -L "$destination/$rel" ]] ||
+       ! cmp -s -- "$REPO/linkstack/$rel" "$destination/$rel"; then
+      echo "ERRO: publicacao divergente: $destination/$rel" >&2
+      return 1
+    fi
+  done
+}
+
 rollback() {
-  status=$?
+  local status=$? failed=0 label destination rel source target old_meta restored_meta task
   trap - EXIT
   if [[ "$deploy_started" == true && "$completed" != true ]]; then
     echo 'ERRO: restaurando arquivos anteriores de desenvolvimento e producao...' >&2
     for label in dev prod; do
       if [[ "$label" == dev ]]; then destination="$DEV"; else destination="$PROD"; fi
+      # Restaurar somente os arquivos do manifesto, nunca atributos dos diretorios
+      # privados do backup sobre os diretorios da instalacao.
+      if [[ ! -f "$backup/files.txt" || ! -f "$backup/new-$label.txt" ]]; then
+        echo "ERRO rollback: manifesto ausente ($label)" >&2
+        failed=1
+        continue
+      fi
       while IFS= read -r rel; do
         [[ -n "$rel" ]] || continue
-        rm -f -- "$destination/$rel"
-      done < "$backup/new-$label.txt"
-      if [[ -s "$backup/files.txt" ]]; then
-        rsync -a --no-owner --no-group "$backup/$label/" "$destination/" || true
+        source="$backup/$label/$rel"
+        target="$destination/$rel"
+        # Nao seguir caminhos simbolicos em diretorios nem aceitar caminhos fora da raiz.
+        if [[ "$rel" == /* || "/$rel/" == */../* || "/$rel/" == */./* ]] ||
+           [[ "$(realpath -m -- "$(dirname -- "$target")")" != "$(realpath -ms -- "$(dirname -- "$target")")" ]]; then
+          echo "ERRO rollback: caminho inseguro ($label/$rel)" >&2
+          failed=1
+          continue
+        fi
+        if grep -Fxq -- "$rel" "$backup/new-$label.txt"; then
+          if [[ -e "$source" || -L "$source" ]] ||
+             ! rm -f -- "$target" || [[ -e "$target" || -L "$target" ]]; then
+            echo "ERRO rollback: nao removido ou manifesto conflitante ($label/$rel)" >&2
+            failed=1
+          fi
+        elif [[ ! -f "$source" || -L "$source" || -L "$target" ]] ||
+             ! rsync -ac --numeric-ids -- "$source" "$target" ||
+             [[ ! -f "$target" || -L "$target" ]] ||
+             ! cmp -s -- "$source" "$target"; then
+          echo "ERRO rollback: restauracao de conteudo falhou ($label/$rel)" >&2
+          failed=1
+        elif ! old_meta="$(stat -c '%a:%u:%g:%Y' -- "$source")" ||
+             ! restored_meta="$(stat -c '%a:%u:%g:%Y' -- "$target")" ||
+             [[ "$old_meta" != "$restored_meta" ]]; then
+          echo "ERRO rollback: metadados divergentes ($label/$rel)" >&2
+          failed=1
+        fi
+      done < "$backup/files.txt"
+    done
+    for task in config:clear route:clear view:clear; do
+      if ! (cd "$PROD" && runuser -u www-data -- php artisan "$task"); then
+        echo "ERRO rollback: cache nao limpo ($task)" >&2
+        failed=1
       fi
     done
-    (cd "$PROD" && runuser -u www-data -- php artisan config:clear && runuser -u www-data -- php artisan route:clear && runuser -u www-data -- php artisan view:clear) || true
+    if (( failed )); then
+      echo "ROLLBACK INCOMPLETO: falha original=$status; recuperacao manual obrigatoria. Banco nao revertido." >&2
+      echo "Backup de recuperacao: $backup" >&2
+      exit 74
+    fi
+    echo 'ROLLBACK DE CODIGO VERIFICADO: conteudo, metadados e arquivos novos; banco nao revertido.' >&2
   fi
   if [[ "$completed" != true ]]; then echo "Backup de recuperacao: $backup"; fi
   exit "$status"
@@ -492,10 +546,12 @@ runuser -u www-data -- test -w "$PROD/storage/app/linkfree/visit-sources" || { e
 if ((${#files[@]})); then
   deploy_started=true
   # Rsync apenas dos arquivos alterados: sem --delete, sem tocar em storage, .env ou DB.
-  rsync -a --chmod=F644,D755 --chown=ubuntu:ubuntu \
+  rsync -ac --chmod=F644,D755 --chown=ubuntu:ubuntu \
     --files-from="$backup/files.txt" "$REPO/linkstack/" "$DEV/"
-  rsync -a --chmod=F644,D755 --no-owner --no-group \
+  rsync -ac --chmod=F644,D755 --no-owner --no-group \
     --files-from="$backup/files.txt" "$REPO/linkstack/" "$PROD/"
+  verify_published_files "$DEV"
+  verify_published_files "$PROD"
 fi
 
 # Nunca executar config:cache, route:cache ou optimize neste projeto.
