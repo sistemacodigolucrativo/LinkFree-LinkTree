@@ -137,6 +137,61 @@ async function run() {
         return {formsWithCsrf:true,post302:true,editorReached:true,createdExactlyOne:true};
       } finally {await context.close();}
     });
+    await check('TC-04-D','Impersonation browser start, member access and return',async()=>{
+      const {context,page}=await session('auditadmin');
+      try {
+        await page.goto(base+'/admin/users',{waitUntil:'load'});
+        const button=page.locator('form[action$="/auth-as/2"] button[type=submit]');
+        await button.waitFor({state:'visible'});
+        await Promise.all([page.waitForURL('**/dashboard',{timeout:20000}),button.click({timeout:20000})]);
+        await page.goto(base+'/studio/links',{waitUntil:'load'});
+        const bar=page.locator('.lf-impersonation-bar');
+        await bar.waitFor({state:'visible',timeout:15000});
+        assert.equal(await bar.locator('a').innerText(),'auditfree');
+        assert.equal(await page.locator('#links-table-body [data-id="104"]').count(),1);
+        assert.equal(await page.locator('#links-table-body [data-id="105"]').count(),0);
+        const returnButton=bar.locator('form[action$="/auth-as"] button[type=submit]');
+        await Promise.all([page.waitForURL('**/admin/users',{timeout:20000}),returnButton.click({timeout:20000})]);
+        assert.equal(await page.locator('.lf-impersonation-bar').count(),0);
+        await page.locator('form[action$="/admin/new-user"]').first().waitFor({state:'attached'});
+        return {memberOnly:true,returnButton:true,adminRestored:true};
+      } finally {await context.close();}
+    });
+    await check('TC-04-D','Page icon browser cancel and confirm',async()=>{
+      execFileSync('python3',['-c',"import sqlite3,sys; c=sqlite3.connect(sys.argv[1]); c.execute(\"INSERT INTO buttons(id,name) VALUES(94,'icon')\"); c.execute(\"INSERT INTO links(id,user_id,button_id,link,title) VALUES(106,2,94,'https://example.test/icon','facebook')\"); c.commit()",db]);
+      const {context,page}=await session('auditfree');
+      try {
+        await page.goto(base+'/studio/page-icons',{waitUntil:'load'});
+        const button=page.locator('button[formaction$="/deleteLink/106"]');
+        await dialogClick(page,button,false);
+        assert.equal(countLink(106),1);
+        const response=page.waitForResponse(res=>new URL(res.url()).pathname==='/deleteLink/106'&&res.request().method()==='POST',{timeout:20000});
+        await dialogClick(page,button,true);
+        const res=await response;
+        assert.equal(res.status(),302);
+        await page.goto(base+'/studio/page-icons',{waitUntil:'load'});
+        assert.equal(await button.count(),0);
+        assert.equal(countLink(106),0);
+        return {cancelPreserves:true,confirmed:true,reloadPersisted:true};
+      } finally {await context.close();}
+    });
+    await check('TC-04-D','Admin account deletion browser cancel and confirm',async()=>{
+      const {context,page}=await session('auditadmin');
+      try {
+        await page.goto(base+'/admin/users',{waitUntil:'load'});
+        const button=page.locator('button.confirmation[data-id="4"]');
+        await dialogClick(page,button,false);
+        assert.equal(scalar('SELECT COUNT(*) FROM users WHERE id=4'),1);
+        const response=page.waitForResponse(res=>new URL(res.url()).pathname==='/admin/delete-table-user/4'&&res.request().method()==='POST',{timeout:20000});
+        await dialogClick(page,button,true);
+        assert.equal((await response).status(),200);
+        await page.reload({waitUntil:'load'});
+        assert.equal(await button.count(),0);
+        assert.equal(scalar('SELECT COUNT(*) FROM users WHERE id=4'),0);
+        assert.equal(scalar('SELECT COUNT(*) FROM users WHERE id=1'),1);
+        return {cancelPreserves:true,confirmed:true,reloadPersisted:true,rootPreserved:true};
+      } finally {await context.close();}
+    });
   } finally {await browser.close();}
   return {status:results.every(x=>x.status==='PASS')?'PASS':'FAIL',sourceSha:process.env.GITHUB_SHA||'',results};
 }

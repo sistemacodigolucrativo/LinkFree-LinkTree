@@ -226,7 +226,7 @@ class AdminController extends Controller
     User::findOrFail($id);
 
     if ($status == "true") {
-      $verify = "0000-00-00 00:00:00";
+      $verify = now();
     } else {
       $verify = null;
     }
@@ -550,13 +550,7 @@ class AdminController extends Controller
   //Delete avatar
   public function delAvatar()
   {
-    $path = findFile("avatar");
-    $path = base_path("/assets/linkstack/images/" . $path);
-
-    // Delete existing image
-    if (File::exists($path)) {
-      File::delete($path);
-    }
+    $this->removeBrandMedia('avatar');
 
     return back();
   }
@@ -564,16 +558,22 @@ class AdminController extends Controller
   //Delete favicon
   public function delFavicon()
   {
-    // Delete existing image
-    $path = findFile("favicon");
-    $path = base_path("/assets/linkstack/images/" . $path);
-
-    // Delete existing image
-    if (File::exists($path)) {
-      File::delete($path);
-    }
+    $this->removeBrandMedia('favicon');
 
     return back();
+  }
+
+  // Do not remove the bundled fallback favicon.svg or files outside branding.
+  private function removeBrandMedia(string $prefix): void
+  {
+    $path = base_path('assets/linkstack/images');
+    $pattern = '/^' . preg_quote($prefix, '/') . '(_\w+)?\.\w+$/iD';
+    foreach (new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS) as $file) {
+      if (!$file->isLink() && $file->isFile() &&
+          $file->getFilename() !== 'favicon.svg' && preg_match($pattern, $file->getFilename())) {
+        abort_unless(File::delete($file->getPathname()), 500, 'Brand media removal failed');
+      }
+    }
   }
 
   //View footer page: terms

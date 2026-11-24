@@ -23,6 +23,9 @@ class admin
             return $next($request);
       }   
 
+            if ($request->expectsJson()) {
+                abort(403);
+            }
             return redirect(url('dashboard'));
     }
 }

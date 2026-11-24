@@ -17,9 +17,12 @@ Data: 2026-11-24. Base anterior: 0bfb563ac91f524dddb17dd37306870f662d21e4. Escop
 | 05 | exclusão própria/Admin/AJAX, root protegido, FK, isolamento | preparado, CI pendente |
 | 06 | impersonação start/return, sessão independente, CSRF, bloqueio de escalada | preparado, CI pendente |
 | 07 | bloqueio/desbloqueio, plano, e-mail, acesso negado | preparado, CI pendente |
-| 08 | avatar, fundo, cache ícone; arquivos sintéticos e dono | preparado, CI pendente; marca/site e ícone de página ainda precisam reteste específico |
+| 08 | avatar, fundo, cache ícone, ícone de página, avatar/favicon admin | preparado, CI pendente; browser ícone e HTTP marca, preservando favicon.svg |
 | 09 | GETs mutáveis e exceções intencionais | revisão estática parcial; instalador e outros controllers ainda a revisar |
 | 10 | login/logout, acesso visitante/admin, persistência entre sessões | preparado, CI pendente |
 | 11 | regressão e reteste no SHA novo | CI pendente |
 ## Reprodução e segurança
 Workflow qa-functional-isolated.yml, runner GitHub, SQLite descartável e localhost; scripts/qa-isolated/http_acceptance.py e browser_interactions.cjs. Logs/JSON a verificar no novo SHA. Os casos originais da PR #15 não mudam de classificação. Acessibilidade residual TC-09-B permanece no STEP 04. Não declarar STEP 03 concluído enquanto testes ou lacunas restantes não forem comprovados.
+
+## Segunda revisão
+O primeiro candidato 61b10090d4016a5c2911b86305d62950c15c28c0 apresentou erro sintático no UserController (bloco residual duplicado); corrigido antes de novo candidato. Adicionados retestes de marca/ícone de página, impersonação e exclusão administrativa no navegador. Verificação de e-mail agora grava timestamp válido. Negação de admin com Accept JSON usa 403; redirects HTML continuam. Nenhum resultado de runtime novo aprovado até logs do candidato final.

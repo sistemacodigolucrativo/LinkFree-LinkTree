@@ -330,6 +330,46 @@ def media_isolation():
 
 check('TC-04-D','Member media and icon deletion isolation',media_isolation)
 
+def page_icon_and_brand():
+    import base64
+    png=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jT1sAAAAASUVORK5CYII=')
+    with sqlite3.connect(DB) as con:
+        con.execute("INSERT INTO buttons(id,name) VALUES(94,'icon')")
+        con.executemany("INSERT INTO links(id,user_id,button_id,link,title) VALUES(?,?,94,'https://example.test/icon','facebook')", [(106,2),(107,3)])
+    tok=member.token('/studio/page-icons')
+    status,_,html=member.request('GET','/studio/page-icons')
+    expect(status==200 and '/deleteLink/106' in html and '/deleteLink/107' not in html,'Icon UI/ownership invalid')
+    status,_,_=member.request('POST','/deleteLink/107',{'_method':'DELETE','_token':tok})
+    expect(status==403 and value('SELECT COUNT(*) FROM links WHERE id=107')==1,'Foreign page icon deleted')
+    status,headers,_=member.request('POST','/deleteLink/106',{'_method':'DELETE'})
+    expect(reject_csrf(status,headers) and value('SELECT COUNT(*) FROM links WHERE id=106')==1,'CSRF page icon removal')
+    status,headers,_=member.request('POST','/deleteLink/106',{'_method':'DELETE','_token':tok})
+    expect(status==302 and '/studio/page-icons' in headers.get('Location','') and value('SELECT COUNT(*) FROM links WHERE id=106')==0,'Page icon deletion/redirect failed')
+    expect(value('SELECT COUNT(*) FROM links WHERE id=107')==1,'Foreign page icon changed')
+    directory=ROOT/'assets/linkstack/images'
+    expect(directory.resolve().is_relative_to(ROOT),'Non-isolated brand directory')
+    fallback=directory/'favicon.svg'
+    baseline=fallback.read_bytes()
+    mt=member.token('/studio/links')
+    at=admin.token('/admin/users')
+    for name,url in [('avatar_qa.png','/admin/site/delavatar'),('favicon_qa.png','/admin/site/delfavicon')]:
+        f=directory/name
+        expect(not f.exists(),'Brand fixture already exists')
+        f.write_bytes(png)
+        status,_,_=admin.request('GET',url)
+        expect(status==405 and f.is_file(),'GET removed brand')
+        status,headers,_=admin.request('POST',url,{})
+        expect(reject_csrf(status,headers) and f.is_file(),'Missing CSRF removed brand')
+        status,headers,_=member.request('POST',url,{'_token':mt})
+        assert_denied(status,headers)
+        expect(f.is_file(),'Member removed brand')
+        status,_,_=admin.request('POST',url,{'_token':at})
+        expect(status in (200,302) and not f.exists(),'Admin brand deletion failed')
+        expect(fallback.read_bytes()==baseline,'Bundled favicon removed')
+    return 'page icon native DELETE override, ownership/CSRF; brand admin only and fallback preserved'
+
+check('TC-04-D','Page icon and site branding removal',page_icon_and_brand)
+
 def account_deletion():
     # Synthetic social account proves FK cascades are not bypassed.
     with sqlite3.connect(DB) as con:
