@@ -43,7 +43,7 @@ jobs:
           set -euo pipefail
           export QA_APP_ROOT=/tmp/linkfree-audit/linkstack
           install -d /tmp/linkfree-audit "$QA_APP_ROOT"
-          rsync -a --exclude='.env' --exclude='*.sqlite' --exclude='*.sqlite3' --exclude='*.db' linkstack/ "$QA_APP_ROOT/"
+          rsync -a --exclude='.env' --exclude='*.sqlite' --exclude='*.sqlite3' --exclude='*.db' --exclude=INSTALLING --exclude=INSTALLERLOCK linkstack/ "$QA_APP_ROOT/"
           install -d "$QA_APP_ROOT"/database "$QA_APP_ROOT"/storage/framework/{cache,sessions,views} "$QA_APP_ROOT"/storage/logs "$QA_APP_ROOT"/assets/favicon/icons
           touch "$QA_APP_ROOT/database/audit.sqlite"
           KEY=$(php -r 'echo "base64:".base64_encode(random_bytes(32));')
@@ -120,7 +120,7 @@ jobs:
           set -euo pipefail
           QA_APP_ROOT=/tmp/linkfree-audit/linkstack
           install -d "$QA_APP_ROOT"
-          rsync -a --exclude='.env' --exclude='*.sqlite' --exclude='*.sqlite3' --exclude='*.db' linkstack/ "$QA_APP_ROOT/"
+          rsync -a --exclude='.env' --exclude='*.sqlite' --exclude='*.sqlite3' --exclude='*.db' --exclude=INSTALLING --exclude=INSTALLERLOCK linkstack/ "$QA_APP_ROOT/"
           install -d "$QA_APP_ROOT"/database "$QA_APP_ROOT"/storage/framework/{cache,sessions,views} "$QA_APP_ROOT"/storage/logs "$QA_APP_ROOT"/assets/favicon/icons
           touch "$QA_APP_ROOT/database/audit.sqlite"
           KEY=$(php -r 'echo "base64:".base64_encode(random_bytes(32));')
