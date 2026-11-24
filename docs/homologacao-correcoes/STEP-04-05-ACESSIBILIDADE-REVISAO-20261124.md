@@ -17,3 +17,6 @@ STEP 04 iniciado, candidato em validação; STEP 05 iniciado (inventário e reus
 
 ## Complemento de formulários e STEP 05
 Adicionada matriz de seis cenários Chromium em perfil/tema Membro e editor Admin, claro 1280px/escuro 390px, axe, largura e Tab; teste do seletor de esquema com teclado e aria-pressed sincronizado pelo setting.js existente. Sem alterar valores de negócio dos formulários. [Plano de revisão e liberação](STEP-05-PLANO-REVISAO-DEPLOY-ROLLBACK-20261124.md). Candidato ainda requer CI completo; não repetir testes históricos indiscriminadamente.
+
+## Segunda execução — 72fcc555
+[Browser 45450019655](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45450019655/job/138644199922) e push correspondente: 12/12 scans sem violações, seis interações aprovadas, matriz 22/24. Os três cenários PolySleek passaram. Firefox/WebKit com imagem falharam somente por ausência do marcador interno após o contraste numérico ter passado; não considerar aprovação final até reteste. Novo candidato restaura explicitamente os longhands que o guard modificou, evita transição de cores durante recálculo, testa a superfície opaca real e decodificação do PNG, e troca claro/escuro no mesmo DOM para detectar ajustes obsoletos. Não remove assertiva de contraste 4.5:1.

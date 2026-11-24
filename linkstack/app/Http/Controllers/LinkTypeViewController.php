@@ -7,6 +7,7 @@ use App\Models\Link;
 use App\Models\Button;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
+use Symfony\Component\HttpFoundation\Response;
 
 class LinkTypeViewController extends Controller
 {
@@ -59,6 +60,8 @@ class LinkTypeViewController extends Controller
     public function blockAsset(Request $request, $type)
     {
         $asset = $request->query('asset');
+        abort_unless(is_string($asset) && $asset !== '' && !str_contains($asset, "\0"), 400);
+        abort_unless(preg_match('/^[A-Za-z0-9_-]+$/D', $type), 403);
     
         // Prevent directory traversal in $type
         if (preg_match('/\.\.|\/|\\\\/', $type)) {

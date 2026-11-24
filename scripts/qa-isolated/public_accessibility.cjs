@@ -77,7 +77,7 @@ async function run(){
               return locator.evaluate(el=>{
                 function rgb(v){const x=v.match(/[\d.]+/g)?.map(Number);return x&&x.length>=3?[x[0],x[1],x[2],x[3]??1]:null}
                 function luminance(v){return v.slice(0,3).map(x=>{x/=255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4}).reduce((a,x,i)=>a+x*[.2126,.7152,.0722][i],0)}
-                const fg=rgb(getComputedStyle(el).color);let samples=[];
+                const fg=rgb(getComputedStyle(el).color);let samples=[],surface='canvas';
                 for(let n=el;n;n=n.parentElement){
                   const st=getComputedStyle(n);
                   if(Number(st.opacity)<.999)throw Error('Text or ancestor has reduced opacity');
@@ -86,32 +86,53 @@ async function run(){
                     if(st.backgroundImage.includes('url('))throw Error('Image behind unprotected text');
                     const stops=(st.backgroundImage.match(/rgba?\([\d.,\s]+\)/g)||[]).map(rgb);
                     if(stops.length<2||stops.some(x=>!x||x[3]!==1))throw Error('Unresolved background gradient');
+                    surface=n.tagName+':gradient';
                     for(let i=1;i<stops.length;i++)for(let j=0;j<=20;j++)samples.push(stops[i-1].map((v,k)=>v+(stops[i][k]-v)*j/20));
                   }else{
                     const bg=rgb(st.backgroundColor);
-                    if(bg&&bg[3]===1)samples=[bg];
+                    if(bg&&bg[3]===1){samples=[bg];surface=n.tagName+':opaque';}
                     else if(bg&&bg[3]!==0)throw Error('Unresolved translucent surface');
                   }
                 }
                 if(!samples.length)samples=[[255,255,255,1]];
                 if(!fg||fg[3]!==1)throw Error('Unresolved foreground');
                 const a=luminance(fg);
-                return {min:Math.min(...samples.map(b=>{const z=luminance(b);return (Math.max(a,z)+.05)/(Math.min(a,z)+.05)})),foreground:getComputedStyle(el).color,adjusted:el.dataset.lfContrastAdjusted==='true'};
+                return {min:Math.min(...samples.map(b=>{const z=luminance(b);return (Math.max(a,z)+.05)/(Math.min(a,z)+.05)})),foreground:getComputedStyle(el).color,surface,adjusted:el.dataset.lfContrastAdjusted==='true'};
               });
             }
             const titleContrast=await sample(title),buttonContrast=await sample(button);
             assert(titleContrast.min>=4.5&&buttonContrast.min>=4.5,JSON.stringify({titleContrast,buttonContrast}));
             if(name==='custom-image'){
               assert((await page.locator('body').evaluate(e=>getComputedStyle(e).backgroundImage)).includes('2_step04qa.png'),'Image fixture not rendered');
-              assert(titleContrast.adjusted,'Unknown background image did not receive local protection');
+              // Test the visual result, not an implementation marker. The sample
+              // fails on any unresolved image and must find an opaque local surface.
+              assert(titleContrast.surface.endsWith(':opaque')&&!titleContrast.surface.startsWith('BODY:'),'Image has no opaque local protection '+JSON.stringify(titleContrast));
+              const imageOK=await page.evaluate(async()=>{
+                const url=getComputedStyle(document.body).backgroundImage.match(/url\(["']?(.*?)["']?\)/)?.[1];
+                if(!url)return false;
+                const image=new Image();image.src=url;
+                try{await image.decode();return image.naturalWidth===16&&image.naturalHeight===16;}catch(_){return false}
+              });
+              assert(imageOK,'Background fixture PNG did not decode');
             }
             await button.hover();
             await page.waitForTimeout(350);
             const hoverContrast=await sample(button);
             assert(hoverContrast.min>=4.5,'Hovered button contrast '+hoverContrast.min);
+            let switched=null;
+            if(name==='custom-partial'){
+              // Same DOM and stored preference; prove adjustments are not stale.
+              await page.emulateMedia({colorScheme:'dark'});
+              await page.waitForFunction(()=>getComputedStyle(document.querySelector('h1')).color==='rgb(255, 255, 255)',null,{timeout:8000});
+              switched=await sample(title);
+              assert(switched.min>=4.5,'Dark scheme switch lost text contrast');
+              await page.emulateMedia({colorScheme:'light'});
+              await page.waitForFunction(()=>getComputedStyle(document.querySelector('h1')).color==='rgb(0, 0, 0)',null,{timeout:8000});
+              assert((await sample(title)).min>=4.5,'Light scheme switch lost text contrast');
+            }
             const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa']).analyze();
             const violations=axe.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,reason:n.failureSummary})).slice(0,5)}));
-            results.push({engine,name,width,scheme,status:violations.length?'FAIL':'PASS',violations,contrast:{title:titleContrast,button:buttonContrast,hover:hoverContrast},incomplete:axe.incomplete.map(v=>v.id)});
+            results.push({engine,name,width,scheme,status:violations.length?'FAIL':'PASS',violations,contrast:{title:titleContrast,button:buttonContrast,hover:hoverContrast,switched},incomplete:axe.incomplete.map(v=>v.id)});
           }catch(e){results.push({engine,name,status:'FAIL',error:String(e.message).slice(0,500)});}
           finally{await ctx.close();}
         }

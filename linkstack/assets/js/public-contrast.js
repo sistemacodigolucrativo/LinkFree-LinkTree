@@ -60,14 +60,14 @@
   function saveSet(el,property,value,entry) {
     const old=[el.style.getPropertyValue(property),el.style.getPropertyPriority(property)];
     el.style.setProperty(property,value,'important');
-    entry[property]=[...old,el.style.getPropertyValue(property)];
+    entry[property]=old;
   }
   function reset(el) {
     const old=tracked.get(el);
-    if(old) for(const [key,[value,priority,ours]] of Object.entries(old)) {
-      if(el.style.getPropertyValue(key)===ours && el.style.getPropertyPriority(key)==='important') {
-        if(value) el.style.setProperty(key,value,priority);else el.style.removeProperty(key);
-      }
+    // Restore the original values of the exact properties this guard owns.
+    // CSSOM serialization of longhands/important differs by engine.
+    if(old) for(const [key,[value,priority]] of Object.entries(old)) {
+      if(value) el.style.setProperty(key,value,priority);else el.style.removeProperty(key);
     }
     tracked.delete(el);
     el.removeAttribute('data-lf-contrast-adjusted');
@@ -75,7 +75,10 @@
   function protect() {
     const elements=[...root.querySelectorAll(selector)];
     elements.forEach(reset);
-    if(forced.matches) return;
+    if(forced.matches) {
+      root.setAttribute('data-lf-contrast-ready','true');
+      return;
+    }
     for(const el of elements) {
       if(!el.getClientRects().length||getComputedStyle(el).visibility!=='visible') continue;
       const style=getComputedStyle(el), fg=rgba(style.color), bgs=backgrounds(el);
@@ -104,9 +107,14 @@
     requestAnimationFrame(()=>{queued=false;protect();});
   }
   // Re-evaluate only on visual state changes, never poll or mutate stored data.
-  for(const name of ['focusin','focusout','pointerover','pointerout']) root.addEventListener(name,schedule,{passive:true});
+  for(const name of ['focusin','focusout','pointerover','pointerout']) root.addEventListener(name,e=>{
+    if(e.target instanceof Element && e.target.closest(selector))schedule();
+  },{passive:true});
   addEventListener('resize',schedule,{passive:true});
   addEventListener('load',schedule,{once:true});
-  for(const q of [matchMedia('(prefers-color-scheme: dark)'),forced]) q.addEventListener('change',schedule);
+  for(const q of [matchMedia('(prefers-color-scheme: dark)'),forced]) {
+    if(q.addEventListener)q.addEventListener('change',schedule);
+    else if(q.addListener)q.addListener(schedule);
+  }
   protect();
 })();

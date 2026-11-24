@@ -35,4 +35,8 @@ body.lf-public-profile .button-hover:focus-visible { transform: none; }
   }
 }
 
-body.lf-public-profile [data-lf-contrast-adjusted] { transition-property: transform, box-shadow !important; }
+/* Prevent transitions from interpolating text/background through unreadable
+   colors during a guard refresh. Keep the theme's motion and shadow effects. */
+body.lf-public-profile :is(h1,.description-parent p,.description-parent a,.button-entrance .button,.dynamic-contrast,.footer a,.social-icon,.sharebutton) {
+  transition-property: transform, box-shadow !important;
+}

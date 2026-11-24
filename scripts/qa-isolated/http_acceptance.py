@@ -379,7 +379,26 @@ def block_editor_isolation():
     expect(member.request('GET','/studio/linkparamform_part/predefined/0')[0]==200,'New block form denied')
     expect(member.request('GET','/studio/linkparamform_part/predefined/999999999')[0]==404,'Missing block not rejected')
     expect(member.request('GET','/studio/linkparamform_part/unknown-type/0')[0]==404,'Unknown block type not rejected')
-    return 'own/new forms work; foreign, missing and unknown blocks denied'
+    # Same isolated fixture, public block asset route; no external files or secrets.
+    asset=ROOT/'blocks/text/step04qa.css'
+    outside=ROOT/'blocks/step04qa.css'
+    expect(not asset.exists() and not outside.exists(),'Fixture path already exists')
+    asset.write_text('/* qa block fixture */')
+    outside.write_text('/* qa outside fixture */')
+    try:
+        status,headers,body=anonymous.request('GET','/block-asset/text?asset=step04qa.css')
+        expect(status==200 and 'qa block fixture' in body and 'text/css' in headers.get('Content-Type',''),'Valid block CSS inaccessible')
+        for url,expected in (
+            ('/block-asset/text?asset=handler.php',403),
+            ('/block-asset/text?asset=missing-step04qa.css',404),
+            ('/block-asset/text?asset=../step04qa.css',404),
+            ('/block-asset/text?asset%5B%5D=step04qa.css',400),
+            ('/block-asset/text',400)):
+            status,_,body=anonymous.request('GET',url)
+            expect(status==expected and 'qa outside fixture' not in body,'Block asset status/isolation failed: '+url+' '+str(status))
+    finally:
+        asset.unlink();outside.unlink()
+    return 'own/new forms work; foreign, missing and unknown blocks denied; static asset type/path/shape guarded'
 
 check('TC-04-D','Block editor owner authorization and valid type',block_editor_isolation)
 
