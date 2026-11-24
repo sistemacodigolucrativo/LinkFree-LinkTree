@@ -2,6 +2,9 @@
 
 43 casos: 4 aprovados, 2 reprovados, 34 parciais, 2 bloqueados e 1 não automatizável.
 
+**Revisão independente (24/11):** [Matriz de rastreabilidade dos 43 testes](MATRIZ-RASTREABILIDADE-43-TESTES.md) documenta arquivos de evidência, verificações vinculadas por ID e lacunas concretas, sem reclassificar resultados. [PR #16](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/16) contém correções propostas em branch separada, sem deploy. Os checks de consistência documental verificam a integridade do relatório, não a homologação funcional.
+
+
 Estado: parcial, sem aceite final. Checkout VPS limpo em 3f20bf95e75fb93cb6abfef3aaa388c9798b664d; documentação remota em 342fce9b15cdc7a55e9bcc6f8a00278dc712d73d. /srv/linkfree não é Git; registro de deploy aponta o primeiro SHA e 540 arquivos comparados de aplicação coincidem. Produção: SQLite somente leitura íntegro, zero violações FK, backup restaurado em diretório privado temporário e conferido, storage copiado com hashes coincidentes. Nenhuma escrita na aplicação ou banco de produção. HEAD em arquivos privados foi precedido de inspeção da regra nginx e retornou 403.
 
 Ambiente isolado em /tmp com schema sem dados reais, PHP 8.3, Laravel 9 e rede externa bloqueada. Testes de consentimento, rollback, cadastro social simulado, indicações, selo, denúncias, importação, acesso, navegador e acessibilidade: ver [evidências](evidencias/) e [matriz](MATRIZ-RESULTADOS-43-TESTES.md). Chromium e Firefox abriram telas e testaram fluxos; WebKit não iniciou por bibliotecas ausentes. OAuth simulado não comprova provedor real. Duas verificações adicionais de persistência falharam por preparação do ambiente e não foram atribuídas ao produto.
