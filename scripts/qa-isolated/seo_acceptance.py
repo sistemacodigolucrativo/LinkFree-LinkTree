@@ -103,7 +103,7 @@ def locs(root):
 mode=os.getenv('SEO_TEST_MODE','default')
 if mode == 'global-noindex':
     m,_=page('/@auditfree')
-    assert 'noindex' in m.one('robots') or 'none' in m.one('robots')
+    assert 'noindex' in m.one('robots') or 'none' in m.one('robots'), m.one('robots')
     assert not locs(xml('/sitemap.xml')) and not locs(xml('/sitemap-profiles/1.xml'))
     print('PASS global robots noindex/none excludes sitemap')
 elif mode == 'home-profile':
