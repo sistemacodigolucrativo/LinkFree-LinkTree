@@ -1,5 +1,7 @@
 # Continuidade técnica LinkFree-LinkTree
 
+> **SEO — tipografia:** PR #29 integrada após cinco checks aprovados, merge d7059b62f72c90077cee12eadf7a14b24a4296c5. Nome em uma linha com fonte adaptativa, emojis omitidos somente no JPEG, metadados preservados. Sem novo deploy. [Registro](homologacao-correcoes/SEO-CARD-TIPOGRAFIA-20261124.md). H3-C pausada.
+
 > **SEO publicado:** deploy controlado no SHA `a90dbb80efccacd629b1687e2a41c43c0515c219`; staging, backup e homologação pós-deploy aprovados no escopo descrito no [relatório](homologacao-correcoes/SEO-DEPLOY-CONTROLADO-20261124.md). H3-C permanece pausada.
 
 > **SEO — PR #27 integrada:** recuperação horizontal e SEO avançado aprovados em CI, merge 0a9ebeabf0656ece8a1155b25661a36c401fb9c5. Sem deploy. [Registro e gate pré-deploy](homologacao-correcoes/SEO-RECUPERACAO-20261124.md). H3-C permanece pausada.
