@@ -10,8 +10,8 @@ Aprovado pelo operador em 24/11/2026. Fonte de continuidade para ChatGPT, Codex 
 | Fase | Responsável | Entrega / gate | Estado |
 |---|---|---|---|
 | H1 | ChatGPT | Triagem dos 43 IDs com provas, responsabilidades e lacunas | Concluída documentalmente; [matriz de continuidade](MATRIZ-CONTINUIDADE-43-CASOS-20261124.md) |
-| H2 | Codex | Boot de aplicação restaurada, recuperação verificável e ambiente de teste sintético segregado | CONDICIONAL: backup quiescente e restauração comprovados; PR #19 integrada, validação operacional do dispatcher pendente; [registro da integração](H2-INTEGRACAO-ROLLBACK-20261124.md); [backup e recuperação](H2-BACKUP-QUIESCENTE-RESTAURACAO-20261124.md), [ensaio integral candidato](H2-ENSAIO-INTEGRAL-E-BACKUP-20261124.md) |
-| H3 | Codex + ChatGPT | Testes residuais da matriz; primeiro fixtures TC-03-B/08-D | Pendente H2 |
+| H2 | Codex | Boot de aplicação restaurada, recuperação verificável e ambiente de teste sintético segregado | CONCLUÍDA no escopo de recuperação local e staging; dispatcher validado. [Verificação final](H2-VERIFICACAO-OPERACIONAL-FINAL-20261124.md); [integração](H2-INTEGRACAO-ROLLBACK-20261124.md); [backup e recuperação](H2-BACKUP-QUIESCENTE-RESTAURACAO-20261124.md) |
+| H3 | Codex + ChatGPT | Testes residuais da matriz; primeiro fixtures TC-03-B/08-D | Pendente revisão do relatório final H2 pelo ChatGPT; não iniciada |
 | H4 | ChatGPT | Auditar resultados, PRs de defeitos confirmados e retestes de impacto | Pendente |
 | H5 | Operador + ChatGPT | Testes físicos, integrações que exijam intervenção e decisões | Pendente |
 | H6 | Todos | Avaliar necessidade de nova publicação; autorizar separadamente se houver correção | Condicional |

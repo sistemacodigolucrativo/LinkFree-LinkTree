@@ -1,0 +1,16 @@
+{
+  "main_verificada":"521d8cc6b17e5b5e2f88aa9ea8b0655066408a2d",
+  "merge_pr19":"b0309e1cb267169f599aafa00f92066fb8d79a39",
+  "script_sha256":"7c5be89b0c3a0d0ac831585efdcda343dc9e8392da73e4e0c34c0aff243a0012",
+  "dispatcher_igual_bootstrap":true,
+  "dispatcher_busca_origin_main_por_execucao":true,
+  "script_extraido_sintaxe_ok":true,
+  "merge_ancestral_do_alvo":true,
+  "clone_limpo":true,
+  "producao_sha":"6e55da55e57203da2606a4b1ca1c83865c0f760d",
+  "diff_linkstack_vazio":true,
+  "backup_privado_presente_modo":"0700 root:root",
+  "ci_pos_merge":{"workflows":3,"jobs":4,"success":4},
+  "staging":{"uid":61050,"diretorio_modo":"0700","sqlite_quick_check":"ok","fk":0,"contas":4,"emails_sinteticos":true,"chave_distinta":true,"rede_namespace_distinto":true,"montagem_namespace_distinto":true,"host_acesso_loopback":false,"rotas_ipv4_externas":0,"egress_bloqueado":true,"http_login_interno":200,"processo_parado":true},
+  "h3_iniciada":false
+}
