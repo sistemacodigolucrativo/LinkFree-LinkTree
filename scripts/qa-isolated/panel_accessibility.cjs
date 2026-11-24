@@ -47,6 +47,9 @@ async function run(){
       }else{
         await nextTab(page,page.locator('#field-name'),page.locator('#field-email'));
       }
+      // Audit the painted, settled state after keyboard navigation; reduced motion
+      // is requested and the scoped CSS removes contrast interpolation.
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
       const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa']).analyze();
       const violations=axe.violations.map(v=>({id:v.id,nodes:v.nodes.slice(0,4).map(n=>({target:n.target,reason:n.failureSummary}))}));
       const overflow=await page.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth}));
@@ -58,18 +61,26 @@ async function run(){
         await page.keyboard.press('Enter');
         const panel=page.locator('#offcanvasExample');
         await panel.waitFor({state:'visible'});
+        // Bootstrap activates its focus trap only once the opening transition ends.
+        await page.waitForFunction(()=>{const el=document.querySelector('#offcanvasExample');return el.classList.contains('show')&&!el.classList.contains('showing')&&!el.classList.contains('hiding');},null,{timeout:10000});
+        await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
         const light=panel.locator('button[data-setting="color-mode"][data-value="light"]');
         const dark=panel.locator('button[data-setting="color-mode"][data-value="dark"]');
         assert.equal(await light.getAttribute('aria-pressed'),String(scheme==='light'));
         await dark.focus();
-        await page.keyboard.press('Space');
-        await page.waitForFunction(()=>document.body.classList.contains('dark'));
+        assert(await dark.evaluate(el=>document.activeElement===el),'Dark scheme button could not receive keyboard focus');
+        await dark.press('Space');
+        try{
+          await page.waitForFunction(()=>document.body.classList.contains('dark')&&localStorage.getItem('color-mode')==='dark',null,{timeout:8000});
+        }catch(e){throw Error('Space failed to select dark scheme: '+JSON.stringify(await page.evaluate(()=>({body:document.body.className,mode:localStorage.getItem('color-mode'),active:document.activeElement?.outerHTML.slice(0,220)}))));}
         assert.equal(await dark.getAttribute('aria-pressed'),'true');
         assert.equal(await light.getAttribute('aria-pressed'),'false');
         await page.keyboard.press('Tab');
         assert(await light.evaluate(e=>document.activeElement===e),'Color mode keyboard order is broken');
-        await page.keyboard.press('Enter');
-        await page.waitForFunction(()=>document.body.classList.contains('light'));
+        await light.press('Enter');
+        try{
+          await page.waitForFunction(()=>document.body.classList.contains('light')&&!document.body.classList.contains('dark')&&localStorage.getItem('color-mode')==='light',null,{timeout:8000});
+        }catch(e){throw Error('Enter failed to select light scheme: '+JSON.stringify(await page.evaluate(()=>({body:document.body.className,mode:localStorage.getItem('color-mode'),active:document.activeElement?.outerHTML.slice(0,220)}))));}
         assert.equal(await light.getAttribute('aria-pressed'),'true');
         toggle={keyboard:true,pressedState:true};
         await panel.locator('button[data-bs-dismiss=offcanvas]').click();
