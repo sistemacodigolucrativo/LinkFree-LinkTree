@@ -1,5 +1,7 @@
 # Continuidade técnica LinkFree-LinkTree
 
+> **H2 — atualização 24/11/2026:** recuperação e staging sintético executados em ambiente fechado; rollback oficial falhou em fixture de mesmo tamanho/mtime. H2 parcial, H3 não iniciada; consultar [relatório H2](homologacao-correcoes/H2-RECUPERACAO-STAGING-20261124.md).
+
 > **Atualização operacional 24/11/2026 19:07 UTC:** deploy normal concluído na VPS, SHA `6e55da55e57203da2606a4b1ca1c83865c0f760d`; preflight e homologação read-only aprovados. Recuperação integral e aceite funcional continuam pendentes. Ver [relatório operacional](homologacao-correcoes/STEP-06-RELATORIO-OPERACIONAL-VPS-20261124.md). O texto posterior preserva o estado histórico anterior ao deploy.
 
 Atualização: 2026-11-24. Estado atual confirmado por API GitHub, sem acesso SSH à VPS.

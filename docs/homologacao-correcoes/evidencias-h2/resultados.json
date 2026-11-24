@@ -1,0 +1,13 @@
+{
+  "data_utc": "2026-11-24T19:48:33Z",
+  "codigo_recuperacao": "3f20bf95e75fb93cb6abfef3aaa388c9798b664d",
+  "codigo_staging": "6e55da55e57203da2606a4b1ca1c83865c0f760d",
+  "backup_manifesto": {"arquivos":130,"divergencias":0,"codigo_sobreposto_divergente_git":0,"vendor_comparado_producao":7465,"vendor_ausente":0,"vendor_divergente":0},
+  "isolamento": {"rede_namespace":true,"ipv4_somente_loopback":true,"rota_externa":false,"conexao_externa_bloqueada":true,"montagens_producao_backups_homeubuntu_run_ocultadas":true,"uid":61050,"servidor": "127.0.0.1:18771"},
+  "recuperacao": {"home":200,"login":200,"registro":200,"inexistente":404,"copia_real_removida":true,"configuracao_original_substituida_por_configuracao_isolada":true},
+  "staging_sintetico": {"migracoes_banco_vazio":true,"usuarios_sinteticos":4,"email_apenas_example_test":true,"login_http":200,"integrity_check":"ok","foreign_key_violations":0,"servidor_parado":true},
+  "rollback_oficial_fixture": {"exit_injetado":42,"arquivos_novos_removidos":true,"codigo_antigo_restaurado":false,"tamanho_e_mtime_iguais":true,"conteudo_diferente":true,"escrita_sintetica_preservada":true,"quick_check":"ok"},
+  "recuperacao_fixture_checksum": {"codigo_restaurado":true,"escrita_sintetica_preservada":true},
+  "tc_02_c_log_bruto_m13":"nao_encontrado_nos_locais_consultados",
+  "notas":"O rollback testou o fragmento oficial com runuser substituído por shim; não executou o script integral. Contagem de vendor é comparação apenas de leitura com instalação atual, não prova de backup histórico integral."
+}
