@@ -44,3 +44,16 @@ No candidato 14ededab, teste MySQL identificou CSRF de instalação respondendo 
 
 ### Reteste do ciclo de instalação
 O candidato c82c5f56 comprovou os controles de GET/CSRF e inicialização de banco nos dois motores; SQLite também comprovou criação e isolamento do administrador. A ferramenta `artisan serve` reinicia o servidor quando `.env` muda (ServeCommand verifica mtime), provocando desconexão no teste durante configuração/finalização. A fixture virgem passa a invocar o roteador PHP do repositório diretamente, sem watcher, para ler a configuração atual a cada requisição, sem alterar a proteção nem repetir POSTs.
+
+## Evidências da rodada final (SHA de código 6d865f4d309c232d28d5bab84f031b024b54dbaa)
+- [SQLite](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426/job/138619036468): 4/4, incluindo ciclo completo e login após conclusão.
+- [MariaDB](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426/job/138619035775): 4/4, incluindo rejeição de schema ocupado e credenciais inválidas sem alteração de estado.
+- [HTTP 20/20](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45442661964/job/138617767751) no candidato 9d6b1155; inclui hierarquia Admin e mídias.
+- [Execução final](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426): browser-a11y=in_progress; installer-isolated (sqlite)=success; regression=success; http-behavior=in_progress; php-lint=success; studio-layout=success; installer-isolated (mysql)=success.
+
+### Decisões operacionais e limites
+- Manutenção web legada desativada por decisão de segurança; consulta e download administrativo dos backups existentes preservados. Atualização e backup efetivos seguem procedimento VPS controlado, com autorização, sem execução nesta etapa.
+- Antes de uma instalação nova, restringir ingresso ao operador via firewall/rede; o primeiro cadastro do instalador não autentica um operador preexistente. Não reativar INSTALLING/INSTALLERLOCK em instalação existente. Se a sessão de setup for perdida ou houver falha parcial, suspender acesso ao instalador e revisar o estado com backup em ambiente controlado; não apagar banco ou marcadores às cegas.
+- MariaDB testado como serviço efêmero de CI; nenhuma conexão de produção. Contraste residual do perfil público pertence ao STEP 04. A matriz histórica PR #15 não foi reclassificada.
+
+**Estado do STEP 03:** Implementações e testes específicos concluídos; aguardar evidência dos retestes finais HTTP/browser do SHA acima para declarar encerramento integral.
