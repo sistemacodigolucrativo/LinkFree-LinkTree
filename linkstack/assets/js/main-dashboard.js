@@ -32,7 +32,9 @@
         const abort = new AbortController();
         const timer = setTimeout(() => abort.abort(), 20000);
         try {
-            const response = await fetch(control.href, {
+            const form = control.closest('form[data-delete-link-form]');
+            if (!form || !form.action) throw new Error('missing delete form');
+            const response = await fetch(form.action, {
                 method: 'DELETE', credentials: 'same-origin', signal: abort.signal,
                 headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
             });

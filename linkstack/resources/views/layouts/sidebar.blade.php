@@ -299,17 +299,17 @@ $usrhandl = Auth::user()->littlelink_name;
                 <div class="logo-main">
                 @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
                 <div class="logo-normal">
-                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
+                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
               </div>
               <div class="logo-mini">
-                <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
+                <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
               </div>
                 @else
                 <div class="logo-normal">
-                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
+                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
               </div>
               <div class="logo-mini">
-                <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
+                <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
               </div>
                 @endif
                 </div>
@@ -454,17 +454,17 @@ $usrhandl = Auth::user()->littlelink_name;
                 <div class="logo-main">
                   @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
                   <div class="logo-normal">
-                    <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
+                    <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
                 </div>
                 <div class="logo-mini">
-                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
+                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
                 </div>
                   @else
                   <div class="logo-normal">
-                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
+                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
                 </div>
                 <div class="logo-mini">
-                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
+                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
                 </div>
                   @endif
                   </div>
