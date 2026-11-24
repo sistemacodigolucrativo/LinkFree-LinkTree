@@ -1,5 +1,7 @@
 # Continuidade técnica LinkFree-LinkTree
 
+> **H2 — verificação operacional final:** dispatcher aprovado busca automaticamente o script corrigido da main; backup e staging reavaliados no escopo solicitado. H2 concluída no escopo de recuperação local; H3 pendente de revisão pelo ChatGPT. [Relatório](homologacao-correcoes/H2-VERIFICACAO-OPERACIONAL-FINAL-20261124.md).
+
 > **H2 — backup quiescente:** janela autorizada durou aproximadamente 9 s; backup da instalação e restauração isolada validados. H2 continua condicional porque PR #19 não foi integrada/publicada e o rollback P1 antigo permanece. H3 não iniciada. [Relatório](homologacao-correcoes/H2-BACKUP-QUIESCENTE-RESTAURACAO-20261124.md).
 
 > **H2 — ensaio integral:** candidato PR #19 passou em publicação sintética e falhas de rollback; novo backup online restaurou em isolamento, mas consistência entre recursos não é atômica e janela de manutenção está pendente. H2 parcial; H3 não iniciada. [Relatório](homologacao-correcoes/H2-ENSAIO-INTEGRAL-E-BACKUP-20261124.md).
