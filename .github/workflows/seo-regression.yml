@@ -12,6 +12,7 @@ on:
       - 'linkstack/assets/linkstack/images/**'
       - 'instal.sh'
       - 'scripts/qa-isolated/seo_acceptance.py'
+      - 'scripts/qa-isolated/seo_card_typography.php'
       - 'scripts/audit-default-branding.py'
       - '.github/workflows/seo-regression.yml'
   workflow_dispatch:
@@ -49,6 +50,7 @@ jobs:
           php -l linkstack/app/Http/Controllers/SocialPreviewController.php
           php -l linkstack/app/Http/Controllers/UserController.php
           php -l linkstack/routes/web.php
+          php scripts/qa-isolated/seo_card_typography.php
       - name: Prepare strictly isolated synthetic application
         shell: bash
         run: |
@@ -108,6 +110,7 @@ jobs:
       - name: Validate rendered metadata, JPEG, sitemap and privacy
         env:
           QA_EXPECTED_SITE: http://127.0.0.1:18765
+          SEO_CARD_ARTIFACT: /tmp/linkfree-audit/seo-card-synthetic.jpg
         run: |
           python3 scripts/qa-isolated/seo_acceptance.py
           cd /tmp/linkfree-audit/linkstack
@@ -133,6 +136,14 @@ jobs:
           python3 -c 'import sqlite3; d=sqlite3.connect("database/audit.sqlite"); d.execute("UPDATE users SET name=? WHERE id=2",("auditfree",)); d.commit()'
           restart_fixture
           SEO_TEST_MODE=home-profile python3 "$GITHUB_WORKSPACE/scripts/qa-isolated/seo_acceptance.py"
+      - name: Upload synthetic visual sample
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-card-typography-synthetic
+          path: /tmp/linkfree-audit/seo-card-synthetic.jpg
+          if-no-files-found: warn
+          retention-days: 14
       - name: Stop disposable server
         if: always()
         run: |

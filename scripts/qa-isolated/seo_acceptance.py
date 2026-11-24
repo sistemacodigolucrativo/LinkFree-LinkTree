@@ -135,6 +135,26 @@ else:
     assert get('/social-preview/profile/2-wide.jpg')[0]==200
     assert get('/social-preview/profile/999999999.jpg')[0]==404
     print('PASS profile-specific images, legacy wide URL and nonexistent profile')
+    # Real raster and metadata comparison with synthetic Unicode input.
+    emoji_bio = '💻 Desenvolvedor Full Stack 🧠 Tecnologia • Inteligência • Estratégia.🚀'
+    clean_bio = 'Desenvolvedor Full Stack Tecnologia • Inteligência • Estratégia.'
+    with sqlite3.connect(DB) as d:
+        d.execute("update users set name=?,littlelink_description=? where id=2", ('Roberto R. Almeida',emoji_bio))
+    unicode_page,_ = page('/@auditfree')
+    assert unicode_page.one('og:description') == emoji_bio
+    assert unicode_page.one('og:title') == 'Roberto R. Almeida'
+    unicode_status, unicode_headers, unicode_image = image(unicode_page.one('og:image'))
+    assert unicode_status == 200
+    jpeg(unicode_image)
+    with sqlite3.connect(DB) as d:
+        d.execute("update users set littlelink_description=? where id=2",(clean_bio,))
+    clean_page,_ = page('/@auditfree')
+    assert clean_page.one('og:description') == clean_bio
+    assert image(clean_page.one('og:image'))[2] == unicode_image, 'Emoji fallback changes pixels compared with clean text'
+    artifact = os.getenv('SEO_CARD_ARTIFACT')
+    if artifact:
+        Path(artifact).write_bytes(unicode_image)
+    print('PASS Unicode metadata preserved; raster equals clean text; adaptive title rendered')
     original_image = image(profile.one('og:image'))[2]
     # Real update of synthetic public data, including potentially unsafe description.
     with sqlite3.connect(DB) as d:
