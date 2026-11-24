@@ -182,13 +182,13 @@ Route::group([
     Route::post('/admin/users/registration-vip', [AdminController::class, 'updateRegistrationVip'])->name('admin.registration-vip');
     Route::get('/admin/links/{id}', [AdminController::class, 'showLinksUser'])->name('showLinksUser');
     Route::delete('/admin/deleteLink/{id}', [AdminController::class, 'deleteLinkUser'])->name('deleteLinkUser');
-    Route::get('/admin/users/block/{block}/{id}', [AdminController::class, 'blockUser'])->name('blockUser');
-    Route::get('/admin/users/verify/{verify}/{id}', [AdminController::class, 'verifyCheckUser'])->name('verifyCheckUser');
-    Route::get('/admin/users/verify-mail/{verify}/{id}', [AdminController::class, 'verifyUser'])->name('verifyUser');
+    Route::post('/admin/users/block/{block}/{id}', [AdminController::class, 'blockUser'])->name('blockUser');
+    Route::post('/admin/users/verify/{verify}/{id}', [AdminController::class, 'verifyCheckUser'])->name('verifyCheckUser');
+    Route::post('/admin/users/verify-mail/{verify}/{id}', [AdminController::class, 'verifyUser'])->name('verifyUser');
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'showUser'])->name('showUser');
     Route::post('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->name('editUser');
     Route::get('/admin/new-user', [AdminController::class, 'createNewUser'])->name('createNewUser')->middleware('max.users');
-    Route::get('/admin/delete-user/{id}', [AdminController::class, 'deleteUser'])->name('deleteUser');
+    Route::delete('/admin/delete-user/{id}', [AdminController::class, 'deleteUser'])->name('deleteUser');
     Route::post('/admin/delete-table-user/{id}', [AdminController::class, 'deleteTableUser'])->name('deleteTableUser');
     Route::get('/admin/pages', [AdminController::class, 'showSitePage'])->name('showSitePage');
     Route::post('/admin/pages', [AdminController::class, 'editSitePage'])->name('editSitePage');
@@ -215,7 +215,7 @@ Route::group([
     Route::get('/admin/config', [AdminController::class, 'showConfig'])->name('showConfig');
     Route::post('/admin/config', [AdminController::class, 'editConfig'])->name('editConfig');
     Route::get('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail');
-    Route::get('/auth-as/{id}', [AdminController::class, 'authAsID'])->name('authAsID');
+    Route::post('/auth-as/{id}', [AdminController::class, 'authAsID'])->name('authAsID');
     Route::get('/theme-updater', function () {return view('studio/theme-updater', []);});
     Route::get('/update', function () {return view('update', []);});
     Route::get('/backup', function () {return view('backup', []);});

@@ -82,7 +82,7 @@ document.addEventListener('click', function(e) {
  button.disabled=true;button.setAttribute('aria-busy','true');button.textContent='…';
  const xhr=new XMLHttpRequest();
  const id=button.getAttribute('data-id');
- xhr.open(deleting?'POST':'GET',deleting?@json(route('deleteTableUser',['id'=>':id'])).replace(':id',id):id,true);
+ xhr.open('POST',deleting?@json(route('deleteTableUser',['id'=>':id'])).replace(':id',id):id,true);
  xhr.timeout=20000;
  xhr.setRequestHeader('X-CSRF-TOKEN',@json(csrf_token()));
  xhr.setRequestHeader('Accept','application/json');

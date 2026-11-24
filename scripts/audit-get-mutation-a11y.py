@@ -39,6 +39,12 @@ checks["Photo removal is POST with CSRF"] = 'action="{{ route(\'delProfilePictur
 checks["Icon-cache removal is POST with CSRF"] = 'action="{{ route(\'clearIcon\',' in links and "@csrf" in links
 checks["Brand removal uses POST override"] = 'formaction="{{ route(\'delAvatar\') }}"' in read("linkstack/resources/views/panel/site.blade.php") and 'formaction="{{ route(\'delFavicon\') }}"' in read("linkstack/resources/views/panel/site.blade.php")
 
+for endpoint in ("/admin/users/block/{block}/{id}", "/admin/users/verify/{verify}/{id}", "/admin/users/verify-mail/{verify}/{id}", "/admin/delete-user/{id}", "/auth-as/{id}"):
+    checks["Admin GET mutation blocked: "+endpoint] = "Route::get('" + endpoint + "'" not in routes
+checks["Admin AJAX role mutations use POST"] = "xhr.open('POST'" in read("linkstack/resources/views/panel/users.blade.php")
+checks["Admin delete user form is CSRF protected"] = "@method('DELETE')" in read("linkstack/resources/views/linkstack/modules/admin-bar.blade.php") and "@method('DELETE')" in read("linkstack/resources/views/linkinfo.blade.php")
+checks["Admin impersonation UI uses POST"] = 'method="POST" action="{{ route(\'authAsID\'' in read("linkstack/resources/views/components/table-components/action.blade.php")
+
 for name, passed in checks.items():
     print(("PASS" if passed else "FAIL") + " " + name)
 if not all(checks.values()):
