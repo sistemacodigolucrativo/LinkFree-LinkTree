@@ -1,0 +1,38 @@
+[
+  {
+    "id": "TC-01-C/D",
+    "assertion": "índices únicos e FKs M13 reais",
+    "pass": true,
+    "observed": {
+      "indices_unicos": 4,
+      "tabelas_com_fk": 6,
+      "foreign_keys": 12,
+      "violacoes": 0
+    }
+  },
+  {
+    "id": "TC-01-C/D",
+    "assertion": "FK rejeitam órfãos em seis tabelas",
+    "pass": true,
+    "observed": {
+      "insercoes_orfas_rejeitadas": 6
+    }
+  },
+  {
+    "id": "TC-01-C/D",
+    "assertion": "restrições únicas executadas em SQLite",
+    "pass": true,
+    "observed": {
+      "duplicatas_rejeitadas": 3
+    }
+  },
+  {
+    "id": "TC-01-C/D",
+    "assertion": "transação com falha simulada preserva registros legados",
+    "pass": true,
+    "observed": {
+      "tabelas_revertidas": 3,
+      "contagens_legadas_iguais": true
+    }
+  }
+]
