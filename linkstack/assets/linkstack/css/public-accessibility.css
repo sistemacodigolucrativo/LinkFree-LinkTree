@@ -34,3 +34,5 @@ body.lf-public-profile .button-hover:focus-visible { transform: none; }
     box-shadow: none !important;
   }
 }
+
+body.lf-public-profile [data-lf-contrast-adjusted] { transition-property: transform, box-shadow !important; }

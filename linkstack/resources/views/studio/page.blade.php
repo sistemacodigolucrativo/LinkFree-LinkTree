@@ -261,7 +261,7 @@
                   @if(file_exists(base_path(findAvatar(Auth::user()->id))))
                   <div class="upload-icone bg-primary">
                     <form method="POST" action="{{ route('delProfilePicture') }}" class="d-inline" onsubmit="return confirm('Remover a foto do perfil?')">@csrf<button type="submit" class="btn btn-link p-0" style="top:1px;position:relative;" title="Remover foto do perfil" aria-label="Remover foto do perfil"><i class="bi bi-trash-fill text-white"></i></button></form>
-                    <input class="file-upload" type="file" accept="image/*">
+                    <input class="file-upload" type="file" accept="image/*" aria-label="{{__('messages.Profile Picture')}}">
                   </div>
                   @endif
                 </div>
@@ -302,25 +302,25 @@
                             $url = $_SERVER['REQUEST_URI'];
                              if( strpos( $url, "no_page_name" ) == true ) echo '<span style="color:var(--lf-danger); font-size:120%;">You do not have a Page URL</span>'; ?>
                         <br>
-                        <label class="form-label">{{__('messages.Page URL')}}</label>
+                        <label for="littlelink_name" class="form-label">{{__('messages.Page URL')}}</label>
                         <div class="input-group mb-3 has-validation">
                           <span class="input-group-text" id="basic-addon3">{{str_replace(['http://', 'https://'], '', url(''))}}/@</span>
-                          <input type="text" class="form-control" id="littlelink_name" name="littlelink_name" aria-describedby="littlelink_name" value="{{ old('littlelink_name', $page->littlelink_name ?? '') }}" required autofocus>
+                          <input type="text" class="form-control" id="littlelink_name" name="littlelink_name" aria-describedby="basic-addon3" value="{{ old('littlelink_name', $page->littlelink_name ?? '') }}" required autofocus>
                         </div>
                         <script>const exceptionvar = @json($page->littlelink_name ?? '');</script>
                         @include('auth.url-validation')
 
-                         <label style="margin-top:15px">{{__('messages.Display name')}}</label>
+                         <label for="lf-display-name" style="margin-top:15px">{{__('messages.Display name')}}</label>
                         <div class="input-group">
                             {{-- <div class="input-group-prepend">
                                 <div class="input-group-text">{{__('messages.Name')}}</div>
                             </div> --}}
-                            <input type="text" class="form-control" name="name" value="{{ $page->name }}" required>
+                            <input type="text" id="lf-display-name" class="form-control" name="name" value="{{ $page->name }}" required>
                         </div>
                     </div>
 
                     <div class="form-group col-lg-8">
-                        <label>{{__('messages.Page Description')}}</label>
+                        <label for="field-pageDescription">{{__('messages.Page Description')}}</label>
                         <textarea class="form-control @if(env('ALLOW_USER_HTML') === true) ckeditor @endif" name="pageDescription" rows="3" id="field-pageDescription">{{ $page->littlelink_description ?? '' }}</textarea>
                     </div>
 
@@ -344,7 +344,7 @@
                       <p class="text-muted">{{__('messages.disablesharebutton')}}</p>
                         <div class="mb-3 form-check form-switch">
                           <input name="sharebtn" class="switch toggle-btn" type="checkbox" id="sharebtn" <?php if(UserData::getData(Auth::user()->id, 'disable-sharebtn') != "true"){echo 'checked';} ?> />
-                          <label class="form-check-label" for="sharebtn">{{__('messages.Enable')}}</label>
+                          <label class="form-check-label" for="sharebtn">{{__('messages.Show share button')}}</label>
                         </div>
 
                         <div class="form-group col-lg-8">
@@ -352,7 +352,7 @@
                           <p class="text-muted">{{__('messages.openlinksnewtab')}}</p>
                             <div class="mb-3 form-check form-switch">
                               <input name="tablinks" class="switch toggle-btn" type="checkbox" id="tablinks" <?php if(UserData::getData(Auth::user()->id, 'links-new-tab') != false){echo 'checked';} ?> />
-                              <label class="form-check-label" for="tablinks">{{__('messages.Enable')}}</label>
+                              <label class="form-check-label" for="tablinks">{{__('messages.Open links in new tab')}}</label>
                             </div>
 
                     <fieldset class="border rounded-3 p-3 mt-4" style="max-width:850px">

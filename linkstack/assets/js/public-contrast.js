@@ -29,6 +29,7 @@
     for(let n=el;n;n=n.parentElement) {
       const style=getComputedStyle(n);
       const bg=rgba(style.backgroundColor);
+      if(!bg) return null;
       if(style.backgroundImage!=='none') {
         const image=style.backgroundImage;
         if(!/^(?:repeating-)?(?:linear|radial|conic)-gradient\(/.test(image) ||
