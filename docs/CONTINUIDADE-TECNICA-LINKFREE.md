@@ -1,5 +1,7 @@
 # Continuidade técnica LinkFree-LinkTree
 
+> **H2 — backup quiescente:** janela autorizada durou aproximadamente 9 s; backup da instalação e restauração isolada validados. H2 continua condicional porque PR #19 não foi integrada/publicada e o rollback P1 antigo permanece. H3 não iniciada. [Relatório](homologacao-correcoes/H2-BACKUP-QUIESCENTE-RESTAURACAO-20261124.md).
+
 > **H2 — ensaio integral:** candidato PR #19 passou em publicação sintética e falhas de rollback; novo backup online restaurou em isolamento, mas consistência entre recursos não é atômica e janela de manutenção está pendente. H2 parcial; H3 não iniciada. [Relatório](homologacao-correcoes/H2-ENSAIO-INTEGRAL-E-BACKUP-20261124.md).
 
 > **H2 — reteste independente:** candidato PR #19 passou no cenário P1 e em falhas injetadas, com limpeza real de caches no staging; segue sem integração/deploy. Backup seletivo e recuperação integral ainda têm lacunas. H2 parcial; H3 não iniciada. [Relatório complementar](homologacao-correcoes/H2-RETESTE-INDEPENDENTE-ROLLBACK-20261124.md).

@@ -1,0 +1,61 @@
+{
+  "janela_utc": {
+    "inicio": "2026-11-24T20:32:28Z",
+    "montagem_ro": "2026-11-24T20:32:31Z",
+    "copia_concluida": "2026-11-24T20:32:37Z",
+    "retorno": "2026-11-24T20:32:37Z",
+    "duracao_aproximada_segundos": 9,
+    "limite_segundos": 900
+  },
+  "acesso_503_confirmado": true,
+  "descritores_antes_ro": 0,
+  "aplicacao_somente_leitura_durante_copia": true,
+  "backup_manifesto": {
+    "utc": "2026-11-24T20:33:17Z",
+    "entries": 12912,
+    "files": 11075,
+    "dirs": 1759,
+    "links": 78,
+    "manifest_errors": 0,
+    "xattr_errors": 0,
+    "config_comparison": {
+      "nginx": {
+        "exit": 0,
+        "differences": 0
+      },
+      "php": {
+        "exit": 0,
+        "differences": 0
+      },
+      "letsencrypt": {
+        "exit": 0,
+        "differences": 0
+      }
+    },
+    "git_bundle_valid": true,
+    "sqlite_integrity": "ok",
+    "sqlite_fk": 0
+  },
+  "restauracao": {
+    "entradas_verificadas": 12912,
+    "divergencias": 0,
+    "validou_conteudo_permissoes_uid_gid_mtime_symlinks_xattrs": true,
+    "sqlite_integrity": "ok",
+    "fk": 0,
+    "egress_bloqueado": true,
+    "laravel_db_storage_isolados": true,
+    "http": {
+      "/": 200,
+      "/login": 200,
+      "/register": 200,
+      "/report": 200,
+      "/studio/profile": 302,
+      "/admin/config": 302,
+      "/__h2_invalid_route": 404
+    },
+    "copia_com_dados_reais_removida": true
+  },
+  "producao_sha": "6e55da55e57203da2606a4b1ca1c83865c0f760d",
+  "pr19_integrada": false,
+  "h3_iniciada": false
+}
