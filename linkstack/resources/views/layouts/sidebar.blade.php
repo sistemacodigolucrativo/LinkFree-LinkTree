@@ -299,17 +299,17 @@ $usrhandl = Auth::user()->littlelink_name;
                 <div class="logo-main">
                 @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
                 <div class="logo-normal">
-                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
+                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
               </div>
               <div class="logo-mini">
-                <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
+                <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
               </div>
                 @else
                 <div class="logo-normal">
-                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
+                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
               </div>
               <div class="logo-mini">
-                <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
+                <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
               </div>
                 @endif
                 </div>
@@ -392,7 +392,7 @@ $usrhandl = Auth::user()->littlelink_name;
   </a>
   <ul class="sub-nav collapse {{ $adminUsersOpen ? 'show' : '' }}" id="admin-users-menu" data-bs-parent="#admin-navigation">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') ? 'active' : '' }}" href="{{ route('showUsers') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">{{__('messages.Manage Users')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/new-user') ? 'active' : '' }}" href="{{ route('createNewUser') }}"><i class="icon bi bi-person-plus" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin New User')}}</span></a></li>
+<li class="nav-item"><form method="POST" action="{{ route('createNewUser') }}" class="m-0">@csrf<button type="submit" class="nav-link w-100 text-start border-0"><i class="icon bi bi-person-plus" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin New User')}}</span></button></form></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/referrals*') ? 'active' : '' }}" href="{{ route('admin.referrals') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">Indicações</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/verification*') ? 'active' : '' }}" href="{{ route('admin.verification') }}"><i class="icon bi bi-patch-check" aria-hidden="true"></i><span class="item-name">Solicitações de selo</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/reports*') ? 'active' : '' }}" href="{{ route('admin.abuse-reports.index') }}"><i class="icon bi bi-flag" aria-hidden="true"></i><span class="item-name">Central de denúncias</span></a></li>
@@ -454,17 +454,17 @@ $usrhandl = Auth::user()->littlelink_name;
                 <div class="logo-main">
                   @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
                   <div class="logo-normal">
-                    <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
+                    <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
                 </div>
                 <div class="logo-mini">
-                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;">
+                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
                 </div>
                   @else
                   <div class="logo-normal">
-                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
+                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
                 </div>
                 <div class="logo-mini">
-                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px">
+                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
                 </div>
                   @endif
                   </div>
@@ -722,25 +722,25 @@ $usrhandl = Auth::user()->littlelink_name;
           <div class="col-lg-12">
              <h5 class="mb-3">{{__('messages.Scheme')}}</h5>
             <div class="d-grid gap-3 grid-cols-3 mb-4">
-              <div class="btn btn-border" data-setting="color-mode" data-name="color" data-value="auto">
+              <button type="button" aria-pressed="false" class="btn btn-border" data-setting="color-mode" data-name="color" data-value="auto">
                   <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path fill="currentColor" d="M7,2V13H10V22L17,10H13L17,2H7Z" />
                   </svg>
                 <span class="ms-2 "> {{__('messages.Auto')}} </span>
-              </div>
+              </button>
 
-               <div class="btn btn-border" data-setting="color-mode" data-name="color" data-value="dark">
+               <button type="button" aria-pressed="false" class="btn btn-border" data-setting="color-mode" data-name="color" data-value="dark">
                  <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path fill="currentColor" d="M9,2C7.95,2 6.95,2.16 6,2.46C10.06,3.73 13,7.5 13,12C13,16.5 10.06,20.27 6,21.54C6.95,21.84 7.95,22 9,22A10,10 0 0,0 19,12A10,10 0 0,0 9,2Z" />
                   </svg>
                 <span class="ms-2 "> {{__('messages.Dark')}}  </span>
-              </div>
-               <div class="btn btn-border active" data-setting="color-mode" data-name="color" data-value="light">
+              </button>
+               <button type="button" aria-pressed="true" class="btn btn-border active" data-setting="color-mode" data-name="color" data-value="light">
                   <svg class="icon-20" width="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path fill="currentColor" d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,8.69V4H15.31L12,0.69L8.69,4H4V8.69L0.69,12L4,15.31V20H8.69L12,23.31L15.31,20H20V15.31L23.31,12L20,8.69Z" />
                 </svg>
                 <span class="ms-2 "> {{__('messages.Light')}}</span>
-              </div>
+              </button>
             </div>
             <hr class="hr-horizontal">
             <div class="d-flex align-items-center justify-content-between">

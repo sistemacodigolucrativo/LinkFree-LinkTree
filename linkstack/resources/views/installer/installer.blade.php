@@ -7,13 +7,7 @@
 @if(($_SERVER['QUERY_STRING'] ?? '') === '')
 {{-- Landing page --}}
 
-@if(!DB::table('users')->get()->isEmpty())
-    @php
-    if(file_exists(base_path("INSTALLING"))){unlink(base_path("INSTALLING"));}
-    header("Refresh:0");
-    @endphp
-@else
-        <div class="logo-container fadein">
+         <div class="logo-container fadein">
            <img class="logo-img" src="{{ asset('assets/linkstack/images/logo.svg') }}" alt="Logo">
         </div>
         <h1>{{__('messages.Setup LinkStack')}}</h1>
@@ -68,7 +62,6 @@
 <p style="margin:25px;max-width:350px;">{{__('messages.setup.disclaimer')}} <a href="https://linkstack.org/terms-and-conditions/" target="_blank">{{__('messages.Terms and Conditions')}}</a>.</p>
 
         &ensp;<a class="btn" href="{{url('?2')}}">{{__('messages.Next')}}</a>&ensp;
-@endif
 
 @endif
 

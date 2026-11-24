@@ -1,0 +1,68 @@
+# Continuidade técnica LinkFree-LinkTree
+Atualização: 2026-11-24. Snapshot verificado por API GitHub e logs, sem acesso SSH à VPS.
+## 1. Projeto e arquitetura
+[Repositório](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree); PHP/Laravel 9, SQLite, Blade, JS/CSS, código em linkstack/, GitHub Actions, Playwright/Chromium e axe-core.
+## 2. Produção
+https://linkfree.website. Repositório VPS /home/ubuntu/src-Projects/LinkFree-LinkTree; publicação /srv/linkfree (não é checkout Git). Último SHA publicado documentado: 3f20bf95e75fb93cb6abfef3aaa388c9798b664d; não confirmado novamente nesta sessão. O relatório PR #15 registra 540 arquivos iguais e integridade SQLite na auditoria anterior. Não confundir com HEAD da main.
+## 3. Histórico
+M13, PR #14 integrada: indicação, selo, denúncia, migrações 000002–000004 e backup (evidência histórica do operador); os checks técnicos pós-deploy passaram, sem aceite funcional. PR #11 integrada; #12/#13 encerradas e incorporadas pela #14. Não repetir deploy/migração.
+## 4. Estado das branches verificado antes deste commit
+- main: [342fce9b15cdc7a55e9bcc6f8a00278dc712d73d](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/commit/342fce9b15cdc7a55e9bcc6f8a00278dc712d73d).
+- [PR #15](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/15) aberta/draft, head 361c4cb4d4da9db98039d58e10834ad8541f40a7, 4 commits à frente, 0 atrás, 43 arquivos de relatório/scripts/evidências.
+- [PR #16](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/16) aberta/draft, head anterior 581966a03a30dd5f76dfac30553917f7dd36a36e, 14 commits à frente, 0 atrás, 28 arquivos. Mesma base main, sem sobreposição de caminhos modificados na comparação dos dois heads anteriores. Não integrar automaticamente.
+## 5. Estados distintos
+| Item | Implementado | Testado | Aprovado | Publicado | Pendente |
+|---|---|---|---|---|---|
+| M13 indicações, selo, denúncias | Sim | Técnico e parcial funcional | Só checks técnicos | Histórico 23/11 | Aceite funcional |
+| PR #15 | Relatório | 43 casos em vários ambientes | 4 casos no relatório histórico | Não integrada | 2 reprovados, 34 parciais, 2 bloqueados, 1 não automatizável |
+| PR #16 anterior | Correções propostas | HTTP 8/8, axe 12 páginas | Escopo isolado apenas | Não | UI, contraste, demais autorizações |
+| Nova correção criação Admin | Nesta alteração | CI pendente | Não | Não | Verificar execução e interface |
+## 6. Correções não implantadas e revisão
+PR #16 converte DELETE/POST com CSRF e ajusta atributos de acessibilidade. Revisão estática desta retomada identificou GET /admin/new-user chamando AdminController::createNewUser, que cria User e salva papel (achado adicional, não reproduzido em produção). Alteração proposta: POST preservando middleware max.users e três controles Blade com @csrf, sem mudar regra de papel. Ver guards e retestes abaixo. Revisar separadamente GET de instalação (/skip), callbacks OAuth/verificação assinada e contador público, distinguindo mutações intencionais; não alterar indiscriminadamente.
+## 7. Evidências e resultados comprovados
+PR #15: 4 aprovados/2 reprovados/34 parciais/2 bloqueados/1 não automatizável; não reclassificar.
+[Run 45372421569](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45372421569) no head 350bd66526ce0d7e9438b5df4dd8ef0a1b897212; comparação até 581966a03a30dd5f76dfac30553917f7dd36a36e mostrou apenas o relatório modificado em dois commits. [Run posterior 45372898573](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45372898573) no head anterior: logs HTTP 8/8 (6 GET membro, 9 GET admin; CSRF, isolamento e DELETE/POST legítimos), axe 12 páginas, 0 erros de scanner, 1 grupo color-contrast com 3 nós em /@auditfree, 0 regressões-alvo. Artefatos não expirados no momento da consulta: 14910775539 (HTTP), 14910046383 (a11y). [PHP lint](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45372898523), [layout](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45372898452), [guards](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45372898555), [consistência #15](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45369909184) concluídos com sucesso. Green CI não significa WCAG integral.
+### Novos testes (TC-04-D, aguardando CI)
+Ambiente: runner efêmero, 127.0.0.1:18765, SQLite audit.sqlite, quatro contas fictícias. Procedimento: workflow qa-functional-isolated.yml (scripts/qa-isolated/http_acceptance.py e browser_a11y.cjs que chama browser_interactions.cjs). Esperado: GET criação 405 sem mutação, POST sem CSRF 419 e membro sem autorização não cria; admin legítimo cria exatamente uma conta e chega ao editor; controles dos 3 pontos POST/CSRF; cancelamento da exclusão não envia mutação, confirmação em navegador membro/admin apaga somente alvo e persiste no refresh. Observado: código dos testes preparado; nenhuma execução nova confirmada nesta atualização. Prova: logs e JSONs de artefatos do próximo run, commit efetivo da PR. Não incluir segredos. A matriz histórica não muda.
+## 8. Defeitos e riscos
+P1 GET mutável original (TC-04-D) e criação administrativa adicional identificada estaticamente; sem aceite de produção. P2 TC-09-B contraste tema público, teclado, dispositivos reais. Fixture NoneType em TC-03-B e TC-08-D não prova defeito do produto. Revisar impersonação, exclusão permanente e outras mutações/autorizações. Main reportada como não protegida pela API de branch; verificar rulesets/política antes de concluir proteção efetiva.
+## 9. Pendências técnicas
+Rever CI novo, confirmar UI e novas assertivas; contraste do perfil público sem sobrescrever preferências; corrigir fixtures de persistência e complementar 34 parciais conforme matriz. Cobrir logout, login novo, concorrência, importação, permissões, Firefox/WebKit e recuperação com aplicação sobre cópia isolada. TC-02-A/02-C faltam logs brutos históricos; evidência secundária não basta.
+## 10. Dependências e decisões
+OAuth e SMTP reais em staging com contas de teste, dispositivos Safari/iOS e Android, política LGPD/retencão e selo legado, revisão humana/aceite TC-10-D; confirmar ambiente staging seguro e política de contraste dos temas.
+## 11. Ordem de prioridade
+1. Validar CI da correção de criação Admin e novos fluxos em navegador; corrigir somente defeitos demonstrados.
+2. Completar segurança residual, especialmente impersonação e exclusão permanente, em ambiente isolado.
+3. Diagnosticar contraste, propor guarda compatível com temas e validar teclado/cross-browser.
+4. Reexecutar fixtures TC-03-B e TC-08-D, completar demais parciais por lacunas.
+5. Recolher dependências externas e logs, exercício de recuperação, preparar proposta de merge/deploy.
+## 12. Continuação segura
+Consultar heads/PRs e comparar commits antes de editar; preservar matriz e relatório, registrar ID, SHA, ambiente, procedimento, esperado/observado, status, evidência, risco e próxima ação. Não executar deploy, restart, migração, merge, exclusão real, escrever no banco ou acessar segredos. Usar dados sintéticos, loopback e SQLite descartável; nunca reproduzir ações destrutivas em produção.
+## 13. Referências
+- [Documentação PR #15 fixada por SHA](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/tree/361c4cb4d4da9db98039d58e10834ad8541f40a7/docs/homologacao-automatizada): RELATORIO-TECNICO-COMPLETO, MATRIZ-RESULTADOS-43-TESTES, MATRIZ-RASTREABILIDADE-43-TESTES, FALHAS-E-RISCOS, PENDENCIAS-HOMOLOGACAO-MANUAL, RESUMO-EXECUTIVO, scripts e evidências.
+- [Reteste PR #16 anterior](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/blob/581966a03a30dd5f76dfac30553917f7dd36a36e/docs/homologacao-correcoes/RETESTE-FUNCIONAL-ISOLADO-20261124.md).
+- [Manual](HOMOLOGACAO-ASSISTIDA-01-10-MANUAL-OPERACIONAL.md), [prompt](HOMOLOGACAO-ASSISTIDA-01-10-PROMPT-IA.md), [registro](HOMOLOGACAO-ASSISTIDA-01-10-REGISTRO.md), [matriz](MATRIZ-HOMOLOGACAO-01-10-20261123.md), [status M13](STATUS-PRODUCAO-M13-20261123.md), [consolidação](CONSOLIDACAO-M13-05-07-E-GATES-20261123.md), [procedimento](PROCEDIMENTO-DEPLOY-M13-20261123.md).
+## 14. Gates de merge e deploy
+Revisão de diff e evidência para o SHA candidato, CI aprovado no escopo, sem P0/P1 aberto, riscos residuais documentados e aceitos, staging, backup/rollback testado, decisões de negócio aplicáveis, autorização expressa separada para merge e para deploy. Pós-deploy somente verificações seguras aprovadas. TC-10-D aceite humano obrigatório.
+## 15. Última atualização
+2026-11-24; base técnica verificada: 581966a03a30dd5f76dfac30553917f7dd36a36e. O SHA que contém este documento deve ser obtido pelo histórico Git do arquivo (não é possível registrar o próprio hash dentro do commit). Nova alteração proposta na branch da PR #16, sem merge ou deploy. Limitações: sem SSH, leitura parcial de evidências brutas históricas e testes externos indisponíveis. Não declarar CI novo aprovado até conferir os logs.
+
+## 16. STEP 03 — atualização incremental
+[Relatório de segurança residual e retestes](homologacao-correcoes/STEP-03-SEGURANCA-RETETESTE-20261124.md). No candidato e51c66a7dc01db21ae3efc88421d85f59e7a1c7b: [HTTP 16/16](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45436916182/job/138597109172), PHP lint/layout/regressão aprovados; browser pendente na consulta. Candidato subsequente protege editor de bloco por proprietário e propõe bloquear execução GET da manutenção legada (consulta de backups preservada). Não significa homologação final; CI do novo SHA, compatibilidade do instalador e aceite do comportamento de manutenção ainda são necessários. PR #15 intacta; PR #16 draft; não mesclar nem publicar.
+
+Atualização posterior STEP 03: [browser 5/6 no e51c66a7](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45436916182/job/138597109766), com causa do clique Membro confirmada (tooltip intercepta ponteiro). Patch CSS local em novo candidato; não declarar aprovação sem novo log. 
+
+### Retomada de encerramento STEP 03
+Candidato anterior 13c89b11 teve todos os workflows verdes, HTTP 18/18 e browser 6/6. Nova revisão fecha lacunas do instalador e editor genérico Admin, com testes próprios em instâncias efêmeras e credenciais sintéticas. Manutenção web legada desativada; VPS controlada permanece mecanismo operacional. Não iniciar STEP 04 até prova de regressão no candidato atual. Sem merge, deploy ou alterações na produção.
+
+### Evidências mais recentes do STEP 03
+SHA de código 6d865f4d309c232d28d5bab84f031b024b54dbaa. Instaladores [SQLite 4/4](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426/job/138619036468) e [MariaDB 4/4](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426/job/138619035775) aprovados. Editor Admin [HTTP 20/20](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45442661964/job/138617767751) comprovado no candidato 9d6b1155. [CI final](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426). Implementação concluída; confirmar conclusão dos jobs HTTP/browser do candidato atual antes de fechar STEP 03. Manutenção pela VPS controlada; ingresso de instalação nova restrito ao operador. Sem merge/deploy, main preservada, PR #15 intacta.
+
+## 17. STEP 03 encerrado / STEP 04 e 05 iniciados
+Evidência final: [run 45443009426](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45443009426), HTTP 20/20, interações 6/6, dois instaladores 4/4, lint/layout/regressão verdes. Código 6d865f4d; e09e3033 contém apenas documentação. STEP 03 concluído no escopo isolado. STEP 04 protege legibilidade do perfil e amplia matriz de navegador; STEP 05 revisão em paralelo. [Relatório STEP 04/05](homologacao-correcoes/STEP-04-05-ACESSIBILIDADE-REVISAO-20261124.md). Reaproveitar evidências por SHA/escopo; retestar superfícies alteradas. Não declarar WCAG integral nem Safari/iOS real por emulação. Sem merge/deploy.
+
+### Continuidade STEP 04/05
+[Execução 45448305974](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45448305974): 12 páginas sem violações axe, HTTP 20/20, browser 6/6. Matriz ampliada falhou em três assertivas de texto uppercase PolySleek; corrigidas. Cenário imagem real, contraste numérico/hover, labels de formulários e matriz de 6 cenários complementares em preparação. [Plano revisão/deploy/rollback](homologacao-correcoes/STEP-05-PLANO-REVISAO-DEPLOY-ROLLBACK-20261124.md). Não declarar encerrado antes dos logs do novo SHA.
+
+## 18. Encerramento técnico isolado dos STEPS 04 e 05
+Código validado 1d5a4bc3688f7bfb6d7906b55088da4a20b36ca8, [PR CI 45452596718](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45452596718), [push 45452573437](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45452573437), todos os checks aplicáveis verdes. HTTP 20/20, browser funcional 6/6, 12 páginas sem violações, perfis 24/24 em Chromium/Firefox/WebKit, formulários 6/6, SQLite e MariaDB 4/4 cada, PHP/layout/regressão aprovados. [Relatório STEP 04/05](homologacao-correcoes/STEP-04-05-ACESSIBILIDADE-REVISAO-20261124.md) e [parecer STEP 05](homologacao-correcoes/STEP-05-PLANO-REVISAO-DEPLOY-ROLLBACK-20261124.md). STEP 04 escopo automatizado encerrado (9/10, dispositivo real não disponível); STEP 05 revisão interna encerrada com parecer condicionado. Axe incompletos em gradientes e controles seguem para inspeção humana. Não confundir com WCAG integral, matriz PR15 ou produção. A posição seguinte é avaliação dos gates externos e autorização do STEP 06. Sem merge/deploy/VPS.

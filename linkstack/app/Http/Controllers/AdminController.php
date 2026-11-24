@@ -175,11 +175,22 @@ class AdminController extends Controller
     }
   }
 
+  // Only the primary administrator can manage other administrators.
+  private function authorizeAccountManagement(User $target): void
+  {
+    abort_if((int) $target->id === 1 && (int) Auth::id() !== 1, 403);
+    abort_if($target->role === 'admin' && (int) Auth::id() !== 1 &&
+      (int) $target->id !== (int) Auth::id(), 403);
+  }
+
   //Block user
   public function blockUser(request $request)
   {
-    $id = $request->id;
-    $status = $request->block;
+    $id = $request->route('id');
+    $status = $request->route('block');
+    abort_unless(in_array($status, ['yes', 'no'], true), 422);
+    abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
+    $this->authorizeAccountManagement(User::findOrFail($id));
 
     if ($status == "yes") {
       $block = "no";
@@ -195,8 +206,11 @@ class AdminController extends Controller
   //Verify user
   public function verifyCheckUser(request $request)
   {
-    $id = $request->id;
-    $status = $request->verify;
+    $id = $request->route('id');
+    $status = $request->route('verify');
+    abort_unless(in_array($status, ['vip', 'user'], true), 422);
+    abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
+    $this->authorizeAccountManagement(User::findOrFail($id));
 
     if ($status == "vip") {
       $verify = "vip";
@@ -213,11 +227,14 @@ class AdminController extends Controller
   //Verify or un-verify users emails
   public function verifyUser(request $request)
   {
-    $id = $request->id;
-    $status = $request->verify;
+    $id = $request->route('id');
+    $status = $request->route('verify');
+    abort_unless(in_array($status, ['true', 'false'], true), 422);
+    abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
+    $this->authorizeAccountManagement(User::findOrFail($id));
 
     if ($status == "true") {
-      $verify = "0000-00-00 00:00:00";
+      $verify = now();
     } else {
       $verify = null;
     }
@@ -276,43 +293,36 @@ class AdminController extends Controller
   //Delete existing user
   public function deleteUser(request $request)
   {
-    $id = $request->id;
-
-    Link::where("user_id", $id)->delete();
-
-    Schema::disableForeignKeyConstraints();
-
-    $user = User::find($id);
-    $user->forceDelete();
-
-    Schema::enableForeignKeyConstraints();
-
+    $this->deleteAccount((int) $request->route('id'));
     return redirect("admin/users/all");
   }
 
   //Delete existing user with POST request
   public function deleteTableUser(request $request)
   {
-    $id = $request->id;
+    $this->deleteAccount((int) $request->route('id'));
+    return response('', 200);
+  }
 
-    Link::where("user_id", $id)->delete();
-
-    Schema::disableForeignKeyConstraints();
-
-    $user = User::find($id);
-    $user->forceDelete();
-
-    Schema::enableForeignKeyConstraints();
+  // Keep foreign-key enforcement active; model deletion hooks retain case history.
+  private function deleteAccount(int $id): void
+  {
+    abort_if($id === 1 || $id === (int) Auth::id(), 403);
+    \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+      $user = User::whereKey($id)->lockForUpdate()->firstOrFail();
+      $this->authorizeAccountManagement($user);
+      Link::where("user_id", $id)->delete();
+      $user->forceDelete();
+    });
   }
 
   //Show user to edit
   public function showUser(request $request)
   {
-    $id = $request->id;
-
-    $data["user"] = User::where("id", $id)->get();
-
-    return view("panel/edit-user", $data);
+    $user = User::findOrFail($request->route('id'));
+    $this->authorizeAccountManagement($user);
+    abort_if(in_array($request->server('QUERY_STRING', ''), ['delete', 'deleteB'], true), 405);
+    return view("panel/edit-user", ["user" => collect([$user])]);
   }
 
   //Show link, click number, up link in links page
@@ -341,7 +351,7 @@ class AdminController extends Controller
   //Delete link
   public function deleteLinkUser(request $request)
   {
-    $linkId = $request->id;
+    $linkId = $request->route('id');
 
     Link::where("id", $linkId)->delete();
 
@@ -351,14 +361,22 @@ class AdminController extends Controller
   //Save user edit
   public function editUser(request $request)
   {
+    $target = User::findOrFail($request->route('id'));
+    $this->authorizeAccountManagement($target);
+    $id = $target->id;
     $request->validate([
-      "name" => "",
-      "email" => "",
-      "password" => "",
-      "littlelink_name" => "",
+      'name' => 'required|string|max:255',
+      'email' => ['required','email','max:255', \Illuminate\Validation\Rule::unique('users','email')->ignore($id)],
+      'password' => 'nullable|string|min:8|max:255',
+      'littlelink_name' => 'nullable|string|max:255',
+      'role' => 'required|in:user,vip,admin',
+      'theme' => 'required|string|regex:/^[A-Za-z0-9_-]+$/D',
+      'image' => 'nullable|image|mimes:jpeg,png,gif,webp|max:10240',
+      'background' => 'nullable|image|mimes:jpeg,png,gif,webp|max:10240',
     ]);
-
-    $id = $request->id;
+    $requestedRole = $request->input('role');
+    abort_if(((int) $id === 1 || (int) $id === (int) Auth::id()) && $requestedRole !== $target->role, 403);
+    abort_if($requestedRole === 'admin' && $target->role !== 'admin' && (int) Auth::id() !== 1, 403);
     $name = $request->name;
     $email = $request->email;
     $password = Hash::make($request->password);
@@ -369,10 +387,8 @@ class AdminController extends Controller
     $customBackground = $request->file("background");
     $theme = $request->theme;
 
-    if (User::where("id", $id)->get("role")->first()->role = !$role) {
-      if ($role == "vip") {
-        UserData::saveData($id, "checkmark", true);
-      }
+    if ($target->role !== $role && $role === 'vip') {
+      UserData::saveData($id, 'checkmark', true);
     }
 
     if ($request->password == "") {
@@ -418,6 +434,23 @@ class AdminController extends Controller
     }
 
     return redirect("admin/users/all");
+  }
+
+  public function removeAccountMedia(Request $request)
+  {
+    $target = User::findOrFail($request->route('id'));
+    $this->authorizeAccountManagement($target);
+    $directory = $request->route('kind') === 'avatar' ? 'assets/img' : 'assets/img/background-img';
+    $path = base_path($directory);
+    if (is_dir($path)) {
+      $pattern = '/^' . preg_quote((string) $target->id, '/') . '(_\w+)?\.\w+$/iD';
+      foreach (new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS) as $file) {
+        if (!$file->isLink() && $file->isFile() && preg_match($pattern, $file->getFilename())) {
+          abort_unless(File::delete($file->getPathname()), 500, 'Media removal failed');
+        }
+      }
+    }
+    return redirect()->route('showUser', $target->id);
   }
 
   //Show site pages to edit
@@ -548,13 +581,7 @@ class AdminController extends Controller
   //Delete avatar
   public function delAvatar()
   {
-    $path = findFile("avatar");
-    $path = base_path("/assets/linkstack/images/" . $path);
-
-    // Delete existing image
-    if (File::exists($path)) {
-      File::delete($path);
-    }
+    $this->removeBrandMedia('avatar');
 
     return back();
   }
@@ -562,16 +589,22 @@ class AdminController extends Controller
   //Delete favicon
   public function delFavicon()
   {
-    // Delete existing image
-    $path = findFile("favicon");
-    $path = base_path("/assets/linkstack/images/" . $path);
-
-    // Delete existing image
-    if (File::exists($path)) {
-      File::delete($path);
-    }
+    $this->removeBrandMedia('favicon');
 
     return back();
+  }
+
+  // Do not remove the bundled fallback favicon.svg or files outside branding.
+  private function removeBrandMedia(string $prefix): void
+  {
+    $path = base_path('assets/linkstack/images');
+    $pattern = '/^' . preg_quote($prefix, '/') . '(_\w+)?\.\w+$/iD';
+    foreach (new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS) as $file) {
+      if (!$file->isLink() && $file->isFile() &&
+          $file->getFilename() !== 'favicon.svg' && preg_match($pattern, $file->getFilename())) {
+        abort_unless(File::delete($file->getPathname()), 500, 'Brand media removal failed');
+      }
+    }
   }
 
   //View footer page: terms
@@ -837,59 +870,37 @@ class AdminController extends Controller
   //Removes impersonation if authenticated
   public function authAs(Request $request)
   {
-    $userID = $request->id;
-    $token = $request->token;
-
-    $user = User::find($userID);
-
-    if (!$user) {
-      Auth::logout();
-      return redirect("/login");
+    $state = $request->session()->get('linkfree_impersonation');
+    abort_unless(is_array($state) && (int) ($state['member_id'] ?? 0) === (int) Auth::id(), 403);
+    $admin = User::find($state['admin_id'] ?? null);
+    if (!$admin || $admin->role !== 'admin' || $admin->block === 'yes') {
+      Auth::guard('web')->logoutCurrentDevice();
+      $request->session()->invalidate();
+      $request->session()->regenerateToken();
+      return redirect('/login');
     }
-
-    $userRememberToken = $user->remember_token;
-    $sessionToken = $request->session()->get("display_auth_nav");
-
-    if (
-      !empty($token) &&
-      !empty($userRememberToken) &&
-      !empty($sessionToken) &&
-      hash_equals($userRememberToken, $token) &&
-      hash_equals($userRememberToken, $sessionToken)
-    ) {
-      $user->auth_as = null;
-      $user->remember_token = null;
-      $user->save();
-
-      $request->session()->forget("display_auth_nav");
-
-      Auth::loginUsingId($userID);
-
-      return redirect("/admin/users/all");
-    } else {
-      Auth::logout();
-      return redirect("/login");
-    }
+    Auth::guard('web')->logoutCurrentDevice();
+    Auth::guard('web')->login($admin);
+    $request->session()->forget('linkfree_impersonation');
+    $request->session()->regenerateToken();
+    return redirect("admin/users/all");
   }
 
   //Add impersonation
   public function authAsID(request $request)
   {
-    $adminUser = User::whereNotNull("auth_as")->where("role", "admin")->first();
+    abort_if($request->session()->has('linkfree_impersonation'), 403);
+    $admin = Auth::user();
+    abort_unless($admin && $admin->role === 'admin' && $admin->block !== 'yes', 403);
+    $target = User::findOrFail($request->route('id'));
+    abort_unless((int) $target->id !== (int) $admin->id && in_array($target->role, ['user', 'vip'], true) && $target->block !== 'yes', 403);
+    abort_unless(env('REGISTER_AUTH') === 'auth' || $target->hasVerifiedEmail(), 403);
 
-    if (!$adminUser) {
-      $userID = $request->id;
-      $id = Auth::user()->id;
-
-      $user = User::find($id);
-
-      $user->auth_as = $userID;
-      $user->save();
-
-      return redirect("dashboard");
-    } else {
-      return redirect("admin/users/all");
-    }
+    Auth::guard('web')->logoutCurrentDevice();
+    Auth::guard('web')->login($target);
+    $request->session()->regenerateToken();
+    $request->session()->put('linkfree_impersonation', ['admin_id' => (int) $admin->id, 'member_id' => (int) $target->id]);
+    return redirect("dashboard");
   }
 
   //Show info about link

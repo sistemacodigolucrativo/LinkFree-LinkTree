@@ -7,11 +7,14 @@ use App\Models\Link;
 use App\Models\Button;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
+use Symfony\Component\HttpFoundation\Response;
 
 class LinkTypeViewController extends Controller
 {
     public function getParamForm($typename, $linkId = 0)
     {
+        abort_unless(preg_match('/^[A-Za-z0-9_-]+$/D', $typename) && LinkType::existsByTypename($typename), 404);
+        abort_unless(ctype_digit((string) $linkId), 404);
         $data = [
             'title' => '',
             'link' => '',
@@ -20,7 +23,8 @@ class LinkTypeViewController extends Controller
         ];
     
         if ($linkId) {
-            $link = Link::find($linkId);
+            $link = Link::findOrFail($linkId);
+            abort_unless((int) $link->user_id === (int) auth()->id(), 403);
             $data['title'] = $link->title;
             $data['link'] = $link->link;
             if (Route::currentRouteName() != 'showButtons') {
@@ -56,6 +60,8 @@ class LinkTypeViewController extends Controller
     public function blockAsset(Request $request, $type)
     {
         $asset = $request->query('asset');
+        abort_unless(is_string($asset) && $asset !== '' && !str_contains($asset, "\0"), 400);
+        abort_unless(preg_match('/^[A-Za-z0-9_-]+$/D', $type), 403);
     
         // Prevent directory traversal in $type
         if (preg_match('/\.\.|\/|\\\\/', $type)) {
@@ -74,7 +80,7 @@ class LinkTypeViewController extends Controller
     
         $fullPath = realpath(base_path("blocks/$type/$asset"));
     
-        if (!$fullPath || !file_exists($fullPath) || strpos($fullPath, $basePath) !== 0) {
+        if (!$basePath || !$fullPath || !is_file($fullPath) || !str_starts_with($fullPath, $basePath . DIRECTORY_SEPARATOR)) {
             return response('File not found', Response::HTTP_NOT_FOUND);
         }
     

@@ -32,7 +32,7 @@
         <div class="col-auto"><a class="btn btn-outline-secondary" href="{{ route('admin.abuse-reports.index') }}">Limpar</a></div>
       </form>
 
-      <div class="table-responsive">
+      <div class="table-responsive" tabindex="0" role="region" aria-label="Lista de denúncias">
         <table class="table table-hover align-middle">
           <thead>
           <tr>

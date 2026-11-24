@@ -39,14 +39,14 @@
             <div class="lf-site-field">
               <label for="field-site-logo" class="form-label fw-semibold">{{__('messages.Site logo')}}</label>
               @if(file_exists(base_path('assets/linkstack/images/').findFile('avatar')))
-                <a class="small ms-2 text-danger" href="{{ route('delAvatar') }}" title="Remover logotipo">Remover logotipo</a>
+                <button class="btn btn-link btn-sm ms-2 text-danger" type="submit" formaction="{{ route('delAvatar') }}" formmethod="post" onclick="return confirm('Remover logotipo?')">Remover logotipo</button>
               @endif
               <input type="file" class="form-control" id="field-site-logo" name="image" accept="image/*">
             </div>
             <div class="lf-site-field">
               <label for="field-site-favicon" class="form-label fw-semibold">{{__('messages.Favicon')}}</label>
               @if(file_exists(base_path('assets/linkstack/images/').findFile('favicon')))
-                <a class="small ms-2 text-danger" href="{{ route('delFavicon') }}" title="Remover favicon">Remover favicon</a>
+                <button class="btn btn-link btn-sm ms-2 text-danger" type="submit" formaction="{{ route('delFavicon') }}" formmethod="post" onclick="return confirm('Remover favicon?')">Remover favicon</button>
               @endif
               <input type="file" class="form-control" id="field-site-favicon" name="icon" accept="image/*">
             </div>

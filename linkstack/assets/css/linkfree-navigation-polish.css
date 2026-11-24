@@ -303,6 +303,8 @@ body .main-content .footer .left-panel a{
 body .main-content .footer .right-panel{
   flex:1 1 230px;min-width:0;overflow-wrap:anywhere;line-height:1.65
 }
+/* Footer contrast: use the design tokens already scoped per light/dark mode. */
+body .main-content .footer .right-panel{color:var(--lf-muted,#4b5870)!important}
 body .main-content .footer .right-panel svg{vertical-align:middle}
 #offcanvasExample{width:min(430px,100vw);max-width:100vw;overflow-x:hidden;box-sizing:border-box}
 #offcanvasExample .offcanvas-header{min-width:0;gap:12px}

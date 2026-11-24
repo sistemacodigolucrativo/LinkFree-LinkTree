@@ -42,17 +42,16 @@ if(file_exists(base_path('INSTALLING')) or file_exists(base_path('INSTALLERLOCK'
   Route::post('/db', [InstallerController::class, 'db'])->name('db');
   Route::post('/mysql', [InstallerController::class, 'mysql'])->name('mysql');
   Route::post('/options', [InstallerController::class, 'options'])->name('options');
-  Route::get('/mysql-test', [InstallerController::class, 'mysqlTest'])->name('mysqlTest');
-  Route::get('/skip', function () {Artisan::call('db:seed', ['--class' => 'AdminSeeder',]); Auth::login(User::where('name', 'admin')->first()); return redirect(url('dashboard'));});
+  // Database initialization now occurs in the CSRF-protected /mysql POST.
+  Route::get('/mysql-test', fn () => abort(405));
+  // The VPS installer already denies this default-account shortcut at nginx.
+  Route::get('/skip', fn () => abort(404));
   Route::post('/editConfigInstaller', [InstallerController::class, 'editConfigInstaller'])->name('editConfigInstaller');
 
-  Route::get('{any}', function() {
-    if(!DB::table('users')->get()->isEmpty()){
-    if(file_exists(base_path("INSTALLING")) and !file_exists(base_path('INSTALLERLOCK'))){unlink(base_path("INSTALLING"));header("Refresh:0");}
-    } else {
-      return redirect(url(''));
-    }
-  })->where('any', '.*');
+  // Reading a URL must never complete installation or remove a marker.
+  Route::get('{any}', fn () => abort(404))->where('any', '.*');
+  // No normal login, registration, OAuth or administrative routes until setup is finished.
+  return;
 
 }else{
 
@@ -121,9 +120,8 @@ Route::post('/studio/verification/visibility', [VerificationController::class, '
 Route::post('/studio/referrals/code', [ReferralController::class, 'createCode'])->name('studio.referrals.code')->middleware('throttle:10,1');
 Route::get('/studio/theme-preview/{theme}', [\App\Http\Controllers\ThemePreviewController::class, 'show'])->name('themePreview')->where('theme', '[A-Za-z][A-Za-z0-9_-]*');
 Route::post('/studio/theme', [UserController::class, 'editTheme'])->name('editTheme');
-Route::get('/deleteLink/{id}', [UserController::class, 'deleteLink'])->name('deleteLink')->middleware('link-id');
-Route::delete('/deleteLink/{id}', [UserController::class, 'deleteLink'])->middleware('link-id');
-Route::get('/upLink/{up}/{id}', [UserController::class, 'upLink'])->name('upLink')->middleware('link-id');
+Route::delete('/deleteLink/{id}', [UserController::class, 'deleteLink'])->name('deleteLink')->middleware('link-id');
+Route::post('/upLink/{up}/{id}', [UserController::class, 'upLink'])->name('upLink')->middleware('link-id');
 Route::post('/studio/edit-link/{id}', [UserController::class, 'editLink'])->name('editLink')->middleware('link-id');
 Route::get('/studio/button-editor/{id}', [UserController::class, 'showCSS'])->name('showCSS')->middleware('link-id');
 Route::post('/studio/button-editor/{id}', [UserController::class, 'editCSS'])->name('editCSS')->middleware('link-id');
@@ -131,16 +129,16 @@ Route::get('/studio/page', [UserController::class, 'showPage'])->name('showPage'
 Route::get('/studio/no_page_name', [UserController::class, 'showPage'])->name('showPageMissingName');
 Route::post('/studio/page', [UserController::class, 'editPage'])->name('editPage');
 Route::post('/studio/background', [UserController::class, 'themeBackground'])->name('themeBackground');
-Route::get('/studio/rem-background', [UserController::class, 'removeBackground'])->name('removeBackground');
+Route::post('/studio/rem-background', [UserController::class, 'removeBackground'])->name('removeBackground');
 Route::get('/studio/profile', [UserController::class, 'showProfile'])->name('showProfile');
 Route::post('/studio/profile', [UserController::class, 'editProfile'])->name('editProfile');
 // Returning to the form URL with GET must not resubmit changes.
 Route::get('/edit-icons', fn () => redirect()->route('showPageIcons'));
 Route::post('/edit-icons', [UserController::class, 'editIcons'])->name('editIcons');
-Route::get('/clearIcon/{id}', [UserController::class, 'clearIcon'])->name('clearIcon')->middleware('link-id');
-Route::get('/studio/page/delprofilepicture', [UserController::class, 'delProfilePicture'])->name('delProfilePicture');
-Route::get('/studio/delete-user/{id}', [UserController::class, 'deleteUser'])->name('deleteOwnUser')->middleware('verified');
-Route::post('/auth-as', [AdminController::class, 'authAs'])->name('authAs');
+Route::post('/clearIcon/{id}', [UserController::class, 'clearIcon'])->name('clearIcon')->middleware('link-id');
+Route::post('/studio/page/delprofilepicture', [UserController::class, 'delProfilePicture'])->name('delProfilePicture');
+Route::delete('/studio/delete-user/{id}', [UserController::class, 'deleteUser'])->name('deleteOwnUser')->middleware('verified');
+
 
 // Catch all redirects
 Route::get('/admin/users/all', fn() => redirect(route('showUsers')));
@@ -158,6 +156,9 @@ Route::get('/studio/linkparamform_part/{typeid}/{linkid}', [LinkTypeViewControll
 });
 });
 }
+
+// Return is authenticated and session-bound, even when the impersonated member is blocked.
+Route::post('/auth-as', [AdminController::class, 'authAs'])->middleware('auth')->name('authAs');
 
 //Social login route
 Route::get('/social-auth/{provider}/callback', [SocialLoginController::class, 'providerCallback']);
@@ -182,14 +183,15 @@ Route::group([
     Route::post('/admin/users/{user}/verification', [VerificationController::class, 'toggle'])->whereNumber('user')->name('admin.verification.toggle');
     Route::post('/admin/users/registration-vip', [AdminController::class, 'updateRegistrationVip'])->name('admin.registration-vip');
     Route::get('/admin/links/{id}', [AdminController::class, 'showLinksUser'])->name('showLinksUser');
-    Route::get('/admin/deleteLink/{id}', [AdminController::class, 'deleteLinkUser'])->name('deleteLinkUser');
-    Route::get('/admin/users/block/{block}/{id}', [AdminController::class, 'blockUser'])->name('blockUser');
-    Route::get('/admin/users/verify/{verify}/{id}', [AdminController::class, 'verifyCheckUser'])->name('verifyCheckUser');
-    Route::get('/admin/users/verify-mail/{verify}/{id}', [AdminController::class, 'verifyUser'])->name('verifyUser');
+    Route::delete('/admin/deleteLink/{id}', [AdminController::class, 'deleteLinkUser'])->name('deleteLinkUser');
+    Route::post('/admin/users/block/{block}/{id}', [AdminController::class, 'blockUser'])->name('blockUser');
+    Route::post('/admin/users/verify/{verify}/{id}', [AdminController::class, 'verifyCheckUser'])->name('verifyCheckUser');
+    Route::post('/admin/users/verify-mail/{verify}/{id}', [AdminController::class, 'verifyUser'])->name('verifyUser');
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'showUser'])->name('showUser');
     Route::post('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->name('editUser');
-    Route::get('/admin/new-user', [AdminController::class, 'createNewUser'])->name('createNewUser')->middleware('max.users');
-    Route::get('/admin/delete-user/{id}', [AdminController::class, 'deleteUser'])->name('deleteUser');
+    Route::post('/admin/edit-user/{id}/media/{kind}', [AdminController::class, 'removeAccountMedia'])->whereNumber('id')->where('kind', 'avatar|background')->name('admin.remove-account-media');
+    Route::post('/admin/new-user', [AdminController::class, 'createNewUser'])->name('createNewUser')->middleware('max.users');
+    Route::delete('/admin/delete-user/{id}', [AdminController::class, 'deleteUser'])->name('deleteUser');
     Route::post('/admin/delete-table-user/{id}', [AdminController::class, 'deleteTableUser'])->name('deleteTableUser');
     Route::get('/admin/pages', [AdminController::class, 'showSitePage'])->name('showSitePage');
     Route::post('/admin/pages', [AdminController::class, 'editSitePage'])->name('editSitePage');
@@ -200,8 +202,8 @@ Route::group([
     Route::get('/admin/site', [AdminController::class, 'showSite'])->name('showSite');
     Route::post('/admin/site/content', [AdminController::class, 'editPublicSiteContent'])->name('admin.site.content');
     Route::post('/admin/site', [AdminController::class, 'editSite'])->name('editSite');
-    Route::get('/admin/site/delavatar', [AdminController::class, 'delAvatar'])->name('delAvatar');
-    Route::get('/admin/site/delfavicon', [AdminController::class, 'delFavicon'])->name('delFavicon');
+    Route::post('/admin/site/delavatar', [AdminController::class, 'delAvatar'])->name('delAvatar');
+    Route::post('/admin/site/delfavicon', [AdminController::class, 'delFavicon'])->name('delFavicon');
     Route::get('/admin/phpinfo', [AdminController::class, 'phpinfo'])->name('phpinfo');
     Route::get('/admin/backups', [AdminController::class, 'showBackups'])->name('showBackups');
     Route::post('/admin/theme', [AdminController::class, 'deleteTheme'])->name('deleteTheme');
@@ -215,11 +217,19 @@ Route::group([
     Route::get('/update/theme', [AdminController::class, 'updateThemes'])->name('updateThemes');
     Route::get('/admin/config', [AdminController::class, 'showConfig'])->name('showConfig');
     Route::post('/admin/config', [AdminController::class, 'editConfig'])->name('editConfig');
-    Route::get('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail');
-    Route::get('/auth-as/{id}', [AdminController::class, 'authAsID'])->name('authAsID');
+    Route::post('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail');
+    Route::post('/auth-as/{id}', [AdminController::class, 'authAsID'])->name('authAsID');
     Route::get('/theme-updater', function () {return view('studio/theme-updater', []);});
-    Route::get('/update', function () {return view('update', []);});
-    Route::get('/backup', function () {return view('backup', []);});
+    // Legacy views execute server updates and backup cleanup from query strings.
+    // Keep navigation read-only; operational changes use the controlled VPS procedure.
+    Route::get('/update', function () {
+        abort_if(request()->server('QUERY_STRING', '') !== '', 403);
+        return view('panel.maintenance-operations', ['operation' => 'update']);
+    });
+    Route::get('/backup', function () {
+        abort_if(request()->server('QUERY_STRING', '') !== '', 403);
+        return view('panel.maintenance-operations', ['operation' => 'backup']);
+    });
 
     Route::group(['namespace'=>'App\Http\Controllers\Admin', 'prefix'=>'admin', 'as'=>'admin'],function() {
         //Route::resource('/admin/linktype', LinkTypeController::class);

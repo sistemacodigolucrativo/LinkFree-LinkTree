@@ -74,7 +74,7 @@
                                                     <div class="input-group">
                                                       <span class="input-group-text"><i class="fab fa-'.$name.'"></i></span>
                                                       <input type="url" class="form-control" name="'.$name.'" value="'.iconLink($name).'" />
-                                                      '.(searchIcon($name) != NULL ? '<a href="'.route("deleteLink", searchIcon($name)).'" aria-label="Excluir ícone de '.e($label).'" class="btn btn-danger"><i class="bi bi-trash-fill"></i></a>' : '').'
+                                                      '.(searchIcon($name) != NULL ? '<button type="submit" formaction="'.route("deleteLink", searchIcon($name)).'" formmethod="post" name="_method" value="DELETE" onclick="return confirm(&quot;Excluir este ícone?&quot;)" aria-label="Excluir ícone de '.e($label).'" class="btn btn-danger"><i class="bi bi-trash-fill"></i></button>' : '').'
                                                     </div>
                                                   </div>';
                                         }

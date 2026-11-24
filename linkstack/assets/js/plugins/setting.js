@@ -57,7 +57,11 @@ Index Of Script
     // On Page Load Active Function
     const checkSettingMenu = (type, name, value) => {
         const items = document.querySelectorAll('[data-setting="' + type + '"][data-name="' + name + '"]');
-        items.forEach(el => el.classList.toggle('active', el.getAttribute('data-value') === value));
+        items.forEach(el => {
+            const selected = el.getAttribute('data-value') === value;
+            el.classList.toggle('active', selected);
+            if (el.hasAttribute('aria-pressed')) el.setAttribute('aria-pressed', String(selected));
+        });
     }
 
         // Dark mode enable & disabled function
@@ -173,17 +177,26 @@ Index Of Script
         }
     };
 
-    updateMode();
-
-        // Modo de cor: alternancia imediata, estado selecionado e persistencia.
+    // Single activation path for native click and explicit keyboard fallback.
+    // Bind before restoring optional sidebar preferences, so a stale optional
+    // setting cannot prevent the core color controls from working.
     const colorMode = document.querySelectorAll('[data-setting="color-mode"][data-name="color"]');
-    colorMode.forEach(mode => mode.addEventListener('click', () => {
+    const selectColorMode = mode => {
         const chosen = mode.getAttribute('data-value');
         if (!colorModes.includes(chosen)) return;
-        localStorage.setItem('color-mode', chosen);
+        try { localStorage.setItem('color-mode', chosen); } catch (_) {}
         applyColorMode(chosen);
         changeMode('color-mode', chosen);
-    }));
+    };
+    colorMode.forEach(mode => {
+        mode.addEventListener('click', () => selectColorMode(mode));
+        mode.addEventListener('keydown', event => {
+            if (event.key !== ' ' && event.key !== 'Spacebar' && event.key !== 'Enter') return;
+            event.preventDefault();
+            if (!event.repeat) selectColorMode(mode);
+        });
+    });
+    updateMode();
 
         //rtl & ltr
     const dirMode = document.querySelectorAll('[data-setting="dir-mode"][data-name="dir"]')

@@ -130,8 +130,8 @@
                 </div>
     
                 <div class="d-flex flex-column flex-md-row align-items-md-center">
-                    <button class="btn btn-primary me-md-3 mb-3 mb-md-0"><a href="{{ route('deleteLink', $linkID ) }}" target="_blank" class="text-white confirmation">{{__('messages.Delete')}} {{strtolower(__('messages.Link'))}}</a></button>
-                    <button class="btn btn-danger me-md-3 mb-3 mb-md-0"><a href="{{ route('deleteUser', ['id' => $id]) }}" target="_blank" class="text-white confirmation">{{__('messages.Delete')}} {{strtolower(__('messages.User'))}}</a></button>
+                    <form method="POST" action="{{ route('deleteLinkUser', $linkID) }}" class="me-md-3 mb-3 mb-md-0" onsubmit="return confirm('Excluir este link?')">@csrf @method('DELETE')<button type="submit" class="btn btn-primary">{{__('messages.Delete')}} {{strtolower(__('messages.Link'))}}</button></form>
+                    <form method="POST" action="{{ route('deleteUser', ['id' => $id]) }}" class="me-md-3 mb-3 mb-md-0" onsubmit="return confirm('Excluir definitivamente este usuário?')">@csrf @method('DELETE')<button type="submit" class="btn btn-danger">{{__('messages.Delete')}} {{strtolower(__('messages.User'))}}</button></form>
                   </div>
 
                   <script type="text/javascript">

@@ -521,19 +521,12 @@ class UserController extends Controller
     //Delete link
     public function deleteLink(request $request)
     {
-        $linkId = $request->id;
+        $linkId = $request->route('id');
 
         $isPageIcon = Link::where('id', $linkId)->where('user_id', Auth::id())->where('button_id', 94)->exists();
         Link::where('id', $linkId)->delete();
 
-        $directory = base_path("assets/favicon/icons");
-        $files = scandir($directory);
-        foreach($files as $file) {
-        if (strpos($file, $linkId.".") !== false) {
-        $pathinfo = pathinfo($file, PATHINFO_EXTENSION);}}
-        if (isset($pathinfo)) {
-        try{File::delete(base_path("assets/favicon/icons")."/".$linkId.".".$pathinfo);} catch (exception $e) {}
-        }
+        $this->removeOwnedMedia('assets/favicon/icons', (int) $linkId);
 
         if ($request->expectsJson()) {
             return response()->json(['deleted' => true, 'id' => (string) $linkId]);
@@ -544,16 +537,9 @@ class UserController extends Controller
     //Delete icon
     public function clearIcon(request $request)
     {
-        $linkId = $request->id;
+        $linkId = $request->route('id');
 
-        $directory = base_path("assets/favicon/icons");
-        $files = scandir($directory);
-        foreach($files as $file) {
-        if (strpos($file, $linkId.".") !== false) {
-        $pathinfo = pathinfo($file, PATHINFO_EXTENSION);}}
-        if (isset($pathinfo)) {
-        try{File::delete(base_path("assets/favicon/icons")."/".$linkId.".".$pathinfo);} catch (exception $e) {}
-        }
+        $this->removeOwnedMedia('assets/favicon/icons', (int) $linkId);
 
         return redirect('/studio/links');
     }
@@ -561,8 +547,9 @@ class UserController extends Controller
     //Raise link on the littlelink page
     public function upLink(request $request)
     {
-        $linkId = $request->id;
-        $upLink = $request->up;
+        $linkId = $request->route('id');
+        $upLink = $request->route('up');
+        abort_unless(in_array($upLink, ['yes', 'no'], true), 422);
 
         if ($upLink == 'yes') {
             $up = 'no';
@@ -595,7 +582,7 @@ class UserController extends Controller
     //Show custom CSS + custom icon
     public function showCSS(request $request)
     {
-        $linkId = $request->id;
+        $linkId = $request->route('id');
 
         $link = Link::where('id', $linkId)->value('link');
         $title = Link::where('id', $linkId)->value('title');
@@ -629,7 +616,7 @@ class UserController extends Controller
         $title = $request->title;
         $order = $request->order;
         $button = $request->button;
-        $linkId = $request->id;
+        $linkId = $request->route('id');
 
         $buttonId = Button::select('id')->where('name', $button)->value('id');
 
@@ -641,7 +628,7 @@ class UserController extends Controller
     //Save edit custom CSS + custom icon
     public function editCSS(request $request)
     {
-        $linkId = $request->id;
+        $linkId = $request->route('id');
         $custom_icon = $request->custom_icon;
         $custom_css = $request->custom_css;
 
@@ -798,14 +785,7 @@ class UserController extends Controller
     //Delete custom background image
     public function removeBackground()
     {
-        $userId = Auth::user()->id;
-
-        // Delete the user's current background image if it exists
-        while (findBackground($userId) !== "error.error") {
-            $avatarName = "assets/img/background-img/" . findBackground(Auth::id());
-            unlink(base_path($avatarName));
-        }
-
+        $this->removeOwnedMedia('assets/img/background-img', (int) Auth::id());
         return back();
     }
 
@@ -916,38 +896,40 @@ class UserController extends Controller
     //Delete existing user
     public function deleteUser(request $request)
     {
-
-        // echo $request->id;
-        // echo "<br>";
-        // echo Auth::id();
-        $id = $request->id;
-
-    if($id == Auth::id() and $id != "1") {
-
-        Link::where('user_id', $id)->delete();
-
-        $user = User::find($id);
-
-        Schema::disableForeignKeyConstraints();
-        $user->forceDelete();
-        Schema::enableForeignKeyConstraints();
-    }
-
+        $id = (int) $request->route('id');
+        abort_unless($id === (int) Auth::id() && $id !== 1, 403);
+        abort_if($request->session()->has('linkfree_impersonation'), 403);
+        DB::transaction(function () use ($id) {
+            $user = User::findOrFail($id);
+            Link::where('user_id', $id)->delete();
+            $user->forceDelete();
+        });
+        Auth::guard('web')->logoutCurrentDevice();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect('/');
     }
 
     //Delete profile picture
     public function delProfilePicture()
     {
-        $userId = Auth::user()->id;
-
-        // Delete the user's current avatar if it exists
-        while (findAvatar($userId) !== "error.error") {
-            $avatarName = findAvatar($userId);
-            unlink(base_path($avatarName));
-        }
-
+        $this->removeOwnedMedia('assets/img', (int) Auth::id());
         return back();
+    }
+
+    // Scan once: findAvatar/findBackground cache the directory listing per request.
+    private function removeOwnedMedia(string $directory, int $id): void
+    {
+        $path = base_path($directory);
+        if (!is_dir($path)) {
+            return;
+        }
+        $pattern = '/^' . preg_quote((string) $id, '/') . '(_\w+)?\.\w+$/iD';
+        foreach (new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS) as $file) {
+            if (!$file->isLink() && $file->isFile() && preg_match($pattern, $file->getFilename())) {
+                abort_unless(File::delete($file->getPathname()), 500, 'Media removal failed');
+            }
+        }
     }
 
     //Export user links

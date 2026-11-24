@@ -399,7 +399,7 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
   </div>
 @endif
 </div>
-<a href="{{route('SendTestMail')}}" class="btn btn-gray">{{__('messages.Send Test E-Mail')}}</a>
+<form method="POST" action="{{ route('SendTestMail') }}" class="d-inline">@csrf<button type="submit" class="btn btn-gray">{{__('messages.Send Test E-Mail')}}</button></form>
 {{-- end SMTP settings --}}
 
 

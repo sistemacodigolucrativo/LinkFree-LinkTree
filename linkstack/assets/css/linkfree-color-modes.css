@@ -694,6 +694,9 @@ body .sidebar.sidebar-default.sidebar-color {
 /* Transparent sidebar keeps its positioning and backdrop behavior. */
 body .sidebar.sidebar-default:not(.sidebar-transparent) {
   background-color:var(--lf-sidebar-surface)!important;
+  /* Do not interpolate a light surface against a dark foreground (or vice versa).
+     Preserve the existing sidebar sliding and sizing transitions. */
+  transition-property:transform,width,left,right,margin,margin-inline-start!important;
 }
 body .sidebar.sidebar-default {
   color:var(--lf-sidebar-fg);
@@ -703,6 +706,16 @@ body .sidebar.sidebar-default .sidebar-header {
 }
 body .sidebar.sidebar-default .navbar-brand .logo-title {
   color:var(--lf-sidebar-fg)!important;
+  transition-property:transform,opacity,margin,width!important;
+}
+@media(prefers-reduced-motion:reduce) {
+  body .sidebar.sidebar-default,
+  body .sidebar.sidebar-default .navbar-brand .logo-title,
+  body #offcanvasExample,
+  body .offcanvas-backdrop {
+    transition-duration:.001ms!important;
+    animation-duration:.001ms!important;
+  }
 }
 /* Section labels and separators: vendor gray-400 is inadequate on white. */
 body .sidebar.sidebar-default .sidebar-body .nav-item.static-item .nav-link,

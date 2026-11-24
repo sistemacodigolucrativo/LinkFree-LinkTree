@@ -22,7 +22,7 @@
       </div>
 
       <h2 class="h5">Fila de análise</h2>
-      <div class="table-responsive">
+      <div class="table-responsive" tabindex="0" role="region" aria-label="Fila de solicitações de selo">
         <table class="table align-middle">
           <thead><tr><th scope="col">Membro</th><th scope="col">Solicitação</th><th scope="col">Situação</th><th scope="col">Decisão</th></tr></thead>
           <tbody>
@@ -74,7 +74,7 @@
       {{ $applications->links() }}
 
       <h2 class="h5 mt-4">Histórico de ações recentes</h2>
-      <div class="table-responsive">
+      <div class="table-responsive" tabindex="0" role="region" aria-label="Histórico administrativo de verificação">
         <table class="table table-sm align-middle">
           <thead><tr><th scope="col">Data</th><th scope="col">Membro</th><th scope="col">Responsável</th><th scope="col">Ação</th></tr></thead>
           <tbody>

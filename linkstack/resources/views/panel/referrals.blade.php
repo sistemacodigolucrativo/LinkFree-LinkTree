@@ -23,7 +23,7 @@
                 <div class="col-auto"><a class="btn btn-outline-secondary" href="{{ route('admin.referrals') }}">Limpar</a></div>
             </form>
 
-            <div class="table-responsive">
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Histórico administrativo de indicações">
                 <table class="table table-striped align-middle">
                     <thead><tr><th scope="col">Data</th><th scope="col">Indicador</th><th scope="col">Convidado</th><th scope="col">Código</th></tr></thead>
                     <tbody>
@@ -40,7 +40,7 @@
                                 <span class="small text-muted d-block">ID {{ $entry->invited_user_id }}</span>
                                 @if($entry->invited_email)<span class="small text-muted">{{ $entry->invited_email }}</span>@endif
                             </td>
-                            <td><code>{{ $entry->referral_code }}</code></td>
+                            <td><code style="color:inherit;font-weight:600">{{ $entry->referral_code }}</code></td>
                         </tr>
                     @empty
                         <tr><td colspan="4" class="text-muted">Não há indicações registradas para este filtro.</td></tr>

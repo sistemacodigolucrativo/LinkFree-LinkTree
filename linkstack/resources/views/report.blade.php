@@ -48,6 +48,11 @@
 
       <!-- RTL Css -->
       <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}" />
+      <style>
+        /* Scoped public reporting form contrast in the white card. */
+        .card--customized :is(.form-label,.form-control,.form-select,label,select,textarea){color:#334155!important}
+        .card--customized :is(.form-control,.form-select,textarea)::placeholder{color:#4b5870!important;opacity:1}
+      </style>
 
 
   </head>
@@ -117,7 +122,7 @@
                                     <label for="message" class="form-label">{{ __('messages.additional_comments_label') }}</label>
                                 </div>
                                 <textarea class="form-control" id="message" name="message" rows="3" maxlength="2000">{{ old('message') }}</textarea>
-                                <p class="small text-muted">Não envie senhas, documentos ou informações pessoais desnecessárias.</p>
+                                <p class="small" style="color:#334155!important">Não envie senhas, documentos ou informações pessoais desnecessárias.</p>
                                 <div class="display-msg"></div>
                             </div>
                             <button type="submit" class="btn btn-primary">{{ __('messages.submit_button') }}</button>

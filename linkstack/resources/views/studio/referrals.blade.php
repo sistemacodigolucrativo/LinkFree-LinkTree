@@ -34,7 +34,7 @@
 
             <h2 class="h5">Histórico de convidados</h2>
             <p class="small text-muted">Exibimos apenas o identificador público do convidado, não seu e-mail.</p>
-            <div class="table-responsive">
+            <div class="table-responsive" tabindex="0" role="region" aria-label="Histórico de indicações">
                 <table class="table align-middle">
                     <thead><tr><th scope="col">Convidado</th><th scope="col">Data do cadastro</th></tr></thead>
                     <tbody>
