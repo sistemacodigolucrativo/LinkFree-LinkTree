@@ -46,7 +46,7 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
     }));
     pages.push({route:location,role,axeRules:found.length,axeNodes:found.reduce((n,x)=>n+x.count,0),incomplete:axe.incomplete.map(x=>x.id)});
     for(const v of found)issues.push({route:location,role,...v});
-    console.log(location,role,'violations='+found.map(v=>v.rule+'('+v.count+')').join(','),flush=true);
+    console.log(location,role,'violations='+found.map(v=>v.rule+'('+v.count+')').join(','));
   }
   try {
     for (const [role, paths] of [
