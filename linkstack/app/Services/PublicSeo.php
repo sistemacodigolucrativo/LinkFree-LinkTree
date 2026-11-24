@@ -30,7 +30,10 @@ final class PublicSeo
         if (!$parts) $parts = ['index', 'follow'];
         if ($noIndex || in_array('none', $parts, true) || in_array('noindex', $parts, true)) {
             $parts = array_values(array_diff($parts, ['index', 'all']));
-            if (!in_array('none', $parts, true) && !in_array('noindex', $parts, true)) $parts[] = 'noindex';
+            if (!in_array('none', $parts, true)) {
+                $parts = array_values(array_diff($parts, ['noindex']));
+                array_unshift($parts, 'noindex');
+            }
             if (!in_array('none', $parts, true) && !in_array('nofollow', $parts, true) && !in_array('follow', $parts, true)) $parts[] = 'follow';
         } elseif (!array_filter($parts, fn ($part) => str_starts_with($part, 'max-image-preview:'))) {
             $parts[] = 'max-image-preview:large';

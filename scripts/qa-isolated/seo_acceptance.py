@@ -147,7 +147,7 @@ else:
     assert updated.one('og:image') != profile.one('og:image')
     assert image(updated.one('og:image'))[2] != original_image
     hidden,headers=page('/@auditother')
-    assert 'noindex' in hidden.one('robots') and 'noindex' in headers['X-Robots-Tag']
+    assert hidden.one('robots') == 'noindex, follow' and 'noindex' in headers['X-Robots-Tag']
     assert image(hidden.one('og:image'))[0]==200
     assert get('/@auditvip')[0]==404 and get('/social-preview/profile/4.jpg')[0]==404
     assert get('/social-preview/profile/4-wide.jpg')[0]==404
