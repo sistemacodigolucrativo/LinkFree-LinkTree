@@ -399,7 +399,7 @@ if (isset($_COOKIE['LinkCount'])) {
                                                             @endif
                                                             @endif
 
-                                                        @if(file_exists(base_path("assets/favicon/icons/").localIcon($link->id)))<a style="float: right;" href="{{ route('clearIcon', $link->id ) }}" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Limpar cache do ícone de {{ $link->title }}" data-original-title="Clear icon cache" class="float-right hvr-grow p-1 text-primary"><i style="-webkit-text-stroke:1px;padding-right:5px;" class="bi bi-arrow-repeat"></i></a>@endif
+                                                        @if(file_exists(base_path("assets/favicon/icons/").localIcon($link->id)))<form method="POST" action="{{ route('clearIcon', $link->id ) }}" style="float:right;margin:0">@csrf<button type="submit" title="Limpar cache do ícone" aria-label="Limpar cache do ícone de {{ $link->title }}" class="btn btn-link hvr-grow p-1 text-primary"><i style="-webkit-text-stroke:1px;padding-right:5px;" class="bi bi-arrow-repeat"></i></button></form>@endif
 
                                                     </div>
                                                 </div>

@@ -32,6 +32,13 @@ checks["All sidebar logos have alternative text"] = len(logos) >= 8 and all(re.s
 for path in ["linkstack/resources/views/studio/referrals.blade.php","linkstack/resources/views/panel/abuse-reports.blade.php"]:
     content = read(path)
     checks[path+" table is keyboard-focusable"] = bool(re.search(r'<div class="table-responsive"[^>]*tabindex="0"[^>]*role="region"', content))
+for endpoint in ("/upLink/{up}/{id}", "/studio/rem-background", "/clearIcon/{id}", "/studio/page/delprofilepicture", "/studio/delete-user/{id}", "/admin/site/delavatar", "/admin/site/delfavicon"):
+    checks["No mutating GET at " + endpoint] = "Route::get('" + endpoint + "'" not in routes
+checks["Background removal is POST with CSRF"] = 'formaction="{{ route(\'removeBackground\') }}"' in read("linkstack/resources/views/studio/theme.blade.php") and "@csrf" in read("linkstack/resources/views/studio/theme.blade.php")
+checks["Photo removal is POST with CSRF"] = 'action="{{ route(\'delProfilePicture\') }}"' in read("linkstack/resources/views/studio/page.blade.php") and "@csrf" in read("linkstack/resources/views/studio/page.blade.php")
+checks["Icon-cache removal is POST with CSRF"] = 'action="{{ route(\'clearIcon\',' in links and "@csrf" in links
+checks["Brand removal uses POST override"] = 'formaction="{{ route(\'delAvatar\') }}"' in read("linkstack/resources/views/panel/site.blade.php") and 'formaction="{{ route(\'delFavicon\') }}"' in read("linkstack/resources/views/panel/site.blade.php")
+
 for name, passed in checks.items():
     print(("PASS" if passed else "FAIL") + " " + name)
 if not all(checks.values()):

@@ -260,7 +260,7 @@
                   @endif
                   @if(file_exists(base_path(findAvatar(Auth::user()->id))))
                   <div class="upload-icone bg-primary">
-                    <a href="{{ route('delProfilePicture') }}" style="top:1px;position:relative;" data-bs-toggle="tooltip" data-bs-placement="right" title="Delete profile picture"><i class="bi bi-trash-fill text-white"></i></a>
+                    <form method="POST" action="{{ route('delProfilePicture') }}" class="d-inline" onsubmit="return confirm('Remover a foto do perfil?')">@csrf<button type="submit" class="btn btn-link p-0" style="top:1px;position:relative;" title="Remover foto do perfil" aria-label="Remover foto do perfil"><i class="bi bi-trash-fill text-white"></i></button></form>
                     <input class="file-upload" type="file" accept="image/*">
                   </div>
                   @endif

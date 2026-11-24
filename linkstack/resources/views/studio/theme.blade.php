@@ -103,7 +103,7 @@
                             <figure style="max-width:1000px;max-height:562.5px;" class="figure">
                             @if(!file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<p><i>{{__('messages.No image selected')}}</i></p>@endif
                             <img class="bd-placeholder-img figure-img img-fluid rounded" src="@if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id)))){{url('assets//img/background-img/'.findBackground(Auth::user()->id))}}@else{{url('/assets/linkstack/images/themes/no-preview.png')}}@endif"><br>
-                            @if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<a class="mt-3 ml-3 btn btn-primary" style="background-color:var(--lf-danger-action)!important;border-color:var(--lf-danger-action)!important;transform: scale(.9);" title="Delete background image" href="{{ url('/studio/rem-background') }}"><i class="bi bi-trash-fill"></i>{{__('messages.Remove background')}}</a><br>@endif
+                            @if(file_exists(base_path('assets/img/background-img/'.findBackground(Auth::user()->id))))<button type="submit" class="mt-3 ml-3 btn btn-primary" style="background-color:var(--lf-danger-action)!important;border-color:var(--lf-danger-action)!important;transform: scale(.9);" title="Remover imagem de fundo" formaction="{{ route('removeBackground') }}" formmethod="post" onclick="return confirm('Remover imagem de fundo?')"><i class="bi bi-trash-fill"></i>{{__('messages.Remove background')}}</button><br>@endif
                             {{-- <figcaption class="figure-caption">A caption for the above image.</figcaption> --}}
                         </figure>
                             <br>

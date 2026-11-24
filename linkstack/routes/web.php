@@ -122,7 +122,7 @@ Route::post('/studio/referrals/code', [ReferralController::class, 'createCode'])
 Route::get('/studio/theme-preview/{theme}', [\App\Http\Controllers\ThemePreviewController::class, 'show'])->name('themePreview')->where('theme', '[A-Za-z][A-Za-z0-9_-]*');
 Route::post('/studio/theme', [UserController::class, 'editTheme'])->name('editTheme');
 Route::delete('/deleteLink/{id}', [UserController::class, 'deleteLink'])->name('deleteLink')->middleware('link-id');
-Route::get('/upLink/{up}/{id}', [UserController::class, 'upLink'])->name('upLink')->middleware('link-id');
+Route::post('/upLink/{up}/{id}', [UserController::class, 'upLink'])->name('upLink')->middleware('link-id');
 Route::post('/studio/edit-link/{id}', [UserController::class, 'editLink'])->name('editLink')->middleware('link-id');
 Route::get('/studio/button-editor/{id}', [UserController::class, 'showCSS'])->name('showCSS')->middleware('link-id');
 Route::post('/studio/button-editor/{id}', [UserController::class, 'editCSS'])->name('editCSS')->middleware('link-id');
@@ -130,15 +130,15 @@ Route::get('/studio/page', [UserController::class, 'showPage'])->name('showPage'
 Route::get('/studio/no_page_name', [UserController::class, 'showPage'])->name('showPageMissingName');
 Route::post('/studio/page', [UserController::class, 'editPage'])->name('editPage');
 Route::post('/studio/background', [UserController::class, 'themeBackground'])->name('themeBackground');
-Route::get('/studio/rem-background', [UserController::class, 'removeBackground'])->name('removeBackground');
+Route::post('/studio/rem-background', [UserController::class, 'removeBackground'])->name('removeBackground');
 Route::get('/studio/profile', [UserController::class, 'showProfile'])->name('showProfile');
 Route::post('/studio/profile', [UserController::class, 'editProfile'])->name('editProfile');
 // Returning to the form URL with GET must not resubmit changes.
 Route::get('/edit-icons', fn () => redirect()->route('showPageIcons'));
 Route::post('/edit-icons', [UserController::class, 'editIcons'])->name('editIcons');
-Route::get('/clearIcon/{id}', [UserController::class, 'clearIcon'])->name('clearIcon')->middleware('link-id');
-Route::get('/studio/page/delprofilepicture', [UserController::class, 'delProfilePicture'])->name('delProfilePicture');
-Route::get('/studio/delete-user/{id}', [UserController::class, 'deleteUser'])->name('deleteOwnUser')->middleware('verified');
+Route::post('/clearIcon/{id}', [UserController::class, 'clearIcon'])->name('clearIcon')->middleware('link-id');
+Route::post('/studio/page/delprofilepicture', [UserController::class, 'delProfilePicture'])->name('delProfilePicture');
+Route::delete('/studio/delete-user/{id}', [UserController::class, 'deleteUser'])->name('deleteOwnUser')->middleware('verified');
 Route::post('/auth-as', [AdminController::class, 'authAs'])->name('authAs');
 
 // Catch all redirects
@@ -199,8 +199,8 @@ Route::group([
     Route::get('/admin/site', [AdminController::class, 'showSite'])->name('showSite');
     Route::post('/admin/site/content', [AdminController::class, 'editPublicSiteContent'])->name('admin.site.content');
     Route::post('/admin/site', [AdminController::class, 'editSite'])->name('editSite');
-    Route::get('/admin/site/delavatar', [AdminController::class, 'delAvatar'])->name('delAvatar');
-    Route::get('/admin/site/delfavicon', [AdminController::class, 'delFavicon'])->name('delFavicon');
+    Route::post('/admin/site/delavatar', [AdminController::class, 'delAvatar'])->name('delAvatar');
+    Route::post('/admin/site/delfavicon', [AdminController::class, 'delFavicon'])->name('delFavicon');
     Route::get('/admin/phpinfo', [AdminController::class, 'phpinfo'])->name('phpinfo');
     Route::get('/admin/backups', [AdminController::class, 'showBackups'])->name('showBackups');
     Route::post('/admin/theme', [AdminController::class, 'deleteTheme'])->name('deleteTheme');
