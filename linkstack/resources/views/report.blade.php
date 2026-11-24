@@ -48,6 +48,11 @@
 
       <!-- RTL Css -->
       <link rel="stylesheet" href="{{asset('assets/css/rtl.min.css')}}" />
+      <style>
+        /* Scoped public reporting form contrast in the white card. */
+        .card--customized :is(.form-label,.form-control,.form-select,label,select,textarea){color:#334155!important}
+        .card--customized :is(.form-control,.form-select,textarea)::placeholder{color:#4b5870!important;opacity:1}
+      </style>
 
 
   </head>
