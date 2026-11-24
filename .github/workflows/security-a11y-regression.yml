@@ -1,0 +1,36 @@
+name: Security and accessibility regression guards
+on:
+  push:
+    branches:
+      - fix/homologacao-get-delete-a11y-20261124
+    paths:
+      - 'linkstack/routes/web.php'
+      - 'linkstack/resources/views/**'
+      - 'linkstack/assets/js/main-dashboard.js'
+      - 'scripts/audit-get-mutation-a11y.py'
+      - '.github/workflows/security-a11y-regression.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'linkstack/routes/web.php'
+      - 'linkstack/resources/views/**'
+      - 'linkstack/assets/js/main-dashboard.js'
+      - 'scripts/audit-get-mutation-a11y.py'
+      - '.github/workflows/security-a11y-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP routes syntax
+        run: php -l linkstack/routes/web.php
+      - name: JavaScript syntax
+        run: node --check linkstack/assets/js/main-dashboard.js
+      - name: Security and accessibility static guards
+        run: python3 scripts/audit-get-mutation-a11y.py
