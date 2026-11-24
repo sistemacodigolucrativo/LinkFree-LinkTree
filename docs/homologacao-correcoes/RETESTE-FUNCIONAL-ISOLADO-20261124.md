@@ -31,11 +31,22 @@
 
 A falha original **existe na versão de produção reportada** e permanece \`REPROVADO\` na matriz histórica da PR #15. **Na branch corretiva**, o subconjunto de exclusão GET/CSRF e autorização foi reexecutado e passou contra dados sintéticos. A aprovação integral do TC-04-D exige confirmar todos os estados do caso (inclusive sessão, logout e isolamento) na versão que for efetivamente publicada. Não usar estes testes para alterar os números históricos 4/2/34/2/1.
 
-## Acessibilidade — prova separada
+## Acessibilidade — reteste real com navegador e axe-core
 
-O teste \`browser-a11y\` verifica Chromium com axe-core em páginas anônimas, do membro e do administrador; os achados originais TC-09-B incluem contraste, imagens sem alt, componentes sem nome e regiões roláveis sem acesso por teclado. A política do job é **falhar se regressões de acessibilidade direcionadas forem encontradas** e registrar todos os contrastes e problemas remanescentes, independentemente do estado do job.
+**Ambiente:** Chromium headless dentro do GitHub Actions, aplicação Laravel local/SQLite sintético, **12 telas públicas, de membro e Admin**, sem conexões externas. Auditoria limitada a WCAG A/AA por axe-core nos cenários verificados; não equivale a teste manual de leitores de tela, Safari ou todos os temas.
 
-**A aprovação de \`php-lint\`/\`studio-layout\`/\`regression\` não substitui axe-core real nem inspeção manual de dispositivos/teclado.** Anexar o JSON \`linkfree-qa-browser-a11y-synthetic\` e atualizar esta seção após evidência de execução; não declarar \`TC-09-B APROVADO\` sem zero falhas pertinentes, revisão do contraste e aceitação de UX.
+| Execução | Páginas | Erros de execução | Grupos de violações axe | Violações-alvo (alt, nome, foco, ARIA) |
+|---|---:|---:|---:|---:|
+| [Primeira bateria após correções iniciais](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45371320410) | 12 | 0 | 10 | **0** |
+| [Depois de corrigir rodapé, formulário e prévia](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45371995654) | 12 | 0 | 2 | **0** |
+| [Após correção complementar do formulário](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45372421569) | 12 | 0 | **1** | **0** |
+
+Na última execução, **11/12 páginas ficaram sem regras de violação axe detectadas**; a única exceção foi \`/@auditfree\`, com três nós de contraste insuficiente no tema público sintético (nome de perfil e dois botões). Como as cores das páginas públicas podem depender de temas e preferências dos membros, uma correção global não deve sobrescrevê-las sem uma regra de contraste validada. Avaliar guarda de contraste nos editores/temas e teste manual de temas reais antes do aceite.
+
+O job \`browser-a11y\` foi **aprovado para o escopo de regressões direcionadas** (faltas de alt, nome acessível, foco de tabelas e ARIA), e os 12 scans terminaram. Isso **não significa aprovação integral de TC-09-B**: ainda resta o contraste do tema público e a validação humana/cross-browser. Os JSONs completos de cada execução foram anexados como artefatos \`linkfree-qa-browser-a11y-synthetic\` e os logs de ações estão linkados acima.
+
+**Controle de segurança repetido:** [run #45372421569](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45372421569) mantém \`http-behavior\` em sucesso, com 8/8 verificações sobre GET, autorização e CSRF no SQLite de teste.
+
 
 ## Gates que permanecem antes de merge e deploy
 
