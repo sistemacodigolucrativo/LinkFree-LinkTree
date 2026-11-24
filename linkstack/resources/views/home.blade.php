@@ -7,39 +7,42 @@
     <meta charset="utf-8">
     @php $GLOBALS['themeName'] = config('advanced-config.home_theme'); @endphp
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      @if(env('CUSTOM_META_TAGS') == 'true' and config('advanced-config.title') != '')
-      <title>{{ config('advanced-config.title') }}</title>
-      @else
-      <title>{{ config('app.name') }}</title>
-      @endif
-
-<!--#### BEGIN Meta Tags social media preview images  ####-->
-  <!-- This shows a preview for title, description and avatar image of users profiles if shared on social media sites -->
-
-    <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="{{ url('') }}">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{env('APP_NAME')}}">
-    <meta property="og:description" content='@if($message->home_message == "default"){!!strip_tags(__('messages.HOME.MESSAGE'))!!}@else{!!$message->home_message!!}@endif'>
-    @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
-    <meta property="og:image" content="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}">
-    @else
-    <meta property="og:image" content="{{ asset('assets/linkstack/images/logo.svg') }}">
-    @endif
-
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="{{ url('') }}">
-    <meta property="twitter:url" content="{{ url('') }}">
-    <meta name="twitter:title" content="{{env('APP_NAME')}}">
-    <meta name="twitter:description" content='@if($message->home_message == "default"){!!strip_tags(__('messages.HOME.MESSAGE'))!!}@else{!!$message->home_message!!}@endif'>
-    @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
-    <meta name="twitter:image" content="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}">
-    @else
-    <meta name="twitter:image" content="{{ asset('assets/linkstack/images/logo.svg') }}">
-    @endif
-
-<!--#### END Meta Tags social media preview images  ####-->
+@php
+    $homeTitle = \App\Services\PublicSeo::homeTitle();
+    $homeDescription = \App\Services\PublicSeo::homeDescription();
+    $homeCanonical = \App\Services\PublicSeo::canonical(url()->current());
+    $homeVersion = \App\Services\PublicSeo::version(config('app.name', 'LinkFree'), $homeDescription, \App\Services\PublicSeo::avatar());
+    $homeImage = route('socialPreview.site', ['v' => $homeVersion]);
+    $homeSchema = ['@context' => 'https://schema.org', '@type' => 'WebSite',
+        '@id' => $homeCanonical . '#website', 'url' => $homeCanonical,
+        'name' => config('app.name', 'LinkFree'), 'description' => $homeDescription,
+        'publisher' => ['@type' => 'Organization', 'name' => config('app.name', 'LinkFree'), 'url' => $homeCanonical]];
+@endphp
+<title>{{ $homeTitle }}</title>
+<meta name="description" content="{{ $homeDescription }}">
+<meta name="robots" content="{{ \App\Services\PublicSeo::robots() }}">
+<link rel="canonical" href="{{ $homeCanonical }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ config('app.name', 'LinkFree') }}">
+<meta property="og:locale" content="{{ \App\Services\PublicSeo::locale() }}">
+<meta property="og:url" content="{{ $homeCanonical }}">
+<meta property="og:title" content="{{ $homeTitle }}">
+<meta property="og:description" content="{{ $homeDescription }}">
+<meta property="og:image" content="{{ $homeImage }}">
+@if(str_starts_with($homeImage, 'https://'))
+<meta property="og:image:secure_url" content="{{ $homeImage }}">
+@endif
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Prévia do LinkFree">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ $homeCanonical }}">
+<meta name="twitter:title" content="{{ $homeTitle }}">
+<meta name="twitter:description" content="{{ $homeDescription }}">
+<meta name="twitter:image" content="{{ $homeImage }}">
+<meta name="twitter:image:alt" content="Prévia do LinkFree">
+<script type="application/ld+json">{!! json_encode($homeSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) !!}</script>
 
       <!-- Favicon -->
       @if(file_exists(base_path("assets/linkstack/images/").findFile('favicon')))

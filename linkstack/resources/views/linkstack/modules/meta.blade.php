@@ -1,59 +1,51 @@
 <meta charset="utf-8">
-@if(!empty($noIndex))
-<meta name="robots" content="noindex, follow">
-@endif
-
-{{-- Fediverse rel="me" links --}}
 @php
-  $relMe = "mastodon, firefish, streams, friendica";
-  $relMeList = explode(', ', $relMe);
+    $seoName = \App\Services\PublicSeo::plain($userinfo->name) ?: $littlelink_name;
+    $seoDescription = \App\Services\PublicSeo::description($userinfo->littlelink_description, 'Encontre os links e canais de contato de ' . $seoName . '.');
+    $seoCustom = env('CUSTOM_META_TAGS') === 'true';
+    $seoCanonical = \App\Services\PublicSeo::canonical(\App\Services\PublicSeo::profileUrl(request(), $userinfo));
+    $seoRobots = \App\Services\PublicSeo::robots(!empty($noIndex));
+    $seoVersion = \App\Services\PublicSeo::version($seoName, $seoDescription, \App\Services\PublicSeo::avatar((int) $userinfo->id), (string) $userinfo->updated_at);
+    $seoImage = route('socialPreview.profile', ['id' => $userinfo->id, 'v' => $seoVersion]);
+    $seoSchema = ['@context' => 'https://schema.org', '@type' => 'ProfilePage',
+        '@id' => $seoCanonical . '#profile', 'url' => $seoCanonical,
+        'mainEntity' => ['@type' => 'Person', '@id' => $seoCanonical . '#person',
+            'name' => $seoName, 'description' => $seoDescription, 'url' => $seoCanonical, 'image' => $seoImage]];
 @endphp
-
 @foreach($links as $link)
-  @if(in_array($link->name, $relMeList))
-    <link href="{{$link->link}}" rel="me">
-  @endif
+    @if(in_array($link->name, ['mastodon', 'firefish', 'streams', 'friendica'], true))
+        <link href="{{ $link->link }}" rel="me">
+    @endif
 @endforeach
-
-@if(env('CUSTOM_META_TAGS') == 'true')
-  @include('layouts.meta')
-@else
-  <meta name="description" content="{{ strip_tags($userinfo->littlelink_description) }}">
-  <meta name="author" content="{{ $userinfo->name }}">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="{{ $seoCustom && trim((string) config('advanced-config.description')) !== '' ? \App\Services\PublicSeo::description(config('advanced-config.description'), $seoDescription) : $seoDescription }}">
+<meta name="author" content="{{ $seoCustom && config('advanced-config.author') != '' ? config('advanced-config.author') : $seoName }}">
+<meta name="viewport" content="{{ $seoCustom && config('advanced-config.viewport') != '' ? config('advanced-config.viewport') : 'width=device-width, initial-scale=1' }}">
+<meta name="robots" content="{{ $seoRobots }}">
+<link rel="canonical" href="{{ $seoCanonical }}">
+@if($seoCustom && config('advanced-config.twitter_creator') != '')
+<meta name="twitter:creator" content="{{ config('advanced-config.twitter_creator') }}">
 @endif
-
-<!--#### BEGIN Meta Tags social media preview images  ####-->
-  <!-- This shows a preview for title, description and avatar image of users profiles if shared on social media sites -->
-
-    <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="{{ url('') }}/{{ "@" . $littlelink_name }}">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $userinfo->name }}">
-    <meta property="og:description" content="{{ strip_tags($userinfo->littlelink_description) }}">
-    @if(file_exists(base_path(findAvatar($userinfo->id))))
-    <meta property="og:image" content="{{ url(findAvatar($userinfo->id)) }}">
-    @elseif(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
-    <meta property="og:image" content="{{ url("assets/linkstack/images/")."/".findFile('avatar') }}">
-    @else
-    <meta property="og:image" content="{{ asset('assets/linkstack/images/logo.svg') }}">
-    @endif
-
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="twitter:domain" content="{{ url('') }}/{{ "@" . $littlelink_name }}">
-    <meta property="twitter:url" content="{{ url('') }}/{{ "@" . $littlelink_name }}">
-    <meta name="twitter:title" content="{{ $userinfo->littlelink_name }}">
-    <meta name="twitter:description" content="{{ strip_tags($userinfo->littlelink_description) }}">
-    @if(file_exists(base_path(findAvatar($userinfo->id))))
-    <meta name="twitter:image" content="{{ url(findAvatar($userinfo->id)) }}">
-    @elseif(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
-    <meta name="twitter:image" content="{{ url("assets/linkstack/images/")."/".findFile('avatar') }}">
-    @else
-    <meta name="twitter:image" content="{{ asset('assets/linkstack/images/logo.svg') }}">
-    @endif
-
-<!--#### END Meta Tags social media preview images  ####-->
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="{{ config('app.name', 'LinkFree') }}">
+<meta property="og:locale" content="{{ \App\Services\PublicSeo::locale() }}">
+<meta property="og:url" content="{{ $seoCanonical }}">
+<meta property="og:title" content="{{ $seoName }}">
+<meta property="og:description" content="{{ $seoDescription }}">
+<meta property="og:image" content="{{ $seoImage }}">
+@if(str_starts_with($seoImage, 'https://'))
+<meta property="og:image:secure_url" content="{{ $seoImage }}">
+@endif
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Prévia da página pública de {{ $seoName }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ $seoCanonical }}">
+<meta name="twitter:title" content="{{ $seoName }}">
+<meta name="twitter:description" content="{{ $seoDescription }}">
+<meta name="twitter:image" content="{{ $seoImage }}">
+<meta name="twitter:image:alt" content="Prévia da página pública de {{ $seoName }}">
+<script type="application/ld+json">{!! json_encode($seoSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) !!}</script>
 
 @if(config('advanced-config.linkstack_title') != '' and env('HOME_URL') === '')
 <title>{{ $userinfo->name }} {{ config('advanced-config.linkstack_title') }}</title>
@@ -62,7 +54,7 @@
 @elseif(env('HOME_URL') != '')
 <title>{{ $userinfo->name }}</title>
 @else
-<title>{{ $userinfo->name }} 🔗 {{ config('app.name') }} </title>
+<title>{{ $seoName }} | {{ config('app.name') }} </title>
 @endif
 
 @include('components.favicon')

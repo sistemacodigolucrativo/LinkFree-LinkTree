@@ -94,7 +94,7 @@ class UserController extends Controller
             return abort(404);
         }
      
-        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible')->where('id', $id)->first();
+        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible', 'updated_at')->where('id', $id)->first();
         $information = User::select('name', 'littlelink_name', 'littlelink_description', 'theme')->where('id', $id)->get();
         
         if ($userinfo->block == 'yes') {
@@ -136,7 +136,7 @@ class UserController extends Controller
             return abort(404);
         }
      
-        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible')->where('id', $id)->first();
+        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible', 'updated_at')->where('id', $id)->first();
         $information = User::select('name', 'littlelink_name', 'littlelink_description', 'theme')->where('id', $id)->get();
         
         $links = DB::table('links')
@@ -184,6 +184,8 @@ class UserController extends Controller
     // Visitas publicas e SEO compartilham o contador ja usado pelo dashboard.
     private function renderPublicProfile(Request $request, User $userinfo, $information, $links, string $littlelink_name)
     {
+        // HOME_URL must obey the same blocked-profile rule as /@handle.
+        abort_if($userinfo->block === 'yes', 404);
         $visitCount = 0;
         try {
             $counter = visits('App\\Models\\User', $littlelink_name);
