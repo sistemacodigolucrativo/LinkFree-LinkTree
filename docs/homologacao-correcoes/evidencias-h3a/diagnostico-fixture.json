@@ -1,0 +1,8 @@
+{
+  "id": "TC-08-D",
+  "http_historico": 200,
+  "user_agent": "Python-urllib/3.12 (padrão urllib)",
+  "linha_total_presente": false,
+  "resultado_historico": "fetchone() retorna None; índice [0] gera TypeError",
+  "conclusao": "fixture usou agente ignorado como crawler; linha ausente é pré-condição não satisfeita"
+}
