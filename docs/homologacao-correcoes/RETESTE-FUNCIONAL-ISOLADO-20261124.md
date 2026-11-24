@@ -62,3 +62,6 @@ O job \`browser-a11y\` foi **aprovado para o escopo de regressões direcionadas*
 **Correção de comportamento GET/CSRF: tecnicamente comprovada no sandbox.**
 **Acessibilidade: 11/12 páginas avaliadas sem violações axe detectadas; 1 grupo de contraste remanescente no perfil público sintético. TC-09-B segue sem aceite completo (temas, outros navegadores e avaliação humana).**
 **Publicação na VPS: NÃO realizada. Homologação final: NÃO concluída.**
+
+## Atualização posterior — evidência de encerramento isolado
+Preservar os resultados históricos acima. Código 1d5a4bc3688f7bfb6d7906b55088da4a20b36ca8, [execução final](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45452596718): TC-04-D 20/20 HTTP e 6/6 interações, instaladores 4/4 cada; TC-09-B 12/12 páginas sem violações detectadas e 24/24 cenários perfil em três motores, 6/6 formulários, correção de contraste original concluída no escopo automatizado. Ver [relatório STEP 04/05](STEP-04-05-ACESSIBILIDADE-REVISAO-20261124.md) e [parecer](STEP-05-PLANO-REVISAO-DEPLOY-ROLLBACK-20261124.md). Safari/iOS físico e inspeção humana dos incompletos axe não executados. Não declarar aceite integral ou publicação.

@@ -24,3 +24,20 @@ Dispositivo Safari/iOS físico, leitor de tela, temas instalados externamente, a
 Head de revisão anterior 6dcfa6e6: 28 commits, 54 arquivos, 39 na aplicação; diff completo disponível para os 54; nenhuma exclusão, migration, dependência, marcador ou arquivo de tema instalado. Comparação por caminho com a PR #15: 43 arquivos nela, interseção vazia. Main 342fce9b intacta e PR #16 draft/mergeável.
 - Ensaio local no container (diretório temporário, rsync real, fragmento rollback do blob 0cc6588f6e459d54755624be160abbac1dcdef82, falha injetada exit 42): **PASS** restauração de arquivos distintos em dev/prod, remoção de arquivos novos, hash de SQLite/.env/storage sintéticos idêntico, PRAGMA quick_check ok, linha sintética preservada, status 42 preservado, chamadas de limpeza de cache registradas por shim. Não executamos o script integral nem o Artisan real no rollback; não equivale a recuperação de produção. O trap legado suprime falhas de rsync/cache; a verificação posterior de integridade e de hashes permanece gate obrigatório.
 - Revisão do controller de assets de blocos detectou import ausente de Response e ausência de guarda para query não escalar. Corrigido no próximo candidato; ampliada assertiva HTTP existente (asset CSS válido, extensão proibida, ausente, fora da pasta e query malformada). Requer reteste.
+
+## PARECER FINAL — STEP 05
+SHA de código 1d5a4bc3688f7bfb6d7906b55088da4a20b36ca8; 31 commits à frente, 0 atrás de main 342fce9b15cdc7a55e9bcc6f8a00278dc712d73d; 55 arquivos (40 aplicação), zero removidos, zero migrations novas, zero dependências/temas instalados/marcadores modificados. PR #15 361c4cb4, interseção de arquivos vazia. PR #16 draft, mergeable=true na última consulta. [CI final](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45452596718) e [push](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45452573437) aprovados nos sete checks aplicáveis. Workflows de deploy não foram repetidos sem alteração no script; revisão e ensaio do fragmento rollback foram registrados acima. O script de rollback deve ser verificado por hash após recuperação pois suprime certos erros de rsync/cache.
+
+| Nº original | Atividade | Estado |
+|---|---|---|
+| 22 | Revisar diff | Concluída; correções de tratamento de assets e acessibilidade incorporadas |
+| 23 | Regressões/conflitos | Concluída no escopo, main preservada, nenhuma sobreposição PR15 |
+| 24 | Workflows | Concluída; todos os checks aplicáveis verdes no SHA de código |
+| 25 | Consolidar TC-04-D/TC-09-B | Concluída com separação de evidência automatizada/manual |
+| 26 | Atualizar relatório de reteste | Concluída |
+| 27 | Atualizar documento mestre | Concluída |
+| 28 | Atualizar descrição PR | Atualizar para o parecer e links desta revisão |
+| 29 | Plano de implantação/rollback | Concluída; ensaio local de restauração de código aprovado |
+| 30 | Parecer técnico | Concluída: parecer favorável ao escopo automatizado, condicionado aos gates externos e autorização |
+
+**Parecer:** revisão técnica interna concluída, candidato apto para avaliação de liberação controlada, não para publicação automática. O gate Safari/iOS físico/inspeção humana (incluindo achados axe incompletos) segue aberto; não alegar conformidade total. Não iniciar merge/deploy até autorização expressa e tratamento/aceite documentado dos riscos externos. Preflight da VPS somente no STEP 06; não presumir versão instalada. Sem alterar PR #15, main ou produção.
