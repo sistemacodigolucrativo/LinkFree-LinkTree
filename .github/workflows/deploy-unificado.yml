@@ -7,6 +7,7 @@ on:
       - 'scripts/homologar-linkfree.sh'
       - 'scripts/audit-consent-deploy.py'
       - 'scripts/audit-deploy-unificado.py'
+      - 'scripts/audit-deploy-rollback.py'
       - '.github/workflows/deploy-unificado.yml'
   pull_request:
     paths:
@@ -15,6 +16,7 @@ on:
       - 'scripts/homologar-linkfree.sh'
       - 'scripts/audit-consent-deploy.py'
       - 'scripts/audit-deploy-unificado.py'
+      - 'scripts/audit-deploy-rollback.py'
       - '.github/workflows/deploy-unificado.yml'
 jobs:
   script-quality:
@@ -29,6 +31,10 @@ jobs:
           bash -n scripts/homologar-linkfree.sh
           python3 scripts/audit-consent-deploy.py
           python3 scripts/audit-deploy-unificado.py
+      - name: Exercitar rollback real em fixture isolado
+        run: |
+          command -v rsync || { sudo apt-get update && sudo apt-get install -y rsync; }
+          python3 scripts/audit-deploy-rollback.py
       - name: Compilar sintaxe do bootstrap embutido
         run: |
           awk '/^cat > "\$work" <<\x27LINKFREE_BOOTSTRAP\x27$/ {on=1;next} on && /^LINKFREE_BOOTSTRAP$/ {exit} on {print}' scripts/instalar-deploy-unificado.sh > /tmp/linkfree-bootstrap-test.sh
