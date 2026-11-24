@@ -49,3 +49,5 @@ Revisão de diff e evidência para o SHA candidato, CI aprovado no escopo, sem P
 
 ## 16. STEP 03 — atualização incremental
 [Relatório de segurança residual e retestes](homologacao-correcoes/STEP-03-SEGURANCA-RETETESTE-20261124.md). No candidato e51c66a7dc01db21ae3efc88421d85f59e7a1c7b: [HTTP 16/16](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45436916182/job/138597109172), PHP lint/layout/regressão aprovados; browser pendente na consulta. Candidato subsequente protege editor de bloco por proprietário e propõe bloquear execução GET da manutenção legada (consulta de backups preservada). Não significa homologação final; CI do novo SHA, compatibilidade do instalador e aceite do comportamento de manutenção ainda são necessários. PR #15 intacta; PR #16 draft; não mesclar nem publicar.
+
+Atualização posterior STEP 03: [browser 5/6 no e51c66a7](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45436916182/job/138597109766), com causa do clique Membro confirmada (tooltip intercepta ponteiro). Patch CSS local em novo candidato; não declarar aprovação sem novo log. 

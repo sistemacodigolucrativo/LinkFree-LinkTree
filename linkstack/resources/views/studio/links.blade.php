@@ -193,6 +193,8 @@ if (isset($_COOKIE['LinkCount'])) {
   flex:0 0 auto!important;float:none!important;min-width:max-content;margin:0!important;
 }
 .studio-links-page #links-table-body .studio-link-actions button[data-delete-link]{cursor:pointer;}
+/* A Bootstrap tooltip is descriptive only; never let it cover the action target. */
+.tooltip[role="tooltip"], .tooltip[role="tooltip"] * {pointer-events:none!important;}
 .studio-links-page #links-table-body .studio-link-slim{
   position:relative!important;display:block;min-width:0;
   padding:5px 7px!important;min-height:0!important;box-sizing:border-box;
