@@ -40,8 +40,8 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (\Exception $e) {
-            if ($e->getPrevious() instanceof \Illuminate\Session\TokenMismatchException) {
-                if (!\Illuminate\Support\Facades\Route::has('login')) return response('CSRF token mismatch', 419);
+            if ($e instanceof \Illuminate\Session\TokenMismatchException || $e->getPrevious() instanceof \Illuminate\Session\TokenMismatchException) {
+                if (is_file(base_path('INSTALLING')) || is_file(base_path('INSTALLERLOCK')) || !\Illuminate\Support\Facades\Route::has('login')) return response('CSRF token mismatch', 419);
                 return redirect()->route('login');
             };
         });

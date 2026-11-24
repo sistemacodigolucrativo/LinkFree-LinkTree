@@ -38,3 +38,6 @@ No commit 13c89b11: [HTTP 18/18](https://github.com/sistemacodigolucrativo/LinkF
 
 ### Ajuste da fixture instalada
 O primeiro reteste do candidato c5c80696 encontrou GET /login 404 porque os runners anteriores copiavam o marcador INSTALLING versionado e dependiam da remoção automática por GET. Agora os dois jobs que representam uma aplicação já instalada excluem INSTALLING e INSTALLERLOCK somente na cópia efêmera; o job de instalação virgem cria o marcador explicitamente. A guarda do instalador permanece ativa.
+
+### Isolamento das rotas do instalador
+No candidato 14ededab, teste MySQL identificou CSRF de instalação respondendo com status diferente de 419. A leitura completa de web.php mostrou rotas de autenticação e Admin registradas após o bloco condicional do instalador. Retorno antecipado no bloco de instalação impede seu registro e Handler devolve 419 para token inválido durante setup. Testes agora exigem também indisponibilidade de login/registro/social/admin POST enquanto marcadores estão ativos. Não alterar comportamento CSRF 302 da aplicação normal.

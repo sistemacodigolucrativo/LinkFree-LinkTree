@@ -50,6 +50,8 @@ if(file_exists(base_path('INSTALLING')) or file_exists(base_path('INSTALLERLOCK'
 
   // Reading a URL must never complete installation or remove a marker.
   Route::get('{any}', fn () => abort(404))->where('any', '.*');
+  // No normal login, registration, OAuth or administrative routes until setup is finished.
+  return;
 
 }else{
 

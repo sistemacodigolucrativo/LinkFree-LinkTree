@@ -69,7 +69,11 @@ def preinstall():
     token=owner.token('/?3')
     for url,code in [('/mysql-test',405),('/skip',404),('/anything',404),('/?5',403)]:
         expect(owner.req('GET',url)[0]==code,'Unexpected status: '+url)
-    expect(owner.req('POST','/db',{})[0]==419,'Missing CSRF not rejected')
+    status=owner.req('POST','/db',{})[0]
+    expect(status==419,f'Missing CSRF returned {status}, expected 419')
+    for path in ('/login','/register','/admin/new-user','/social-auth/github/consent'):
+        status=owner.req('POST',path,{'_token':token})[0]
+        expect(status in (404,405),f'Normal application route exposed during installation: {path} {status}')
     expect(owner.req('POST','/editConfigInstaller',{'_token':token,'entry':'APP_KEY','value':'invalid'})[0]==422,'Arbitrary env key accepted')
     expect(owner.req('POST','/options',{'_token':token})[0]==403,'Options before root accepted')
     expect(snapshot()==before and (ROOT/'INSTALLING').exists() and not (ROOT/'INSTALLERLOCK').exists(),'Read or unauthorized action mutated fixture')
