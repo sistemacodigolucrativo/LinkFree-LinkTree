@@ -43,7 +43,12 @@ jobs:
           fi
           php -m | grep -iE '^(pdo_sqlite|sqlite3)$'
       - name: Run migration, registration rejection and persistence using temporary SQLite
-        run: php scripts/audit-consent-storage-sqlite.php
+        run: |
+          # The disposable CI checkout models an installed instance, not an installer.
+          # Never remove markers on the VPS; installer tests cover them separately.
+          test "$GITHUB_ACTIONS" = true
+          rm -f -- linkstack/INSTALLING linkstack/INSTALLERLOCK
+          php scripts/audit-consent-storage-sqlite.php
       - name: Lint consent PHP files
         run: |
           php -l linkstack/app/Services/ConsentReceipt.php

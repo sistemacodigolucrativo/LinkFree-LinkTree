@@ -26,6 +26,7 @@ def run_case(name, mode, expected):
         for label in ("dev", "prod"):
             dest = root / label
             dest.mkdir(mode=0o755)
+            dest.chmod(0o755)
             (backup / label).mkdir(mode=0o700)
             (backup / label / "old.php").write_bytes(b"old!")
             (dest / "old.php").write_bytes(b"new!")
@@ -112,3 +113,26 @@ if __name__ == "__main__":
     assert 'rsync -ac --chmod=F644,D755 --no-owner --no-group' in SCRIPT
     assert SCRIPT.index('verify_published_files "$PROD"') < SCRIPT.rindex('printf \'%s\\n\' "$TARGET" > "$LAST_FILE"')
     print("PASS: publication checksum and verification ordering")
+    # Exercise the actual production rsync command (no chown and no live paths)
+    # against a same-size/same-mtime pair, then independently verify the bytes.
+    with tempfile.TemporaryDirectory(prefix="lf-forward-") as tmp:
+        root = Path(tmp)
+        src = root / "repo" / "linkstack"
+        dest = root / "prod"
+        backup = root / "backup"
+        for folder in (src, dest, backup):
+            folder.mkdir(parents=True)
+        (src / "file.php").write_bytes(b"new!")
+        (dest / "file.php").write_bytes(b"old!")
+        for p in (src / "file.php", dest / "file.php"):
+            os.utime(p, (1700000000, 1700000000))
+        (backup / "files.txt").write_text("file.php\n")
+        start = SCRIPT.index("  rsync -ac --chmod=F644,D755 --no-owner --no-group")
+        end = SCRIPT.index('  verify_published_files "$DEV"', start)
+        command = SCRIPT[start:end]
+        setup = 'set -Eeuo pipefail\nREPO="$ROOT/repo"; PROD="$ROOT/prod"; backup="$ROOT/backup"; files=(file.php)\n'
+        func = FRAGMENT[:FRAGMENT.index("\nrollback()")]
+        subprocess.run(["bash", "-c", setup + func + command + 'verify_published_files "$PROD"\n'],
+                       env=dict(os.environ, ROOT=str(root)), check=True, timeout=30)
+        assert (dest / "file.php").read_bytes() == b"new!"
+        print("PASS: actual forward copy replaces same-size/same-mtime file")
