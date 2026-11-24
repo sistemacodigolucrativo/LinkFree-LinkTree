@@ -41,3 +41,6 @@ O primeiro reteste do candidato c5c80696 encontrou GET /login 404 porque os runn
 
 ### Isolamento das rotas do instalador
 No candidato 14ededab, teste MySQL identificou CSRF de instalação respondendo com status diferente de 419. A leitura completa de web.php mostrou rotas de autenticação e Admin registradas após o bloco condicional do instalador. Retorno antecipado no bloco de instalação impede seu registro e Handler devolve 419 para token inválido durante setup. Testes agora exigem também indisponibilidade de login/registro/social/admin POST enquanto marcadores estão ativos. Não alterar comportamento CSRF 302 da aplicação normal.
+
+### Reteste do ciclo de instalação
+O candidato c82c5f56 comprovou os controles de GET/CSRF e inicialização de banco nos dois motores; SQLite também comprovou criação e isolamento do administrador. A ferramenta `artisan serve` reinicia o servidor quando `.env` muda (ServeCommand verifica mtime), provocando desconexão no teste durante configuração/finalização. A fixture virgem passa a invocar o roteador PHP do repositório diretamente, sem watcher, para ler a configuração atual a cada requisição, sem alterar a proteção nem repetir POSTs.
