@@ -1,0 +1,32 @@
+[
+  {
+    "id": "TC-05-A",
+    "name": "criação, clipboard, reload e nova sessão",
+    "pass": true,
+    "code_format": "24 hex",
+    "clipboard": "copiado no Chromium local",
+    "reload": "estável",
+    "nova_sessao": "estável",
+    "outro_membro": "distinto",
+    "url_transporte": "HTTP isolado; HTTPS histórico"
+  },
+  {
+    "id": "TC-05-B/D",
+    "name": "atribuição e telas proprietário/Admin",
+    "pass": true,
+    "delta": 1,
+    "atribuicao": "uma para usuário 2",
+    "historico": "handle e data sem email",
+    "admin": "mesma indicação e filtro",
+    "outro_membro": "sem registro",
+    "admin_membro": "negado"
+  },
+  {
+    "id": "TC-05-C",
+    "name": "navegação inválida, sessão autenticada e conta existente",
+    "pass": true,
+    "invalido": 404,
+    "autenticado": "redirecionado sem atribuição",
+    "conta_existente": "login e reload sem atribuição"
+  }
+]

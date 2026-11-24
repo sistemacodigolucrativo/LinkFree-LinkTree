@@ -1,0 +1,43 @@
+[
+  {
+    "id": "TC-06-A",
+    "assertion": "pedido e reload",
+    "pass": true,
+    "observed": {
+      "dois_membros": "pendente",
+      "controle_prematuro": "ausente",
+      "pedidos": 2
+    }
+  },
+  {
+    "id": "TC-06-B/E",
+    "assertion": "aprovação, recusa e trilha",
+    "pass": true,
+    "observed": {
+      "aprovado": "controle liberado",
+      "recusado": "justificativa exibida",
+      "eventos_admin": 2,
+      "vip_e_email": "preservados"
+    }
+  },
+  {
+    "id": "TC-06-C",
+    "assertion": "coluna Selo, concessão e revogação",
+    "pass": true,
+    "observed": {
+      "concessao": "aprovado",
+      "revogacao": "não aprovado",
+      "papel": "preservado"
+    }
+  },
+  {
+    "id": "TC-06-D",
+    "assertion": "render público e revogação",
+    "pass": true,
+    "observed": {
+      "exibir": 1,
+      "ocultar": 0,
+      "revogado": "controle e selo ausentes"
+    }
+  }
+]

@@ -1,5 +1,7 @@
 # Continuidade técnica LinkFree-LinkTree
 
+> **H3-C:** lotes C1 e C2 concluídos no escopo sintético, C3 executado com defeito de localização TC-07-B confirmado; [relatório](homologacao-correcoes/H3-C-INDICACOES-SELO-DENUNCIAS-20261124.md). Aguardando revisão pelo ChatGPT; H3-D não iniciada.
+
 > **H3-B:** lote residual executado em staging sintético; seis casos aprovados no escopo indicado e TC-03-C parcial pela equivalência web não integral. HTTPS/OAuth/SMTP reais pendentes; [relatório](homologacao-correcoes/H3-B-BANCO-PRIVACIDADE-AUTENTICACAO-20261124.md). Revisado pelo ChatGPT; H3-C autorizada por lotes, [roteiro](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md).
 
 > **H3-A:** TC-03-B e TC-08-D aprovados no escopo automatizado de staging, sem reclassificar a matriz histórica; causas de fixture diagnosticadas. [Relatório](homologacao-correcoes/H3-A-PERSISTENCIA-ESTATISTICAS-20261124.md). H3-A revisada pelo ChatGPT e H3-B autorizada no escopo isolado; [roteiro](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md).

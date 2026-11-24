@@ -1,0 +1,83 @@
+[
+  {
+    "id": "TC-07-A",
+    "assertion": "ícone por configuração",
+    "pass": true,
+    "observed": {
+      "desligado": "ausente",
+      "ligado": "visível e link acionável"
+    }
+  },
+  {
+    "id": "TC-07-A/C/F",
+    "assertion": "envio para perfil",
+    "pass": true,
+    "observed": {
+      "feedback": "sucesso",
+      "registro": "um",
+      "evento": "criado",
+      "perfil": "não bloqueado"
+    }
+  },
+  {
+    "id": "TC-07-C",
+    "assertion": "conteúdo de email capturado",
+    "pass": true,
+    "observed": {
+      "central": "link encontrado",
+      "link_exclusao": "ausente",
+      "entrega": "SMTP sintético local"
+    }
+  },
+  {
+    "id": "TC-07-A",
+    "assertion": "envio por URL",
+    "pass": true,
+    "observed": {
+      "feedback": "sucesso",
+      "registro": "um"
+    }
+  },
+  {
+    "id": "TC-07-D",
+    "assertion": "fila, detalhe e autorização",
+    "pass": true,
+    "observed": {
+      "fila": "filtro new",
+      "detalhe": "relato correto",
+      "membro": "negado"
+    }
+  },
+  {
+    "id": "TC-07-E/F",
+    "assertion": "decisões e histórico",
+    "pass": true,
+    "observed": {
+      "analise": "persistiu",
+      "resolucao_sem_nota": "negada",
+      "resolucao_arquivo_reabertura": "persistiram",
+      "novos_eventos": 4,
+      "ator_e_data": "presentes",
+      "alvo": "não bloqueado"
+    }
+  },
+  {
+    "id": "TC-07-B",
+    "assertion": "limites e rótulos do formulário com LOCALE=pt-BR em Chromium",
+    "pass": true,
+    "observed": {
+      "appLang": "pt-BR",
+      "motivoObrigatorio": true,
+      "urlObrigatoria": true,
+      "urlMax": 2048,
+      "comentarioMax": 2000,
+      "quantidadeOpcoes": 14,
+      "labels": [
+        "Deixe este campo vazio",
+        "URL of the site you are reporting*",
+        "Type of report*",
+        "Additional comments"
+      ]
+    }
+  }
+]
