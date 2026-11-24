@@ -1,4 +1,6 @@
 # PR #16 — STEP 05: revisão e plano de liberação controlada
+
+**Atualização de estado — STEP 06:** PR #16 integrada à main em 24/11/2026 às 18:10:42 UTC (15:10:42 BRT). [Merge 1b71b747e2c2b803eaffc6c63b64b90c408e8f4e](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/commit/1b71b747e2c2b803eaffc6c63b64b90c408e8f4e). Publicação na VPS não realizada nem autorizada separadamente; ver [registro STEP 06](STEP-06-INTEGRACAO-PUBLICACAO-20261124.md). As seções abaixo preservam o estado histórico das respectivas revisões, não o estado atual da main.
 Data 24/11/2026. Documento de trabalho; nenhuma ordem de deploy. Main de referência 342fce9b15cdc7a55e9bcc6f8a00278dc712d73d; código anterior ao fechamento STEP 04: 388b80f8b83cde0622ff8ec057e2e6cec86ecd60.
 ## 1. Inventário e compatibilidade
 Comparação API GitHub: 26 commits à frente, 0 atrás, 51 arquivos (38 aplicação), nenhum removido, nenhuma migration, dependência ou tema instalado alterado. PR #15 permanece draft 361c4cb4. PR #16 draft, mergeável na consulta, não integrada. O candidato posterior adiciona apenas correções de acessibilidade/testes/documentação; recontar no head final.
@@ -36,7 +38,7 @@ SHA de código 1d5a4bc3688f7bfb6d7906b55088da4a20b36ca8; 31 commits à frente, 0
 | 25 | Consolidar TC-04-D/TC-09-B | Concluída com separação de evidência automatizada/manual |
 | 26 | Atualizar relatório de reteste | Concluída |
 | 27 | Atualizar documento mestre | Concluída |
-| 28 | Atualizar descrição PR | Atualizar para o parecer e links desta revisão |
+| 28 | Atualizar descrição PR | Concluída: descrição atualizada antes do merge; comentário STEP 06 registra a integração |
 | 29 | Plano de implantação/rollback | Concluída; ensaio local de restauração de código aprovado |
 | 30 | Parecer técnico | Concluída: parecer favorável ao escopo automatizado, condicionado aos gates externos e autorização |
 

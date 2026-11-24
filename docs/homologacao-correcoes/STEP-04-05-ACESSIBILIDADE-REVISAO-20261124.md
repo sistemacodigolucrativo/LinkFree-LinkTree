@@ -1,4 +1,6 @@
 # PR #16 — STEP 04 / STEP 05
+
+**Atualização de estado — STEP 06:** PR #16 integrada à main em 24/11/2026 às 18:10:42 UTC (15:10:42 BRT). [Merge 1b71b747e2c2b803eaffc6c63b64b90c408e8f4e](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/commit/1b71b747e2c2b803eaffc6c63b64b90c408e8f4e). Publicação na VPS não realizada nem autorizada separadamente; ver [registro STEP 06](STEP-06-INTEGRACAO-PUBLICACAO-20261124.md). As seções abaixo preservam o estado histórico das respectivas revisões, não o estado atual da main.
 Data: 2026-11-24. Base de trabalho: e09e3033e34d7c3cf11a874508f230fd21ea54a2; base de produção não verificada por SSH. STEP 03 concluído, CI 45443009426 (20/20 HTTP, 6/6 browser, 4/4 em cada instalador).
 ## Reutilização de testes
 Manter os 12 scans Chromium, 6 interações e 20 casos HTTP como baseline; a execução anterior comprovou 11/12 sem violações, perfil /@auditfree com 3 nós. Não reexecutar testes históricos PR #15 indiscriminadamente. O CI existente roda regressão ao alterar a view pública; o novo teste amplia lacunas, não substitui evidências. Instaladores não tiveram alteração nesta etapa, mas workflow atual os repete como gate de integração.

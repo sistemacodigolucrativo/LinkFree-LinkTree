@@ -1,16 +1,18 @@
 # Continuidade técnica LinkFree-LinkTree
-Atualização: 2026-11-24. Snapshot verificado por API GitHub e logs, sem acesso SSH à VPS.
+Atualização: 2026-11-24. Estado atual confirmado por API GitHub, sem acesso SSH à VPS.
+
+**ESTADO ATUAL — STEP 06:** PR #16 integrada à main, merge de aplicação [`1b71b747e2c2b803eaffc6c63b64b90c408e8f4e`](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/commit/1b71b747e2c2b803eaffc6c63b64b90c408e8f4e). PHP e layout pós-merge aprovados. Deploy ainda não executado; preflight, backup, autorização específica e homologação permanecem pendentes. Consultar o [registro operacional STEP 06](homologacao-correcoes/STEP-06-INTEGRACAO-PUBLICACAO-20261124.md). Os estados anteriores abaixo constituem histórico e não substituem este registro.
 ## 1. Projeto e arquitetura
 [Repositório](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree); PHP/Laravel 9, SQLite, Blade, JS/CSS, código em linkstack/, GitHub Actions, Playwright/Chromium e axe-core.
 ## 2. Produção
 https://linkfree.website. Repositório VPS /home/ubuntu/src-Projects/LinkFree-LinkTree; publicação /srv/linkfree (não é checkout Git). Último SHA publicado documentado: 3f20bf95e75fb93cb6abfef3aaa388c9798b664d; não confirmado novamente nesta sessão. O relatório PR #15 registra 540 arquivos iguais e integridade SQLite na auditoria anterior. Não confundir com HEAD da main.
 ## 3. Histórico
 M13, PR #14 integrada: indicação, selo, denúncia, migrações 000002–000004 e backup (evidência histórica do operador); os checks técnicos pós-deploy passaram, sem aceite funcional. PR #11 integrada; #12/#13 encerradas e incorporadas pela #14. Não repetir deploy/migração.
-## 4. Estado das branches verificado antes deste commit
+## 4. Estado histórico das branches antes do fechamento dos STEPS 03–05
 - main: [342fce9b15cdc7a55e9bcc6f8a00278dc712d73d](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/commit/342fce9b15cdc7a55e9bcc6f8a00278dc712d73d).
 - [PR #15](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/15) aberta/draft, head 361c4cb4d4da9db98039d58e10834ad8541f40a7, 4 commits à frente, 0 atrás, 43 arquivos de relatório/scripts/evidências.
 - [PR #16](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/16) aberta/draft, head anterior 581966a03a30dd5f76dfac30553917f7dd36a36e, 14 commits à frente, 0 atrás, 28 arquivos. Mesma base main, sem sobreposição de caminhos modificados na comparação dos dois heads anteriores. Não integrar automaticamente.
-## 5. Estados distintos
+## 5. Estados distintos — snapshot histórico anterior à integração
 | Item | Implementado | Testado | Aprovado | Publicado | Pendente |
 |---|---|---|---|---|---|
 | M13 indicações, selo, denúncias | Sim | Técnico e parcial funcional | Só checks técnicos | Histórico 23/11 | Aceite funcional |
@@ -66,3 +68,10 @@ Evidência final: [run 45443009426](https://github.com/sistemacodigolucrativo/Li
 
 ## 18. Encerramento técnico isolado dos STEPS 04 e 05
 Código validado 1d5a4bc3688f7bfb6d7906b55088da4a20b36ca8, [PR CI 45452596718](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45452596718), [push 45452573437](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45452573437), todos os checks aplicáveis verdes. HTTP 20/20, browser funcional 6/6, 12 páginas sem violações, perfis 24/24 em Chromium/Firefox/WebKit, formulários 6/6, SQLite e MariaDB 4/4 cada, PHP/layout/regressão aprovados. [Relatório STEP 04/05](homologacao-correcoes/STEP-04-05-ACESSIBILIDADE-REVISAO-20261124.md) e [parecer STEP 05](homologacao-correcoes/STEP-05-PLANO-REVISAO-DEPLOY-ROLLBACK-20261124.md). STEP 04 escopo automatizado encerrado (9/10, dispositivo real não disponível); STEP 05 revisão interna encerrada com parecer condicionado. Axe incompletos em gradientes e controles seguem para inspeção humana. Não confundir com WCAG integral, matriz PR15 ou produção. A posição seguinte é avaliação dos gates externos e autorização do STEP 06. Sem merge/deploy/VPS.
+
+## 19. STEP 06 — integração confirmada, publicação pendente
+- PR #16: encerrada por merge, 32 commits de origem preservados. Main anterior 342fce9b15cdc7a55e9bcc6f8a00278dc712d73d; head aprovado 6afb27d9e47884c6c2741b08806d5624856c8868; merge de aplicação 1b71b747e2c2b803eaffc6c63b64b90c408e8f4e. Árvore 0e5f3ad3a17cc0ec0a20bf056e7baaa35bd458ad idêntica à árvore aprovada no CI pré-merge.
+- [PHP pós-merge](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45456662353/job/138667833720) e [layout pós-merge](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45456662150/job/138667834252): ambos aprovados. Os sete checks pré-merge foram aprovados; HTTP/browser/segurança possuem filtros de branch, não afirmar nova execução na main.
+- PR #15 segue aberta/draft, head 361c4cb4d4da9db98039d58e10834ad8541f40a7; matriz histórica dos 43 casos preservada. Não confundir integração com deploy, homologação geral ou conformidade WCAG integral.
+- Próximo passo: preflight da VPS com --check, confirmar SHA instalado, banco, integridade, ausência de marcadores e sessões legadas; garantir backup consistente antes de publicação. Autorização de merge não autoriza deploy. Safari/iOS físico e revisão humana dos incompletos axe seguem abertos.
+- [Registro STEP 06](homologacao-correcoes/STEP-06-INTEGRACAO-PUBLICACAO-20261124.md), [comentário de integração](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/16#issuecomment-7140278238). Este commit documental não modifica código executável nem scripts; não exige repetir bateria de testes da árvore de aplicação aprovada. Não executar migrações M13 novamente.
