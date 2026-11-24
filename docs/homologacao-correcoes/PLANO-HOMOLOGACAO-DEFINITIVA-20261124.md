@@ -11,7 +11,7 @@ Aprovado pelo operador em 24/11/2026. Fonte de continuidade para ChatGPT, Codex 
 |---|---|---|---|
 | H1 | ChatGPT | Triagem dos 43 IDs com provas, responsabilidades e lacunas | Concluída documentalmente; [matriz de continuidade](MATRIZ-CONTINUIDADE-43-CASOS-20261124.md) |
 | H2 | Codex | Boot de aplicação restaurada, recuperação verificável e ambiente de teste sintético segregado | CONCLUÍDA no escopo de recuperação local e staging; dispatcher validado. [Verificação final](H2-VERIFICACAO-OPERACIONAL-FINAL-20261124.md); [integração](H2-INTEGRACAO-ROLLBACK-20261124.md); [backup e recuperação](H2-BACKUP-QUIESCENTE-RESTAURACAO-20261124.md) |
-| H3 | Codex + ChatGPT | Testes residuais da matriz; primeiro fixtures TC-03-B/08-D | INICIADA: H2 revisada/aprovada no escopo local; [roteiro H3-A](H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md), execução Codex pendente |
+| H3 | Codex + ChatGPT | Testes residuais da matriz; primeiro fixtures TC-03-B/08-D | EM ANDAMENTO: [H3-A](H3-A-PERSISTENCIA-ESTATISTICAS-20261124.md) revisada e aprovada em staging (TC-03-B/08-D); [H3-B](H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md) autorizada, execução pendente |
 | H4 | ChatGPT | Auditar resultados, PRs de defeitos confirmados e retestes de impacto | Pendente |
 | H5 | Operador + ChatGPT | Testes físicos, integrações que exijam intervenção e decisões | Pendente |
 | H6 | Todos | Avaliar necessidade de nova publicação; autorizar separadamente se houver correção | Condicional |

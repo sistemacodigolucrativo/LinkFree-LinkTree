@@ -1,6 +1,6 @@
 # Continuidade técnica LinkFree-LinkTree
 
-> **H3-A:** TC-03-B e TC-08-D aprovados no escopo automatizado de staging, sem reclassificar a matriz histórica; causas de fixture diagnosticadas. [Relatório](homologacao-correcoes/H3-A-PERSISTENCIA-ESTATISTICAS-20261124.md). H3-B aguarda revisão pelo ChatGPT.
+> **H3-A:** TC-03-B e TC-08-D aprovados no escopo automatizado de staging, sem reclassificar a matriz histórica; causas de fixture diagnosticadas. [Relatório](homologacao-correcoes/H3-A-PERSISTENCIA-ESTATISTICAS-20261124.md). H3-A revisada pelo ChatGPT e H3-B autorizada no escopo isolado; [roteiro](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md).
 
 
 > **H2 — verificação operacional final:** dispatcher aprovado busca automaticamente o script corrigido da main; backup e staging reavaliados no escopo solicitado. H2 concluída no escopo de recuperação local; H3 autorizada após revisão do ChatGPT; [roteiro H3-A](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md). [Relatório](homologacao-correcoes/H2-VERIFICACAO-OPERACIONAL-FINAL-20261124.md).
@@ -102,3 +102,6 @@ PR #19 integrada em b0309e1cb267169f599aafa00f92066fb8d79a39, script idêntico a
 
 ## 22. H2 encerrada no escopo local; H3 iniciada
 PR #23 integrada em a9ae3654dd57242fd29c614cdcef31613e2a059a; H2 revisada pelo ChatGPT, dispatcher seleciona script corrigido, backup quiescente e recuperação comprovados. [Roteiro H3-A](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md): TC-03-B e TC-08-D, staging sintético revalidado, relatório pendente. Nenhum teste H3 de runtime executado nesta sessão. TC-02-C histórico bloqueado; recuperação de outro host, integrações externas e aceite humano pendentes. Sem deploy.
+
+## 23. H3-A revisada; H3-B autorizada
+PR #24 integrada em d1b44dc729b96065d6f335edeea738951e3b2d6a; TC-03-B e TC-08-D aprovados em staging (7/7 principais, 2/2 adicionais, 1/1 expiração simulada). A seção navigation do Admin, em vez de identity, explica concretamente o cenário histórico de persistência; a exclusão de crawler reproduziu a ausência de contador. Não há defeito comprovado nesses cenários; proxy real e 900 s reais não ensaiados. H3-B: lacunas de schema, transações, privacidade, cadastro/consentimento e sessões. Reaproveitar CI, executar apenas faltantes; [roteiro](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md). Sem deploy, sem reclassificação da matriz histórica. Execução H3-B pendente.
