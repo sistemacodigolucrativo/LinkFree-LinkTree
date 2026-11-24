@@ -461,6 +461,10 @@ server {
  index index.php;
  client_max_body_size 20m;
  location = /skip { return 404; }
+ # Exact public XML endpoints only; the private-extension deny rule remains below.
+ location = /sitemap.xml { rewrite ^ /index.php last; }
+ location = /sitemap-home.xml { rewrite ^ /index.php last; }
+ location ~ ^/sitemap-profiles/[1-9][0-9]*\\.xml$ { rewrite ^ /index.php last; }
  location = /vendor/livewire/livewire/dist/livewire.js { try_files \$uri =404; }
  location ~ /\. { deny all; }
  location ~* \.(sqlite|sqlite3|db|log|zip|env|lock|json|md|yml|yaml|xml|conf|config|bak|sql)$ { deny all; }

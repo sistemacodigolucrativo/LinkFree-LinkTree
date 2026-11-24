@@ -60,6 +60,17 @@ if(env('MAINTENANCE_MODE') != 'true'){
 
 require __DIR__.'/home.php';
 
+// SEO and public social previews; unavailable in installer/maintenance mode.
+Route::get('/robots.txt', [\App\Http\Controllers\SeoController::class, 'robots'])->name('seo.robots')->middleware('disableCookies');
+Route::get('/sitemap.xml', [\App\Http\Controllers\SeoController::class, 'sitemap'])->name('seo.sitemap')->middleware('disableCookies');
+Route::get('/sitemap-home.xml', [\App\Http\Controllers\SeoController::class, 'homeSitemap'])->name('seo.sitemap.home')->middleware('disableCookies');
+Route::get('/sitemap-profiles/{page}.xml', [\App\Http\Controllers\SeoController::class, 'profilesSitemap'])->where('page', '[1-9][0-9]{0,7}')->name('seo.sitemap.profiles')->middleware('disableCookies');
+Route::get('/social-preview/site.jpg', [\App\Http\Controllers\SocialPreviewController::class, 'site'])->name('socialPreview.site')->middleware(['disableCookies','throttle:60,1']);
+Route::get('/social-preview/profile/{id}.jpg', [\App\Http\Controllers\SocialPreviewController::class, 'profile'])->where('id', '[0-9]{1,18}')->name('socialPreview.profile')->middleware(['disableCookies','throttle:60,1']);
+Route::get('/social-preview/profile/{id}-wide.jpg', [\App\Http\Controllers\SocialPreviewController::class, 'profileWide'])->where('id', '[0-9]{1,18}')->name('socialPreview.profile.wide')->middleware(['disableCookies','throttle:60,1']);
+
+
+
 //Redirect if no page URL is set
 Route::get('/@', function () {
     return redirect('/studio/no_page_name');
