@@ -1,6 +1,6 @@
 # Continuidade técnica LinkFree-LinkTree
 
-> **H2 — verificação operacional final:** dispatcher aprovado busca automaticamente o script corrigido da main; backup e staging reavaliados no escopo solicitado. H2 concluída no escopo de recuperação local; H3 pendente de revisão pelo ChatGPT. [Relatório](homologacao-correcoes/H2-VERIFICACAO-OPERACIONAL-FINAL-20261124.md).
+> **H2 — verificação operacional final:** dispatcher aprovado busca automaticamente o script corrigido da main; backup e staging reavaliados no escopo solicitado. H2 concluída no escopo de recuperação local; H3 autorizada após revisão do ChatGPT; [roteiro H3-A](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md). [Relatório](homologacao-correcoes/H2-VERIFICACAO-OPERACIONAL-FINAL-20261124.md).
 
 > **H2 — backup quiescente:** janela autorizada durou aproximadamente 9 s; backup da instalação e restauração isolada validados. H2 continua condicional porque PR #19 não foi integrada/publicada e o rollback P1 antigo permanece. H3 não iniciada. [Relatório](homologacao-correcoes/H2-BACKUP-QUIESCENTE-RESTAURACAO-20261124.md).
 
@@ -96,3 +96,6 @@ PR #17 integrada, main documental 3a609409a56f319e7a303a0d9de893bdf64fbb18; prod
 
 ## 21. H2 — integração da correção de rollback autorizada
 PR #19 integrada em b0309e1cb267169f599aafa00f92066fb8d79a39, script idêntico ao candidato testado 46b33169f06ca4e1902b8d5e5b83519b1bd5050f. Backup quiescente e recuperação local comprovados na PR #22. [Registro e gate operacional](homologacao-correcoes/H2-INTEGRACAO-ROLLBACK-20261124.md). Sem novo deploy. O dispatcher busca origin/main em cada execução; verificar identidade efetiva e SHA do script na VPS sem publicação. Produção relatada permanece 6e55da55e57203da2606a4b1ca1c83865c0f760d. H2 condicionada à verificação operacional e CI pós-merge; H3 não iniciada. TC-02-C histórico e recuperação de outro host permanecem explicitamente limitados. PR #15 intacta.
+
+## 22. H2 encerrada no escopo local; H3 iniciada
+PR #23 integrada em a9ae3654dd57242fd29c614cdcef31613e2a059a; H2 revisada pelo ChatGPT, dispatcher seleciona script corrigido, backup quiescente e recuperação comprovados. [Roteiro H3-A](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md): TC-03-B e TC-08-D, staging sintético revalidado, relatório pendente. Nenhum teste H3 de runtime executado nesta sessão. TC-02-C histórico bloqueado; recuperação de outro host, integrações externas e aceite humano pendentes. Sem deploy.
