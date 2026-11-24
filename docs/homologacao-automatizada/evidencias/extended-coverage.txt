@@ -1,0 +1,6 @@
+PASS TC-05-D member 15 and admin 20 item pagination with exact totals
+PASS TC-07-D report pagination 20 items and status filtered totals
+PASS TC-07-F deleting reporter and reviewer preserves events
+PASS TC-08-A persisted decorative blocks do not consume quota
+PASS TC-03-B theme selection and permissions persist after cache flush
+PASS TC-10-B synthetic 500 renders without private exception marker

@@ -1,0 +1,20 @@
+{
+  "restored_quick_check": [
+    [
+      "ok"
+    ]
+  ],
+  "restored_fk_violation_count": 0,
+  "storage_restored_files": 4,
+  "storage_hashes_match": true,
+  "old_code_files_restored": 13,
+  "synthetic_new_writes_unchanged": true,
+  "private_restore_removed": true,
+  "scope": "File restore only; no application boot against restored real backup. Synthetic DB preservation; not execution of deployment rollback script.",
+  "tls": {
+    "verified": true,
+    "protocol": "TLSv1.3",
+    "notAfter": "Feb 16 20:34:52 2027 GMT",
+    "http_sent": false
+  }
+}

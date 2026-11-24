@@ -1,0 +1,91 @@
+[
+  {
+    "id": "TC-10-B",
+    "assertion": "public pages true 404 no trace",
+    "pass_": true,
+    "observed": {
+      "/": 200,
+      "/login": 200,
+      "/register": 200,
+      "/report": 200,
+      "/@auditfree": 200,
+      "/does-not-exist": 404
+    }
+  },
+  {
+    "id": "TC-10-C",
+    "assertion": "HTTP middleware gates admin routes",
+    "pass_": true,
+    "observed": {
+      "anon/admin/referrals": 302,
+      "member/admin/referrals": 302,
+      "admin/admin/referrals": 200,
+      "anon/admin/verification": 302,
+      "member/admin/verification": 302,
+      "admin/admin/verification": 200,
+      "anon/admin/reports": 302,
+      "member/admin/reports": 302,
+      "admin/admin/reports": 200,
+      "anon/admin/reports/1": 302,
+      "member/admin/reports/1": 302,
+      "admin/admin/reports/1": 200,
+      "anon/admin/users": 302,
+      "member/admin/users": 302,
+      "admin/admin/users": 200
+    }
+  },
+  {
+    "id": "TC-07-B",
+    "assertion": "CSRF rejects missing token without persistence",
+    "pass_": true,
+    "observed": {
+      "status": 302,
+      "redirect": "/login",
+      "row_delta": 0,
+      "note": "Handler intentionally redirects TokenMismatchException to login"
+    }
+  },
+  {
+    "id": "TC-07-B",
+    "assertion": "five requests accepted sixth throttled in isolated app",
+    "pass_": true,
+    "observed": [
+      302,
+      302,
+      302,
+      302,
+      302,
+      429
+    ]
+  },
+  {
+    "id": "TC-07-B",
+    "assertion": "XSS text escaped in rendered admin detail",
+    "pass_": true,
+    "observed": "escaped in admin HTML"
+  },
+  {
+    "id": "TC-08-C",
+    "assertion": "public profile renders persisted noindex meta and header",
+    "pass_": true,
+    "observed": "noindex, follow"
+  },
+  {
+    "id": "TC-04-D",
+    "assertion": "cross-account link edit denied",
+    "pass_": true,
+    "observed": 403
+  },
+  {
+    "id": "TC-04-D",
+    "assertion": "login session refresh logout and anonymous denial",
+    "pass_": true,
+    "observed": "refresh and logout protected"
+  },
+  {
+    "id": "TC-04-D",
+    "assertion": "GET must not delete link without CSRF",
+    "pass_": false,
+    "error": "GET deleted synthetic link without CSRF token; HTTP 302"
+  }
+]

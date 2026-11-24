@@ -1,0 +1,37 @@
+[
+  {
+    "path": "/.env",
+    "method": "HEAD",
+    "status": 403,
+    "expected": 403,
+    "nginx_denies_before_php": true
+  },
+  {
+    "path": "/database/database.sqlite",
+    "method": "HEAD",
+    "status": 403,
+    "expected": 403,
+    "nginx_denies_before_php": true
+  },
+  {
+    "path": "/backups/audit-nonexistent.zip",
+    "method": "HEAD",
+    "status": 403,
+    "expected": 403,
+    "nginx_denies_before_php": true
+  },
+  {
+    "path": "/storage/app/linkfree/audit-nonexistent.json",
+    "method": "HEAD",
+    "status": 403,
+    "expected": 403,
+    "nginx_denies_before_php": true
+  },
+  {
+    "path": "/config/advanced-config.php",
+    "method": "HEAD",
+    "status": 403,
+    "expected": 403,
+    "nginx_denies_before_php": true
+  }
+]

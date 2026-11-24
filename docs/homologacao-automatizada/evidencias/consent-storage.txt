@@ -1,0 +1,32 @@
+PASS: Migração cria tabela registration_consents
+PASS: Coluna de consentimento: user_id
+PASS: Coluna de consentimento: method
+PASS: Coluna de consentimento: terms_version
+PASS: Coluna de consentimento: privacy_version
+PASS: Coluna de consentimento: accepted_at
+PASS: Consentimento persiste com user_id e modalidade
+PASS: Versão corresponde ao hash dos Termos publicados
+PASS: Versão corresponde ao hash da Privacidade publicada
+PASS: Data do aceite está registrada
+PASS: Falha simulada inicia rollback
+PASS: Transação reverte cadastro quando há falha
+PASS: Transação reverte recibo do cadastro
+PASS: Cadastro rejeita requisição sem aceite no servidor
+PASS: Nenhum usuário criado sem aceite
+PASS: Cadastro comum com aceite conclui sem exceção
+PASS: Cadastro tradicional cria usuário sem alterar role indevidamente
+PASS: Cadastro tradicional grava exatamente um comprovante
+PASS: OAuth bloqueia conta nova sem aceite
+PASS: OAuth não grava conta sem aceite
+PASS: OAuth recebe autorização explícita antes do provedor
+PASS: OAuth conclui criação com aceite
+PASS: Novo usuário OAuth foi persistido
+PASS: Novo usuário OAuth grava recibo exclusivo de consentimento
+PASS: OAuth mantém login de conta já existente
+PASS: Login social existente não duplica comprovante
+PASS: Permissão de personalização persistida em JSON
+PASS: Controles não liberados permanecem inativos
+PASS: Alterações de permissão são persistentes
+PASS: Relatório de origem persiste e volta a ser lido
+PASS: Agregados não armazenam identificadores pessoais
+CONSENT AND STORAGE SQLITE INTEGRATION PASS

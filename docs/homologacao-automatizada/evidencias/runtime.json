@@ -1,0 +1,6 @@
+{
+    "php": "8.3.6",
+    "laravel": "9.x-dev",
+    "socialite": "v5.30.0",
+    "sqlite": "3.45.1"
+}

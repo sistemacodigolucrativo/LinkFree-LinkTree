@@ -1,0 +1,346 @@
+[
+  {
+    "id": "TC-01-A",
+    "categoria": "A",
+    "status": "APROVADO",
+    "ambiente": "Técnico / VPS, somente leitura.",
+    "procedimento": "Conferir a saída de bash /root/atualizar-linkstack.sh --homologar ou log M13; não executar SQL de escrita.",
+    "criterio": "SQLite íntegro, quick_check sem erro; relatório de integridade aprovado."
+  },
+  {
+    "id": "TC-01-B",
+    "categoria": "A",
+    "status": "APROVADO",
+    "ambiente": "Técnico / VPS.",
+    "procedimento": "Na saída do relatório, localizar registration_consents, colunas e migration 000001.",
+    "criterio": "Tabela, user_id, method, terms_version, privacy_version, accepted_at e migration registrados."
+  },
+  {
+    "id": "TC-01-C",
+    "categoria": "A",
+    "status": "PARCIAL",
+    "ambiente": "Técnico / logs M13 e staging isolado.",
+    "procedimento": "Conferir migrations 000002, 000003, 000004; esquema, índices e foreign keys.",
+    "criterio": "referral_codes/referrals; verification_requests/verification_audit_events e users.verified_at/verification_visible; abuse_reports/abuse_report_events existem; sem violações de FK."
+  },
+  {
+    "id": "TC-01-D",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Somente staging descartável.",
+    "procedimento": "Simular repetição das migrations e falha transacional com dados fictícios.",
+    "criterio": "Sem tabelas/registros duplicados, estado parcial ou perda de dados."
+  },
+  {
+    "id": "TC-02-A",
+    "categoria": "B",
+    "status": "BLOQUEADO",
+    "ambiente": "Técnico / logs preflight 23/11.",
+    "procedimento": "Ler saída de --check enviada pelo operador.",
+    "criterio": "SHA antigo 54add49d30a8, alvo 3f20bf95e75f, 23 arquivos de código, nenhum conflito, SIMULACAO CONCLUIDA."
+  },
+  {
+    "id": "TC-02-B",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Técnico / backup privado e staging.",
+    "procedimento": "Verificar arquivo /var/backups/linkfree-deploy/20261123-231449-jORt0u/sqlite-before-deploy.sqlite; restaurar somente cópia isolada.",
+    "criterio": "Backup íntegro, recuperável e acompanhado dos dados persistentes relevantes."
+  },
+  {
+    "id": "TC-02-C",
+    "categoria": "B",
+    "status": "BLOQUEADO",
+    "ambiente": "Técnico / saída do deploy.",
+    "procedimento": "Comparar ordem do log: backup, 3 migrations, verificação schema, publicação, limpeza de cache.",
+    "criterio": "Migrations 000002–000004 concluídas ANTES da cópia de código; publicação 3f20bf95e75f."
+  },
+  {
+    "id": "TC-02-D",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Técnico / staging.",
+    "procedimento": "Comparar SHA publicado e testar plano de recuperação de código sem reset de banco.",
+    "criterio": "Aplicação VPS usa 3f20bf95e75f; main conserva esse commit no histórico, apesar de commits posteriores só de documentação; restauração não apaga dados novos."
+  },
+  {
+    "id": "TC-03-A",
+    "categoria": "A",
+    "status": "APROVADO",
+    "ambiente": "Técnico / relatório --homologar.",
+    "procedimento": "Verificar permissões www-data de SQLite e storage e ausência de links simbólicos.",
+    "criterio": "Relatório sem erros de leitura/escrita/arquivos privados."
+  },
+  {
+    "id": "TC-03-B",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Membro/Admin / /studio/theme, /admin/site, /studio/visitors.",
+    "procedimento": "Em conta autorizada, alterar dado NÃO crítico, salvar, atualizar, sair/entrar e conferir.",
+    "criterio": "Preferências e textos continuam salvos; informação pública reflete alteração quando aplicável; relatório de visitas persiste."
+  },
+  {
+    "id": "TC-03-C",
+    "categoria": "A",
+    "status": "PARCIAL",
+    "ambiente": "Visitante anônimo / site e relatório técnico.",
+    "procedimento": "Inspecionar menus públicos e relatórios de acesso sem explorar conteúdos privados.",
+    "criterio": "Sem exposição de .env, backups, storage privado ou dados de outros membros."
+  },
+  {
+    "id": "TC-04-A",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Visitante / /register.",
+    "procedimento": "Com conta de teste inédita, preencher cadastro e enviar SEM aceitar termos.",
+    "criterio": "Mensagem de aceite obrigatório; cadastro bloqueado; nenhuma conta/recibo deve ser criado."
+  },
+  {
+    "id": "TC-04-B",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Visitante / /register; Admin quando necessário.",
+    "procedimento": "Criar conta nova com aceite e conferir Dashboard e registro.",
+    "criterio": "Exatamente um usuário, um comprovante com método email/data/hash; login coerente com configuração de aprovação manual e VIP inicial."
+  },
+  {
+    "id": "TC-04-C",
+    "categoria": "C",
+    "status": "PARCIAL",
+    "ambiente": "Visitante / provedor social habilitado.",
+    "procedimento": "Com conta social de teste, provar bloqueio sem aceite e cadastro/login com aceite.",
+    "criterio": "Sem aceite novo usuário não é criado; com aceite conta e recibo social únicos; login posterior não duplica."
+  },
+  {
+    "id": "TC-04-D",
+    "categoria": "B",
+    "status": "REPROVADO",
+    "ambiente": "Membro/visitante / /login, /dashboard, /studio/profile.",
+    "procedimento": "Login, navegação, refresh, logout e tentativa anônima de abrir Studio/Admin.",
+    "criterio": "Membro acessa apenas seus dados, sessão funciona e logout protege área interna; dados salvos permanecem."
+  },
+  {
+    "id": "TC-05-A",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Membro / /studio/referrals.",
+    "procedimento": "Clicar Criar meu link de convite se não existir, copiar URL, recarregar e comparar em outra conta.",
+    "criterio": "URL HTTPS /invite/CODIGO com 24 caracteres hexadecimais; código estável e diferente entre membros."
+  },
+  {
+    "id": "TC-05-B",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Indicador/Membro novo/Admin / link convite, /register, /studio/referrals, /admin/referrals.",
+    "procedimento": "Abrir convite numa janela anônima, cadastrar conta nova com aceite, consultar histórico.",
+    "criterio": "Indicador recebe exatamente +1 no total e um @handle com data; Admin vê mesma indicação; membro não vê e-mail do convidado."
+  },
+  {
+    "id": "TC-05-C",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Visitante/membro / link convite.",
+    "procedimento": "Abrir convite já logado, testar código inválido e login de conta existente; outros negativos em staging.",
+    "criterio": "Logado não atribui; código inválido dá 404; conta existente não vira indicada; autoindicação, bloqueio do indicador e convite após 7 dias não atribuem."
+  },
+  {
+    "id": "TC-05-D",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Membro/Admin / /studio/referrals e /admin/referrals.",
+    "procedimento": "Ver histórico, números e datas; Admin filtra por ID do indicador; membro tenta abrir /admin/referrals.",
+    "criterio": "Membro vê somente próprios convites, sem e-mails; Admin tem totais/detalhes corretos; acesso Admin negado ao membro."
+  },
+  {
+    "id": "TC-06-A",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Membro SEM selo / /studio/verification.",
+    "procedimento": "Solicitar selo com mensagem não sensível, recarregar e tentar segunda solicitação.",
+    "criterio": "Mostra Aguardando aprovação; apenas um pedido pendente; Exibir/Ocultar indisponível antes de concessão."
+  },
+  {
+    "id": "TC-06-B",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Admin / /admin/verification e Membro / /studio/verification.",
+    "procedimento": "Analisar duas solicitações de teste: aprovar uma; recusar outra com justificativa.",
+    "criterio": "Aprovado libera opção de exibir/ocultar; recusado não ganha selo e vê motivo; histórico mostra data/responsável."
+  },
+  {
+    "id": "TC-06-C",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Admin / /admin/users, coluna Selo.",
+    "procedimento": "Escolher membro sem solicitação; clicar badge Não aprovado e depois revogar com Aprovado.",
+    "criterio": "Badge muda para verde Aprovado e volta a Não aprovado; concessão direta funciona e persiste."
+  },
+  {
+    "id": "TC-06-D",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Membro aprovado / /studio/verification e /@IDENTIFICADOR.",
+    "procedimento": "Salvar Exibir, atualizar perfil público; salvar Ocultar; Admin revoga e perfil atualiza.",
+    "criterio": "Aprovado+Exibir mostra selo junto ao nome quando tema/flag permite; Ocultar ou revogado não mostram selo; revogado perde controle."
+  },
+  {
+    "id": "TC-06-E",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Free/VIP/Admin / /admin/users e perfil público.",
+    "procedimento": "Comparar papéis, e-mail verificado e status de selo antes/depois da concessão.",
+    "criterio": "Conceder selo não altera VIP nem status do e-mail; VIP não ganha selo automaticamente."
+  },
+  {
+    "id": "TC-07-A",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Visitante / /report ou perfil público autorizado.",
+    "procedimento": "Abrir /report?user=ID_DE_TESTE, escolher motivo e enviar relato inofensivo; testar também /report com URL.",
+    "criterio": "Formulário público funciona sem login, confirma envio; Admin encontra novo protocolo, perfil denunciado não é bloqueado."
+  },
+  {
+    "id": "TC-07-B",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Visitante / /report.",
+    "procedimento": "Testar motivo ausente, URL inválida e comentário além de 2000 caracteres; XSS/CSRF/throttle somente em staging.",
+    "criterio": "Dados inválidos são recusados; URL até 2048, comentário até 2000; HTML fornecido não executa no Admin; proteção CSRF/rate limit."
+  },
+  {
+    "id": "TC-07-C",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Visitante/Admin / /report e /admin/reports.",
+    "procedimento": "Enviar uma denúncia de teste e localizar no painel; testar falha SMTP apenas em staging.",
+    "criterio": "Denúncia e evento persistem mesmo sem SMTP; e-mail opcional direciona para central e não contém link GET de exclusão."
+  },
+  {
+    "id": "TC-07-D",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Admin e membro / /admin/reports, /admin/reports/ID.",
+    "procedimento": "Conferir total/filtro Nova, botão Analisar, detalhes e acesso como membro.",
+    "criterio": "Registro correto na fila, detalhe e histórico; membro comum não consegue abrir telas Admin."
+  },
+  {
+    "id": "TC-07-E",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Admin / /admin/reports/ID de TESTE.",
+    "procedimento": "Mudar Nova para Em análise; tentar resolver SEM motivo; informar motivo e salvar; arquivar/reabrir.",
+    "criterio": "Sem justificativa impede encerramento; com nota salva estado, data, ator e histórico sem apagar eventos anteriores."
+  },
+  {
+    "id": "TC-07-F",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Admin e staging / perfil denunciado e casos encerrados.",
+    "procedimento": "Verificar que denúncias não alteram status do usuário; testar exclusões apenas em staging.",
+    "criterio": "Receber, resolver ou arquivar não bloqueia nem exclui automaticamente; histórico de caso permanece após exclusão controlada."
+  },
+  {
+    "id": "TC-08-A",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Free / /studio/links; VIP/admin conforme perfil.",
+    "procedimento": "Em conta Free de teste criar cinco links navegáveis, tentar sexto; testar importação em staging.",
+    "criterio": "Limite Free de 5 links navegáveis; sexto recusado sem perda de outros; heading/spacer/text não contam; VIP/admin seguem permissões."
+  },
+  {
+    "id": "TC-08-B",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Membro / /studio/add-link e /studio/links.",
+    "procedimento": "Criar bloco WhatsApp predefinido com DDI/número/mensagem de teste e abrir link público.",
+    "criterio": "Gera URL wa.me com número normalizado e mensagem com codificação correta, sem alterar texto."
+  },
+  {
+    "id": "TC-08-C",
+    "categoria": "B",
+    "status": "APROVADO",
+    "ambiente": "Membro / /studio/page e /@IDENTIFICADOR.",
+    "procedimento": "Ativar search_noindex, salvar e recarregar; conferir meta robots e header X-Robots-Tag tecnicamente.",
+    "criterio": "Página pública continua acessível diretamente, mas orienta noindex por meta/header quando habilitado."
+  },
+  {
+    "id": "TC-08-D",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "VIP/Admin / /studio/visitors e página pública.",
+    "procedimento": "Gerar visita legítima com UTM/referrer de teste, revisar contador e relatório.",
+    "criterio": "Contador segue política anti-duplicação (não aumenta necessariamente a cada refresh); origem classificada corretamente; Free sem permissão não vê relatório restrito."
+  },
+  {
+    "id": "TC-08-E",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Membro / /studio/links, /studio/blocks, /studio/page, /studio/theme.",
+    "procedimento": "Criar/editar link/bloco, ordenar, prévia, escolher tema permitido; salvar, recarregar e abrir página pública.",
+    "criterio": "Elementos persistem na ordem correta e aparecem fielmente no público; prévias e tema não quebram layout."
+  },
+  {
+    "id": "TC-09-A",
+    "categoria": "C",
+    "status": "PARCIAL",
+    "ambiente": "Android/tablet/desktop / áreas pública, membro e Admin.",
+    "procedimento": "Percorrer telas em larguras 320/360/390, 768/1024 e 1440 quando disponíveis.",
+    "criterio": "Menus, formulários, badges, tabelas e botões visíveis/acessíveis, sem sobreposição, corte ou overflow geral."
+  },
+  {
+    "id": "TC-09-B",
+    "categoria": "C",
+    "status": "REPROVADO",
+    "ambiente": "Claro/escuro / telas principais.",
+    "procedimento": "Alternar tema, verificar legibilidade, campos, alertas e navegação por teclado.",
+    "criterio": "Contraste legível, foco visível, rótulos claros, estado não comunicado apenas pela cor."
+  },
+  {
+    "id": "TC-09-C",
+    "categoria": "C",
+    "status": "PARCIAL",
+    "ambiente": "Navegadores disponíveis / Chrome Android, Firefox, Safari iOS, desktop.",
+    "procedimento": "Repetir fluxos-chave de cadastro, formulários, botões Copiar, modal e menus.",
+    "criterio": "Comportamento equivalente nos navegadores efetivamente testados."
+  },
+  {
+    "id": "TC-09-D",
+    "categoria": "C",
+    "status": "PARCIAL",
+    "ambiente": "Visitante, membro, Admin / menus e URLs.",
+    "procedimento": "Usar menus, voltar/avançar, refresh, modal e múltiplas abas em páginas permitidas.",
+    "criterio": "Sem rotas quebradas, sobreposição nem acesso Admin indevido; sessão protegida."
+  },
+  {
+    "id": "TC-10-A",
+    "categoria": "A",
+    "status": "PARCIAL",
+    "ambiente": "Técnico / GitHub e log VPS.",
+    "procedimento": "Conferir SHA, três migrações concluídas, backup e integridade SQLite.",
+    "criterio": "SHA de aplicativo VPS 3f20bf95e75f; main contém commit mesmo com docs posteriores; schema e backup confirmados."
+  },
+  {
+    "id": "TC-10-B",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Visitante / /, /login, /register e URL inexistente.",
+    "procedimento": "Verificar HTTPS, HTTP 200 nas telas públicas e 404 em rota inválida; 500/503 apenas em staging controlado.",
+    "criterio": "200 nas páginas esperadas; 404 verdadeiro para inexistente; sem stack trace; manutenção 503 controlada."
+  },
+  {
+    "id": "TC-10-C",
+    "categoria": "B",
+    "status": "PARCIAL",
+    "ambiente": "Membro/Admin / /dashboard, /studio/profile, /admin/config.",
+    "procedimento": "Testar sessão, visibilidade de menus, acesso permitido, isolamento e persistência.",
+    "criterio": "Membro não vê dados/admin de terceiros; Admin acessa funções autorizadas; logout protege acessos."
+  },
+  {
+    "id": "TC-10-D",
+    "categoria": "D",
+    "status": "NÃO AUTOMATIZÁVEL",
+    "ambiente": "Operador + IA / registro integral dos 43 casos.",
+    "procedimento": "Revisar resultados, evidências, defeitos, plano de recuperação, selo legado e LGPD; solicitar aceite explícito.",
+    "criterio": "Somente encerrar quando obrigatórios aprovados, nenhum P0/P1 aberto, bloqueios tratados, evidências suficientes e aceite do operador."
+  }
+]
