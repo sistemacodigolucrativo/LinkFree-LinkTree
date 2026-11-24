@@ -1,0 +1,156 @@
+{
+  "http": {
+    "/": {
+      "status": 200,
+      "robots": [
+        "index, follow, max-image-preview:large"
+      ],
+      "canonical": [
+        "https://linkfree.website"
+      ],
+      "og_type": [
+        "image/jpeg"
+      ],
+      "dimensions": [
+        [
+          "1200"
+        ],
+        [
+          "630"
+        ]
+      ],
+      "images_match": true,
+      "image_host": "linkfree.website"
+    },
+    "/@Dev": {
+      "status": 200,
+      "robots": [
+        "index, follow, max-image-preview:large"
+      ],
+      "canonical": [
+        "https://linkfree.website/@Dev"
+      ],
+      "og_type": [
+        "image/jpeg"
+      ],
+      "dimensions": [
+        [
+          "1200"
+        ],
+        [
+          "630"
+        ]
+      ],
+      "images_match": true,
+      "image_host": "linkfree.website"
+    },
+    "/robots.txt": {
+      "status": 200,
+      "type": "text/plain",
+      "sitemap_presente": true
+    },
+    "/sitemap.xml": {
+      "status": 200,
+      "type": "application/xml",
+      "xml_valido": true,
+      "elemento": "sitemapindex"
+    },
+    "/sitemap-home.xml": {
+      "status": 200,
+      "type": "application/xml",
+      "xml_valido": true,
+      "elemento": "urlset"
+    },
+    "/sitemap-profiles/1.xml": {
+      "status": 200,
+      "type": "application/xml",
+      "xml_valido": true,
+      "elemento": "urlset"
+    },
+    "/login": {
+      "status": 200,
+      "type": "text/html"
+    },
+    "/register": {
+      "status": 200,
+      "type": "text/html"
+    },
+    "/admin/users": {
+      "status": 200,
+      "type": "text/html",
+      "destino_final": "/login"
+    },
+    "/.env": {
+      "status": 403,
+      "type": "text/html"
+    },
+    "/database/database.sqlite": {
+      "status": 403,
+      "type": "text/html"
+    },
+    "/config/advanced-config.php": {
+      "status": 403,
+      "type": "text/html"
+    },
+    "/secret.xml": {
+      "status": 403,
+      "type": "text/html"
+    },
+    "image /": {
+      "status": 200,
+      "type": "image/jpeg",
+      "etag": true,
+      "bytes": 69440,
+      "dimensoes": "1200x630"
+    },
+    "image /@Dev": {
+      "status": 200,
+      "type": "image/jpeg",
+      "etag": true,
+      "bytes": 118689,
+      "dimensoes": "1200x630"
+    }
+  },
+  "integridade": {
+    "sha": "a90dbb80efccacd629b1687e2a41c43c0515c219",
+    "arquivos": [
+      {
+        "arquivo": "app/Http/Controllers/SeoController.php",
+        "igual": true
+      },
+      {
+        "arquivo": "app/Http/Controllers/SocialPreviewController.php",
+        "igual": true
+      },
+      {
+        "arquivo": "app/Http/Controllers/UserController.php",
+        "igual": true
+      },
+      {
+        "arquivo": "app/Services/PublicSeo.php",
+        "igual": true
+      },
+      {
+        "arquivo": "assets/linkstack/images/social-brand.png",
+        "igual": true
+      },
+      {
+        "arquivo": "resources/views/home.blade.php",
+        "igual": true
+      },
+      {
+        "arquivo": "resources/views/linkstack/modules/meta.blade.php",
+        "igual": true
+      },
+      {
+        "arquivo": "routes/web.php",
+        "igual": true
+      }
+    ],
+    "sqlite": "ok",
+    "fk_violacoes": 0,
+    "migrations": 16,
+    "admin_anonimo_destino": "/login",
+    "admin_anonimo_status_final": 200
+  }
+}
