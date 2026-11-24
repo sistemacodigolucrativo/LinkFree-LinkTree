@@ -50,7 +50,7 @@ O job \`browser-a11y\` foi **aprovado para o escopo de regressões direcionadas*
 
 ## Gates que permanecem antes de merge e deploy
 
-1. Executar e avaliar por completo o job axe-core em Chromium. Resolver violações prioritárias, reexecutar CI e preservar comparativo antes/depois.
+1. **Axe-core Chromium foi executado e registrado:** revisar e corrigir o contraste restante no tema público (ou adotar política explícita de contraste para temas configuráveis). Preservar comparativo 10 → 2 → 1 grupo de violações.
 2. Validar interações de navegador dos botões convertidos (exclusão em Meus Links, ícones, Admin, confirmação e navegação), não só requisições HTTP diretas.
 3. Verificar demais rotas mutáveis e interações não abrangidas; tomar cuidado especial com exclusão permanente, impersonação e procedimentos administrativos.
 4. Concluir a revisão de compatibilidade WebKit/Safari e da acessibilidade visual real; temas públicos customizáveis têm contraste configurável.
@@ -60,5 +60,5 @@ O job \`browser-a11y\` foi **aprovado para o escopo de regressões direcionadas*
 ## Resultado atual
 
 **Correção de comportamento GET/CSRF: tecnicamente comprovada no sandbox.**
-**Correção visual/acessibilidade: ainda depende da auditoria axe e de testes de UX.**
+**Acessibilidade: 11/12 páginas avaliadas sem violações axe detectadas; 1 grupo de contraste remanescente no perfil público sintético. TC-09-B segue sem aceite completo (temas, outros navegadores e avaliação humana).**
 **Publicação na VPS: NÃO realizada. Homologação final: NÃO concluída.**
