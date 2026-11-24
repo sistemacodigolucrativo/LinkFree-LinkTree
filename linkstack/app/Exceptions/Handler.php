@@ -41,6 +41,7 @@ class Handler extends ExceptionHandler
 
         $this->renderable(function (\Exception $e) {
             if ($e->getPrevious() instanceof \Illuminate\Session\TokenMismatchException) {
+                if (!\Illuminate\Support\Facades\Route::has('login')) return response('CSRF token mismatch', 419);
                 return redirect()->route('login');
             };
         });

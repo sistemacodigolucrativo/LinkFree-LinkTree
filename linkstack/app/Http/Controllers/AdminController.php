@@ -175,6 +175,14 @@ class AdminController extends Controller
     }
   }
 
+  // Only the primary administrator can manage other administrators.
+  private function authorizeAccountManagement(User $target): void
+  {
+    abort_if((int) $target->id === 1 && (int) Auth::id() !== 1, 403);
+    abort_if($target->role === 'admin' && (int) Auth::id() !== 1 &&
+      (int) $target->id !== (int) Auth::id(), 403);
+  }
+
   //Block user
   public function blockUser(request $request)
   {
@@ -182,7 +190,7 @@ class AdminController extends Controller
     $status = $request->route('block');
     abort_unless(in_array($status, ['yes', 'no'], true), 422);
     abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
-    User::findOrFail($id);
+    $this->authorizeAccountManagement(User::findOrFail($id));
 
     if ($status == "yes") {
       $block = "no";
@@ -202,7 +210,7 @@ class AdminController extends Controller
     $status = $request->route('verify');
     abort_unless(in_array($status, ['vip', 'user'], true), 422);
     abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
-    User::findOrFail($id);
+    $this->authorizeAccountManagement(User::findOrFail($id));
 
     if ($status == "vip") {
       $verify = "vip";
@@ -223,7 +231,7 @@ class AdminController extends Controller
     $status = $request->route('verify');
     abort_unless(in_array($status, ['true', 'false'], true), 422);
     abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
-    User::findOrFail($id);
+    $this->authorizeAccountManagement(User::findOrFail($id));
 
     if ($status == "true") {
       $verify = now();
@@ -301,7 +309,8 @@ class AdminController extends Controller
   {
     abort_if($id === 1 || $id === (int) Auth::id(), 403);
     \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
-      $user = User::findOrFail($id);
+      $user = User::whereKey($id)->lockForUpdate()->firstOrFail();
+      $this->authorizeAccountManagement($user);
       Link::where("user_id", $id)->delete();
       $user->forceDelete();
     });
@@ -310,11 +319,10 @@ class AdminController extends Controller
   //Show user to edit
   public function showUser(request $request)
   {
-    $id = $request->id;
-
-    $data["user"] = User::where("id", $id)->get();
-
-    return view("panel/edit-user", $data);
+    $user = User::findOrFail($request->route('id'));
+    $this->authorizeAccountManagement($user);
+    abort_if(in_array($request->server('QUERY_STRING', ''), ['delete', 'deleteB'], true), 405);
+    return view("panel/edit-user", ["user" => collect([$user])]);
   }
 
   //Show link, click number, up link in links page
@@ -353,14 +361,22 @@ class AdminController extends Controller
   //Save user edit
   public function editUser(request $request)
   {
+    $target = User::findOrFail($request->route('id'));
+    $this->authorizeAccountManagement($target);
+    $id = $target->id;
     $request->validate([
-      "name" => "",
-      "email" => "",
-      "password" => "",
-      "littlelink_name" => "",
+      'name' => 'required|string|max:255',
+      'email' => ['required','email','max:255', \Illuminate\Validation\Rule::unique('users','email')->ignore($id)],
+      'password' => 'nullable|string|min:8|max:255',
+      'littlelink_name' => 'nullable|string|max:255',
+      'role' => 'required|in:user,vip,admin',
+      'theme' => 'required|string|regex:/^[A-Za-z0-9_-]+$/D',
+      'image' => 'nullable|image|mimes:jpeg,png,gif,webp|max:10240',
+      'background' => 'nullable|image|mimes:jpeg,png,gif,webp|max:10240',
     ]);
-
-    $id = $request->route('id');
+    $requestedRole = $request->input('role');
+    abort_if(((int) $id === 1 || (int) $id === (int) Auth::id()) && $requestedRole !== $target->role, 403);
+    abort_if($requestedRole === 'admin' && $target->role !== 'admin' && (int) Auth::id() !== 1, 403);
     $name = $request->name;
     $email = $request->email;
     $password = Hash::make($request->password);
@@ -371,10 +387,8 @@ class AdminController extends Controller
     $customBackground = $request->file("background");
     $theme = $request->theme;
 
-    if (User::where("id", $id)->get("role")->first()->role = !$role) {
-      if ($role == "vip") {
-        UserData::saveData($id, "checkmark", true);
-      }
+    if ($target->role !== $role && $role === 'vip') {
+      UserData::saveData($id, 'checkmark', true);
     }
 
     if ($request->password == "") {
@@ -420,6 +434,23 @@ class AdminController extends Controller
     }
 
     return redirect("admin/users/all");
+  }
+
+  public function removeAccountMedia(Request $request)
+  {
+    $target = User::findOrFail($request->route('id'));
+    $this->authorizeAccountManagement($target);
+    $directory = $request->route('kind') === 'avatar' ? 'assets/img' : 'assets/img/background-img';
+    $path = base_path($directory);
+    if (is_dir($path)) {
+      $pattern = '/^' . preg_quote((string) $target->id, '/') . '(_\w+)?\.\w+$/iD';
+      foreach (new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS) as $file) {
+        if (!$file->isLink() && $file->isFile() && preg_match($pattern, $file->getFilename())) {
+          abort_unless(File::delete($file->getPathname()), 500, 'Media removal failed');
+        }
+      }
+    }
+    return redirect()->route('showUser', $target->id);
   }
 
   //Show site pages to edit

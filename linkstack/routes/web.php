@@ -42,18 +42,14 @@ if(file_exists(base_path('INSTALLING')) or file_exists(base_path('INSTALLERLOCK'
   Route::post('/db', [InstallerController::class, 'db'])->name('db');
   Route::post('/mysql', [InstallerController::class, 'mysql'])->name('mysql');
   Route::post('/options', [InstallerController::class, 'options'])->name('options');
-  Route::get('/mysql-test', [InstallerController::class, 'mysqlTest'])->name('mysqlTest');
+  // Database initialization now occurs in the CSRF-protected /mysql POST.
+  Route::get('/mysql-test', fn () => abort(405));
   // The VPS installer already denies this default-account shortcut at nginx.
   Route::get('/skip', fn () => abort(404));
   Route::post('/editConfigInstaller', [InstallerController::class, 'editConfigInstaller'])->name('editConfigInstaller');
 
-  Route::get('{any}', function() {
-    if(!DB::table('users')->get()->isEmpty()){
-    if(file_exists(base_path("INSTALLING")) and !file_exists(base_path('INSTALLERLOCK'))){unlink(base_path("INSTALLING"));header("Refresh:0");}
-    } else {
-      return redirect(url(''));
-    }
-  })->where('any', '.*');
+  // Reading a URL must never complete installation or remove a marker.
+  Route::get('{any}', fn () => abort(404))->where('any', '.*');
 
 }else{
 
@@ -191,6 +187,7 @@ Route::group([
     Route::post('/admin/users/verify-mail/{verify}/{id}', [AdminController::class, 'verifyUser'])->name('verifyUser');
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'showUser'])->name('showUser');
     Route::post('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->name('editUser');
+    Route::post('/admin/edit-user/{id}/media/{kind}', [AdminController::class, 'removeAccountMedia'])->whereNumber('id')->where('kind', 'avatar|background')->name('admin.remove-account-media');
     Route::post('/admin/new-user', [AdminController::class, 'createNewUser'])->name('createNewUser')->middleware('max.users');
     Route::delete('/admin/delete-user/{id}', [AdminController::class, 'deleteUser'])->name('deleteUser');
     Route::post('/admin/delete-table-user/{id}', [AdminController::class, 'deleteTableUser'])->name('deleteTableUser');

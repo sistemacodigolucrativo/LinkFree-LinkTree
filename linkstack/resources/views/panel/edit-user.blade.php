@@ -45,8 +45,8 @@
                               @else
                               <img src="{{ asset('assets/linkstack/images/favicon.svg') }}" class="bd-placeholder-img img-thumbnail" width="100" height="100" draggable="false">
                               @endif
-                              @if(file_exists(base_path(findAvatar($user->id))))<br><a title="Remove icon" class="hvr-grow p-1 text-danger" style="padding-left:5px;" href="?delete"><i class="bi bi-trash-fill"></i> {{__('messages.Delete')}}</a>@endif
-                              @if(($_SERVER['QUERY_STRING'] ?? '') === 'delete' and File::exists(base_path(findAvatar($user->id))))@php File::delete(base_path(findAvatar($user->id))); header("Location: ".url()->current()); die(); @endphp @endif
+                              @if(file_exists(base_path(findAvatar($user->id))))<br><button type="submit" formaction="{{ route('admin.remove-account-media', [$user->id,'avatar']) }}" formnovalidate onclick="return confirm('Excluir imagem deste usuário?')" class="btn btn-link text-danger"><i class="bi bi-trash-fill"></i> {{__('messages.Delete')}}</button>@endif
+
                           </div><br>
 
                             <div class="form-group col-lg-8">
@@ -58,8 +58,8 @@
                             <div class="form-group col-lg-8">
                                 @if(!file_exists(base_path('assets/img/background-img/'.findBackground($user->id))))<p><i>{{__('messages.No image selected')}}</i></p>@endif
                                 <img style="width:95%;max-width:400px;border-radius:5px;" src="@if(file_exists(base_path('assets/img/background-img/'.findBackground($user->id)))){{url('assets/img/background-img/'.findBackground($user->id))}}@else{{url('/assets/linkstack/images/themes/no-preview.png')}}@endif">
-                                @if(file_exists(base_path('assets/img/background-img/'.findBackground($user->id))))<br><a title="Remove icon" class="hvr-grow p-1 text-danger" style="padding-left:5px;" href="?deleteB"><i class="bi bi-trash-fill"></i> {{__('messages.Delete')}}</a>@endif
-                                @if(($_SERVER['QUERY_STRING'] ?? '') === 'deleteB' and File::exists(base_path('assets/img/background-img/'.findBackground($user->id))))@php File::delete(base_path('assets/img/background-img/'.findBackground($user->id))); header("Location: ".url()->current()); die(); @endphp @endif
+                                @if(file_exists(base_path('assets/img/background-img/'.findBackground($user->id))))<br><button type="submit" formaction="{{ route('admin.remove-account-media', [$user->id,'background']) }}" formnovalidate onclick="return confirm('Excluir fundo deste usuário?')" class="btn btn-link text-danger"><i class="bi bi-trash-fill"></i> {{__('messages.Delete')}}</button>@endif
+
                                 <br>
                             </div><br>
 
@@ -120,11 +120,18 @@
                             </div>
                             <div class="form-group col-lg-8">
                               <label for="field-role">{{__('messages.Role')}}</label>
-                              <select class="form-control" name="role" id="field-role">
-                                <option <?= ($user->role === strtolower('user')) ? 'selected' : '' ?>>user</option>
-                                <option <?= ($user->role === strtolower('vip')) ? 'selected' : '' ?>>vip</option>
-                                <option <?= ($user->role === strtolower('admin')) ? 'selected' : '' ?>>admin</option>
-                              </select>
+                              @if((int) $user->id === 1 || (int) $user->id === (int) Auth::id())
+                                <input class="form-control" id="field-role" value="{{ $user->role }}" readonly>
+                                <input type="hidden" name="role" value="{{ $user->role }}">
+                              @else
+                                <select class="form-control" name="role" id="field-role">
+                                  <option value="user" @selected($user->role === 'user')>user</option>
+                                  <option value="vip" @selected($user->role === 'vip')>vip</option>
+                                  @if((int) Auth::id() === 1)
+                                    <option value="admin" @selected($user->role === 'admin')>admin</option>
+                                  @endif
+                                </select>
+                              @endif
                             </div>
                             @endforeach
                             <button type="submit" class="mt-3 ml-3 btn btn-primary">{{__('messages.Save')}}</button>

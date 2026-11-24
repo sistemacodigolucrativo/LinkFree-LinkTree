@@ -401,6 +401,59 @@ def maintenance_get_guards():
 
 check('TC-04-D','Legacy updater and backup GET execution blocked',maintenance_get_guards)
 
+def generic_admin_editor():
+    at=admin.token('/admin/users')
+    mt=member.token('/studio/links')
+    def fields(uid, role, token):
+        with sqlite3.connect(DB) as con:
+            name,email,handle,theme=con.execute("SELECT name,email,littlelink_name,theme FROM users WHERE id=?",(uid,)).fetchone()
+        return {'_token':token,'name':name,'email':email,'littlelink_name':handle or '', 'theme':theme or 'default','role':role}
+    def update(cli,uid,role,token):
+        return cli.request('POST',f'/admin/edit-user/{uid}',fields(uid,role,token),json_response=True)
+    status,headers,_=update(member,2,'admin',mt)
+    assert_denied(status,headers)
+    expect(value('SELECT role FROM users WHERE id=2')=='user','Member promoted self')
+    expect(update(admin,1,'user',at)[0]==403,'Root role changed')
+    expect(update(admin,3,'unknown',at)[0]==422,'Invalid role accepted')
+    expect(update(admin,3,'admin',at)[0]==302 and value('SELECT role FROM users WHERE id=3')=='admin','Root cannot promote')
+    secondary=Client().login('auditother')
+    st=secondary.token('/admin/users')
+    expect(update(secondary,2,'admin',st)[0]==403,'Secondary promoted another admin')
+    expect(update(secondary,1,'admin',st)[0]==403,'Secondary edited root')
+    expect(update(secondary,3,'user',st)[0]==403,'Secondary changed own role')
+    expect(secondary.request('GET','/admin/edit-user/1',json_response=True)[0]==403,'Root edit page exposed')
+    expect(update(secondary,2,'vip',st)[0]==302 and value('SELECT role FROM users WHERE id=2')=='vip','Secondary cannot manage member')
+    expect(update(secondary,2,'user',st)[0]==302,'Secondary cannot restore member role')
+    expect(update(admin,3,'user',at)[0]==302 and value('SELECT role FROM users WHERE id=3')=='user','Root cannot restore member role')
+    expect(value('SELECT role FROM users WHERE id=1')=='admin','Root role was modified')
+    return 'root-only promotion, invalid role rejected, root/self protected, secondary can manage members'
+
+check('TC-04-D','Generic admin editor role hierarchy and validation',generic_admin_editor)
+
+def admin_editor_media():
+    import base64
+    png=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jT1sAAAAASUVORK5CYII=')
+    at=admin.token('/admin/users')
+    mt=member.token('/studio/links')
+    for folder,kind,query in (('assets/img','avatar','delete'),('assets/img/background-img','background','deleteB')):
+        a=ROOT/folder/'2_adminqa.png'; b=ROOT/folder/'3_adminqa.png'
+        a.write_bytes(png); b.write_bytes(png)
+        url='/admin/edit-user/2/media/'+kind
+        status,_,_=admin.request('GET','/admin/edit-user/2?'+query)
+        expect(status==405 and a.is_file() and b.is_file(),'Legacy GET deleted media')
+        status,_,_=admin.request('GET',url)
+        expect(status==405 and a.is_file(),'New GET deleted media')
+        status,headers,_=admin.request('POST',url,{})
+        expect(reject_csrf(status,headers) and a.is_file(),'No CSRF media removal')
+        status,headers,_=member.request('POST',url,{'_token':mt})
+        assert_denied(status,headers)
+        expect(a.is_file(),'Member removed media through admin route')
+        status,_,_=admin.request('POST',url,{'_token':at,'id':'3'})
+        expect(status==302 and not a.exists() and b.read_bytes()==png,'Admin media removal/target isolation failed')
+    return 'legacy GET denied, POST CSRF protected, route target only'
+
+check('TC-04-D','Admin editor avatar/background removal authorization',admin_editor_media)
+
 def account_deletion():
     # Synthetic social account proves FK cascades are not bypassed.
     with sqlite3.connect(DB) as con:

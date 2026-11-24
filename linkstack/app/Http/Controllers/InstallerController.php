@@ -2,171 +2,209 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\DB;
-
-use GeoSot\EnvEditor\Controllers\EnvController;
-use GeoSot\EnvEditor\Exceptions\EnvException;
-use GeoSot\EnvEditor\Helpers\EnvFileContentManager;
-use GeoSot\EnvEditor\Helpers\EnvFilesManager;
-use GeoSot\EnvEditor\Helpers\EnvKeysManager;
-use GeoSot\EnvEditor\Facades\EnvEditor;
-use GeoSot\EnvEditor\ServiceProvider;
-
-use Auth;
-use Exception;
-use ZipArchive;
-use Artisan;
-
 use App\Models\User;
-use App\Models\Admin;
-use App\Models\Button;
-use App\Models\Link;
-use App\Models\Page;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 
 class InstallerController extends Controller
 {
-
-    public function showInstaller()
+    private function fresh(): void
     {
+        abort_unless(is_file(base_path('INSTALLING')) && !is_file(base_path('INSTALLERLOCK')), 403);
+        abort_if(Schema::hasTable('users') && User::exists(), 403);
+    }
+
+    // Serialize installer writes; no GET path can change markers or database.
+    private function serialized(callable $operation)
+    {
+        $lock = fopen(storage_path('app/installer-operation.lock'), 'c');
+        abort_unless($lock !== false, 503);
+        try {
+            abort_unless(flock($lock, LOCK_EX | LOCK_NB), 409);
+            return $operation();
+        } finally {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
+    }
+
+    private function owner(Request $request): User
+    {
+        abort_unless(is_file(base_path('INSTALLING')) && is_file(base_path('INSTALLERLOCK')), 403);
+        $user = User::find(1);
+        abort_unless($user && $user->role === 'admin' &&
+            $request->session()->get('lf_setup_admin') === hash('sha256', $user->password), 403);
+        return $user;
+    }
+
+    // Update the selected keys atomically, preserving unrelated settings.
+    private function writeEnv(array $values): void
+    {
+        $path = base_path('.env');
+        $content = file_get_contents($path);
+        abort_unless($content !== false, 503);
+        foreach ($values as $key => $value) {
+            $value = (string) $value;
+            abort_if(preg_match('/[\x00-\x1f\x7f]/', $value), 422);
+            $quoted = '"' . str_replace(['\\', '"', '$'], ['\\\\', '\\"', '\\$'], $value) . '"';
+            $pattern = '/^' . preg_quote($key, '/') . '[ \t]*=.*$/m';
+            $content = preg_replace_callback($pattern, fn () => $key . '=' . $quoted, $content, -1, $count);
+            if (!$count) {
+                $content .= "\n" . $key . '=' . $quoted . "\n";
+            }
+        }
+        $parsed = \Dotenv\Dotenv::parse($content);
+        foreach ($values as $key => $value) {
+            abort_unless(($parsed[$key] ?? null) === (string) $value, 422, 'Invalid configuration value');
+        }
+        $tmp = tempnam(dirname($path), '.lf-setup-');
+        abort_unless($tmp !== false, 503);
+        try {
+            chmod($tmp, fileperms($path) & 0777);
+            abort_unless(file_put_contents($tmp, $content) === strlen($content), 503);
+            abort_unless(rename($tmp, $path), 503);
+        } finally {
+            if (is_file($tmp)) unlink($tmp);
+        }
+    }
+
+    private function initializeDatabase(): void
+    {
+        abort_unless(Artisan::call('migrate', ['--force'=>true, '--no-interaction'=>true]) === 0, 503);
+        abort_if(User::exists(), 403);
+        if (!DB::table('pages')->exists()) {
+            abort_unless(Artisan::call('db:seed', ['--class'=>'PageSeeder','--force'=>true]) === 0, 503);
+        }
+        if (!DB::table('buttons')->exists()) {
+            abort_unless(Artisan::call('db:seed', ['--class'=>'ButtonSeeder','--force'=>true]) === 0, 503);
+        }
+    }
+
+    public function showInstaller(Request $request)
+    {
+        if (is_file(base_path('INSTALLERLOCK'))) {
+            $this->owner($request);
+            if ($request->server('QUERY_STRING', '') !== '5') return redirect(url('?5'));
+        } else {
+            $this->fresh();
+            abort_if($request->server('QUERY_STRING', '') === '5', 403);
+        }
         return view('installer/installer');
     }
 
-    public function db(request $request)
+    public function db(Request $request)
     {
-        if($request->database == 'MySQL'){
-            return redirect(url('?mysql'));
-        }else{
+        return $this->serialized(function () use ($request) {
+            $this->fresh();
+            $data = $request->validate(['database'=>'required|in:SQLite,MySQL']);
+            if ($data['database'] === 'MySQL') return redirect(url('?mysql'));
+            abort_unless(config('database.default') === 'sqlite', 409, 'Database already configured');
+            $this->initializeDatabase();
             return redirect(url('?4'));
-        }
+        });
     }
 
-    public function createAdmin(request $request)
+    public function createAdmin(Request $request)
     {
-
-        $email = $request->email;
-        $password = $request->password;
-        $handle = $request->handle;
-        $name = $request->name;
-
-        $file = base_path('INSTALLERLOCK');
-        if (!file_exists($file)) {
-            $handleFile = fopen($file, 'w') or die('Cannot create file:  '.$file);
-            fclose($handleFile);
-        }
-
-        try{EnvEditor::addKey('ADMIN_EMAIL', $email);}catch(Exception $e){}
-
-        if(DB::table('users')->count() == '0'){
-        Schema::disableForeignKeyConstraints();
-        DB::table('users')->delete();
-        DB::table('users')->truncate();
-        Schema::enableForeignKeyConstraints();
-
-        $user = User::create([
-            'name' => $name,
-            'email' => $email,
-            'email_verified_at' => '0001-01-01 00:00:00',
-            'password' => Hash::make($password),
-            'littlelink_name' => $handle,
-            'littlelink_description' => 'admin page',
-            'block' => 'no',
-        ]);
-
-        User::where('id', '1')->update(['role' => 'admin']);
+        return $this->serialized(function () use ($request) {
+            $this->fresh();
+            $data = $request->validate([
+                'email'=>'required|email|max:255',
+                'password'=>'required|string|min:8|max:255',
+                'handle'=>'required|string|max:100|regex:/^[A-Za-z0-9_-]+$/D',
+                'name'=>'required|string|max:255',
+            ]);
+            abort_unless(Schema::hasTable('users') && Schema::hasTable('pages') && DB::table('pages')->exists() && DB::table('buttons')->exists(), 409);
+            $user = DB::transaction(function () use ($data) {
+                abort_if(User::exists(), 403);
+                $user = new User;
+                $user->forceFill([
+                    'id'=>1, 'name'=>$data['name'], 'email'=>$data['email'],
+                    'password'=>Hash::make($data['password']), 'email_verified_at'=>now(),
+                    'littlelink_name'=>$data['handle'], 'littlelink_description'=>'admin page',
+                    'role'=>'admin', 'block'=>'no',
+                ]);
+                $user->save();
+                return $user;
+            });
+            abort_unless(touch(base_path('INSTALLERLOCK')), 503);
+            $request->session()->regenerate();
+            $request->session()->put('lf_setup_admin', hash('sha256', $user->password));
+            return redirect(url('?5'));
+        });
     }
 
-        return redirect(url('?5'));
-    }
-
-    public function mysql(request $request)
+    public function mysql(Request $request)
     {
-        $DB_CONNECTION = 'mysql';
-        $DB_HOST = $request->host;
-        $DB_PORT = $request->port;
-        $DB_DATABASE = $request->name;
-        $DB_USERNAME = $request->username;
-        $DB_PASSWORD = $request->password;
-
-        if(EnvEditor::keyExists('DB_CONNECTION')){EnvEditor::editKey('DB_CONNECTION', $DB_CONNECTION);}else{EnvEditor::addKey('DB_CONNECTION', $DB_CONNECTION);}
-        if(EnvEditor::keyExists('DB_HOST')){EnvEditor::editKey('DB_HOST', $DB_HOST);}else{EnvEditor::addKey('DB_HOST', $DB_HOST);}
-        if(EnvEditor::keyExists('DB_PORT')){EnvEditor::editKey('DB_PORT', $DB_PORT);}else{EnvEditor::addKey('DB_PORT', $DB_PORT);}
-        if(EnvEditor::keyExists('DB_DATABASE')){EnvEditor::editKey('DB_DATABASE', $DB_DATABASE);}else{EnvEditor::addKey('DB_DATABASE', $DB_DATABASE);}
-        if(EnvEditor::keyExists('DB_USERNAME')){EnvEditor::editKey('DB_USERNAME', $DB_USERNAME);}else{EnvEditor::addKey('DB_USERNAME', $DB_USERNAME);}
-        if(EnvEditor::keyExists('DB_PASSWORD')){EnvEditor::editKey('DB_PASSWORD', $DB_PASSWORD);}else{EnvEditor::addKey('DB_PASSWORD', $DB_PASSWORD);}
-
-        return redirect(url('mysql-test'));
-
-    }
-
-    public function mysqlTest(request $request)
-    {
-        try {Artisan::call('migrate', ['--force' => true]);} catch (exception $e) {$failed = "true";}
-        try {Artisan::call('db:seed --force');} catch (exception $e) {$failed = "true";}
-        try {if (DB::table('pages')->count() === 0) Artisan::call('db:seed --class="PageSeeder" --force');} catch (exception $e) {$failed = "true";}
-        try {if (DB::table('buttons')->count() === 0) Artisan::call('db:seed --class="ButtonSeeder" --force');} catch (exception $e) {$failed = "true";}
-
-        try {$users = DB::table('buttons')->count(); $failed = false;} catch (exception $e) {$failed = true;}
-
-        if($failed == true){
-            if(EnvEditor::keyExists('DB_CONNECTION')){EnvEditor::editKey('DB_CONNECTION', 'sqlite');}else{EnvEditor::addKey('DB_CONNECTION', 'sqlite');}
-            if(EnvEditor::keyExists('DB_HOST')){EnvEditor::deleteKey('DB_HOST');}
-            if(EnvEditor::keyExists('DB_PORT')){EnvEditor::deleteKey('DB_PORT');}
-            if(EnvEditor::keyExists('DB_DATABASE')){EnvEditor::deleteKey('DB_DATABASE');}
-            if(EnvEditor::keyExists('DB_USERNAME')){EnvEditor::deleteKey('DB_USERNAME');}
-            if(EnvEditor::keyExists('DB_PASSWORD')){EnvEditor::deleteKey('DB_PASSWORD');}
-            return redirect(url('?error'));
-        }else{
+        return $this->serialized(function () use ($request) {
+            $this->fresh();
+            abort_unless(config('database.default') === 'sqlite', 409, 'Database already configured');
+            $data = $request->validate([
+                'host'=>'required|string|max:255|regex:/^[A-Za-z0-9_.:-]+$/D',
+                'port'=>'required|integer|min:1|max:65535',
+                'name'=>'required|string|max:64|regex:/^[A-Za-z0-9_-]+$/D',
+                'username'=>'required|string|max:128|regex:/^[A-Za-z0-9_.-]+$/D',
+                'password'=>'nullable|string|max:255',
+            ]);
+            $password = (string) ($data['password'] ?? '');
+            abort_if(preg_match('/[\x00-\x1f\x7f]/', $password), 422);
+            config(['database.connections.mysql.url'=>null, 'database.connections.mysql.unix_socket'=>'',
+                'database.connections.mysql.host'=>$data['host'], 'database.connections.mysql.port'=>$data['port'],
+                'database.connections.mysql.database'=>$data['name'], 'database.connections.mysql.username'=>$data['username'],
+                'database.connections.mysql.password'=>$password]);
+            DB::purge('mysql');
+            try {
+                // Refuse existing schemas before any migration, seed or env write.
+                abort_if(count(DB::connection('mysql')->select('SHOW TABLES')) !== 0, 409, 'Use an empty dedicated database');
+                DB::setDefaultConnection('mysql');
+                $this->initializeDatabase();
+                $this->writeEnv(['DB_CONNECTION'=>'mysql','DB_HOST'=>$data['host'],'DB_PORT'=>$data['port'],
+                    'DB_DATABASE'=>$data['name'],'DB_USERNAME'=>$data['username'],'DB_PASSWORD'=>$password,
+                    'DATABASE_URL'=>'','DB_SOCKET'=>'']);
+            } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
+                throw $e;
+            } catch (\Throwable $e) {
+                // Never flash or print credentials. A failed partial schema requires operator recovery.
+                return redirect(url('?error'));
+            } finally {
+                DB::purge('mysql');
+                DB::setDefaultConnection('sqlite');
+            }
             return redirect(url('?4'));
-        }
+        });
     }
 
-    public function options(request $request)
+    public function options(Request $request)
     {
-
-        $user = User::find(1);
-        $llName = $user->littlelink_name;
-
-        if($request->register == 'Yes'){ 
-            if(EnvEditor::keyExists('ALLOW_REGISTRATION')){EnvEditor::editKey('ALLOW_REGISTRATION', 'true');}else{EnvEditor::addKey('ALLOW_REGISTRATION', 'true');}
-        } else {
-            if(EnvEditor::keyExists('ALLOW_REGISTRATION')){EnvEditor::editKey('ALLOW_REGISTRATION', 'false');}else{EnvEditor::addKey('ALLOW_REGISTRATION', 'false');}
-        }
-
-        if($request->verify == 'Yes'){$value = "verified";}else{$value = "auth";}
-        if(EnvEditor::keyExists('REGISTER_AUTH')){EnvEditor::editKey('REGISTER_AUTH', $value);}
-
-        if($request->page == 'No'){$value = "";}else{$value = '"' . $llName . '"';}
-        if(EnvEditor::keyExists('HOME_URL')){EnvEditor::editKey('HOME_URL', $value);}
-
-        if(EnvEditor::keyExists('APP_NAME')){EnvEditor::editKey('APP_NAME', '"' . $request->app . '"');}
-
-        if(file_exists(base_path("INSTALLING"))){unlink(base_path("INSTALLING"));}
-
-        $file = base_path('INSTALLERLOCK');
-        if (file_exists($file)) {
-            unlink($file) or die('Cannot delete file: '.$file);
-            sleep(1);
-        }
-
-        return redirect(url('dashboard'));
+        return $this->serialized(function () use ($request) {
+            $user = $this->owner($request);
+            $data = $request->validate([
+                'register'=>'required|in:Yes,No','verify'=>'required|in:Yes,No','page'=>'required|in:Yes,No',
+                'app'=>'required|string|max:100',
+            ]);
+            $this->writeEnv(['ALLOW_REGISTRATION'=>$data['register']==='Yes'?'true':'false',
+                'REGISTER_AUTH'=>$data['verify']==='Yes'?'verified':'auth',
+                'HOME_URL'=>$data['page']==='Yes'?$user->littlelink_name:'',
+                'APP_NAME'=>$data['app'],'ADMIN_EMAIL'=>$user->email]);
+            abort_unless(unlink(base_path('INSTALLING')), 503);
+            abort_unless(unlink(base_path('INSTALLERLOCK')), 503);
+            $request->session()->forget('lf_setup_admin');
+            $request->session()->regenerate();
+            return redirect(url('dashboard'));
+        });
     }
 
-    public function editConfigInstaller(request $request)
+    public function editConfigInstaller(Request $request)
     {
-
-        $type = $request->type;
-        $entry = $request->entry;
-        $value = $request->value;
-        $value = '"' . $request->value . '"';
-        
-        if(EnvEditor::keyExists($entry)){EnvEditor::editKey($entry, $value);}
-
-        return Redirect(url('dashboard'));
+        return $this->serialized(function () use ($request) {
+            $this->fresh();
+            $data = $request->validate(['entry'=>'required|in:LOCALE','value'=>'required|string|regex:/^[A-Za-z0-9_-]+$/D']);
+            abort_unless(is_dir(resource_path('lang/'.$data['value'])), 422);
+            $this->writeEnv(['LOCALE'=>$data['value']]);
+            return redirect(url('/'));
+        });
     }
-
 }
