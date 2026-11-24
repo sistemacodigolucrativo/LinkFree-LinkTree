@@ -56,6 +56,12 @@ for file in ("layouts/sidebar.blade.php", "panel/admin-overview.blade.php", "pan
     content = read("linkstack/resources/views/" + file)
     checks["Admin user creation form: " + file] = bool(re.search(r'<form method="POST" action="\{\{ route\(\'createNewUser\'\) \}\}"[^>]*>\s*@csrf', content)) and '/admin/new-user">' not in content and 'href="{{ route(\'createNewUser\') }}">' not in content
 
+checks["Member mutation target taken from route"] = all("request->route('id')" in read("linkstack/app/Http/Controllers/UserController.php").split("function "+name+"(")[1].split("public function")[0] for name in ("deleteLink","clearIcon","upLink","editCSS","editLink"))
+checks["Impersonation state is session-bound, no remember token in middleware"] = "linkfree_impersonation" in read("linkstack/app/Http/Middleware/Impersonate.php") and "remember_token" not in read("linkstack/app/Http/Middleware/Impersonate.php")
+checks["Impersonation return uses a POST CSRF form"] = 'method="POST" action="{{ route(\'authAs\') }}"' in read("linkstack/resources/views/components/impersonation-bar.blade.php") and "@csrf" in read("linkstack/resources/views/components/impersonation-bar.blade.php")
+checks["Installer default account shortcut denied"] = "Route::get('/skip', fn () => abort(404));" in routes
+checks["Member delete is handled as a form submit"] = "addEventListener('submit'" in js and "form[data-delete-link-form]" in js
+
 for name, passed in checks.items():
     print(("PASS" if passed else "FAIL") + " " + name)
 if not all(checks.values()):

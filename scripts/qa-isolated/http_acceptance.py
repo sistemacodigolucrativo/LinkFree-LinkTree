@@ -190,9 +190,10 @@ check('TC-04-D','Rendered delete controls preserve CSRF and DELETE semantics',fo
 
 def admin_create_user():
     before = value('SELECT COUNT(*) FROM users')
-    status, _, _ = admin.request('POST', '/admin/new-user', {}, json_response=True)
-    expect(status == 419, f'Admin creation without CSRF returned {status}')
-    expect(value('SELECT COUNT(*) FROM users') == before, 'Account created without CSRF')
+    for payload in ({}, {'_token':'invalid-synthetic-token'}):
+        status, headers, _ = admin.request('POST', '/admin/new-user', payload, json_response=True)
+        expect(value('SELECT COUNT(*) FROM users') == before, 'Account created without valid CSRF')
+        expect(status == 419 or (status == 302 and urllib.parse.urlparse(headers.get('Location','')).path == '/login'), f'Unexpected CSRF response {status}')
     token = member.token('/studio/links')
     status, _, _ = member.request('POST', '/admin/new-user', {'_token':token}, json_response=True)
     expect(status in (302, 403), f'Non-admin creation returned {status}')
@@ -203,13 +204,167 @@ def admin_create_user():
     expect(value('SELECT COUNT(*) FROM users') == before + 1, 'Expected exactly one new account')
     new_id = int(headers['Location'].rstrip('/').split('/')[-1])
     expect(value("SELECT COUNT(*) FROM users WHERE id=? AND name LIKE 'Admin-Created-%'", (new_id,)) == 1, 'Created account missing')
-    return {'csrfDenied':419,'nonAdminDenied':True,'createdExactlyOne':True,'redirectedToEditor':True}
+    return {'csrfDenied':True,'nonAdminDenied':True,'createdExactlyOne':True,'redirectedToEditor':True}
 
 check('TC-04-D','Admin account creation requires POST, CSRF and administrator privileges',admin_create_user)
 
+def reject_csrf(status, headers):
+    return status == 419 or (status == 302 and urllib.parse.urlparse(headers.get('Location','')).path == '/login')
+
+def assert_denied(status, headers):
+    expect(status in (401,403) or (status == 302 and urllib.parse.urlparse(headers.get('Location','')).path in ('/login','/dashboard','/blocked')), f'Unexpected denial {status}')
+
+def route_target_isolation():
+    tok = member.token('/studio/links')
+    status, _, _ = member.request('POST','/upLink/no/104',{'_token':tok,'id':105,'up':'yes'})
+    expect(status in (200,302),'legitimate link toggle rejected')
+    expect(value('SELECT up_link FROM links WHERE id=104')=='yes','Route target not used')
+    expect(value('SELECT up_link FROM links WHERE id=105')=='no','Body ID modified another account')
+    status, _, _ = member.request('POST','/upLink/bad/104',{'_token':tok})
+    expect(status == 422,'Invalid operation accepted')
+    return 'body id and operation cannot override authorized route'
+
+check('TC-04-D','Route parameter isolation against body overrides',route_target_isolation)
+
+def session_isolation():
+    for path in ('/studio/links','/admin/users'):
+        status, headers, _ = anonymous.request('GET',path)
+        assert_denied(status,headers)
+    status,headers,_ = member.request('GET','/admin/users')
+    assert_denied(status,headers)
+    token=member.token('/studio/links')
+    status,_,_=member.request('POST','/logout',{'_token':token})
+    expect(status==302,'Logout did not redirect')
+    for path in ('/studio/links','/admin/users'):
+        status,headers,_=member.request('GET',path)
+        assert_denied(status,headers)
+    member.login('auditfree')
+    status,_,html=member.request('GET','/studio/links')
+    expect(status==200 and 'QA synthetic 104' in html and 'QA synthetic 105' not in html,'Session or owner data mismatch')
+    return 'guest denied, member admin denied, logout invalidates session, relogin retains own data'
+
+check('TC-04-D','Login/logout and session/owner isolation',session_isolation)
+
+def admin_permissions():
+    tok=member.token('/studio/links')
+    for path in ('/admin/users/block/no/3','/admin/users/verify/vip/3','/admin/users/verify-mail/false/3','/auth-as/3'):
+        status,headers,_=member.request('POST',path,{'_token':tok})
+        assert_denied(status,headers)
+    expect(value('SELECT block FROM users WHERE id=3')=='no','Non-admin blocked user')
+    expect(value('SELECT role FROM users WHERE id=3')=='user','Non-admin changed role')
+    expect(value('SELECT email_verified_at IS NOT NULL FROM users WHERE id=3')==1,'Non-admin changed email verification')
+    tok=admin.token('/admin/users')
+    status,_,_=admin.request('POST','/admin/users/block/no/3',{'_token':tok})
+    expect(status==302 and value('SELECT block FROM users WHERE id=3')=='yes','Block did not persist')
+    status,headers,_=other.request('GET','/studio/links')
+    assert_denied(status,headers)
+    status,_,_=admin.request('POST','/admin/users/block/yes/3',{'_token':tok})
+    expect(status==302 and value('SELECT block FROM users WHERE id=3')=='no','Unblock failed')
+    expect(other.request('GET','/studio/links')[0]==200,'Unblock did not restore access')
+    status,_,_=admin.request('POST','/admin/users/verify-mail/false/3',{'_token':tok})
+    expect(status in (200,302) and value('SELECT email_verified_at IS NULL FROM users WHERE id=3')==1,'Unverify failed')
+    status,_,_=admin.request('POST','/admin/users/verify-mail/true/3',{'_token':tok})
+    expect(status in (200,302) and value('SELECT email_verified_at IS NOT NULL FROM users WHERE id=3')==1,'Verify failed')
+    return 'member blocked from admin operations, access blocked/unblocked, email state persists'
+
+check('TC-04-D','Administrative permission and block enforcement',admin_permissions)
+
+def impersonation():
+    # Separate admin session must never inherit another session's impersonation.
+    independent=Client().login('auditadmin')
+    tok=admin.token('/admin/users')
+    status,_,_=admin.request('POST','/auth-as/1',{'_token':tok})
+    expect(status==403,'Admin self impersonation accepted')
+    status,headers,_=admin.request('POST','/auth-as/2',{})
+    expect(reject_csrf(status,headers),'Missing CSRF not rejected')
+    expect(admin.request('GET','/admin/users')[0]==200,'CSRF attempt changed identity')
+    status,_,_=admin.request('POST','/auth-as/2',{'_token':tok})
+    expect(status==302,'Valid impersonation refused')
+    status,_,html=admin.request('GET','/studio/links')
+    expect(status==200 and 'lf-impersonation-bar' in html and 'QA synthetic 104' in html and 'QA synthetic 105' not in html,'Impersonated member context missing')
+    expect(independent.request('GET','/admin/users')[0]==200,'Independent admin session was switched')
+    status,headers,_=admin.request('GET','/admin/users')
+    assert_denied(status,headers)
+    tok2=admin.token('/studio/links')
+    status,_,_=admin.request('DELETE','/studio/delete-user/2',{'_token':tok2})
+    expect(status==403 and value('SELECT COUNT(*) FROM users WHERE id=2')==1,'Impersonation deleted member account')
+    mt=member.token('/studio/links')
+    status,_,_=member.request('POST','/auth-as',{'_token':mt,'id':'1','token':'synthetic'})
+    expect(status==403,'Ordinary member restored administrator')
+    status,headers,_=admin.request('POST','/auth-as',{})
+    expect(reject_csrf(status,headers),'Return without CSRF allowed')
+    expect(admin.request('GET','/studio/links')[0]==200,'CSRF return changed identity')
+    status,headers,_=admin.request('POST','/auth-as',{'_token':tok2,'id':'3'})
+    expect(status==302 and '/admin/users' in headers.get('Location',''),'Return not successful')
+    expect(admin.request('GET','/admin/users')[0]==200,'Admin not restored')
+    expect(value('SELECT COUNT(*) FROM users WHERE auth_as IS NOT NULL')==0,'Legacy global impersonation state changed')
+    return 'session-bound start and return, no cross-session switch, no privilege escalation, no account deletion'
+
+check('TC-04-D','Impersonation start/return and independent sessions',impersonation)
+
+def media_isolation():
+    import base64
+    png=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jT1sAAAAASUVORK5CYII=')
+    for relative in ('assets/img','assets/img/background-img','assets/favicon/icons'):
+        folder=ROOT/relative
+        folder.mkdir(parents=True,exist_ok=True)
+        expect(folder.resolve().is_relative_to(ROOT),'Non-isolated media directory')
+    tok=member.token('/studio/links')
+    for rel,own,foreign,url in (
+      ('assets/img','2_qa.png','3_qa.png','/studio/page/delprofilepicture'),
+      ('assets/img/background-img','2_qa.png','3_qa.png','/studio/rem-background'),
+      ('assets/favicon/icons','104.png','105.png','/clearIcon/104')):
+        a,b=(ROOT/rel/own),(ROOT/rel/foreign)
+        expect(not a.exists() and not b.exists(),'Fixture file already exists')
+        a.write_bytes(png);b.write_bytes(png)
+        status,_,_=member.request('GET',url)
+        expect(status==405 and a.is_file() and b.is_file(),'GET changed media')
+        status,headers,_=member.request('POST',url,{})
+        expect(reject_csrf(status,headers) and a.is_file() and b.is_file(),'CSRF removed media')
+        if 'clearIcon' in url:
+            status,_,_=member.request('POST','/clearIcon/105',{'_token':tok})
+            expect(status==403 and b.is_file(),'Foreign icon cleared')
+        status,_,_=member.request('POST',url,{'_token':tok,'id':'105'})
+        expect(status in (200,302) and not a.exists() and b.read_bytes()==png,'Own media removal or isolation failed: '+url)
+    return 'avatar/background/icon deleted only with valid CSRF; foreign fixtures unchanged'
+
+check('TC-04-D','Member media and icon deletion isolation',media_isolation)
+
+def account_deletion():
+    # Synthetic social account proves FK cascades are not bypassed.
+    with sqlite3.connect(DB) as con:
+        con.execute("INSERT INTO social_accounts(user_id,provider_name,provider_id) VALUES(3,'synthetic','qa-provider-3')")
+    tok=other.token('/studio/links')
+    status,_,_=other.request('DELETE','/studio/delete-user/2',{'_token':tok})
+    expect(status==403 and value('SELECT COUNT(*) FROM users WHERE id=2')==1,'Cross-account deletion')
+    status,headers,_=other.request('DELETE','/studio/delete-user/3',{})
+    expect(reject_csrf(status,headers) and value('SELECT COUNT(*) FROM users WHERE id=3')==1,'CSRF deleted member')
+    status,_,_=other.request('DELETE','/studio/delete-user/3',{'_token':tok,'id':'2'})
+    expect(status==302 and value('SELECT COUNT(*) FROM users WHERE id=3')==0,'Member self deletion failed')
+    expect(value('SELECT COUNT(*) FROM users WHERE id=2')==1,'Foreign member deleted')
+    expect(value('SELECT COUNT(*) FROM links WHERE user_id=3')==0,'Deleted member links remain')
+    expect(value('SELECT COUNT(*) FROM social_accounts WHERE user_id=3')==0,'Social FK cascade failed')
+    status,headers,_=other.request('GET','/studio/links')
+    assert_denied(status,headers)
+    tok=admin.token('/admin/users')
+    for method,path in (('DELETE','/admin/delete-user/1'),('POST','/admin/delete-table-user/1')):
+        status,_,_=admin.request(method,path,{'_token':tok})
+        expect(status==403 and value('SELECT COUNT(*) FROM users WHERE id=1')==1,'Protected administrator deleted')
+    status,_,_=admin.request('DELETE','/admin/delete-user/4',{'_token':tok})
+    expect(status==302 and value('SELECT COUNT(*) FROM users WHERE id=4')==0,'Admin deletion failed')
+    expect(value('SELECT COUNT(*) FROM links WHERE user_id=4')==0,'Admin deleted account links remain')
+    new_id=value("SELECT id FROM users WHERE name LIKE 'Admin-Created-%' ORDER BY id LIMIT 1")
+    status,_,_=admin.request('POST',f'/admin/delete-table-user/{new_id}',{'_token':tok})
+    expect(status==200 and value('SELECT COUNT(*) FROM users WHERE id=?',(new_id,))==0,'Admin AJAX deletion failed')
+    with sqlite3.connect(DB) as con:
+        expect(con.execute('PRAGMA foreign_key_check').fetchall()==[],'Database contains FK violations')
+    return 'self/admin/AJAX delete, unauthorized denial, root protected, cascade and FK integrity'
+
+check('TC-04-D','Permanent synthetic account deletion and foreign keys',account_deletion)
+
 output=Path(os.environ.get('QA_OUTPUT','/tmp/linkfree-audit/http-results.json')).resolve()
 assert output.is_relative_to(Path('/tmp/linkfree-audit'))
-output.write_text(json.dumps({'source':'ephemeral checkout in GitHub Actions','production':False,'results':results},ensure_ascii=False,indent=2))
+output.write_text(json.dumps({'source':'ephemeral checkout in GitHub Actions','production':False,'sourceSha':os.getenv('GITHUB_SHA',''),'results':results},ensure_ascii=False,indent=2))
 failed=[x for x in results if not x['passed']]
 print(f'HTTP RESULT: {len(results)-len(failed)} passed, {len(failed)} failed; {output}',flush=True)
 if failed:

@@ -189,6 +189,10 @@ if (isset($_COOKIE['LinkCount'])) {
 }
 
 /* Meus Links — ações inline, controles visuais menores e cliques no topo. */
+.studio-links-page #links-table-body .studio-link-actions form{
+  flex:0 0 auto!important;float:none!important;min-width:max-content;margin:0!important;
+}
+.studio-links-page #links-table-body .studio-link-actions button[data-delete-link]{cursor:pointer;}
 .studio-links-page #links-table-body .studio-link-slim{
   position:relative!important;display:block;min-width:0;
   padding:5px 7px!important;min-height:0!important;box-sizing:border-box;
@@ -356,7 +360,7 @@ if (isset($_COOKIE['LinkCount'])) {
 
                                                     <div class='col-12 py-1 px-3 m-0 mt-2 studio-link-actions' role="group" aria-label="Ações do link">
 
-                                                        <form method="POST" action="{{ route('deleteLink', $link->id ) }}" class="d-inline-flex" style="float:right;margin:0" data-delete-link-form>
+                                                        <form method="POST" action="{{ route('deleteLink', $link->id ) }}" class="d-inline-flex" data-delete-link-form>
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" data-delete-link data-confirm="{{ __('messages.confirm_delete', ['title' => $link->title]) }}" class="btn btn-sm me-1 btn-icon btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Delete" data-original-title="{{__('messages.Delete')}}">

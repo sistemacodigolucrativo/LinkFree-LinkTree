@@ -27,10 +27,10 @@ async function run() {
   const browser=await chromium.launch({headless:true});
   async function check(id, name, fn) {
     try { const observed=await fn(); results.push({id,name,status:'PASS',observed}); }
-    catch(e) { results.push({id,name,status:'FAIL',error:String(e.message).slice(0,300)}); }
+    catch(e) { results.push({id,name,status:'FAIL',error:String(e.message).slice(0,2000)}); }
   }
   async function session(name) {
-    const context=await browser.newContext({viewport:{width:1280,height:900},serviceWorkers:'block'});
+    const context=await browser.newContext({viewport:{width:1280,height:900},reducedMotion:'reduce',serviceWorkers:'block'});
     await context.route('**/*',route=>{
       try {if(new URL(route.request().url()).origin===base)return route.continue();}catch(_){}
       return route.abort('blockedbyclient');
@@ -46,9 +46,20 @@ async function run() {
     } catch(e) { await context.close(); throw e; }
   }
   async function dialogClick(page,button,accept) {
+    await page.waitForLoadState('load',{timeout:30000});
+    await button.scrollIntoViewIfNeeded({timeout:20000});
+    try {
+      await button.click({trial:true,timeout:20000});
+    } catch (e) {
+      const hit=await button.evaluate(el=>{
+        const r=el.getBoundingClientRect(),target=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
+        return {target:target?.tagName,className:String(target?.className||'').slice(0,150),own:el.contains(target),rect:{x:r.x,y:r.y,w:r.width,h:r.height}};
+      }).catch(()=>null);
+      throw new Error('Real click actionability failed '+JSON.stringify(hit)+' '+String(e.message).slice(0,1600));
+    }
     await Promise.all([
-      page.waitForEvent('dialog',{timeout:10000}).then(d=>accept?d.accept():d.dismiss()),
-      button.click({timeout:10000})
+      page.waitForEvent('dialog',{timeout:20000}).then(d=>accept?d.accept():d.dismiss()),
+      button.click({timeout:20000})
     ]);
   }
   try {

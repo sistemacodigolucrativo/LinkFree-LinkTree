@@ -12,8 +12,10 @@
         }
     };
 
-    document.addEventListener('click', async function (event) {
-        const control = event.target.closest('[data-delete-link]');
+    document.addEventListener('submit', async function (event) {
+        const form = event.target;
+        if (!form.matches('form[data-delete-link-form]')) return;
+        const control = form.querySelector('[data-delete-link]');
         if (!control) return;
         event.preventDefault();
         if (control.dataset.pending === 'true') return;
@@ -32,8 +34,7 @@
         const abort = new AbortController();
         const timer = setTimeout(() => abort.abort(), 20000);
         try {
-            const form = control.closest('form[data-delete-link-form]');
-            if (!form || !form.action) throw new Error('missing delete form');
+            if (!form.action) throw new Error('missing delete form');
             const response = await fetch(form.action, {
                 method: 'DELETE', credentials: 'same-origin', signal: abort.signal,
                 headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }

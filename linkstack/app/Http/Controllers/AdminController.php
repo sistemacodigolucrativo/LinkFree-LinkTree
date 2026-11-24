@@ -178,8 +178,11 @@ class AdminController extends Controller
   //Block user
   public function blockUser(request $request)
   {
-    $id = $request->id;
-    $status = $request->block;
+    $id = $request->route('id');
+    $status = $request->route('block');
+    abort_unless(in_array($status, ['yes', 'no'], true), 422);
+    abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
+    User::findOrFail($id);
 
     if ($status == "yes") {
       $block = "no";
@@ -195,8 +198,11 @@ class AdminController extends Controller
   //Verify user
   public function verifyCheckUser(request $request)
   {
-    $id = $request->id;
-    $status = $request->verify;
+    $id = $request->route('id');
+    $status = $request->route('verify');
+    abort_unless(in_array($status, ['vip', 'user'], true), 422);
+    abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
+    User::findOrFail($id);
 
     if ($status == "vip") {
       $verify = "vip";
@@ -213,8 +219,11 @@ class AdminController extends Controller
   //Verify or un-verify users emails
   public function verifyUser(request $request)
   {
-    $id = $request->id;
-    $status = $request->verify;
+    $id = $request->route('id');
+    $status = $request->route('verify');
+    abort_unless(in_array($status, ['true', 'false'], true), 422);
+    abort_if((int) $id === 1 || (int) $id === (int) Auth::id(), 403);
+    User::findOrFail($id);
 
     if ($status == "true") {
       $verify = "0000-00-00 00:00:00";
@@ -276,33 +285,26 @@ class AdminController extends Controller
   //Delete existing user
   public function deleteUser(request $request)
   {
-    $id = $request->id;
-
-    Link::where("user_id", $id)->delete();
-
-    Schema::disableForeignKeyConstraints();
-
-    $user = User::find($id);
-    $user->forceDelete();
-
-    Schema::enableForeignKeyConstraints();
-
+    $this->deleteAccount((int) $request->route('id'));
     return redirect("admin/users/all");
   }
 
   //Delete existing user with POST request
   public function deleteTableUser(request $request)
   {
-    $id = $request->id;
+    $this->deleteAccount((int) $request->route('id'));
+    return response('', 200);
+  }
 
-    Link::where("user_id", $id)->delete();
-
-    Schema::disableForeignKeyConstraints();
-
-    $user = User::find($id);
-    $user->forceDelete();
-
-    Schema::enableForeignKeyConstraints();
+  // Keep foreign-key enforcement active; model deletion hooks retain case history.
+  private function deleteAccount(int $id): void
+  {
+    abort_if($id === 1 || $id === (int) Auth::id(), 403);
+    \Illuminate\Support\Facades\DB::transaction(function () use ($id) {
+      $user = User::findOrFail($id);
+      Link::where("user_id", $id)->delete();
+      $user->forceDelete();
+    });
   }
 
   //Show user to edit
@@ -341,7 +343,7 @@ class AdminController extends Controller
   //Delete link
   public function deleteLinkUser(request $request)
   {
-    $linkId = $request->id;
+    $linkId = $request->route('id');
 
     Link::where("id", $linkId)->delete();
 
@@ -358,7 +360,7 @@ class AdminController extends Controller
       "littlelink_name" => "",
     ]);
 
-    $id = $request->id;
+    $id = $request->route('id');
     $name = $request->name;
     $email = $request->email;
     $password = Hash::make($request->password);
@@ -837,59 +839,37 @@ class AdminController extends Controller
   //Removes impersonation if authenticated
   public function authAs(Request $request)
   {
-    $userID = $request->id;
-    $token = $request->token;
-
-    $user = User::find($userID);
-
-    if (!$user) {
-      Auth::logout();
-      return redirect("/login");
+    $state = $request->session()->get('linkfree_impersonation');
+    abort_unless(is_array($state) && (int) ($state['member_id'] ?? 0) === (int) Auth::id(), 403);
+    $admin = User::find($state['admin_id'] ?? null);
+    if (!$admin || $admin->role !== 'admin' || $admin->block === 'yes') {
+      Auth::guard('web')->logoutCurrentDevice();
+      $request->session()->invalidate();
+      $request->session()->regenerateToken();
+      return redirect('/login');
     }
-
-    $userRememberToken = $user->remember_token;
-    $sessionToken = $request->session()->get("display_auth_nav");
-
-    if (
-      !empty($token) &&
-      !empty($userRememberToken) &&
-      !empty($sessionToken) &&
-      hash_equals($userRememberToken, $token) &&
-      hash_equals($userRememberToken, $sessionToken)
-    ) {
-      $user->auth_as = null;
-      $user->remember_token = null;
-      $user->save();
-
-      $request->session()->forget("display_auth_nav");
-
-      Auth::loginUsingId($userID);
-
-      return redirect("/admin/users/all");
-    } else {
-      Auth::logout();
-      return redirect("/login");
-    }
+    Auth::guard('web')->logoutCurrentDevice();
+    Auth::guard('web')->login($admin);
+    $request->session()->forget('linkfree_impersonation');
+    $request->session()->regenerateToken();
+    return redirect("admin/users/all");
   }
 
   //Add impersonation
   public function authAsID(request $request)
   {
-    $adminUser = User::whereNotNull("auth_as")->where("role", "admin")->first();
+    abort_if($request->session()->has('linkfree_impersonation'), 403);
+    $admin = Auth::user();
+    abort_unless($admin && $admin->role === 'admin' && $admin->block !== 'yes', 403);
+    $target = User::findOrFail($request->route('id'));
+    abort_unless((int) $target->id !== (int) $admin->id && in_array($target->role, ['user', 'vip'], true) && $target->block !== 'yes', 403);
+    abort_unless(env('REGISTER_AUTH') === 'auth' || $target->hasVerifiedEmail(), 403);
 
-    if (!$adminUser) {
-      $userID = $request->id;
-      $id = Auth::user()->id;
-
-      $user = User::find($id);
-
-      $user->auth_as = $userID;
-      $user->save();
-
-      return redirect("dashboard");
-    } else {
-      return redirect("admin/users/all");
-    }
+    Auth::guard('web')->logoutCurrentDevice();
+    Auth::guard('web')->login($target);
+    $request->session()->regenerateToken();
+    $request->session()->put('linkfree_impersonation', ['admin_id' => (int) $admin->id, 'member_id' => (int) $target->id]);
+    return redirect("dashboard");
   }
 
   //Show info about link

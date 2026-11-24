@@ -43,7 +43,8 @@ if(file_exists(base_path('INSTALLING')) or file_exists(base_path('INSTALLERLOCK'
   Route::post('/mysql', [InstallerController::class, 'mysql'])->name('mysql');
   Route::post('/options', [InstallerController::class, 'options'])->name('options');
   Route::get('/mysql-test', [InstallerController::class, 'mysqlTest'])->name('mysqlTest');
-  Route::get('/skip', function () {Artisan::call('db:seed', ['--class' => 'AdminSeeder',]); Auth::login(User::where('name', 'admin')->first()); return redirect(url('dashboard'));});
+  // The VPS installer already denies this default-account shortcut at nginx.
+  Route::get('/skip', fn () => abort(404));
   Route::post('/editConfigInstaller', [InstallerController::class, 'editConfigInstaller'])->name('editConfigInstaller');
 
   Route::get('{any}', function() {
@@ -139,7 +140,7 @@ Route::post('/edit-icons', [UserController::class, 'editIcons'])->name('editIcon
 Route::post('/clearIcon/{id}', [UserController::class, 'clearIcon'])->name('clearIcon')->middleware('link-id');
 Route::post('/studio/page/delprofilepicture', [UserController::class, 'delProfilePicture'])->name('delProfilePicture');
 Route::delete('/studio/delete-user/{id}', [UserController::class, 'deleteUser'])->name('deleteOwnUser')->middleware('verified');
-Route::post('/auth-as', [AdminController::class, 'authAs'])->name('authAs');
+
 
 // Catch all redirects
 Route::get('/admin/users/all', fn() => redirect(route('showUsers')));
@@ -157,6 +158,9 @@ Route::get('/studio/linkparamform_part/{typeid}/{linkid}', [LinkTypeViewControll
 });
 });
 }
+
+// Return is authenticated and session-bound, even when the impersonated member is blocked.
+Route::post('/auth-as', [AdminController::class, 'authAs'])->middleware('auth')->name('authAs');
 
 //Social login route
 Route::get('/social-auth/{provider}/callback', [SocialLoginController::class, 'providerCallback']);
