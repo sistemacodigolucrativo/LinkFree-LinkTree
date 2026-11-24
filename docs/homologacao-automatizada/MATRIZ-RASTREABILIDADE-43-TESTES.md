@@ -62,7 +62,7 @@
 3. **Falhas de fixture não são regressões comprovadas:** `evidencias/persistence.json` mostra duas assertivas falhas ligadas à preparação de ambiente (`TC-03-B`, `TC-08-D`). Repetir corretamente; não aprovar nem culpar o produto sem evidência.
 4. **Cenários externos indisponíveis:** OAuth real, WebKit/Safari iOS, SMTP real, retenção LGPD, selo legado e aceite humano.
 5. **Recuperação:** `recovery-tls.json` confirma recuperação de arquivos em pasta isolada, mas explicitamente informa que a aplicação não iniciou sobre o backup real.
-6. **Preflight/deploy 23/11:** os logs integrais não estão anexados à PR; documento anterior `docs/STATUS-PRODUCAO-M13-20261123.md` resume as saídas apresentadas pelo operador, portanto é fonte secundária.
+6. **Preflight/deploy 23/11:** [Síntese histórica do operador](EVIDENCIA-HISTORICA-OPERADOR-20261123.md);  os logs integrais não estão anexados à PR; documento anterior `docs/STATUS-PRODUCAO-M13-20261123.md` resume as saídas apresentadas pelo operador, portanto é fonte secundária.
 7. **Não há mudança de status nesta revisão:** 4 APROVADOS, 2 REPROVADOS, 34 PARCIAIS, 2 BLOQUEADOS, 1 NÃO AUTOMATIZÁVEL. Conclusão funcional permanece pendente.
 
 ## Critério para próxima reclassificação
