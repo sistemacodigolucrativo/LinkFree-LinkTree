@@ -1,6 +1,6 @@
 # Continuidade técnica LinkFree-LinkTree
 
-> **H3-B:** lote residual executado em staging sintético; seis casos aprovados no escopo indicado e TC-03-C parcial pela equivalência web não integral. HTTPS/OAuth/SMTP reais pendentes; [relatório](homologacao-correcoes/H3-B-BANCO-PRIVACIDADE-AUTENTICACAO-20261124.md). Aguardando revisão do ChatGPT antes de H3-C.
+> **H3-B:** lote residual executado em staging sintético; seis casos aprovados no escopo indicado e TC-03-C parcial pela equivalência web não integral. HTTPS/OAuth/SMTP reais pendentes; [relatório](homologacao-correcoes/H3-B-BANCO-PRIVACIDADE-AUTENTICACAO-20261124.md). Revisado pelo ChatGPT; H3-C autorizada por lotes, [roteiro](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md).
 
 > **H3-A:** TC-03-B e TC-08-D aprovados no escopo automatizado de staging, sem reclassificar a matriz histórica; causas de fixture diagnosticadas. [Relatório](homologacao-correcoes/H3-A-PERSISTENCIA-ESTATISTICAS-20261124.md). H3-A revisada pelo ChatGPT e H3-B autorizada no escopo isolado; [roteiro](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md).
 
@@ -107,3 +107,6 @@ PR #23 integrada em a9ae3654dd57242fd29c614cdcef31613e2a059a; H2 revisada pelo C
 
 ## 23. H3-A revisada; H3-B autorizada
 PR #24 integrada em d1b44dc729b96065d6f335edeea738951e3b2d6a; TC-03-B e TC-08-D aprovados em staging (7/7 principais, 2/2 adicionais, 1/1 expiração simulada). A seção navigation do Admin, em vez de identity, explica concretamente o cenário histórico de persistência; a exclusão de crawler reproduziu a ausência de contador. Não há defeito comprovado nesses cenários; proxy real e 900 s reais não ensaiados. H3-B: lacunas de schema, transações, privacidade, cadastro/consentimento e sessões. Reaproveitar CI, executar apenas faltantes; [roteiro](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md). Sem deploy, sem reclassificação da matriz histórica. Execução H3-B pendente.
+
+## 24. H3-B revisada; H3-C autorizada
+PR #25 integrada em 228df719858d499837711e2ad1ac07058672f61b; TC-01-C/D, TC-04-A/B/D e TC-10-C aprovados no escopo sintético; TC-03-C parcial por proxy local diferente de FastCGI real. Reset de senha com captura SMTP local aprovado; HTTPS/cookies reais e provedores externos pendentes. H3-A+B: oito casos aprovados e um parcial no escopo testado, não reclassificar PR #15. Sem defeito de aplicação confirmado; sem deploy. H3-C dividida em C1 indicações, C2 selo, C3 denúncias, com checkpoints por lote e retomada por ID em caso de limite do Codex. [Roteiro](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md). Execução C pendente.
