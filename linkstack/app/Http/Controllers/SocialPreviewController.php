@@ -94,8 +94,9 @@ class SocialPreviewController extends Controller
         $cleanDescription = $this->cleanText($description, 240);
 
         $this->drawText($canvas, 'LinkFree', 33, 558, 155, $green, true);
-        $this->drawLines($canvas, $cleanName, 47, 558, 253, 570, 2, $white, true, 58);
-        $this->drawLines($canvas, $cleanDescription, 25, 558, 390, 570, 4, $muted, false, 40);
+        [$fittedName, $nameSize] = $this->fitName($cleanName, 550);
+        $this->drawText($canvas, $fittedName, $nameSize, 558, 253, $white, true);
+        $this->drawLines($canvas, $cleanDescription !== '' ? $cleanDescription : 'Confira meus links e canais de contato', 25, 558, 350, 550, 5, $muted, false, 36);
         imagefilledrectangle($canvas, 558, 524, 1117, 527, $stroke);
         $this->drawText($canvas, 'Um link. Todos os seus caminhos.', 21, 558, 562, $muted, false);
         ob_start();
@@ -110,17 +111,36 @@ class SocialPreviewController extends Controller
         return response($binary, 200, $headers);
     }
 
-    /**
-     * Wrap using actual TTF metrics. Ellipsize the final line rather than
-     * allowing text to escape the image at mobile preview sizes.
-     */
+    /** A single line, with a readable minimum size and grapheme-safe ellipsis. */
+    private function fitName(string $name, int $maxWidth): array
+    {
+        $name = $name !== '' ? $name : 'LinkFree';
+        for ($size = 47; $size >= 26; $size--) {
+            if ($this->width($name, $size, true) <= $maxWidth) return [$name, $size];
+        }
+        return [$this->ellipsize($name, 26, $maxWidth, true), 26];
+    }
+
+    private function ellipsize(string $text, int $size, int $maxWidth, bool $bold, bool $force = false): string
+    {
+        if (!$force && $this->width($text, $size, $bold) <= $maxWidth) return $text;
+        preg_match_all('/\X/u', $text, $matches);
+        $clusters = $matches[0];
+        while ($clusters) {
+            $candidate = rtrim(implode('', $clusters)) . '…';
+            if ($this->width($candidate, $size, $bold) <= $maxWidth) return $candidate;
+            array_pop($clusters);
+        }
+        return $this->width('…', $size, $bold) <= $maxWidth ? '…' : '';
+    }
+
+    /** Wrap on words, preserving a bounded final line with a single ellipsis. */
     private function wrapText(string $value, int $size, int $maxWidth, bool $bold, int $limit): array
     {
-        $words = preg_split('/\s+/u', trim($value)) ?: [];
+        $words = preg_split('/\s+/u', trim($value), -1, PREG_SPLIT_NO_EMPTY) ?: [];
         $lines = [];
         $line = '';
         foreach ($words as $word) {
-            if ($word === '') continue;
             $candidate = $line === '' ? $word : $line . ' ' . $word;
             if ($line !== '' && $this->width($candidate, $size, $bold) > $maxWidth) {
                 $lines[] = $line;
@@ -130,19 +150,11 @@ class SocialPreviewController extends Controller
             }
         }
         if ($line !== '') $lines[] = $line;
-        if (!$lines) return [];
-
-        $wasTruncated = count($lines) > $limit;
+        $truncated = count($lines) > $limit;
         $lines = array_slice($lines, 0, $limit);
         foreach ($lines as $index => $text) {
-            $last = $index === count($lines) - 1;
-            $needsEllipsis = $last && $wasTruncated;
-            while (mb_strlen($text, 'UTF-8') > 1 &&
-                $this->width($text . ($needsEllipsis ? '…' : ''), $size, $bold) > $maxWidth) {
-                $text = mb_substr($text, 0, -1, 'UTF-8');
-                $needsEllipsis = true;
-            }
-            $lines[$index] = $text . ($needsEllipsis ? '…' : '');
+            $lines[$index] = $this->ellipsize($text, $size, $maxWidth, $bold,
+                $truncated && $index === count($lines) - 1);
         }
         return $lines;
     }
@@ -171,8 +183,24 @@ class SocialPreviewController extends Controller
 
     private function cleanText(string $value, int $limit): string
     {
-        $value = trim(preg_replace('/\s+/u', ' ', strip_tags($value)) ?: '');
-        return mb_strimwidth($value, 0, $limit, '…', 'UTF-8');
+        // GD/FreeType's ordinary text fonts cannot reliably render emoji sequences.
+        // Omit the complete emoji grapheme ONLY in the raster card. Do not rewrite
+        // the member's saved bio or the HTML/Open Graph/Twitter metadata.
+        $value = mb_convert_encoding(strip_tags($value), 'UTF-8', 'UTF-8');
+        $value = preg_replace_callback('/\X/u', static function (array $match): string {
+            $cluster = $match[0];
+            if (preg_match('/[\p{Emoji_Presentation}\p{Regional_Indicator}\x{20E3}\x{FE0F}\x{1F3FB}-\x{1F3FF}]/u', $cluster)
+                || (preg_match('/\p{Extended_Pictographic}/u', $cluster)
+                    && !preg_match('/^[©®™]\x{FE0E}?$/u', $cluster))) {
+                return ' ';
+            }
+            return $cluster;
+        }, $value) ?? '';
+        $value = preg_replace('/[\p{Cc}\p{Cf}\x{FE0E}\x{FE0F}]+/u', ' ', $value) ?? '';
+        $value = trim(preg_replace('/\s+/u', ' ', $value) ?? '');
+        // Avoid splitting a combining sequence at the character limit.
+        preg_match_all('/\X/u', $value, $parts);
+        return count($parts[0]) > $limit ? implode('', array_slice($parts[0], 0, $limit - 1)) . '…' : $value;
     }
 
     private function font(bool $bold): ?string

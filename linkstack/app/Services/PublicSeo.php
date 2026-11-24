@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 /** Public metadata only. Never use private account fields in cards or markup. */
 final class PublicSeo
 {
-    public const CARD_VERSION = 'linkfree-horizontal-v3';
+    public const CARD_VERSION = 'linkfree-horizontal-v4';
 
     public static function plain(?string $text): string
     {
