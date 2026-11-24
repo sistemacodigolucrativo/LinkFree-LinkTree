@@ -1,0 +1,85 @@
+[
+  {
+    "id": "PRE",
+    "assertion": "perfis, autenticação e baseline sem atribuições",
+    "pass": true,
+    "observed": {
+      "usuarios": 4,
+      "perfis": "Admin, Free, outro Free e VIP",
+      "contador_inicial": "sem linha",
+      "origens_inicial": "sem arquivo",
+      "sessoes": "4 logins 302 dashboard"
+    }
+  },
+  {
+    "id": "TC-03-B",
+    "assertion": "nav_features persistência, seção correta, logout/login e home",
+    "pass": true,
+    "observed": {
+      "post": 302,
+      "arquivo": "nav_features salvo",
+      "admin_default": "identity: campo não presente",
+      "admin_navigation": "campo salvo visível após novo login",
+      "home": "texto público presente"
+    }
+  },
+  {
+    "id": "TC-03-B",
+    "assertion": "tema persiste no banco, nova sessão e perfil público",
+    "pass": true,
+    "observed": {
+      "post": 302,
+      "database": "PolySleek após novo login",
+      "publico": "assets PolySleek presentes"
+    }
+  },
+  {
+    "id": "TC-08-D",
+    "assertion": "reprodução controlada de User-Agent histórico ignorado como crawler",
+    "pass": true,
+    "observed": {
+      "HTTP": 200,
+      "linha_antes": "ausente",
+      "linha_depois": "ausente",
+      "interpretação": "crawler ignorado; NoneType não prova erro de contador"
+    }
+  },
+  {
+    "id": "TC-08-D",
+    "assertion": "contador, UTM, deduplicação e referrer com identidades distintas",
+    "pass": true,
+    "observed": {
+      "baseline": 1,
+      "após_instagram": 2,
+      "repetição": 2,
+      "outro_ip": 3,
+      "instagram": 1,
+      "telegram": 1,
+      "janela_segundos": 900,
+      "ips": "loopback sintéticos independentes"
+    }
+  },
+  {
+    "id": "TC-03-B/TC-08-D",
+    "assertion": "relatório persiste, Free negado e VIP/Admin isolados",
+    "pass": true,
+    "observed": {
+      "free_json": 403,
+      "free_html": 403,
+      "vip": 200,
+      "vip_instagram": 1,
+      "vip_telegram": 1,
+      "admin": 200,
+      "admin_origens_proprias": true
+    }
+  },
+  {
+    "id": "TC-03-B",
+    "assertion": "restauração dos valores sintéticos originais",
+    "pass": true,
+    "observed": {
+      "nav_features": "restaurado",
+      "tema": "restaurado"
+    }
+  }
+]

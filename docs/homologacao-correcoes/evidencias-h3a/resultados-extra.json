@@ -1,0 +1,23 @@
+[
+  {
+    "id": "TC-03-B",
+    "assertion": "preferência de tema, nova sessão e CSS público",
+    "pass": true,
+    "observed": {
+      "permissao_admin": true,
+      "preferencia": "mono",
+      "nova_sessao": "persistida",
+      "publico": "CSS monospace"
+    }
+  },
+  {
+    "id": "TC-08-D",
+    "assertion": "contador público, total do relatório e escopo proprietário",
+    "pass": true,
+    "observed": {
+      "contador_público": 3,
+      "relatório_total": 3,
+      "query_outra_conta": "ignorada, dados próprios"
+    }
+  }
+]

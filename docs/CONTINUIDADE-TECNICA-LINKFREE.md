@@ -1,5 +1,8 @@
 # Continuidade técnica LinkFree-LinkTree
 
+> **H3-A:** TC-03-B e TC-08-D aprovados no escopo automatizado de staging, sem reclassificar a matriz histórica; causas de fixture diagnosticadas. [Relatório](homologacao-correcoes/H3-A-PERSISTENCIA-ESTATISTICAS-20261124.md). H3-B aguarda revisão pelo ChatGPT.
+
+
 > **H2 — verificação operacional final:** dispatcher aprovado busca automaticamente o script corrigido da main; backup e staging reavaliados no escopo solicitado. H2 concluída no escopo de recuperação local; H3 autorizada após revisão do ChatGPT; [roteiro H3-A](homologacao-correcoes/H3-ROTEIRO-TESTES-RESIDUAIS-20261124.md). [Relatório](homologacao-correcoes/H2-VERIFICACAO-OPERACIONAL-FINAL-20261124.md).
 
 > **H2 — backup quiescente:** janela autorizada durou aproximadamente 9 s; backup da instalação e restauração isolada validados. H2 continua condicional porque PR #19 não foi integrada/publicada e o rollback P1 antigo permanece. H3 não iniciada. [Relatório](homologacao-correcoes/H2-BACKUP-QUIESCENTE-RESTAURACAO-20261124.md).

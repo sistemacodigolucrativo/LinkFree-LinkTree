@@ -1,0 +1,14 @@
+[
+  {
+    "id": "TC-08-D",
+    "assertion": "nova visita após expiração simulada da janela",
+    "pass": true,
+    "observed": {
+      "tempo": "expiração da linha simulada, sem aguardar 900 s reais",
+      "baseline": 3,
+      "visita_após_expiração": 4,
+      "nova_repetição": 4,
+      "instagram_delta": 1
+    }
+  }
+]
