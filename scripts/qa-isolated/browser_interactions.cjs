@@ -183,6 +183,38 @@ async function run() {
         return {destinations:paths.length,viewports:3};
       } finally {await context.close();}
     });
+    await check('ADMIN-ACCORDIONS','Administrative category accordions expand and collapse on desktop and mobile',async()=>{
+      const {context,page}=await session('auditadmin');
+      try {
+        await page.goto(base+'/admin/overview',{waitUntil:'load'});
+        for(const id of ['admin-users-menu','admin-site-menu','admin-themes-menu','admin-system-menu']){
+          const toggle=page.locator('#sidebar-menu a[aria-controls="'+id+'"]');
+          const submenu=page.locator('#'+id);
+          assert.equal(await toggle.getAttribute('aria-expanded'),'false',id+' expected collapsed');
+          await toggle.click();
+          await submenu.locator('xpath=.').waitFor({state:'visible',timeout:10000});
+          assert.equal(await toggle.getAttribute('aria-expanded'),'true',id+' did not expand');
+          await toggle.click();
+          await page.waitForFunction(menuId=>!document.getElementById(menuId).classList.contains('show'),id,{timeout:10000});
+          assert.equal(await toggle.getAttribute('aria-expanded'),'false',id+' did not collapse');
+        }
+        await page.setViewportSize({width:375,height:900});
+        await page.goto(base+'/admin/overview',{waitUntil:'load'});
+        const sidebar=page.locator('.sidebar-default');
+        const toggle=page.locator('.main-content [data-toggle="sidebar"]').first();
+        assert.equal(await toggle.count(),1,'Mobile sidebar toggle missing');
+        if((await sidebar.getAttribute('class')).includes('sidebar-mini')){
+          await toggle.click();
+          await page.waitForFunction(()=>!document.querySelector('.sidebar-default').classList.contains('sidebar-mini'));
+        }
+        const category=page.locator('#sidebar-menu a[aria-controls="admin-users-menu"]');
+        await category.click();
+        assert.equal(await category.getAttribute('aria-expanded'),'true','Mobile submenu not expanded');
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(()=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini'));
+        return {desktopAccordions:4,mobileExpanded:true,escapeCloses:true};
+      } finally {await context.close();}
+    });
     await check('ADMIN-RBAC','Admin-only destinations reject member and anonymous clients',async()=>{
       const routes=['/admin/overview','/admin/users','/admin/new-user','/admin/referrals','/admin/verification','/admin/reports','/admin/site','/admin/pages','/admin/theme','/admin/github-themes','/admin/linktype','/admin/config','/admin/backups','/admin/advanced-config','/admin/env','/admin/phpinfo','/update'];
       const {context:member}=await session('auditfree');
