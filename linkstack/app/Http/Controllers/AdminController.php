@@ -243,6 +243,11 @@ class AdminController extends Controller
   }
 
   //Create new user from the Admin Panel
+  public function showNewUser()
+  {
+    return view('panel.new-user');
+  }
+
   public function createNewUser()
   {
     function random_str(
@@ -658,7 +663,7 @@ class AdminController extends Controller
   //Shows config file editor page
   public function showFileEditor(request $request)
   {
-    return redirect("/admin/config");
+    return view("panel/config-editor");
   }
 
   //Saves advanced config
