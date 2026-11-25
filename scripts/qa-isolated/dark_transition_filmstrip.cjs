@@ -169,6 +169,37 @@ async function run(){
         }
       }finally{await context.close();}
     }
+
+    // The changed bootstrap must also preserve automatic OS theme selection.
+    // These two startup cases are targeted regression checks, not frame captures.
+    for(const scheme of ['dark','light']){
+      const context=await browser.newContext({viewport:{width:390,height:844},
+        colorScheme:scheme,reducedMotion:'reduce',serviceWorkers:'block'});
+      await context.addInitScript(()=>{
+        try{localStorage.setItem('color-mode','auto');}catch(_){}
+      });
+      const name='auto-system-'+scheme;
+      try{
+        const page=await context.newPage();
+        await login(page);
+        await page.goto(base+'/admin/config',{waitUntil:'domcontentloaded'});
+        const state=await page.evaluate(()=>({
+          bodyDark:document.body.classList.contains('dark'),
+          bodyAuto:document.body.classList.contains('auto'),
+          prepaint:document.documentElement.classList.contains('lf-prepaint-dark'),
+          preference:localStorage.getItem('color-mode')
+        }));
+        assert.equal(state.preference,'auto');
+        assert.equal(state.bodyAuto,true);
+        assert.equal(state.bodyDark,scheme==='dark');
+        assert.equal(state.prepaint,scheme==='dark');
+        cases.push({name,status:'PASS',finalState:state});
+        console.log('PASS '+name+' '+JSON.stringify(state));
+      }catch(e){
+        cases.push({name,status:'FAIL',error:String(e.stack||e).slice(0,1400)});
+        console.log('FAIL '+name+' '+String(e.message).slice(0,220));
+      }finally{await context.close();store();}
+    }
   }finally{await browser.close();store();}
   const failures=cases.filter(x=>x.status!=='PASS');
   console.log('DARK TRANSITION FILMSTRIP: '+(cases.length-failures.length)+' passed, '+failures.length+
