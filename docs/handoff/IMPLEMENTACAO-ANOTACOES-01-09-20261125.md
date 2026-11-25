@@ -2,7 +2,7 @@
 
 **Data:** 25/11/2026. **Origem:** main `844979bdbd4cc1bfeb676cedb32342eb1c5c2d3c`.  
 **Branch de implementação:** `feat/admin-workflow-ux-paginations-20261125`.  
-**Estado final de validação — 25/11/2026:** os nove requisitos foram implementados na branch, com os testes diretamente relacionados **aprovados no CI** (SHA de código testado `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`). **PR #36 pronta para revisão; sem merge nem deploy.** Acessibilidade WCAG integral e dispositivos físicos continuam validações separadas.
+**Estado de integração — 25/11/2026:** os nove requisitos foram implementados, e os testes diretamente relacionados **aprovados no CI** (SHA de código testado `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`). **PR #36 integrada à `main` com sucesso em `c1bb27d94c5ff7f553ec16aac6c9743c0a6901ce`; deploy na VPS ainda não executado.** Acessibilidade WCAG integral e dispositivos físicos continuam validações separadas.
 
 ## Metodologia e reaproveitamento
 
@@ -98,4 +98,15 @@
 
 **Limitações declaradas:** testes automáticos reproduzem os comportamentos no Chromium sintético; testes de Opera, Safari, outros navegadores/GPU e WCAG completa permanecem fora do escopo de aprovação desta PR. Não inferir o estado de produção a partir do merge.
 
-**Status de entrega:** implementação e validação de código prontas para revisão/merge; `main` e VPS inalteradas durante esta implementação.
+**Status de entrega:** implementação validada e **integrada à `main`**. A produção não foi alterada por este merge; a publicação na VPS é uma etapa independente.
+
+## Registro de integração — 25/11/2026
+
+- **PR integrada:** [#36](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/36).
+- **Merge na `main`:** `c1bb27d94c5ff7f553ec16aac6c9743c0a6901ce`; dois pais: `844979bdbd4cc1bfeb676cedb32342eb1c5c2d3c` (base) e `2aa17eb7f567f293e6b6fcb19ff01f9244e74d61` (PR).
+- **Confirmação pelo GitHub:** PR `closed/merged`, `main` apontando para o commit de merge, **25 arquivos alterados**.
+- **Testes aprovados do código:** 10 jobs obrigatórios verdes em `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`. O commit posterior `2aa17eb`, anterior ao merge, alterou apenas este relatório; não houve mudança de código entre os dois commits.
+- **Deploy remoto:** **NÃO executado**. Nenhuma afirmação de que a VPS já esteja na versão do merge.
+- **Pré-deploy previsto, ainda não realizado na VPS:** executar como root `bash /root/atualizar-linkstack.sh --check`, verificar a relação de arquivos e conflitos e confirmar que o alvo é a `main`. O modo `--check` não modifica arquivos da aplicação, mas pode buscar atualizações Git, criar clone persistente e instalar `rsync` se necessário; não é um comando completamente sem efeitos no ambiente.
+- **Regra de publicação:** usar o modo `--deploy` apenas se o `--check` indicar esse modo; migrações M13 ou consentimento seguem as condições explícitas do script, com backup e conferência da base de dados. Não disparar publicação ou migração sem nova autorização.
+- **Homologação pós-publicação:** `bash /root/homologar-linkfree.sh --read-only`, além de inspeção autenticada nas telas alteradas e verificação do SHA de publicação. Esta homologação permanece pendente enquanto o deploy não for autorizado e concluído.
