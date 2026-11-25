@@ -260,7 +260,8 @@ require('nav-accordion-toggle:is(.active,[aria-expanded="true"])' in nav_css,
         "Categoria aberta usa superfície distinta do link ativo")
 require('id="sidebar-scroll-region"' in sidebar and
         'data-bs-parent="#sidebar-menu"' in sidebar and
-        'data-bs-parent="#admin-navigation"' in sidebar,
+        sidebar.count('data-bs-parent="#sidebar-menu"') == 6 and
+        'data-bs-parent="#admin-navigation"' not in sidebar,
         "Rolagem e acordeão exclusivo preservados")
 
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")
