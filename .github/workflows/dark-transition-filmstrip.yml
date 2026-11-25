@@ -21,6 +21,7 @@ jobs:
       - name: Check syntax of focused audit, reusable harness, and safety checks
         run: |
           node --check scripts/qa-isolated/dark_transition_filmstrip.cjs
+          node --check linkstack/assets/js/detect-dark-mode.js
           bash -n scripts/qa-isolated/run_config_browser_smoke.sh
       - name: Run only dark-transition frame analysis in disposable fixture
         timeout-minutes: 8
