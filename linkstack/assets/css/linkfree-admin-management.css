@@ -108,3 +108,27 @@
  .lf-site-settings-nav a{flex-basis:100%}
  .lf-site-actions .btn{width:100%}
 }
+
+/* Seções da personalização: uma página por vez, fechar sempre acessível. */
+.lf-site-section-toolbar{
+  position:sticky;top:10px;z-index:1020;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:10px 12px;border:1px solid var(--lf-border);border-radius:12px;
+  background:var(--lf-surface);color:var(--lf-text);
+  box-shadow:0 5px 18px rgba(0,0,0,.08)
+}
+.lf-site-close{display:inline-flex;align-items:center;justify-content:center;
+  min-width:40px;min-height:40px;font-size:1.1rem}
+.lf-site-toast-stack{position:fixed;top:clamp(70px,10vh,104px);right:12px;
+  z-index:2000;width:min(395px,calc(100vw - 24px));pointer-events:none}
+.lf-site-message{width:100%;max-width:100%;pointer-events:auto;
+  background:var(--lf-surface);color:var(--lf-text);border:1px solid var(--lf-border);
+  box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.lf-site-message .toast-header{background:var(--lf-raised);color:var(--lf-text);
+  border-bottom:1px solid var(--lf-border)}
+.lf-site-message-success{border-left:4px solid var(--lf-success-border,#198754)}
+.lf-site-message-error{border-left:4px solid #bd3636}
+.lf-site-message .toast-body{overflow-wrap:anywhere}
+@media(prefers-reduced-motion:reduce){
+ .lf-site-message{transition:none!important}
+}
