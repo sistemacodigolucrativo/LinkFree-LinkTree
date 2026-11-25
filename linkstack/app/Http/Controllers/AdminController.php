@@ -254,22 +254,23 @@ class AdminController extends Controller
 
     return view('panel.new-user', [
       'suggestedName' => 'Admin-Created-' . $number,
-      'suggestedEmail' => 'admin-created-' . strtolower(\\Illuminate\\Support\\Str::random(10)) . '@' . $domain,
-      'suggestedPassword' => \\Illuminate\\Support\\Str::random(20),
+      'suggestedEmail' => 'admin-created-' . strtolower(\Illuminate\Support\Str::random(10)) . '@' . $domain,
+      'suggestedPassword' => \Illuminate\Support\Str::random(20),
       'newUserRole' => RegistrationVip::roleForNewUser(),
     ]);
   }
 
   public function createNewUser(Request $request)
   {
+    $request->merge(['email' => strtolower(trim((string) $request->input('email', '')))]);
     $fields = $request->validate([
       'name' => 'required|string|max:255',
-      'email' => ['required', 'email', 'max:255', \\Illuminate\\Validation\\Rule::unique('users', 'email')],
+      'email' => ['required', 'email', 'max:255', \Illuminate\Validation\Rule::unique('users', 'email')],
       'password' => 'required|string|min:8|max:255',
     ]);
 
     // Role, verification and other privileges remain server-controlled.
-    $user = \\Illuminate\\Support\\Facades\\DB::transaction(function () use ($fields) {
+    $user = \Illuminate\Support\Facades\DB::transaction(function () use ($fields) {
       $created = User::create([
         'name' => trim($fields['name']),
         'email' => strtolower(trim($fields['email'])),
