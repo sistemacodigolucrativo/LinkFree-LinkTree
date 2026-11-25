@@ -38,7 +38,11 @@ cd "$GITHUB_WORKSPACE"
 install -d /tmp/linkfree-qa-node
 cd /tmp/linkfree-qa-node
 npm init -y > /dev/null
-timeout 180s npm install --no-audit --no-fund playwright
+if [ "${QA_DARK_TRANSITION_ONLY:-0}" = "1" ]; then
+  timeout 180s npm install --no-audit --no-fund playwright pngjs
+else
+  timeout 180s npm install --no-audit --no-fund playwright
+fi
 timeout 180s ./node_modules/.bin/playwright install --with-deps chromium > /tmp/linkfree-audit/config-browser-install.log 2>&1
 cd "$QA_APP_ROOT"
 php -S 127.0.0.1:18765 server.php > /tmp/linkfree-audit/config-server.log 2>&1 &
@@ -50,5 +54,9 @@ for i in $(seq 1 45); do
   sleep 1
 done
 cd "$GITHUB_WORKSPACE"
-timeout 360s node scripts/qa-isolated/config_browser_smoke.cjs
+if [ "${QA_DARK_TRANSITION_ONLY:-0}" = "1" ]; then
+  timeout 360s node scripts/qa-isolated/dark_transition_filmstrip.cjs
+else
+  timeout 360s node scripts/qa-isolated/config_browser_smoke.cjs
+fi
 curl --fail --silent --show-error --max-time 10 http://127.0.0.1:18765/login > /dev/null
