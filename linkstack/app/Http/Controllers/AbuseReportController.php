@@ -179,7 +179,7 @@ class AbuseReportController extends Controller
             ->where('events.abuse_report_id', $id)
             ->select('events.*', 'actor.name as actor_name')
             ->orderBy('events.id')
-            ->get();
+            ->paginate(15)->withQueryString();
 
         return view('panel.abuse-report-detail', [
             'record' => $record,
