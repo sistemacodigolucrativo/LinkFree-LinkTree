@@ -2,7 +2,7 @@
 
 **Data:** 25/11/2026. **Origem:** main `844979bdbd4cc1bfeb676cedb32342eb1c5c2d3c`.  
 **Branch de implementação:** `feat/admin-workflow-ux-paginations-20261125`.  
-**Estado desta versão:** alterações de código implementadas em branch, com testes ainda a verificar pelo CI. Sem merge nem deploy.
+**Estado final de validação — 25/11/2026:** os nove requisitos foram implementados na branch, com os testes diretamente relacionados **aprovados no CI** (SHA de código testado `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`). **PR #36 pronta para revisão; sem merge nem deploy.** Acessibilidade WCAG integral e dispositivos físicos continuam validações separadas.
 
 ## Metodologia e reaproveitamento
 
@@ -14,7 +14,7 @@
 
 ## Estado por anotação (implementação proposta, CI pendente)
 
-| Nº | Resultado da auditoria | Mudança localizada | Validação exigida |
+| Nº | Resultado da auditoria | Mudança localizada | Evidência / validação |
 |---|---|---|---|
 | 01 | Layout ativava `@view-transition{navigation:auto}` também no Admin, podendo cruzar visualmente duas capturas da Sidebar durante a navegação | Opt-out de view transition **apenas no contexto admin**, sem excluir menus, e teste de Sidebar única | Navegar entre rotas, desktop/mobile, confirmar no Opera real após deploy |
 | 02 | Título de Gerenciar Usuários dentro do card ocupava espaço mobile | Slot Blade `mobile-navbar-title`, título entre seta/sino; heading no conteúdo apenas desktop | 375px + 1280px, sem overflow |
@@ -57,3 +57,45 @@
 - Teste de interações existente atualizado para fluxo seguro: `scripts/qa-isolated/browser_interactions.cjs`.
 
 **Atualização obrigatória:** após obter o resultado real do GitHub Actions, registrar SHA, nome de job, total PASS/FAIL, falhas e escopos de validação incompletos antes de qualquer declaração de conclusão.
+
+
+## Execução concluída: matriz de evidências do código testado
+
+**Commit de implementação efetivamente testado:** `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`  
+**PR:** https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/36  
+**CI completo:** sucesso nos **10 jobs obrigatórios executados**; a suíte `browser-a11y` terminou `skipped` por estar reservada para execução manual.
+
+| Job de CI | Resultado | Evidência |
+|---|---|---|
+| `admin-ux-smoke` — 375 px escuro e 1280 px claro, renderização, busca real, colunas, criação GET inerte, hub/editor, X, toast, rodapé, históricos e Studio | **11 PASS / 0 FAIL** | [Job 139509110089](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526404/job/139509110089) |
+| `http-behavior` — segurança CRUD, CSRF, RBAC, GET sem gravação, formulário inválido sem gravação, role server-side, confirmação em Salvar, unicidade e persistência | **23 PASS / 0 FAIL** | [Job 139509110584](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526435/job/139509110584) |
+| `config-browser-smoke` — hub + 10 seções do admin, desktop/mobile e persistência | **24 PASS / 0 FAIL** | [Job 139509111293](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526435/job/139509111293) |
+| `dark-transition-filmstrip` — navegação e reload claro/escuro após desativar transição composta da Sidebar no admin | **6 PASS / 0 FAIL** | [Job 139509110088](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526319/job/139509110088) |
+| `studio-layout` | **success** | [Job 139509111288](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526560/job/139509111288) |
+| `regression` (guardas a11y e segurança existentes atualizadas ao fluxo intencional) | **success** | [Job 139509110408](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526428/job/139509110408) |
+| `php-lint` | **success** | [Job 139509111070](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526626/job/139509111070) |
+| `seo-http` | **success** | [Job 139509110619](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526343/job/139509110619) |
+| `installer-isolated (sqlite)` | **success** | [Job 139509111110](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526435/job/139509111110) |
+| `installer-isolated (mysql)` | **success** | [Job 139509111124](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45700526435/job/139509111124) |
+| `browser-a11y` global | **skipped — NÃO aprovado** | Escopo manual histórico; nenhuma alegação de conformidade WCAG total |
+
+### Linha do tempo e regressões corrigidas no processo
+
+1. Implementação da branch a partir da `main` `844979b`; nenhum código foi aplicado à VPS.
+2. Primeira rodada encontrou **guardas estáticas obsoletas**, pois exigiam a antiga tela intermediária e título interno. As verificações foram **atualizadas para o novo requisito**, mantendo asserts de segurança, sem desativar os guardas.
+3. Um job de blocos teve travamento nativo do Chromium (`FATAL:content/browser/site_instance_impl.cc`) sem falha comprovada no código; foi **reexecutado sem mudança no módulo e terminou success**.
+4. Primeira versão de teste do histórico falhou por examinar o DOM imediatamente após clicar na página 2. O teste foi corrigido para aguardar a navegação `domcontentloaded` e conferir status HTTP. **A segunda página passou com 20 linhas; a primeira também passou com 20.** Os dados sintéticos forçaram o cenário de múltiplas páginas.
+5. A busca da `UserTable` foi verificada com filtro e retorno dos resultados; seleção de colunas alterou efetivamente o cabeçalho. Links do Studio foram testados com 27 registros sintéticos (20 na página 1 e 7 na página 2).
+6. Execução final do commit de implementação `e6a7ea2`: **todos os jobs obrigatórios executados verdes**, sem recorrer a dados reais.
+
+### Observações para homologação pós-merge, sem repetir o que já foi aprovado
+
+- **Admin em Opera mobile físico:** confirmar visualmente que não há duplicação transitória da Sidebar e que o título fica entre seta e sino; filmstrip Chromium não é prova universal.
+- **Novo Usuário:** inspecionar GET sem cadastrar dados reais; o teste completo de criação já foi realizado com contas sintéticas (não criar contas de teste reais sem necessidade).
+- **Personalização do Site:** percorrer uma seção, usar X, salvar alteração autorizada e observar toast. Diferenciar `Páginas institucionais` da configuração de textos dos links.
+- **Históricos:** verificar navegação das páginas quando houver registros reais suficientes, sem gerar dados artificiais na produção.
+- **Publicação:** antes de qualquer deploy, rodar `/root/atualizar-linkstack.sh --check` e observar o diff de arquivos; usar backup privado e homologação read-only do procedimento já existente.
+
+**Limitações declaradas:** testes automáticos reproduzem os comportamentos no Chromium sintético; testes de Opera, Safari, outros navegadores/GPU e WCAG completa permanecem fora do escopo de aprovação desta PR. Não inferir o estado de produção a partir do merge.
+
+**Status de entrega:** implementação e validação de código prontas para revisão/merge; `main` e VPS inalteradas durante esta implementação.
