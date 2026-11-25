@@ -13,7 +13,10 @@
 
                   @if(request()->routeIs('showEnvEditor') || request()->has('alternative-config'))
                   <h2 class="mb-4 card-header">Variáveis de ambiente</h2>
-                  <p>Por segurança, valores brutos e credenciais não são exibidos neste painel. Utilize as configurações disponíveis ou o procedimento autorizado de manutenção no servidor.</p>
+                  <p>Credenciais e demais chaves protegidas não são exibidas nem alteradas por este editor.</p>
+                  @if(!config('linkstack.single_user_mode'))
+                  @include('components.config.alternative-config')
+                  @endif
                   <a href="{{ route('showConfig') }}" class="btn btn-primary">Configurações</a>
                   @elseif(request()->routeIs('showFileEditor'))
                   <h2 class="mb-4 card-header">{{__('messages.Advanced Config')}}</h2>
