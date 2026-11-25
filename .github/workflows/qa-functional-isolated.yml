@@ -43,6 +43,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Check HTTP acceptance Python syntax first
+        run: python3 -m py_compile scripts/qa-isolated/http_acceptance.py
       - name: Install PHP SQLite driver if absent
         run: |
           if ! php -m | grep -qi '^pdo_sqlite$'; then
