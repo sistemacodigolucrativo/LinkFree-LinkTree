@@ -199,9 +199,12 @@ async function run(){
             assert.equal(await history.count(),20,'Expected 20 history rows per page; body: '+(await page.locator('body').innerText()).slice(0,250));
             const link=page.locator('a[href*="history_page=2"]').first();
             assert((await link.count())>=1,'History second-page link missing');
+            const nextPage=page.waitForNavigation({waitUntil:'domcontentloaded',timeout:25000});
             await link.click();
+            const historyResponse=await nextPage;
+            assert.equal(historyResponse?.status(),200,'History page 2 HTTP '+historyResponse?.status()+' body: '+(await page.locator('body').innerText()).slice(0,270));
             assert(new URL(page.url()).searchParams.get('history_page')==='2');
-            assert.equal(await history.count(),20);
+            assert.equal(await history.count(),20,'History page2 should have 20 rows, body: '+(await page.locator('body').innerText()).slice(0,270));
             await page.goto(base+'/admin/reports/800',{waitUntil:'domcontentloaded'});
             assert.equal(await page.locator('h2').filter({hasText:'Histórico da denúncia'}).count(),1);
             assert.equal(await page.locator('ol.list-group > li').count(),15);
