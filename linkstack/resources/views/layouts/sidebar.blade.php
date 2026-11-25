@@ -377,8 +377,8 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
 @php
   $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user') || request()->is('admin/referrals*') || request()->is('admin/verification*') || request()->is('admin/reports*');
   $adminSiteOpen = request()->is('admin/site*') || request()->is('admin/pages*');
-  $adminThemesOpen = request()->is('admin/theme') || request()->is('admin/github-themes*') || request()->is('admin/linktype*');
-  $adminSystemOpen = request()->is('admin/config') || request()->is('admin/backups') || request()->is('admin/advanced-config') || request()->is('admin/env') || request()->is('admin/phpinfo') || request()->is('update');
+  $adminThemesOpen = request()->is('admin/theme') || request()->is('admin/github-themes*', 'update/theme', 'theme-updater') || request()->is('admin/linktype*');
+  $adminSystemOpen = request()->is('admin/config') || request()->is('admin/backups', 'backup') || request()->is('admin/advanced-config') || request()->is('admin/env') || request()->is('admin/phpinfo') || request()->is('update');
 @endphp
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/overview') ? 'active' : '' }}" href="{{ route('adminOverview') }}"><i class="icon bi bi-graph-up-arrow" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Overview')}}</span></a></li>
     <li class="nav-item nav-accordion-group nav-accordion-admin">
@@ -414,7 +414,7 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
   </a>
   <ul class="sub-nav collapse {{ $adminThemesOpen ? 'show' : '' }}" id="admin-themes-menu" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/theme') ? 'active' : '' }}" href="{{ route('showThemes') }}"><i class="icon bi bi-brush" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Theme Manager')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/github-themes*') ? 'active' : '' }}" href="{{ route('githubThemes') }}"><i class="icon bi bi-github" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin GitHub Themes')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/github-themes*', 'update/theme', 'theme-updater') ? 'active' : '' }}" href="{{ route('githubThemes') }}"><i class="icon bi bi-github" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin GitHub Themes')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/linktype*') ? 'active' : '' }}" href="{{ url('/admin/linktype') }}"><i class="icon bi bi-grid" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Block Types')}}</span></a></li>
   </ul>
 </li>
@@ -426,7 +426,7 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
   </a>
   <ul class="sub-nav collapse {{ $adminSystemOpen ? 'show' : '' }}" id="admin-system-menu" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/config') ? 'active' : '' }}" href="{{ route('showConfig') }}"><i class="icon bi bi-sliders" aria-hidden="true"></i><span class="item-name">{{__('messages.Config')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/backups') ? 'active' : '' }}" href="{{ route('showBackups') }}"><i class="icon bi bi-database" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Backups')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/backups', 'backup') ? 'active' : '' }}" href="{{ route('showBackups') }}"><i class="icon bi bi-database" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Backups')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/advanced-config') ? 'active' : '' }}" href="{{ route('showFileEditor') }}"><i class="icon bi bi-gear-wide-connected" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Advanced Config')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/env') ? 'active' : '' }}" href="{{ route('showEnvEditor') }}"><i class="icon bi bi-file-earmark-code" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Env')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/phpinfo') ? 'active' : '' }}" href="{{ route('phpinfo') }}"><i class="icon bi bi-cpu" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin PHP Info')}}</span></a></li>
