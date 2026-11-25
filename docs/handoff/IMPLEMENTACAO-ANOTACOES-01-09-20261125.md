@@ -2,7 +2,7 @@
 
 **Data:** 25/11/2026. **Origem:** main `844979bdbd4cc1bfeb676cedb32342eb1c5c2d3c`.  
 **Branch de implementação:** `feat/admin-workflow-ux-paginations-20261125`.  
-**Estado de integração — 25/11/2026:** os nove requisitos foram implementados, e os testes diretamente relacionados **aprovados no CI** (SHA de código testado `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`). **PR #36 integrada à `main` com sucesso em `c1bb27d94c5ff7f553ec16aac6c9743c0a6901ce`; deploy na VPS ainda não executado.** Acessibilidade WCAG integral e dispositivos físicos continuam validações separadas.
+**Estado de publicação — 25/11/2026:** nove requisitos implementados e validados nos testes relacionados (SHA de código `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`); PR #36 integrada em `c1bb27d94c5ff7f553ec16aac6c9743c0a6901ce`. **O usuário apresentou logs de deploy concluído na VPS da revisão `3d2391563b05` (16 arquivos). Homologação técnica read-only aprovada, homologação autenticada das nove mudanças pendente.** Acessibilidade WCAG integral e outros navegadores físicos continuam validações separadas.
 
 ## Metodologia e reaproveitamento
 
@@ -106,7 +106,30 @@
 - **Merge na `main`:** `c1bb27d94c5ff7f553ec16aac6c9743c0a6901ce`; dois pais: `844979bdbd4cc1bfeb676cedb32342eb1c5c2d3c` (base) e `2aa17eb7f567f293e6b6fcb19ff01f9244e74d61` (PR).
 - **Confirmação pelo GitHub:** PR `closed/merged`, `main` apontando para o commit de merge, **25 arquivos alterados**.
 - **Testes aprovados do código:** 10 jobs obrigatórios verdes em `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`. O commit posterior `2aa17eb`, anterior ao merge, alterou apenas este relatório; não houve mudança de código entre os dois commits.
-- **Deploy remoto:** **NÃO executado**. Nenhuma afirmação de que a VPS já esteja na versão do merge.
-- **Pré-deploy previsto, ainda não realizado na VPS:** executar como root `bash /root/atualizar-linkstack.sh --check`, verificar a relação de arquivos e conflitos e confirmar que o alvo é a `main`. O modo `--check` não modifica arquivos da aplicação, mas pode buscar atualizações Git, criar clone persistente e instalar `rsync` se necessário; não é um comando completamente sem efeitos no ambiente.
+- **Deploy remoto:** executado pelo operador da VPS; evidência: terminal fornecido em 25/11/2026, destino `3d2391563b05`, 16 arquivos atualizados, backup e homologação read-only sem falhas. Não houve acesso direto à VPS por esta assistência.
+- **Pré-deploy:** executado com sucesso conforme log fornecido, usando como root `bash /root/atualizar-linkstack.sh --check`, verificar a relação de arquivos e conflitos e confirmar que o alvo é a `main`. O modo `--check` não modifica arquivos da aplicação, mas pode buscar atualizações Git, criar clone persistente e instalar `rsync` se necessário; não é um comando completamente sem efeitos no ambiente.
 - **Regra de publicação:** usar o modo `--deploy` apenas se o `--check` indicar esse modo; migrações M13 ou consentimento seguem as condições explícitas do script, com backup e conferência da base de dados. Não disparar publicação ou migração sem nova autorização.
-- **Homologação pós-publicação:** `bash /root/homologar-linkfree.sh --read-only`, além de inspeção autenticada nas telas alteradas e verificação do SHA de publicação. Esta homologação permanece pendente enquanto o deploy não for autorizado e concluído.
+- **Homologação pós-publicação:** script read-only executado, 0 falhas, e SHA publicado `3d2391563b05`; ainda falta a inspeção autenticada das telas alteradas. Cadastro real, OAuth real, validação de todos os fluxos sob sessão e WCAG integral não foram cobertos.
+
+
+## Registro de deploy e homologação read-only — 25/11/2026
+
+**Fonte:** saída do terminal da VPS apresentada pelo operador; os números abaixo foram extraídos desse registro, **não** de uma sessão SSH aberta pela assistência.
+
+- **Execução:** `bash /root/atualizar-linkstack.sh --check && bash /root/atualizar-linkstack.sh --deploy` (retornou ao prompt sem erro).
+- **Versão anterior:** `844979bdbd4cc1bfeb676cedb32342eb1c5c2d3c` (exibida `844979bdbd4c`).
+- **Versão publicada:** `3d2391563b05b18067229eae5424a630a45047c5` (exibida `3d2391563b05`), contendo a PR #36 e o registro documental pós-merge.
+- **Prévia:** 16 arquivos de código identificados e validados contra conflitos, sem modificação durante `--check`.
+- **Backup SQLite:** `/var/backups/linkfree-deploy/20261125-211519-s2XlSu/sqlite-before-deploy.sqlite`; pasta do backup `/var/backups/linkfree-deploy/20261125-211519-s2XlSu`.
+- **Publicação:** mensagens `PUBLICACAO CONCLUIDA: 3d2391563b05`; limpezas de cache de configuração, rotas e views reportadas como sucesso.
+- **Homologação read-only:** `0 falha(s), 0 verificação(ões) pendentes de revisão manual` **dentro do escopo do script**. SQLite íntegro; tabela de consentimento, migração, Termos/Privacidade, acesso PHP-FPM a banco e diretórios persistentes, backup íntegro; HTTPS página inicial/login HTTP 200, registro acessível, CSRF e aceite, 404 e bloqueio anônimo ao Studio.
+- **Limite do resultado:** não cobre `/admin/users`, `/admin/new-user`, as seções de `/admin/site`, históricos autenticados, comportamento Livewire nem Opera mobile físico. Não declarar homologação manual completa.
+- **Estado final desta etapa:** deploy operacional concluído conforme evidências fornecidas; homologação **manual autenticada** pendente. Não repetir `--deploy` por padrão se o SHA publicado já corresponde ao esperado.
+
+### Próxima bateria manual, sem criar cadastros reais sem necessidade
+
+1. Entrar com conta administrativa e conferir `/admin/users` em mobile: título na navbar, busca fora do card, dropdown de colunas, ícone de novo usuário; pesquisar e alterar seleção de colunas.
+2. Abrir `/admin/new-user` e retornar sem salvar; validar que não houve criação indevida, sem criar conta real só para testar.
+3. Em `/admin/site`, navegar entre seções, X de retorno e salvar apenas uma alteração controlada, observando toast; verificar os destinos distintos do rodapé.
+4. Navegar entre menus para avaliar a sobreposição da Sidebar; verificar paginação dos históricos de selo, denúncia e links do membro quando houver dados suficientes.
+5. Registrar qualquer defeito com URL, ação exata, viewport/navegador, estado anterior/posterior e evidências. Em caso de falha funcional, tratar em PR corretiva; não confundir aprovação read-only com aprovação de telas autenticadas.
