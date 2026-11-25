@@ -114,13 +114,14 @@ async function run() {
         return {cancelNoMutation:true,postDeleteOverride:true,redirect302:true,reloadPersisted:true,otherAccountIntact:true};
       } finally {await context.close();}
     });
-    await check('TC-04-D','Admin creation controls render POST forms and create exactly one user from the users page',async()=>{
+    await check('TC-04-D','Admin sidebar confirmation is read-only and explicit POST creates exactly one user',async()=>{
       const {context,page}=await session('auditadmin');
       try {
         for (const path of ['/admin/overview','/admin/users']) {
           await page.goto(base+path,{waitUntil:'domcontentloaded'});
           const forms=page.locator('form[action$="/admin/new-user"]');
-          assert((await forms.count())>=2,'Missing creation controls: '+path);
+          assert((await forms.count())>=1,'Missing creation controls: '+path);
+          assert.equal(await page.locator('a[href$="/admin/new-user"]').count(),1);
           for (const form of await forms.all()) {
             assert.equal(await form.getAttribute('method'),'POST');
             assert.equal(await form.locator('input[name="_token"]').count(),1);
@@ -128,7 +129,15 @@ async function run() {
           }
         }
         const before=scalar('SELECT COUNT(*) FROM users');
-        const button=page.locator('form[action$="/admin/new-user"] button[type="submit"]').filter({hasText:'+'}).first();
+        await page.goto(base+'/admin/new-user',{waitUntil:'domcontentloaded'});
+        assert.equal(scalar('SELECT COUNT(*) FROM users'),before);
+        await page.reload({waitUntil:'domcontentloaded'});
+        assert.equal(scalar('SELECT COUNT(*) FROM users'),before);
+        const form=page.locator('form[action$="/admin/new-user"]');
+        assert.equal(await form.count(),1);
+        assert.equal(await form.getAttribute('method'),'POST');
+        assert.equal(await form.locator('input[name="_token"]').count(),1);
+        const button=form.locator('button[type="submit"]');
         const response=page.waitForResponse(res=>new URL(res.url()).pathname==='/admin/new-user'&&res.request().method()==='POST',{timeout:20000});
         await button.click({timeout:10000});
         assert.equal((await response).status(),302);
