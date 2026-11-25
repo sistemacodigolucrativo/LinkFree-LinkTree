@@ -3,7 +3,7 @@
 **Data:** 25/11/2026  
 **Repositório:** sistemacodigolucrativo/LinkFree-LinkTree  
 **Branch:** `test/dark-transition-filmstrip-20261125`  
-**Estado:** primeira execução encontrou flash claro no reload; correção cirúrgica implementada apenas no bootstrap de tema, **aguardando reexecução**. Sidebar não modificada; nenhuma alteração em produção.
+**Estado final — 25/11/2026:** falha clara reproduzida no reload móvel, correção cirúrgica aplicada ao bootstrap do tema e **validada em execução posterior (6/6 transições, 24/24 Chromium, 23/23 HTTP)**. [PR #35](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/35) **integrada à main** no commit `09914c65d7e82ab824f753953465b4cb5371e242`. Sidebar intacta. **Ainda sem deploy na VPS**.
 
 ## 1. Verificação prévia: não repetir verificações existentes
 
@@ -73,3 +73,24 @@ O PNG `reload-375-worst.png` foi inspecionado: mostra a barra lateral e a área 
 **Regressões exigidas após a alteração direta:** reexecutar as quatro capturas, verificar preferência automática `auto` com sistema em claro e escuro, e a suíte Chromium de configurações (o script de bootstrap é compartilhado). Não declarar sucesso até examinar os logs da nova revisão; se houver flash residual, revisar os quadros antes de novo ajuste.
 
 **Sem merge, sem deploy nesta etapa de validação.** A implementação e os resultados devem permanecer rastreáveis e não se deve afirmar que a anomalia acabou em todos os navegadores e dispositivos com base apenas em Chromium isolado.
+
+
+## 6. Fechamento — merge e revalidação confirmados
+
+**Head testado:** `dc3cf8ff679f124fc778da18d98408dc483b9d5b`. **Merge da PR #35 na main:** `09914c65d7e82ab824f753953465b4cb5371e242`. O conteúdo abaixo substitui o estado provisório dos passos 4 e 5, preservado acima como histórico auditável.
+
+| Teste | Evidência | Resultado |
+|---|---|---|
+| Captura de quadros em dark com navegação, POST+redirect e reload | [Job filmstrip](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45688707507/job/139468099054) | **6 PASS, 0 FAIL** |
+| Reload dark 375px (32 frames válidos) | Artefato `linkfree-dark-transition-filmstrip-synthetic` | **0% de pixels quase brancos** na amostragem |
+| Preferência `auto` com sistema claro e escuro | Mesmo job | **2 PASS** incluídos nos 6 |
+| Regressão do navegador de configurações | [Job Chromium](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45688707599/job/139468099209) | **24 PASS, 0 FAIL** |
+| HTTP e persistência | [Job HTTP](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45688707599/job/139468100036) | **23 PASS, 0 FAIL** |
+| Isolamento SQLite/MySQL | CI da PR | **success** |
+| Browser-a11y global | Job manual não executado | **skipped (não aprovado)** |
+
+Os quadros PNG inicial, pior e final do reload corrigido foram inspecionados: exibem o fundo escuro esperado `#222738`. O menu lateral **não foi alterado**; isso também foi verificado no diff da PR.
+
+**Conclusão circunscrita:** o defeito identificado foi corrigido no ambiente Chromium isolado nos fluxos reproduzidos. Nenhuma evidência comprova erradicação universal de flashes em Android/iOS físicos, navegadores diversos ou fluxos fora do ensaio. Após deploy controlado, o operador poderá reproduzir manualmente: tema escuro ativo → abrir o painel → recarregar a página no celular → observar qualquer clarão → navegar e salvar uma configuração não destrutiva. Se houver clarão, registrar dispositivo, navegador, rota e momento para reabertura cirúrgica.
+
+**Estado de publicação:** `main` integrada, **VPS ainda não atualizada nesta etapa**. Merge não implica deploy.
