@@ -1,0 +1,37 @@
+name: Dark-mode transition filmstrip (isolated)
+on:
+  pull_request:
+    paths:
+      - 'scripts/qa-isolated/dark_transition_filmstrip.cjs'
+      - 'scripts/qa-isolated/run_config_browser_smoke.sh'
+      - '.github/workflows/dark-transition-filmstrip.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dark-transition-filmstrip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check syntax of focused audit, reusable harness, and safety checks
+        run: |
+          node --check scripts/qa-isolated/dark_transition_filmstrip.cjs
+          bash -n scripts/qa-isolated/run_config_browser_smoke.sh
+      - name: Run only dark-transition frame analysis in disposable fixture
+        timeout-minutes: 8
+        env:
+          QA_DARK_TRANSITION_ONLY: '1'
+        run: bash scripts/qa-isolated/run_config_browser_smoke.sh
+      - name: Attach frame analysis and selected screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linkfree-dark-transition-filmstrip-synthetic
+          path: /tmp/linkfree-audit/dark-transition-filmstrip/
+          if-no-files-found: warn
+          retention-days: 30
