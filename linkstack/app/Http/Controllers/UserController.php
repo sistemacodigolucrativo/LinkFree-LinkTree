@@ -493,9 +493,12 @@ class UserController extends Controller
     public function showLinks()
     {
         $userId = Auth::user()->id;
-        $data['pagePage'] = 10;
-        
-        $data['links'] = Link::select()->where('user_id', $userId)->orderBy('up_link', 'asc')->orderBy('order', 'asc')->paginate(99999);
+        // Genuine pagination, with a stable page offset for the existing Sortable flow.
+        $data['pagePage'] = 20;
+
+        $data['links'] = Link::select()->where('user_id', $userId)
+            ->orderBy('up_link', 'asc')->orderBy('order', 'asc')->orderBy('id', 'asc')
+            ->paginate($data['pagePage'])->withQueryString();
         return view('studio/links', $data);
     }
 
