@@ -133,14 +133,22 @@ async function run() {
         const toggle=page.locator('#ALLOW_REGISTRATION');
         await toggle.waitFor({state:'visible'});
         assert(await toggle.isChecked(),'Synthetic registration flag was not initially enabled');
-        await Promise.all([
-          page.waitForURL('**/admin/config/sections/application',{waitUntil:'domcontentloaded',timeout:20000}),
-          toggle.uncheck({timeout:15000})
-        ]);
-        assert.equal(await toggle.isChecked(),false,'Toggle not re-rendered as disabled');
-        await page.reload({waitUntil:'domcontentloaded'});
-        assert.equal(await toggle.isChecked(),false,'Saved toggle did not survive page reload');
-        return {POST:true,persistedAfterReload:true,restoredAutomaticallyByDisposableRunner:true};
+        // URL is already the target before submit; waitForURL can resolve immediately.
+        // Instead require the actual POST response and verify persistence from a NEW page.
+        const postResponse=page.waitForResponse(
+          res=>new URL(res.url()).pathname==='/admin/config' && res.request().method()==='POST',
+          {timeout:20000});
+        await toggle.uncheck({timeout:15000});
+        const saved=await postResponse;
+        assert.equal(saved.status(),302,'Config POST did not return a redirect');
+        const verification=await context.newPage();
+        try {
+          await show(verification,'/admin/config/sections/application');
+          const persisted=verification.locator('#ALLOW_REGISTRATION');
+          await persisted.waitFor({state:'visible'});
+          assert.equal(await persisted.isChecked(),false,'Saved toggle did not survive a fresh GET');
+        } finally {await verification.close();}
+        return {POST:true,status:302,persistedAfterNewGET:true,disposableFixture:true};
       } finally { await context.close(); }
     });
     await check('Guest cannot view config section',async()=>{
