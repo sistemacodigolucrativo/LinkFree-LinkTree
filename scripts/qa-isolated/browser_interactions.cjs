@@ -168,12 +168,34 @@ async function run() {
             if(path==='/admin/advanced-config') assert(await page.locator('h2').count()>=1,'Advanced editor heading');
             if(path==='/admin/new-user') assert.equal(await page.locator('form[action$="/admin/new-user"][method="POST"]').count(),1,'Explicit user-creation confirmation');
             if(path==='/update') assert(await page.locator('h1').filter({hasText:'Atualização da instalação'}).count()===1,'Maintenance page content');
-            assert(await page.locator('#sidebar-menu a.active').count()>0,path+' active indicator');
+            const leaf=page.locator('#sidebar-menu a.nav-link.active:not(.nav-accordion-toggle)');
+            assert.equal(await leaf.count(),1,path+' must have exactly one active destination');
+            assert.equal(new URL(await leaf.getAttribute('href'),base).pathname,path,path+' active link points elsewhere');
+            const submenu=leaf.locator('xpath=ancestor::ul[contains(concat(" ", normalize-space(@class), " "), " sub-nav ")]');
+            if(await submenu.count()){
+              assert((await submenu.getAttribute('class')).includes('show'),path+' parent submenu is collapsed');
+              const menuId=await submenu.getAttribute('id');
+              assert.equal(await page.locator('#sidebar-menu a[aria-controls="'+menuId+'"]').getAttribute('aria-expanded'),'true',path+' accordion indicator');
+            }
             assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),path+' horizontal overflow at '+width);
           }
         }
         return {destinations:paths.length,viewports:3};
       } finally {await context.close();}
+    });
+    await check('ADMIN-RBAC','Admin-only destinations reject member and anonymous clients',async()=>{
+      const routes=['/admin/overview','/admin/users','/admin/new-user','/admin/referrals','/admin/verification','/admin/reports','/admin/site','/admin/pages','/admin/theme','/admin/github-themes','/admin/linktype','/admin/config','/admin/backups','/admin/advanced-config','/admin/env','/admin/phpinfo','/update'];
+      const {context:member}=await session('auditfree');
+      const guest=await browser.newContext();
+      try {
+        for(const path of routes){
+          const memberResponse=await member.request.get(base+path,{maxRedirects:0});
+          assert([302,401,403].includes(memberResponse.status()),path+' unauthorized member HTTP '+memberResponse.status());
+          const guestResponse=await guest.request.get(base+path,{maxRedirects:0});
+          assert([302,401,403].includes(guestResponse.status()),path+' anonymous HTTP '+guestResponse.status());
+        }
+        return {destinations:routes.length,memberDenied:true,anonymousDenied:true};
+      } finally {await member.close();await guest.close();}
     });
     await check('ADMIN-ENV','Allowed environment edit preserves all other entries',async()=>{
       const {context,page}=await session('auditadmin');
