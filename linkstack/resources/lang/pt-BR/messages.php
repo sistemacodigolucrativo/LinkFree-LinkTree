@@ -1116,4 +1116,6 @@ return array(
     'lf_admin_themes' => 'Temas e componentes',
     'lf_admin_system' => 'Sistema e segurança',
     'lf_admin_pending_modules' => 'Solicitações de selo, indicações e caixa de denúncias são módulos independentes ainda não implantados; o sistema de verificação manual e denúncias por e-mail existentes permanecem disponíveis.',
+    'lf_social_slogan' => 'Slogan (opcional)',
+    'lf_social_slogan_help' => 'Frase de impacto de até :max caracteres, exibida na imagem de compartilhamento. A biografia permanece no texto externo.',
 );

@@ -28,3 +28,14 @@ verify(count($lines) === 5 && str_ends_with(end($lines), '…'), 'description us
 foreach ($lines as $line) verify(invoke($r, 'width', $line, 25, false) <= 550, 'description line fits');
 $lines = invoke($r, 'wrapText', str_repeat('W', 150), 25, 550, false, 5);
 verify(count($lines) === 1 && invoke($r, 'width', $lines[0], 25, false) <= 550 && str_ends_with($lines[0], '…'), 'unbroken word bounded');
+
+foreach (['Onde outros enxergam problemas, eu desenvolvo soluções.', str_repeat('W', 100), str_repeat('Frase de impacto ', 10), ''] as $slogan) {
+    [$lines, $size] = invoke($r, 'sloganLayout', $slogan);
+    verify(count($lines) >= 1 && count($lines) <= 5 && $size >= 24 && $size <= 32, 'bounded quote layout');
+    verify(str_starts_with($lines[0], '❝') && str_ends_with(end($lines), '❞'), 'opening and closing ornamental quotes');
+    foreach ($lines as $line) verify(invoke($r, 'width', $line, $size, false) <= 550, 'quote line within column');
+}
+foreach (['Ana', 'Roberto R. Almeida', str_repeat('W', 100)] as $name) {
+    [$text, $size, $x] = invoke($r, 'titleLayout', $name, true);
+    verify(invoke($r, 'width', $text, $size, true) <= 502 && $x + 16 <= 1108, 'title and verification badge fit on one line');
+}

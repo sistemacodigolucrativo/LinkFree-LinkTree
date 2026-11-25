@@ -94,7 +94,7 @@ class UserController extends Controller
             return abort(404);
         }
      
-        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible', 'updated_at')->where('id', $id)->first();
+        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible', 'updated_at', 'image')->where('id', $id)->first();
         $information = User::select('name', 'littlelink_name', 'littlelink_description', 'theme')->where('id', $id)->get();
         
         if ($userinfo->block == 'yes') {
@@ -136,7 +136,7 @@ class UserController extends Controller
             return abort(404);
         }
      
-        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible', 'updated_at')->where('id', $id)->first();
+        $userinfo = User::select('id', 'name', 'littlelink_name', 'littlelink_description', 'theme', 'role', 'block', 'verified_at', 'verification_visible', 'updated_at', 'image')->where('id', $id)->first();
         $information = User::select('name', 'littlelink_name', 'littlelink_description', 'theme')->where('id', $id)->get();
         
         $links = DB::table('links')
@@ -668,6 +668,7 @@ class UserController extends Controller
                 'isunique:users,id,'.$userId,
             ],
             'name' => 'sometimes|max:255|string',
+            'social_slogan' => 'sometimes|nullable|string|max:' . \App\Services\PublicSeo::SLOGAN_LIMIT,
             'image' => 'sometimes|image|mimes:jpeg,jpg,png,webp|max:2048', // Max file size: 2MB
         ], [
             'littlelink_name.unique' => __('messages.That handle has already been taken'),
@@ -731,6 +732,12 @@ class UserController extends Controller
         }
         UserData::saveData($userId, 'search_noindex', $request->boolean('search_noindex'));
         UserData::saveData($userId, 'public_visit_count', $request->boolean('public_visit_count'));
+
+        // Old clients that omit the field retain the saved slogan; empty clears it.
+        if ($request->exists('social_slogan')) {
+            UserData::saveData($userId, 'social_slogan',
+                \App\Services\PublicSeo::plain($validator->validated()['social_slogan'] ?? ''));
+        }
 
         return Redirect('/studio/page');
     }

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """SEO HTTP regression. Only the disposable localhost CI application."""
 import html.parser
+import http.cookiejar
+import re
 import json
 import os
 import sqlite3
@@ -135,26 +137,124 @@ else:
     assert get('/social-preview/profile/2-wide.jpg')[0]==200
     assert get('/social-preview/profile/999999999.jpg')[0]==404
     print('PASS profile-specific images, legacy wide URL and nonexistent profile')
-    # Real raster and metadata comparison with synthetic Unicode input.
-    emoji_bio = '💻 Desenvolvedor Full Stack 🧠 Tecnologia • Inteligência • Estratégia.🚀'
-    clean_bio = 'Desenvolvedor Full Stack Tecnologia • Inteligência • Estratégia.'
+    # Exercise the actual existing member profile form and owner-only persistence.
+    class Member:
+        def __init__(self, username):
+            self.opener = urllib.request.build_opener(urllib.request.ProxyHandler({}),
+                urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()), NoRedirect())
+            self.post('/login', {'_token':self.token('/login'), 'email':username+'@example.test',
+                'password':'Synthetic-password-123'})
+        def request(self, path, data=None):
+            payload = urllib.parse.urlencode(data).encode() if data is not None else None
+            try:
+                res = self.opener.open(urllib.request.Request(BASE+path,data=payload),timeout=15)
+            except urllib.error.HTTPError as error:
+                res = error
+            return res.status, res.headers, res.read().decode('utf-8')
+        def token(self, path):
+            status, _, html = self.request(path)
+            assert status == 200, (path,status)
+            return re.search(r'name=["\x27]_token["\x27]\s+value=["\x27]([^"\x27]+)',html).group(1)
+        def post(self, path, data):
+            return self.request(path,data)
+    def settings(id):
+        with sqlite3.connect(DB) as d:
+            row = d.execute('select image from users where id=?',(id,)).fetchone()[0]
+            return json.loads(row or '{}') or {}
+    def save(member, handle, name, bio, **extra):
+        payload = {'_token':member.token('/studio/page'),'littlelink_name':handle,
+                   'name':name,'pageDescription':bio, 'sharebtn':'on','tablinks':'on',
+                   'search_noindex':'1','public_visit_count':'1'}
+        payload.update(extra)
+        status,headers,_=member.post('/studio/page',payload)
+        assert status == 302 and '/studio/page' in headers.get('Location',''), (status,headers.get('Location'))
+    member=Member('auditfree')
+    vip=Member('auditvip')
+    emoji_bio='💻 Desenvolvedor Full Stack 🧠 Tecnologia • Inteligência • Estratégia.🚀'
+    slogan='🚀 Onde outros enxergam problemas, eu desenvolvo soluções.'
+    clean_slogan='Onde outros enxergam problemas, eu desenvolvo soluções.'
+    _,_,form=member.request('/studio/page')
+    assert form.index('name="social_slogan"') < form.index('name="pageDescription"')
+    assert 'maxlength="100"' in form
+    other_before=settings(3)
+    save(member,'auditfree','Roberto R. Almeida',emoji_bio,social_slogan=slogan,user_id='3',verified_at='2026-01-01',verification_visible='1')
+    assert settings(2)['social_slogan']==slogan and settings(3)==other_before
+    assert settings(2)['search_noindex'] is True and settings(2)['public_visit_count'] is True
     with sqlite3.connect(DB) as d:
-        d.execute("update users set name=?,littlelink_description=? where id=2", ('Roberto R. Almeida',emoji_bio))
-    unicode_page,_ = page('/@auditfree')
-    assert unicode_page.one('og:description') == emoji_bio
-    assert unicode_page.one('og:title') == 'Roberto R. Almeida'
-    unicode_status, unicode_headers, unicode_image = image(unicode_page.one('og:image'))
-    assert unicode_status == 200
+        assert d.execute('select verified_at from users where id=2').fetchone()[0] is None
+    _,_,form=member.request('/studio/page')
+    assert slogan in form
+    # Persistence after a new session, invalid length/type and legacy omission.
+    member=Member('auditfree')
+    _,_,form=member.request('/studio/page')
+    assert slogan in form
+    save(member,'auditfree','Roberto R. Almeida',emoji_bio,social_slogan='X'*101)
+    assert settings(2)['social_slogan']==slogan
+    save(member,'auditfree','Roberto R. Almeida',emoji_bio)
+    assert settings(2)['social_slogan']==slogan
+    save(vip,'auditvip','auditvip','VIP bio',social_slogan='Slogan VIP')
+    assert settings(4)['social_slogan']=='Slogan VIP'
+    print('PASS Free/VIP form, persistence, owner isolation, validation, existing flags and legacy omission')
+    unicode_page,_=page('/@auditfree')
+    assert unicode_page.one('og:description')==emoji_bio
+    assert unicode_page.one('og:title')=='Roberto R. Almeida'
+    unicode_status, unicode_headers, unicode_image=image(unicode_page.one('og:image'))
+    assert unicode_status==200
     jpeg(unicode_image)
+    save(member,'auditfree','Roberto R. Almeida',emoji_bio,social_slogan=clean_slogan)
+    clean_page,_=page('/@auditfree')
+    assert clean_page.one('og:description')==emoji_bio
+    assert image(clean_page.one('og:image'))[2]==unicode_image
+    # Bio changes affect metadata, not pixels. Slogan changes affect both image URL and pixels.
+    save(member,'auditfree','Roberto R. Almeida','Outra biografia',social_slogan=clean_slogan)
+    bio_page,_=page('/@auditfree')
+    assert bio_page.one('og:description')=='Outra biografia'
+    assert image(bio_page.one('og:image'))[2]==unicode_image
+    save(member,'auditfree','Roberto R. Almeida','Outra biografia',social_slogan='Outra frase')
+    changed,_=page('/@auditfree')
+    assert changed.one('og:image')!=bio_page.one('og:image')
+    assert image(changed.one('og:image'))[2]!=unicode_image
+    save(member,'auditfree','Roberto R. Almeida',emoji_bio,social_slogan='')
+    assert settings(2)['social_slogan']==''
+    empty,_=page('/@auditfree')
+    empty_image=image(empty.one('og:image'))[2]
+    save(member,'auditfree','Roberto R. Almeida','Outra biografia',social_slogan='')
+    assert image(page('/@auditfree')[0].one('og:image'))[2]==empty_image
+    save(member,'auditfree','Roberto R. Almeida',emoji_bio,social_slogan=slogan)
+    print('PASS slogan changes image; bio stays external; emoji fallback and empty slogan')
+    # Synthetic granted/hidden/revoked states; check JPEG bytes and cache validators.
+    before,_=page('/@auditfree')
+    status,old_headers,old_image=image(before.one('og:image'))
     with sqlite3.connect(DB) as d:
-        d.execute("update users set littlelink_description=? where id=2",(clean_bio,))
-    clean_page,_ = page('/@auditfree')
-    assert clean_page.one('og:description') == clean_bio
-    assert image(clean_page.one('og:image'))[2] == unicode_image, 'Emoji fallback changes pixels compared with clean text'
-    artifact = os.getenv('SEO_CARD_ARTIFACT')
-    if artifact:
-        Path(artifact).write_bytes(unicode_image)
-    print('PASS Unicode metadata preserved; raster equals clean text; adaptive title rendered')
+        d.execute("update users set verified_at='2026-01-01 00:00:00',verification_visible=1 where id=2")
+    verified,_=page('/@auditfree')
+    status,verified_headers,verified_image=image(verified.one('og:image'),extra={'If-None-Match':old_headers['ETag']})
+    assert status==200 and verified_image!=old_image and verified.one('og:image')!=before.one('og:image')
+    jpeg(verified_image)
+    # Detect actual blue pixels in the title region, not just different bytes.
+    with tempfile.NamedTemporaryFile(suffix='.jpg') as f:
+        f.write(verified_image); f.flush()
+        count=int(subprocess.check_output(['php','-r',
+            '$im=imagecreatefromjpeg($argv[1]);$n=0;for($y=210;$y<255;$y++)for($x=558;$x<1110;$x++){$c=imagecolorat($im,$x,$y);$r=($c>>16)&255;$g=($c>>8)&255;$b=$c&255;if($r<75&&$g>95&&$b>170)$n++;}echo $n;',f.name],text=True))
+        assert count>100,count
+    save(member,'auditfree','Roberto R. Almeida',emoji_bio,social_slogan=slogan)
+    hidden_badge,_=page('/@auditfree')
+    assert image(hidden_badge.one('og:image'))[2]==old_image
+    save(member,'auditfree','Roberto R. Almeida',emoji_bio,social_slogan=slogan,verification_visible='1')
+    assert image(page('/@auditfree')[0].one('og:image'))[2]==verified_image
+    with sqlite3.connect(DB) as d:
+        d.execute("update users set verified_at=null where id=2")
+    revoked,_=page('/@auditfree')
+    assert image(revoked.one('og:image'),extra={'If-None-Match':verified_headers['ETag']})[0]==200
+    assert image(revoked.one('og:image'))[2]==old_image
+    # Remove the test privacy flags from auditfree for the existing sitemap assertions.
+    with sqlite3.connect(DB) as d:
+        data=settings(2)
+        data['search_noindex']=False
+        d.execute("update users set image=? where id=2",(json.dumps(data),))
+    artifact=os.getenv('SEO_CARD_ARTIFACT')
+    if artifact: Path(artifact).write_bytes(verified_image)
+    print('PASS actual blue badge; visibility toggle, revoked, cache invalidation')
     original_image = image(profile.one('og:image'))[2]
     # Real update of synthetic public data, including potentially unsafe description.
     with sqlite3.connect(DB) as d:

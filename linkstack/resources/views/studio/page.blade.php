@@ -320,6 +320,17 @@
                     </div>
 
                     <div class="form-group col-lg-8">
+                        <label for="lf-social-slogan" class="form-label">{{ __('messages.lf_social_slogan') }}</label>
+                        <input type="text" class="form-control @error('social_slogan') is-invalid @enderror"
+                               id="lf-social-slogan" name="social_slogan"
+                               maxlength="{{ \App\Services\PublicSeo::SLOGAN_LIMIT }}"
+                               value="{{ is_string(old('social_slogan')) ? old('social_slogan') : \App\Services\PublicSeo::storedSlogan($page->image) }}"
+                               aria-describedby="lf-social-slogan-help">
+                        <div id="lf-social-slogan-help" class="form-text">{{ __('messages.lf_social_slogan_help', ['max' => \App\Services\PublicSeo::SLOGAN_LIMIT]) }}</div>
+                        @error('social_slogan')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+
+                    <div class="form-group col-lg-8">
                         <label for="field-pageDescription">{{__('messages.Page Description')}}</label>
                         <textarea class="form-control @if(env('ALLOW_USER_HTML') === true) ckeditor @endif" name="pageDescription" rows="3" id="field-pageDescription">{{ $page->littlelink_description ?? '' }}</textarea>
                     </div>

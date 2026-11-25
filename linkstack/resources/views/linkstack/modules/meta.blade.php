@@ -5,7 +5,7 @@
     $seoCustom = env('CUSTOM_META_TAGS') === 'true';
     $seoCanonical = \App\Services\PublicSeo::canonical(\App\Services\PublicSeo::profileUrl(request(), $userinfo));
     $seoRobots = \App\Services\PublicSeo::robots(!empty($noIndex));
-    $seoVersion = \App\Services\PublicSeo::version($seoName, $seoDescription, \App\Services\PublicSeo::avatar((int) $userinfo->id), (string) $userinfo->updated_at);
+    $seoVersion = \App\Services\PublicSeo::profileCardVersion($userinfo, $seoName);
     $seoImage = route('socialPreview.profile', ['id' => $userinfo->id, 'v' => $seoVersion]);
     $seoSchema = ['@context' => 'https://schema.org', '@type' => 'ProfilePage',
         '@id' => $seoCanonical . '#profile', 'url' => $seoCanonical,

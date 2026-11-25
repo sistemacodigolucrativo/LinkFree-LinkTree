@@ -1220,4 +1220,6 @@ return [
     'lf_admin_themes' => 'Themes and components',
     'lf_admin_system' => 'System and security',
     'lf_admin_pending_modules' => 'Verification requests, referrals and an abuse-report inbox are separate modules not yet implemented. Existing manual verification and email-based reports remain available.',
+    'lf_social_slogan' => 'Slogan (optional)',
+    'lf_social_slogan_help' => 'An impact phrase of up to :max characters for the sharing image. Your bio remains in the external description.',
 ];
