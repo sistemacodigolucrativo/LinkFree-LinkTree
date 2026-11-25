@@ -192,7 +192,7 @@ async function run() {
           const submenu=page.locator('#'+id);
           assert.equal(await toggle.getAttribute('aria-expanded'),'false',id+' expected collapsed');
           await toggle.click();
-          await submenu.locator('xpath=.').waitFor({state:'visible',timeout:10000});
+          await submenu.waitFor({state:'visible',timeout:10000});
           assert.equal(await toggle.getAttribute('aria-expanded'),'true',id+' did not expand');
           await toggle.click();
           await page.waitForFunction(menuId=>!document.getElementById(menuId).classList.contains('show'),id,{timeout:10000});
