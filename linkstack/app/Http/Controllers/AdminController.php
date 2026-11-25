@@ -242,57 +242,47 @@ class AdminController extends Controller
     User::where("id", $id)->update(["email_verified_at" => $verify]);
   }
 
-  //Create new user from the Admin Panel
+  // A new user is a draft until the administrator submits a validated POST.
+  // Never write from GET, navigation, or a preview button.
   public function showNewUser()
   {
-    return view('panel.new-user');
-  }
-
-  public function createNewUser()
-  {
-    function random_str(
-      int $length = 64,
-      string $keyspace = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    ): string {
-      if ($length < 1) {
-        throw new \RangeException("Length must be a positive integer");
-      }
-      $pieces = [];
-      $max = mb_strlen($keyspace, "8bit") - 1;
-      for ($i = 0; $i < $length; ++$i) {
-        $pieces[] = $keyspace[random_int(0, $max)];
-      }
-      return implode("", $pieces);
+    $number = User::where('name', 'like', 'Admin-Created-%')->count() + 1;
+    $domain = parse_url(url(''), PHP_URL_HOST) ?: 'example.test';
+    if ($domain === 'localhost' || filter_var($domain, FILTER_VALIDATE_IP)) {
+      $domain = 'example.test';
     }
 
-    $names = User::pluck("name")->toArray();
+    return view('panel.new-user', [
+      'suggestedName' => 'Admin-Created-' . $number,
+      'suggestedEmail' => 'admin-created-' . strtolower(\\Illuminate\\Support\\Str::random(10)) . '@' . $domain,
+      'suggestedPassword' => \\Illuminate\\Support\\Str::random(20),
+      'newUserRole' => RegistrationVip::roleForNewUser(),
+    ]);
+  }
 
-    $adminCreatedNames = array_filter($names, function ($name) {
-      return strpos($name, "Admin-Created-") === 0;
-    });
-
-    $numbers = array_map(function ($name) {
-      return (int) str_replace("Admin-Created-", "", $name);
-    }, $adminCreatedNames);
-
-    $maxNumber = !empty($numbers) ? max($numbers) : 0;
-    $newNumber = $maxNumber + 1;
-
-    $domain = parse_url(url(""), PHP_URL_HOST);
-    $domain = $domain == "localhost" ? "example.com" : $domain;
-
-    $user = User::create([
-      "name" => "Admin-Created-" . $newNumber,
-      "email" => strtolower(random_str(8)) . "@" . $domain,
-      "password" => Hash::make(random_str(32)),
-      "role" => "user",
-      "block" => "no",
+  public function createNewUser(Request $request)
+  {
+    $fields = $request->validate([
+      'name' => 'required|string|max:255',
+      'email' => ['required', 'email', 'max:255', \\Illuminate\\Validation\\Rule::unique('users', 'email')],
+      'password' => 'required|string|min:8|max:255',
     ]);
 
-    $user->role = RegistrationVip::roleForNewUser();
-    $user->save();
+    // Role, verification and other privileges remain server-controlled.
+    $user = \\Illuminate\\Support\\Facades\\DB::transaction(function () use ($fields) {
+      $created = User::create([
+        'name' => trim($fields['name']),
+        'email' => strtolower(trim($fields['email'])),
+        'password' => Hash::make($fields['password']),
+      ]);
+      $created->role = RegistrationVip::roleForNewUser();
+      $created->block = 'no';
+      $created->save();
+      return $created;
+    });
 
-    return redirect("admin/edit-user/" . $user->id);
+    return redirect()->route('showUser', ['id' => $user->id])
+      ->with('success', 'Usuário criado após confirmação em Salvar.');
   }
 
   //Delete existing user
