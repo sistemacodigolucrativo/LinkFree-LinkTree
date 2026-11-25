@@ -172,7 +172,9 @@ jobs:
         run: |
           set -euo pipefail
           cd /tmp/linkfree-audit/linkstack
-          php artisan serve --host=127.0.0.1 --port=18765 > /tmp/linkfree-audit/server.log 2>&1 &
+          # Use the same PHP server/router as Laravel ServeCommand, without its .env restart watcher.
+          # Direct PHP also avoids inheriting Laravel's bootstrapped dotenv values via --no-reload.
+          php -S 127.0.0.1:18765 server.php > /tmp/linkfree-audit/server.log 2>&1 &
           echo $! > /tmp/linkfree-audit/server.pid
           for i in $(seq 1 45); do
             STATUS=$(curl -s -o /dev/null -w '%{http_code}' --max-time 2 http://127.0.0.1:18765/login || true)
@@ -188,6 +190,12 @@ jobs:
         env:
           QA_EXPECTED_SITE: http://127.0.0.1:18765
         run: node scripts/qa-isolated/browser_a11y.cjs
+      - name: Verify isolated server remained alive
+        if: always()
+        run: |
+          test -s /tmp/linkfree-audit/server.pid
+          kill -0 "$(cat /tmp/linkfree-audit/server.pid)"
+          curl --fail --silent --show-error --max-time 10 http://127.0.0.1:18765/login >/dev/null
       - name: Upload complete a11y evidence, including residual contrast findings
         if: always()
         uses: actions/upload-artifact@v4
