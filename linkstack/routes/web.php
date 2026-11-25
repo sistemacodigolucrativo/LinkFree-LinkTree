@@ -201,6 +201,7 @@ Route::group([
     Route::get('/admin/edit-user/{id}', [AdminController::class, 'showUser'])->name('showUser');
     Route::post('/admin/edit-user/{id}', [AdminController::class, 'editUser'])->name('editUser');
     Route::post('/admin/edit-user/{id}/media/{kind}', [AdminController::class, 'removeAccountMedia'])->whereNumber('id')->where('kind', 'avatar|background')->name('admin.remove-account-media');
+    Route::get('/admin/new-user', [AdminController::class, 'showNewUser'])->name('showNewUser')->middleware('max.users');
     Route::post('/admin/new-user', [AdminController::class, 'createNewUser'])->name('createNewUser')->middleware('max.users');
     Route::delete('/admin/delete-user/{id}', [AdminController::class, 'deleteUser'])->name('deleteUser');
     Route::post('/admin/delete-table-user/{id}', [AdminController::class, 'deleteTableUser'])->name('deleteTableUser');
