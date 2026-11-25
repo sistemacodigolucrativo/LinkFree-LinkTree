@@ -53,10 +53,25 @@ checks["Verification tables are keyboard focusable"] = read("linkstack/resources
 
 checks["Admin user creation is POST only"] = "Route::get('/admin/new-user', [AdminController::class, 'showNewUser'])" in routes and "Route::post('/admin/new-user', [AdminController::class, 'createNewUser'])->name('createNewUser')->middleware('max.users');" in routes
 checks["Sidebar opens non-mutating confirmation"] = "route('showNewUser')" in read("linkstack/resources/views/layouts/sidebar.blade.php") and "route('createNewUser')" not in read("linkstack/resources/views/layouts/sidebar.blade.php")
-checks["Confirmation GET only renders view"] = "return view('panel.new-user');" in read("linkstack/app/Http/Controllers/AdminController.php").split("function showNewUser()")[1].split("public function")[0]
-for file in ("panel/new-user.blade.php", "panel/admin-overview.blade.php", "panel/users.blade.php"):
-    content = read("linkstack/resources/views/" + file)
-    checks["Admin user creation form: " + file] = bool(re.search(r'<form method="POST" action="\{\{ route\(\'createNewUser\'\) \}\}"[^>]*>\s*@csrf', content)) and '/admin/new-user">' not in content and 'href="{{ route(\'createNewUser\') }}">' not in content
+controller = read("linkstack/app/Http/Controllers/AdminController.php")
+new_get = controller.split("function showNewUser()")[1].split("public function createNewUser(")[0]
+new_post = controller.split("function createNewUser(")[1].split("public function deleteUser")[0]
+checks["New-user GET returns only draft form"] = "return view('panel.new-user'," in new_get and "User::create" not in new_get
+checks["Creation persists only in POST after validation"] = "$request->validate(" in new_post and "User::create(" in new_post
+create_view = read("linkstack/resources/views/panel/new-user.blade.php")
+checks["Single explicit new-user POST form"] = '<form method="POST" action="{{ route(\'createNewUser\') }}"' in create_view and "@csrf" in create_view and 'id="lf-save-new-user"' in create_view
+overview = read("linkstack/resources/views/panel/admin-overview.blade.php")
+users_view = read("linkstack/resources/views/panel/users.blade.php")
+table_view = read("linkstack/resources/views/livewire/admin-user-table.blade.php")
+checks["Overview and users open non-mutating form"] = (
+    "['route' => 'showNewUser'" in overview and "route('createNewUser')" not in overview
+    and "route('createNewUser')" not in users_view and "route('showNewUser')" in table_view
+)
+checks["Creating form cannot be reached by unsafe GET mutation"] = (
+    "Route::get('/admin/new-user', [AdminController::class, 'showNewUser'])" in routes
+    and "User::create" not in new_get
+    and "method=\"POST\"" in create_view
+)
 
 checks["Member mutation target taken from route"] = all("request->route('id')" in read("linkstack/app/Http/Controllers/UserController.php").split("function "+name+"(")[1].split("public function")[0] for name in ("deleteLink","clearIcon","upLink","editCSS","editLink"))
 checks["Impersonation state is session-bound, no remember token in middleware"] = "linkfree_impersonation" in read("linkstack/app/Http/Middleware/Impersonate.php") and "remember_token" not in read("linkstack/app/Http/Middleware/Impersonate.php")
