@@ -243,6 +243,11 @@ class AdminController extends Controller
   }
 
   //Create new user from the Admin Panel
+  public function showNewUser()
+  {
+    return view('panel.new-user');
+  }
+
   public function createNewUser()
   {
     function random_str(
@@ -658,7 +663,7 @@ class AdminController extends Controller
   //Shows config file editor page
   public function showFileEditor(request $request)
   {
-    return redirect("/admin/config");
+    return view("panel/config-editor");
   }
 
   //Saves advanced config
@@ -679,11 +684,19 @@ class AdminController extends Controller
   //Saves .env config
   public function editENV(request $request)
   {
-    $config = $request->altConfig;
-
-    file_put_contents(".env", $config);
-
-    return Redirect("/admin/config?alternative-config");
+    abort_if(config('linkstack.single_user_mode'), 403);
+    $rules = [
+      'APP_NAME' => ['sometimes', 'required', 'string', 'max:80', 'regex:/^[\\pL\\pN ._-]+$/uD'],
+      'APP_LOCALE' => ['sometimes', 'required', 'string', 'regex:/^[a-z]{2}(?:[-_][A-Za-z]{2})?$/D'],
+      'LOG_LEVEL' => ['sometimes', 'required', 'in:debug,info,notice,warning,error,critical,alert,emergency'],
+    ];
+    $validated = $request->validate($rules);
+    foreach ($validated as $key => $value) {
+      if (EnvEditor::keyExists($key)) {
+        EnvEditor::editKey($key, '"' . $value . '"');
+      }
+    }
+    return redirect()->route('showEnvEditor')->with('success', 'Configurações permitidas atualizadas.');
   }
 
   //Shows config file editor page

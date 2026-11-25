@@ -87,7 +87,7 @@ def get_mutations():
         '/admin/deleteLink/102','/admin/users/block/no/2',
         '/admin/users/verify/vip/2','/admin/users/verify-mail/true/2',
         '/admin/delete-user/3','/admin/site/delavatar',
-        '/admin/site/delfavicon','/send-test-email','/auth-as/2','/admin/new-user','/admin/delete-table-user/4'
+        '/admin/site/delfavicon','/send-test-email','/auth-as/2','/admin/delete-table-user/4'
     ]
     snapshot = (value('SELECT COUNT(*) FROM links'), value('SELECT COUNT(*) FROM users'),
                 value('SELECT role FROM users WHERE id=2'),
@@ -97,6 +97,11 @@ def get_mutations():
         for url in urls:
             status,_,_ = cli.request('GET',url)
             expect(status == 405, f'GET {url} not rejected with 405 (got {status})')
+    status, _, body = admin.request('GET', '/admin/new-user')
+    expect(status == 200, f'New user confirmation returned {status}')
+    for cli in (member, anonymous):
+        status, _, _ = cli.request('GET', '/admin/new-user')
+        expect(status in (302, 403), f'Unauthorized confirmation returned {status}')
     after = (value('SELECT COUNT(*) FROM links'), value('SELECT COUNT(*) FROM users'),
              value('SELECT role FROM users WHERE id=2'),
              value('SELECT block FROM users WHERE id=2'),

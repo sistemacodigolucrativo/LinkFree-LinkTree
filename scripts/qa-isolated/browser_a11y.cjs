@@ -9,10 +9,21 @@ if (process.env.QA_EXPECTED_SITE !== base) throw new Error('Isolated localhost o
 const {chromium} = require('/tmp/linkfree-qa-node/node_modules/playwright');
 const {AxeBuilder} = require('/tmp/linkfree-qa-node/node_modules/@axe-core/playwright');
 const output = '/tmp/linkfree-audit/browser-a11y-results.json';
+function progress(label) { console.log(new Date().toISOString(), label); }
+async function bounded(label, ms, task) {
+  let timer;
+  try { return await Promise.race([Promise.resolve().then(task), new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(label+' exceeded '+ms+'ms')), ms);
+  })]); } finally { clearTimeout(timer); }
+}
 
 (async () => {
   const issues = [], pages = [], errors = [];
   const browser = await chromium.launch({headless:true});
+  function checkpoint() {
+    fs.writeFileSync(output, JSON.stringify({sourceSha:process.env.GITHUB_SHA||'',status:'PARTIAL - not homologated',pages,issues,errors},null,2));
+  }
+  checkpoint();
   async function makeContext() {
     const ctx = await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce',serviceWorkers:'block'});
     await ctx.route('**/*', route => {
@@ -39,7 +50,7 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
     if (!res || res.status()!==200) throw new Error('Unexpected status '+location+' '+res?.status());
     if(location.startsWith('/@')) await page.locator('body[data-lf-contrast-ready="true"]').waitFor({timeout:10000});
     await page.waitForTimeout(500);
-    const axe = await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa']).analyze();
+    const axe = await bounded('axe '+role+' '+location, 60000, () => new AxeBuilder({page}).withTags(['wcag2a','wcag2aa']).analyze());
     const found=axe.violations.map(v=>({
       rule:v.id,impact:v.impact,
       count:v.nodes.length,
@@ -55,14 +66,22 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
       ['member',['/studio/referrals','/studio/verification','/studio/links','/studio/page']],
       ['admin',['/admin/referrals','/admin/verification','/admin/users']]
     ]) {
-      const context=await makeContext(),page=await context.newPage();
+      progress('START role '+role);
+      const context=await makeContext(),loginPage=await context.newPage();
       try {
-        if (role!=='anonymous') await login(page,role==='admin'?'auditadmin':'auditfree');
+        if (role!=='anonymous') await login(loginPage,role==='admin'?'auditadmin':'auditfree');
+        await loginPage.close();
         for(const location of paths) {
+          const page=await context.newPage(), started=Date.now();
+          progress('START scan '+role+' '+location);
           try {await scan(page,location,role);}
           catch(e) {
             errors.push({route:location,role,error:String(e.message).slice(0,300)});
             console.error('SCAN ERROR',role,location,String(e.message).slice(0,300));
+          } finally {
+            checkpoint();
+            progress('END scan '+role+' '+location+' duration_ms='+ (Date.now()-started));
+            await page.close();
           }
         }
       } finally { await context.close(); }
@@ -79,6 +98,8 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
       criticalOrSerious:issues.filter(v=>['critical','serious'].includes(v.impact)).length,
       targetedRegressions:priority.length,remainingContrast:issues.filter(v=>v.rule==='color-contrast').length}
   };
+  progress('START browser interactions');
+  fs.writeFileSync(output,JSON.stringify(report,null,2));
   try {
     report.interactions = await require('./browser_interactions.cjs').run();
   } catch (e) {
@@ -87,10 +108,12 @@ const output = '/tmp/linkfree-audit/browser-a11y-results.json';
   fs.writeFileSync(output,JSON.stringify(report,null,2));
   console.log('BROWSER INTERACTION SUMMARY',JSON.stringify(report.interactions));
   console.log('A11Y SUMMARY',JSON.stringify(report.summary));
+  progress('START public accessibility matrix');
   try { report.profileMatrix = await require('./public_accessibility.cjs').run(); }
   catch(e) { report.profileMatrix = {status:'ERROR',error:String(e.stack||e).slice(0,2500)}; }
   fs.writeFileSync(output,JSON.stringify(report,null,2));
   console.log('PUBLIC A11Y MATRIX',JSON.stringify(report.profileMatrix));
+  progress('START panel accessibility matrix');
   try { report.formMatrix = await require('./panel_accessibility.cjs').run(); }
   catch(e) { report.formMatrix = {status:'ERROR',error:String(e.stack||e).slice(0,1800)}; }
   fs.writeFileSync(output,JSON.stringify(report,null,2));

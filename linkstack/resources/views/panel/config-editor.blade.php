@@ -11,7 +11,17 @@
              <div class="row">
                  <div class="col-sm-12">
 
-                  @if(($_SERVER['QUERY_STRING'] ?? '') == '')
+                  @if(request()->routeIs('showEnvEditor') || request()->has('alternative-config'))
+                  <h2 class="mb-4 card-header">Variáveis de ambiente</h2>
+                  <p>Credenciais e demais chaves protegidas não são exibidas nem alteradas por este editor.</p>
+                  @if(!config('linkstack.single_user_mode'))
+                  @include('components.config.alternative-config')
+                  @endif
+                  <a href="{{ route('showConfig') }}" class="btn btn-primary">Configurações</a>
+                  @elseif(request()->routeIs('showFileEditor'))
+                  <h2 class="mb-4 card-header">{{__('messages.Advanced Config')}}</h2>
+                  @include('components.config.advanced-config')
+                  @else
 
                   <div id="exTab2" class="">
                       <ul id="myTab" class="nav nav-tabs">
@@ -58,7 +68,7 @@
                   <div class="config-general">
                     <section class="text-gray-400">
                       <div class="card-body p-0 p-md-3 d-flex flex-column">
-                        <a href="?alternative-config" class="mb-1">
+                        <a href="{{ route('showEnvEditor') }}" class="mb-1">
                           <div class="card bg-soft-primary option w-100 p-3">
                             <div class="card-body p-3">
                               <div class="d-flex align-items-center text-body">
@@ -180,9 +190,7 @@
                   <!-- Back to top button -->
                   <button type="button" id="button-top" aria-label="Voltar ao topo" hidden></button>
 
-                  @elseif(($_SERVER['QUERY_STRING'] ?? '') == 'alternative-config' && !config('linkstack.single_user_mode'))
-                  @include('components.config.alternative-config')
-                  @include('components.config.back-button')
+                  
                   @endif
 
                   @push("sidebar-scripts")
