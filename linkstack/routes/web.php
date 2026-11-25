@@ -78,7 +78,7 @@ Route::get('/@', function () {
 
 //Show diagnose page
 Route::get('/panel/diagnose', function () {
-        return redirect('/admin/config#5');
+        return redirect()->route('admin.config.section', ['section' => 'diagnostics']);
 })->middleware(['auth', 'blocked', 'impersonate', 'admin']);
 
 //Public route
@@ -228,6 +228,7 @@ Route::group([
     Route::post('/admin/github-themes/{category}/{name}/install', [\App\Http\Controllers\GithubThemesController::class, 'install'])->name('githubThemes.install');
     Route::get('/update/theme', [AdminController::class, 'updateThemes'])->name('updateThemes');
     Route::get('/admin/config', [AdminController::class, 'showConfig'])->name('showConfig');
+    Route::get('/admin/config/sections/{section}', [AdminController::class, 'showConfigSection'])->where('section', '[a-z-]+')->name('admin.config.section');
     Route::post('/admin/config', [AdminController::class, 'editConfig'])->name('editConfig');
     Route::post('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail');
     Route::post('/auth-as/{id}', [AdminController::class, 'authAsID'])->name('authAsID');

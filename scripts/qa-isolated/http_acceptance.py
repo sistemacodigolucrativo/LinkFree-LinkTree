@@ -28,10 +28,13 @@ class Client:
         self.cookies = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(
             urllib.request.HTTPCookieProcessor(self.cookies), NoRedirect())
-    def request(self, method, path, fields=None, json_response=False):
+    def request(self, method, path, fields=None, json_response=False, referer=None):
         assert path.startswith('/') and not path.startswith('//')
         data = None if fields is None else urllib.parse.urlencode(fields).encode('utf-8')
         headers = {'Accept':'application/json' if json_response else 'text/html'}
+        if referer is not None:
+            assert referer.startswith('/') and not referer.startswith('//')
+            headers['Referer'] = BASE + referer
         if method == 'DELETE' and data is None:
             data = b''
         rq = urllib.request.Request(BASE + path, data=data, method=method, headers=headers)
@@ -424,6 +427,90 @@ def maintenance_get_guards():
     return 'read-only landing works; legacy update/backup stages denied without writes'
 
 check('TC-04-D','Legacy updater and backup GET execution blocked',maintenance_get_guards)
+
+def modular_admin_config_routes():
+    sections = ['application','panel','appearance','security','advanced',
+                'smtp','footer','debug','language','diagnostics']
+    status,_,hub = admin.request('GET','/admin/config')
+    expect(status==200 and 'Configurações administrativas' in hub,
+           'Configuration index not rendered as modular hub')
+    expect('id="myTab"' not in hub,'Legacy tab navigation still visible')
+    for key in sections:
+        url='/admin/config/sections/'+key
+        expect(url in hub,'Section missing from index: '+key)
+        status,_,html=admin.request('GET',url)
+        expect(status==200 and 'Voltar às configurações' in html,
+               'Admin modular section failed: '+key+' '+str(status))
+        if key != 'diagnostics':
+            expect('name="entry"' in html and 'name="type"' in html,
+                   'Configuration form missing in '+key)
+        for cli,role in ((member,'member'),(anonymous,'anonymous')):
+            denied,_,_=cli.request('GET',url)
+            expect(denied in (302,403),role+' accessed '+url+': '+str(denied))
+    expect(admin.request('GET','/admin/config/sections/unknown')[0]==404,
+           'Unknown module must return 404')
+    status,headers,_=admin.request('GET','/panel/diagnose')
+    expect(status==302 and '/admin/config/sections/diagnostics' in headers.get('Location',''),
+           'Old diagnosis route not redirected')
+    for old in ['/admin/env','/admin/advanced-config','/admin/phpinfo','/admin/backups']:
+        status,_,_=admin.request('GET',old)
+        expect(status==200,'Legacy dedicated admin destination failed: '+old)
+    return {'admin_sections':len(sections),'unauthorized_denials':len(sections)*2,
+            'legacy_pages':4,'unknown_section':'404'}
+
+check('TC-04-D','Modular configuration routes, RBAC and legacy destinations',modular_admin_config_routes)
+
+def modular_config_write_persistence():
+    original=(ROOT/'.env').read_bytes()
+    try:
+        token=admin.token('/admin/config/sections/application')
+        status,headers,_=admin.request(
+            'POST','/admin/config',
+            {'_token':token,'type':'text','entry':'APP_NAME','value':'LinkFree QA Modular'},
+            referer='/admin/config/sections/application')
+        expect(status==302 and '/admin/config/sections/application' in headers.get('Location',''),
+               'POST did not return to dedicated origin section')
+        after=(ROOT/'.env').read_text()
+        expect('APP_NAME="LinkFree QA Modular"' in after,
+               'Existing EnvEditor did not persist synthetic config update')
+        status,headers,_=admin.request('GET','/admin/config/sections/application')
+        # The legacy session cookie name derives from APP_NAME unless SESSION_COOKIE
+        # is configured. Renaming APP_NAME may intentionally require a new login.
+        reauthenticated = False
+        if status == 302:
+            expect('/login' in headers.get('Location',''),
+                   'Unexpected redirect after changing APP_NAME: '+headers.get('Location',''))
+            fresh = Client().login('auditadmin')
+            status,_,_=fresh.request('GET','/admin/config/sections/application')
+            reauthenticated = True
+        expect(status==200,'Section unavailable after APP_NAME save and optional reauthentication: HTTP '+str(status))
+        return {'saved':True,'returnToSection':True,'reauthenticatedAfterSessionCookieChange':reauthenticated}
+    finally:
+        (ROOT/'.env').write_bytes(original)
+
+check('TC-04-D','Modular configuration writes and restores synthetic .env',modular_config_write_persistence)
+
+def modular_config_toggle_persistence():
+    # Ordinary setting changes must preserve the current authenticated session.
+    original=(ROOT/'.env').read_bytes()
+    path='/admin/config/sections/application'
+    try:
+        token=admin.token(path)
+        status,headers,_=admin.request('POST','/admin/config',{
+            '_token':token,'type':'toggle','entry':'ALLOW_REGISTRATION','toggle':''
+        },referer=path)
+        expect(status==302 and path in headers.get('Location',''),
+               'Toggle did not redirect back to its own section')
+        after=(ROOT/'.env').read_text()
+        expect('ALLOW_REGISTRATION=false' in after.splitlines(),
+               'Toggle was not saved in isolated .env')
+        status,_,_=admin.request('GET',path)
+        expect(status==200,'Admin session or section broke after normal toggle: HTTP '+str(status))
+        return 'toggle persisted, session and route available; synthetic .env restored'
+    finally:
+        (ROOT/'.env').write_bytes(original)
+
+check('TC-04-D','Modular configuration toggle persists without session interruption',modular_config_toggle_persistence)
 
 def generic_admin_editor():
     at=admin.token('/admin/users')
