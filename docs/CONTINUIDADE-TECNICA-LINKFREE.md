@@ -1,5 +1,7 @@
 # Continuidade técnica LinkFree-LinkTree
 
+> **SEO — Slogan e selo:** PR #30 integrada após 10 checks aprovados, merge b304bc72f395190874b78a4edea00059345c9cb5. Slogan opcional de até 100 caracteres acima da bio, aspas ornamentais e selo conforme visibilidade efetiva. Bio preservada. Última produção informada pelo operador: `974bf8e62803` (deploy de tipografia aprovado no log fornecido). Nova publicação ainda não executada. [Registro](homologacao-correcoes/SEO-SLOGAN-SELO-20261125.md). H3-C pausada.
+
 > **SEO — tipografia:** PR #29 integrada após cinco checks aprovados, merge d7059b62f72c90077cee12eadf7a14b24a4296c5. Nome em uma linha com fonte adaptativa, emojis omitidos somente no JPEG, metadados preservados. Sem novo deploy. [Registro](homologacao-correcoes/SEO-CARD-TIPOGRAFIA-20261124.md). H3-C pausada.
 
 > **SEO publicado:** deploy controlado no SHA `a90dbb80efccacd629b1687e2a41c43c0515c219`; staging, backup e homologação pós-deploy aprovados no escopo descrito no [relatório](homologacao-correcoes/SEO-DEPLOY-CONTROLADO-20261124.md). H3-C permanece pausada.
