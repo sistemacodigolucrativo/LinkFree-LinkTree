@@ -2,7 +2,7 @@
 
 **Data:** 25/11/2026. **Origem:** main `844979bdbd4cc1bfeb676cedb32342eb1c5c2d3c`.  
 **Branch de implementação:** `feat/admin-workflow-ux-paginations-20261125`.  
-**Estado de publicação — 25/11/2026:** nove requisitos implementados e validados nos testes relacionados (SHA de código `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`); PR #36 integrada em `c1bb27d94c5ff7f553ec16aac6c9743c0a6901ce`. **O usuário apresentou logs de deploy concluído na VPS da revisão `3d2391563b05` (16 arquivos). Homologação técnica read-only aprovada, homologação autenticada das nove mudanças pendente.** Acessibilidade WCAG integral e outros navegadores físicos continuam validações separadas.
+**Estado atualizado em 25/11/2026:** os nove requisitos originais foram implementados e validados em CI (código `e6a7ea2c1c3b2a42253b72dd849f91c891b95717`), integrados pela PR #36 (`c1bb27d94c5ff7f553ec16aac6c9743c0a6901ce`) e publicados na VPS conforme o log do operador (`3d2391563b05`, 16 arquivos, homologação técnica read-only aprovada). **A homologação manual autenticada foi realizada parcialmente, revelou cinco correções novas e não representa aprovação integral das nove anotações.** Consulte a [matriz pós-deploy e nova lista de pendências](HOMOLOGACAO-MANUAL-PR36-E-PENDENCIAS-20261125.md). Acessibilidade WCAG integral e testes amplos em dispositivos físicos continuam separados.
 
 ## Metodologia e reaproveitamento
 
@@ -12,7 +12,7 @@
 - Reutilizar `UserTable`/Rappasoft em vez de reinventar estado de busca, colunas e paginação. Reutilizar `Page`, `PublicSiteContent`, as rotas existentes e mecanismos de sessão flash/Bootstrap toast.
 - Não alterar dados reais de produção: todos os testes com mutações utilizam o ambiente descartável SQLite/contas sintéticas no localhost `127.0.0.1:18765`.
 
-## Estado por anotação (implementação proposta, CI pendente)
+## Estado por anotação (histórico da implementação original — homologação manual posterior em documento separado)
 
 | Nº | Resultado da auditoria | Mudança localizada | Evidência / validação |
 |---|---|---|---|
@@ -126,10 +126,18 @@
 - **Limite do resultado:** não cobre `/admin/users`, `/admin/new-user`, as seções de `/admin/site`, históricos autenticados, comportamento Livewire nem Opera mobile físico. Não declarar homologação manual completa.
 - **Estado final desta etapa:** deploy operacional concluído conforme evidências fornecidas; homologação **manual autenticada** pendente. Não repetir `--deploy` por padrão se o SHA publicado já corresponde ao esperado.
 
-### Próxima bateria manual, sem criar cadastros reais sem necessidade
+### Roteiro manual previsto antes da execução (histórico; resultados posteriores na matriz vinculada)
 
 1. Entrar com conta administrativa e conferir `/admin/users` em mobile: título na navbar, busca fora do card, dropdown de colunas, ícone de novo usuário; pesquisar e alterar seleção de colunas.
 2. Abrir `/admin/new-user` e retornar sem salvar; validar que não houve criação indevida, sem criar conta real só para testar.
 3. Em `/admin/site`, navegar entre seções, X de retorno e salvar apenas uma alteração controlada, observando toast; verificar os destinos distintos do rodapé.
 4. Navegar entre menus para avaliar a sobreposição da Sidebar; verificar paginação dos históricos de selo, denúncia e links do membro quando houver dados suficientes.
 5. Registrar qualquer defeito com URL, ação exata, viewport/navegador, estado anterior/posterior e evidências. Em caso de falha funcional, tratar em PR corretiva; não confundir aprovação read-only com aprovação de telas autenticadas.
+
+## Atualização de homologação manual — 25/11/2026
+
+O usuário percorreu as alterações da PR #36 em produção, confirmou que a sobreposição da Sidebar cessou, que o título de Gerenciar Usuários está na barra mobile, que o controle slim de colunas aparece, que o fluxo de criar/cancelar usuário funciona e que o cadastro salvo consta na listagem. Confirmou ainda a navegação exclusiva das seções de Personalização do Site e a exibição da tela Páginas Institucionais. **Isso não equivale a aprovação completa de todos os nove requisitos originais.**
+
+A confrontação estática com o código da `main` `d8dc7043ab41d4749c2592c1994c5ea6f3268607` identificou **cinco correções novas, ainda não implementadas**: (01) remover a aparência de card da pesquisa, (02) redirecionar após salvar novo usuário à lista, (03) transformar o botão X em FAB sem cabeçalho visível, (04) padronizar paginação e exibição por página em todas as listagens tabulares e (05) padronizar toasts em ambos os painéis. A revisão da nomenclatura/acesso das Páginas Institucionais ficou adiada e é tratada separadamente. Foi também registrado um possível risco de atualização do campo `register` no salvamento da página institucional, **ainda a investigar**.
+
+**Documento canônico para continuar o trabalho:** [HOMOLOGACAO-MANUAL-PR36-E-PENDENCIAS-20261125.md](HOMOLOGACAO-MANUAL-PR36-E-PENDENCIAS-20261125.md). Contém a matriz das nove verificações, as cinco anotações novas, trilhas de código, limitações e próximos testes. **Nenhuma das cinco correções novas foi aplicada nesta atualização documental.**
