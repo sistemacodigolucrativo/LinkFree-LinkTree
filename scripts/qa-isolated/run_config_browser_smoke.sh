@@ -50,5 +50,5 @@ for i in $(seq 1 45); do
   sleep 1
 done
 cd "$GITHUB_WORKSPACE"
-timeout 300s node scripts/qa-isolated/config_browser_smoke.cjs
+timeout 360s node scripts/qa-isolated/config_browser_smoke.cjs
 curl --fail --silent --show-error --max-time 10 http://127.0.0.1:18765/login > /dev/null

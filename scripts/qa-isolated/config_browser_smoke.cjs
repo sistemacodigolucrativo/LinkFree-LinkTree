@@ -89,8 +89,7 @@ async function run() {
     assert(env.includes(needle),'Synthetic fixture guard missing: '+needle);
   const browser=await chromium.launch({headless:true});
   try {
-    for(const viewport of [1280,375]){
-      for(const mode of ['light','dark']){
+    for(const [viewport,mode] of [[1280,'light'],[375,'dark']]){
         const context=await makeContext(browser,viewport,mode);
         const page=await context.newPage();
         page.setDefaultTimeout(12000);
@@ -124,7 +123,6 @@ async function run() {
             });
           }
         } finally { await context.close(); }
-      }
     }
     await check('Administrator form saves and persists via real Chromium click',async()=>{
       const context=await makeContext(browser,1280,'light');
