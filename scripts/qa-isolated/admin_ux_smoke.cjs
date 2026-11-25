@@ -31,7 +31,7 @@ function seedHistories(){
   const py=`import sqlite3,sys
 c=sqlite3.connect(sys.argv[1])
 for i in range(48):
-    c.execute("INSERT INTO verification_audit_events(user_id,actor_id,action,created_at) VALUES(2,1,'requested',datetime('now',?-48 || ' minutes'))",(str(i),))
+    c.execute("INSERT INTO verification_audit_events(user_id,actor_id,action,created_at) VALUES(2,1,'requested',datetime('now'))")
 c.execute("INSERT INTO abuse_reports(id,reported_user_id,reported_url,category,status,created_at,updated_at) VALUES(800,2,'https://example.test','spam','new',datetime('now'),datetime('now'))")
 for i in range(26):
     c.execute("INSERT INTO abuse_report_events(abuse_report_id,actor_user_id,action,to_status,created_at) VALUES(800,1,'created','new',datetime('now'))")
