@@ -1,5 +1,7 @@
 # Anotação Nº 01 — Auditoria integral da navegação administrativa
 
+> **Atualização de encerramento — 25/11/2026:** A PR #33 foi integrada à `main` no commit `88e508554f99faa43fb16142c864897a0da65bf1`; o operador publicou a versão na VPS, obteve **0 falhas** na homologação técnica read-only e realizou os testes manuais de navegação e criação de usuário. No head da PR, **7 checks passaram e `browser-a11y` ficou `skipped`**, por decisão explícita de adiar o teste extensivo para execução manual. Os trechos de investigação e CI abaixo refletem snapshots anteriores e não substituem o [relatório final pós-deploy](HOMOLOGACAO-POS-DEPLOY-PR33-20261125.md). **A homologação automatizada completa de navegador não foi comprovada.**
+
 **Data:** 25/11/2026  
 **Repositório:** `sistemacodigolucrativo/LinkFree-LinkTree`  
 **Pull request:** [#33](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/33)  
@@ -44,9 +46,9 @@ Os destinos a seguir foram mapeados a partir das rotas e respectivos controllers
 4. **Retorno de manutenção ao painel errado**: botão de `/update` apontava ao dashboard do membro. Corrigido para a visão geral administrativa.
 5. **Indicadores legados**: condições de `active` para temas e backups corrigidas; pais expansíveis e links individuais têm estados verificáveis nos testes.
 
-## Plano e evidências automatizadas
+## Plano e evidências automatizadas (histórico e cobertura ainda disponível sob acionamento manual)
 
-O workflow `browser-a11y` executa em instalação Laravel **descartável**, com usuários sintéticos, banco SQLite e configuração isolada, sem acesso a produção:
+Quando acionado manualmente (`workflow_dispatch`), o job `browser-a11y` executa em instalação Laravel **descartável**, com usuários sintéticos, banco SQLite e configuração isolada, sem acesso a produção:
 
 - `ADMIN-NAV`: GET e rota final, contexto correto, **um único destino ativo**, pai expandido, conteúdo de telas especiais e ausência de overflow horizontal em 1280, 768 e 375 px para todos os 17 destinos.
 - `ADMIN-RBAC`: contas de membro e visitante anônimo rejeitadas nas 17 URLs administrativas.
@@ -57,12 +59,14 @@ O workflow `browser-a11y` executa em instalação Laravel **descartável**, com 
 
 **Histórico concreto:** no head `027503381bfe`, sete checks passaram e `browser-a11y` falhou porque o teste exigia sidebar na página PHP antiga, que era standalone. Essa incompatibilidade foi corrigida primeiro no teste; a revisão também integrou a página PHP à Sidebar e restringiu os dados exibidos. No teste `ADMIN-ENV` desse head, o registro foi **PASS** com `allowedWrite=true` e `protectedEntriesPreserved=true`. **Os resultados do head final devem ser consultados separadamente; não se transfere aprovação entre commits.**
 
-## Condições de liberação
+## Condições de liberação — critério original e decisão posterior
 
-Somente classificar destinos como APROVADO e integrar esta PR após **todos os checks exigidos no HEAD atual concluírem com success**, inclusive `ADMIN-NAV`, `ADMIN-RBAC`, `ADMIN-ACCORDIONS` e `ADMIN-ENV`. Se houver erros, corrigir defeitos comprovados, ou classificar limitações não reproduzíveis como NÃO VALIDADO; **não desabilitar testes nem falsificar sucesso**. Merge apenas com SHA esperado, confirmação da `main` posterior e **sem deploy de produção**.
+**Critério original:** eram exigidos oito checks verdes, inclusive `browser-a11y`, antes do merge. Esse critério **foi substituído**, após o bloqueio recorrente do job extenso, pela decisão do operador de retirá-lo da execução automática e preservá-lo como teste manual posterior.
 
-**Escopo excluído:** homologação H3-C, área de membros, integrações comerciais, banco de produção, dependências e reestruturações indiscriminadas.
+**Decisão e fatos finais:** sete checks automáticos foram aprovados no head `bca238873fd9e3a53e8598f82b49d208bf7b53d4`; `browser-a11y` ficou `skipped`. A PR #33 foi integrada à `main` (`88e508554f99faa43fb16142c864897a0da65bf1`) e a versão publicada pelo operador. A homologação pós-deploy read-only e os testes manuais guiados estão documentados no [relatório de 25/11](HOMOLOGACAO-POS-DEPLOY-PR33-20261125.md). A decisão **não comprova WCAG completo, todas as resoluções ou RBAC integral**.
+
+**Escopo da investigação pré-merge:** navegação administrativa em ambiente sintético; não inclui homologação universal de membros, integrações comerciais, banco da VPS ou testes destrutivos.
 
 ## Evidência de execução — 25/11/2026
 
-Head `6f7038019aac6bc63ca36679a5ce854de6db8e21`, [job 139321806048](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45647350215/job/139321806048): ADMIN-NAV (17 × 3), ADMIN-RBAC (17), ADMIN-ACCORDIONS, ADMIN-ENV e seis regressões de interação: PASS. A11Y: 12 páginas, zero erros e violações; painel: 6/6; perfis públicos: 23/24, único erro `ERR_CONNECTION_REFUSED` em Chromium default-light. Causa raiz não comprovada. Sete checks gerais aprovados; browser-a11y reprovado. Duas tentativas de reexecução via integração retornaram erro interno. Este commit documental dispara nova execução sem modificar aplicação ou testes. Aprovação de merge continua condicionada aos oito checks verdes no head final; não executar deploy.
+Head `6f7038019aac6bc63ca36679a5ce854de6db8e21`, [job 139321806048](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45647350215/job/139321806048): ADMIN-NAV (17 × 3), ADMIN-RBAC (17), ADMIN-ACCORDIONS, ADMIN-ENV e seis regressões de interação: PASS. A11Y: 12 páginas, zero erros e violações; painel: 6/6; perfis públicos: 23/24, único erro `ERR_CONNECTION_REFUSED` em Chromium default-light. Causa raiz não comprovada. Sete checks gerais aprovados; browser-a11y reprovado. Duas tentativas de reexecução via integração retornaram erro interno. **Nota histórica:** esse resultado refere-se a um head anterior e registrava o bloqueio vigente naquela ocasião. O encerramento posterior, o merge, o deploy e os resultados manuais estão descritos no relatório pós-deploy acima.
