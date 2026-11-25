@@ -1,0 +1,2 @@
+# SEO — centralização do card e selo ampliado
+Solicitação após deploy eaef3d1bb6eb: centralizar slogan horizontal e verticalmente, centralizar rodapé e aumentar selo em 50%, alinhado ao centro óptico do nome. Medidas FreeType reais, raio 16→24 px, reserva de largura e versão v6. Mantidos avatar, paleta, dados, permissões, metadados e regras de visibilidade. Testes de geometria e regressão em CI; publicação depende de aprovação. H3-C pausada. Sem migrations.

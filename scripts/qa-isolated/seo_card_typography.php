@@ -37,5 +37,29 @@ foreach (['Onde outros enxergam problemas, eu desenvolvo soluções.', str_repea
 }
 foreach (['Ana', 'Roberto R. Almeida', str_repeat('W', 100)] as $name) {
     [$text, $size, $x] = invoke($r, 'titleLayout', $name, true);
-    verify(invoke($r, 'width', $text, $size, true) <= 502 && $x + 16 <= 1108, 'title and verification badge fit on one line');
+    verify(invoke($r, 'width', $text, $size, true) <= 492 && $x + 24 <= 1118, 'title and verification badge fit on one line');
+}
+
+foreach (['Curto', 'Onde outros enxergam problemas, eu desenvolvo soluções.', str_repeat('Frase de impacto ', 10), str_repeat('W', 100)] as $quote) {
+    [$lines, $size] = invoke($r, 'sloganLayout', $quote);
+    $top = PHP_INT_MAX; $bottom = PHP_INT_MIN;
+    foreach (invoke($r, 'centeredSlogan', $lines, $size) as [$line, $x, $y]) {
+        [$l, $t, $rr, $b] = invoke($r, 'textBounds', $line, $size, false);
+        verify(abs($x + ($l + $rr)/2 - 837.5) <= 1 && $x+$l >= 558 && $x+$rr <= 1117, 'quote line centered and bounded');
+        $top = min($top, $y+$t); $bottom = max($bottom, $y+$b);
+    }
+    verify(abs(($top+$bottom)/2 - 396) <= 1 && $top >= 280 && $bottom <= 512, 'quote block vertically centered and bounded');
+}
+$footer = 'Um link. Todos os seus caminhos.';
+[$l, , $rr] = invoke($r, 'textBounds', $footer, 21, false);
+verify(abs(invoke($r, 'centeredX', $footer, 21) + ($l+$rr)/2 - 837.5) <= 1, 'footer centered');
+foreach (['Ana', 'Roberto R. Almeida', str_repeat('W', 100)] as $name) {
+    [$text, $size, $x] = invoke($r, 'titleLayout', $name, true);
+    [, $top, , $bottom] = invoke($r, 'textBounds', $text, $size, true);
+    $y = invoke($r, 'badgeCenterY', $text, $size, 253);
+    verify(abs($y - (253+($top+$bottom)/2)) <= 1, 'badge aligned to actual title glyphs');
+    $im = imagecreatetruecolor(100, 100);
+    invoke($r, 'drawBadge', $im, 50, 50);
+    verify((imagecolorat($im, 50, 26) & 0xffffff) === 0x179cf0 && imagecolorat($im, 50, 25) === 0, 'badge radius 24 px, 50 percent larger');
+    imagedestroy($im);
 }
