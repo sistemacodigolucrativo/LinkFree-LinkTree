@@ -483,8 +483,8 @@ class AdminController extends Controller
   public function showSite(Request $request)
   {
     $sections = PublicSiteContent::sections();
-    $selected = (string) $request->query('section', 'identity');
-    if ($selected !== 'identity' && !isset($sections[$selected])) {
+    $selected = (string) $request->query('section', '');
+    if ($selected !== '' && $selected !== 'identity' && !isset($sections[$selected])) {
       abort(404);
     }
     $page = Page::select('home_message')->first();
@@ -527,7 +527,7 @@ class AdminController extends Controller
         ->with('fail', 'Não foi possível gravar a seção. Verifique as permissões de storage.');
     }
 
-    return redirect()->route('showSite', ['section' => $section])
+    return redirect()->route('showSite')
       ->with('success', 'Seção atualizada com sucesso.');
   }
 
@@ -571,7 +571,8 @@ class AdminController extends Controller
         "favicon" . "_" . time() . "." . $request->file("icon")->extension(),
       );
     }
-    return back();
+    return redirect()->route('showSite')
+      ->with('success', 'Identidade do site atualizada com sucesso.');
   }
 
   //Delete avatar
