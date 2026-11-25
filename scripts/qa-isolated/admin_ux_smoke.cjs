@@ -35,14 +35,17 @@ for i in range(48):
 c.execute("INSERT INTO abuse_reports(id,reported_user_id,reported_url,category,status,created_at,updated_at) VALUES(800,2,'https://example.test','spam','new',datetime('now'),datetime('now'))")
 for i in range(26):
     c.execute("INSERT INTO abuse_report_events(abuse_report_id,actor_user_id,action,to_status,created_at) VALUES(800,1,'created','new',datetime('now'))")
+for i in range(25):
+    c.execute("INSERT INTO links(id,user_id,button_id,link,title,type,created_at,updated_at) VALUES(?,?,?,?,?,'link',datetime('now'),datetime('now'))",
+              (600+i,2,1,'https://example.test/studio-'+str(i),'Studio QA link '+str(i)))
 c.commit()`;
   // Seeded audit data is disposable and only used to force multiple pages.
   execFileSync('python3',['-c',py,db]);
 }
-async function login(page){
+async function login(page,name='auditadmin'){
   await page.goto(base+'/login',{waitUntil:'domcontentloaded',timeout:25000});
   const form=page.locator('form[action$="/login"]').first();
-  await form.locator('[name=email]').fill('auditadmin@example.test');
+  await form.locator('[name=email]').fill(name+'@example.test');
   await form.locator('[name=password]').fill('Synthetic-password-123');
   await Promise.all([page.waitForURL('**/dashboard',{timeout:20000}),form.locator('button[type=submit]').click()]);
 }
@@ -125,7 +128,7 @@ async function run(){
         });
         await check('Footer functions are distinct '+width,async()=>{
           await page.goto(base+'/admin/site?section=footer',{waitUntil:'domcontentloaded'});
-          const heading=await page.locator('h1').first().innerText();
+          const heading=await page.locator('.lf-site-section-toolbar h1').innerText();
           assert(heading.includes('Textos dos links do rodapé'),heading);
           assert.equal(await page.locator('a[href$="/admin/pages"]').count()>=1,true);
           assert.equal(await page.locator('a[href$="/admin/config"]').count()>=1,true);
@@ -134,6 +137,25 @@ async function run(){
           return {textLabels:true,legalPagesLink:true,configLink:true,sidebarRenamed:true};
         });
         if(width===375){
+          await check('Member Studio links pagination reuses Sortable page offset',async()=>{
+            const memberContext=await browser.newContext({viewport:{width:375,height:844},serviceWorkers:'block'});
+            try {
+              const member=await memberContext.newPage();
+              await login(member,'auditfree');
+              let response=await member.goto(base+'/studio/links',{waitUntil:'domcontentloaded'});
+              assert.equal(response.status(),200);
+              const body=member.locator('#links-table-body');
+              const rows=body.locator('[data-id]');
+              assert.equal(await rows.count(),20,'First page must render 20 links');
+              assert.equal(await body.getAttribute('data-per-page'),'20');
+              assert(await member.locator('nav[aria-label="Paginação dos meus links"] a[href*="page=2"]').count()>=1);
+              response=await member.goto(base+'/studio/links?page=2',{waitUntil:'domcontentloaded'});
+              assert.equal(response.status(),200);
+              assert.equal(await rows.count(),7,'Second page must contain remaining 7 links');
+              assert.equal(await body.getAttribute('data-page'),'2');
+              return {firstPage:20,secondPage:7,sortableOffset:'20'};
+            } finally {await memberContext.close();}
+          });
           await check('Saving site section returns to hub with toast',async()=>{
             await page.goto(base+'/admin/site?section=final',{waitUntil:'domcontentloaded'});
             const title=page.locator('#lf-site-final_title');
@@ -149,9 +171,10 @@ async function run(){
             return {saved:true,returnedToHub:true,toast:true,persisted:true};
           });
           await check('Independent pagination on badges and abuse histories',async()=>{
-            await page.goto(base+'/admin/verification',{waitUntil:'domcontentloaded'});
+            const badgeResponse=await page.goto(base+'/admin/verification',{waitUntil:'domcontentloaded'});
+            assert.equal(badgeResponse.status(),200,'Badge history HTTP '+badgeResponse.status()+' '+(await page.locator('body').innerText()).slice(0,210));
             const history=page.locator('[aria-label="Histórico administrativo de verificação"] tbody tr');
-            assert.equal(await history.count(),20,'Expected 20 history rows per page');
+            assert.equal(await history.count(),20,'Expected 20 history rows per page; body: '+(await page.locator('body').innerText()).slice(0,250));
             const link=page.locator('a[href*="history_page=2"]').first();
             assert((await link.count())>=1,'History second-page link missing');
             await link.click();
