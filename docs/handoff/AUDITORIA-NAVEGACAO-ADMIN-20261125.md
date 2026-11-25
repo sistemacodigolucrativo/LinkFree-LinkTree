@@ -18,23 +18,23 @@ Os destinos a seguir foram mapeados a partir das rotas e respectivos controllers
 
 | Categoria | Item | Método / destino | Controller / conteúdo efetivo | Análise e ação | Resultado funcional |
 |---|---|---|---|---|---|
-| Geral | Visão geral | GET `/admin/overview` | `AdminController::index` / `panel/admin-overview` | Dashboard e atalhos administrativos; sem divergência estática | NÃO VALIDADO |
-| Usuários | Gerenciar usuários | GET `/admin/users` | `AdminController::users` / `panel/users` | Listagem e controles de administração preservados | NÃO VALIDADO |
-| Usuários | Novo usuário | GET `/admin/new-user`; POST de confirmação | `AdminController::showNewUser` / `panel/new-user`; POST `createNewUser` | Corrigida criação indevida por clique em menu: GET não grava, POST CSRF e confirmação explícita | NÃO VALIDADO |
-| Usuários | Indicações | GET `/admin/referrals` | `ReferralController::adminIndex` / `panel/referrals` | Administração de indicações | NÃO VALIDADO |
-| Usuários | Selo verificado | GET `/admin/verification` | `VerificationController::admin` / `panel/verification` | Solicitações de selo | NÃO VALIDADO |
-| Usuários | Denúncias | GET `/admin/reports` | `AbuseReportController::index` / `panel/abuse-reports` | Central de denúncias | NÃO VALIDADO |
-| Site | Personalização do site | GET `/admin/site` | `AdminController::showSite` / `panel/site` | Personalização da identidade e áreas públicas | NÃO VALIDADO |
-| Site | Páginas/rodapé | GET `/admin/pages` | `AdminController::showSitePage` / `panel/pages` | Conteúdos institucionais do rodapé | NÃO VALIDADO |
-| Temas | Gerenciar temas | GET `/admin/theme` | `AdminController::showThemes` / `panel/theme` | Temas instalados; ativo legado corrigido | NÃO VALIDADO |
-| Temas | Temas do GitHub | GET `/admin/github-themes` | `GithubThemesController::index` / `panel/github-themes` | Catálogo e gerenciamento de temas remotos | NÃO VALIDADO |
-| Temas | Tipos de bloco | GET `/admin/linktype` | `LinkTypeController::index` / `admin/linktype/index` | Gerenciamento de tipos de bloco | NÃO VALIDADO |
-| Sistema | Configuração | GET `/admin/config` | `AdminController::showConfig` / `panel/config-editor` | Configurações comuns e abas preservadas | NÃO VALIDADO |
-| Sistema | Backups | GET `/admin/backups` | `AdminController::showBackups` / `panel/backups` | Consulta de backups; ativo legado corrigido | NÃO VALIDADO |
-| Sistema | Configurações avançadas | GET `/admin/advanced-config` | `AdminController::showFileEditor` / `panel/config-editor` (ramo avançado) | Corrigido redirect indevido para configuração geral | NÃO VALIDADO |
-| Sistema | Variáveis de ambiente | GET e POST `/admin/env` | `showFileEditor` / editor restrito; `editENV` | Editor agora permite somente APP_NAME, APP_LOCALE e LOG_LEVEL; segredos não são exibidos nem modificados | NÃO VALIDADO |
-| Sistema | Diagnóstico PHP | GET `/admin/phpinfo` | `AdminController::phpinfo` / `panel/phpinfo` | Saída ampla do PHP substituída por diagnóstico não sensível e integrado à sidebar, com exportação segura | NÃO VALIDADO |
-| Sistema | Atualizações | GET `/update` | Closure administrativo / `panel/maintenance-operations` | Consulta de manutenção; corrigido botão **Voltar ao painel** para `adminOverview`; operações pelo navegador não executam | NÃO VALIDADO |
+| Geral | Visão geral | GET `/admin/overview` | `AdminController::index` / `panel/admin-overview` | Dashboard e atalhos administrativos; sem divergência estática | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Usuários | Gerenciar usuários | GET `/admin/users` | `AdminController::users` / `panel/users` | Listagem e controles de administração preservados | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Usuários | Novo usuário | GET `/admin/new-user`; POST de confirmação | `AdminController::showNewUser` / `panel/new-user`; POST `createNewUser` | Corrigida criação indevida por clique em menu: GET não grava, POST CSRF e confirmação explícita | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Usuários | Indicações | GET `/admin/referrals` | `ReferralController::adminIndex` / `panel/referrals` | Administração de indicações | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Usuários | Selo verificado | GET `/admin/verification` | `VerificationController::admin` / `panel/verification` | Solicitações de selo | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Usuários | Denúncias | GET `/admin/reports` | `AbuseReportController::index` / `panel/abuse-reports` | Central de denúncias | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Site | Personalização do site | GET `/admin/site` | `AdminController::showSite` / `panel/site` | Personalização da identidade e áreas públicas | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Site | Páginas/rodapé | GET `/admin/pages` | `AdminController::showSitePage` / `panel/pages` | Conteúdos institucionais do rodapé | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Temas | Gerenciar temas | GET `/admin/theme` | `AdminController::showThemes` / `panel/theme` | Temas instalados; ativo legado corrigido | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Temas | Temas do GitHub | GET `/admin/github-themes` | `GithubThemesController::index` / `panel/github-themes` | Catálogo e gerenciamento de temas remotos | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Temas | Tipos de bloco | GET `/admin/linktype` | `LinkTypeController::index` / `admin/linktype/index` | Gerenciamento de tipos de bloco | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Sistema | Configuração | GET `/admin/config` | `AdminController::showConfig` / `panel/config-editor` | Configurações comuns e abas preservadas | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Sistema | Backups | GET `/admin/backups` | `AdminController::showBackups` / `panel/backups` | Consulta de backups; ativo legado corrigido | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Sistema | Configurações avançadas | GET `/admin/advanced-config` | `AdminController::showFileEditor` / `panel/config-editor` (ramo avançado) | Corrigido redirect indevido para configuração geral | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Sistema | Variáveis de ambiente | GET e POST `/admin/env` | `showFileEditor` / editor restrito; `editENV` | Editor agora permite somente APP_NAME, APP_LOCALE e LOG_LEVEL; segredos não são exibidos nem modificados | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Sistema | Diagnóstico PHP | GET `/admin/phpinfo` | `AdminController::phpinfo` / `panel/phpinfo` | Saída ampla do PHP substituída por diagnóstico não sensível e integrado à sidebar, com exportação segura | APROVADO (evidência dinâmica anterior; CI final pendente) |
+| Sistema | Atualizações | GET `/update` | Closure administrativo / `panel/maintenance-operations` | Consulta de manutenção; corrigido botão **Voltar ao painel** para `adminOverview`; operações pelo navegador não executam | APROVADO (evidência dinâmica anterior; CI final pendente) |
 
 ## Inconsistências detectadas e correções isoladas
 
@@ -62,3 +62,7 @@ O workflow `browser-a11y` executa em instalação Laravel **descartável**, com 
 Somente classificar destinos como APROVADO e integrar esta PR após **todos os checks exigidos no HEAD atual concluírem com success**, inclusive `ADMIN-NAV`, `ADMIN-RBAC`, `ADMIN-ACCORDIONS` e `ADMIN-ENV`. Se houver erros, corrigir defeitos comprovados, ou classificar limitações não reproduzíveis como NÃO VALIDADO; **não desabilitar testes nem falsificar sucesso**. Merge apenas com SHA esperado, confirmação da `main` posterior e **sem deploy de produção**.
 
 **Escopo excluído:** homologação H3-C, área de membros, integrações comerciais, banco de produção, dependências e reestruturações indiscriminadas.
+
+## Evidência de execução — 25/11/2026
+
+Head `6f7038019aac6bc63ca36679a5ce854de6db8e21`, [job 139321806048](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45647350215/job/139321806048): ADMIN-NAV (17 × 3), ADMIN-RBAC (17), ADMIN-ACCORDIONS, ADMIN-ENV e seis regressões de interação: PASS. A11Y: 12 páginas, zero erros e violações; painel: 6/6; perfis públicos: 23/24, único erro `ERR_CONNECTION_REFUSED` em Chromium default-light. Causa raiz não comprovada. Sete checks gerais aprovados; browser-a11y reprovado. Duas tentativas de reexecução via integração retornaram erro interno. Este commit documental dispara nova execução sem modificar aplicação ou testes. Aprovação de merge continua condicionada aos oito checks verdes no head final; não executar deploy.
