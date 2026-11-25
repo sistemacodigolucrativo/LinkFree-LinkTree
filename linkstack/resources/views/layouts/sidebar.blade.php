@@ -24,6 +24,10 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
         /* O loader do template cobria toda a tela com branco ao navegar. */
         #loading{display:none!important}
         @view-transition{navigation:auto}
+        {{-- Admin navigation must not cross-fade two sidebar snapshots. --}}
+        @if($isAdminPanel)
+        @view-transition{navigation:none}
+        @endif
       </style>
       <script>
         (function(){
@@ -284,6 +288,28 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
    width:38px!important;min-width:38px!important;height:40px!important;
  }
 }
+
+/* Heading of /admin/users on mobile: between back arrow and notification bell. */
+.lf-mobile-nav-title{display:none}
+@media(max-width:991.98px){
+  .main-content .mobile-unified-nav>.navbar-inner.lf-mobile-titled-nav{
+    grid-template-columns:44px minmax(0,1fr) auto!important;
+  }
+  .main-content .mobile-unified-nav .lf-mobile-nav-title{
+    display:block;grid-column:2;grid-row:1;min-width:0;
+    margin:0;text-align:center;font-size:clamp(.75rem,3.3vw,.95rem);
+    font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    color:var(--lf-text);
+  }
+  .main-content .mobile-unified-nav .lf-mobile-titled-nav #navbarSupportedContent{
+    grid-column:3;grid-row:1;width:auto!important;max-width:max-content!important;
+  }
+}
+@media(max-width:359px){
+  .main-content .mobile-unified-nav>.navbar-inner.lf-mobile-titled-nav{
+    grid-template-columns:38px minmax(0,1fr) auto!important;
+  }
+}
 </style>
 </head>
   <body class="  ">
@@ -403,7 +429,7 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
   </a>
   <ul class="sub-nav collapse {{ $adminSiteOpen ? 'show' : '' }}" id="admin-site-menu" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/site*') ? 'active' : '' }}" href="{{ route('showSite') }}"><i class="icon bi bi-palette" aria-hidden="true"></i><span class="item-name">{{__('messages.Site Customization')}}</span></a></li>
-<li class="nav-item"><a class="nav-link {{ request()->is('admin/pages*') ? 'active' : '' }}" href="{{ route('showSitePage') }}"><i class="icon bi bi-file-earmark-text" aria-hidden="true"></i><span class="item-name">{{__('messages.Footer Pages')}}</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/pages*') ? 'active' : '' }}" href="{{ route('showSitePage') }}"><i class="icon bi bi-file-earmark-text" aria-hidden="true"></i><span class="item-name">Páginas institucionais</span></a></li>
   </ul>
 </li>
     <li class="nav-item nav-accordion-group nav-accordion-admin">
@@ -449,7 +475,7 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
       <div class="position-relative iq-banner">
         <!--Nav Start-->
         <nav class="nav navbar navbar-expand-lg navbar-light iq-navbar mobile-unified-nav">
-          <div class="container-fluid navbar-inner">
+          <div class="container-fluid navbar-inner @hasSection('mobile-navbar-title') lf-mobile-titled-nav @endif">
             <a href="{{ route('panelIndex') }}" class="navbar-brand">
 
                 <!--Logo start-->
@@ -482,6 +508,9 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
                 </svg>
                 </i>
             </button>
+            @hasSection('mobile-navbar-title')
+              <span class="lf-mobile-nav-title" aria-label="Página atual">@yield('mobile-navbar-title')</span>
+            @endif
             {{-- <div class="input-group search-input">
               <span class="input-group-text" id="search-input">
                 <svg class="icon-18" width="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
