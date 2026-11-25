@@ -156,13 +156,18 @@ async function run() {
             const res=await page.goto(base+path,{waitUntil:'domcontentloaded'});
             assert.equal(res.status(),200,path+' HTTP '+res.status());
             assert.equal(new URL(page.url()).pathname,path,'Unexpected destination '+path);
-            if(path==='/admin/phpinfo'){
-              // The legacy PHP diagnostics view is a standalone page, not the sidebar layout.
-              assert.equal(await page.locator('h1').count(),1,path+' diagnostics heading');
-              assert(await page.locator('iframe[title="Informações técnicas do PHP"]').count()===1,path+' diagnostics iframe');
-              continue;
-            }
             assert.equal(await page.locator('[data-panel-context="admin"]').count(),1,path+' panel context');
+            if(path==='/admin/phpinfo'){
+              assert.equal(await page.locator('#php-diagnostics').count(),1,'Safe PHP diagnostic content');
+              assert.equal(await page.locator('iframe[title="Informações técnicas do PHP"]').count(),0,'Raw phpinfo must not be rendered');
+              assert.equal(await page.locator('#download-php-diagnostics').count(),1,'Diagnostic download preserved');
+              const secret=fs.readFileSync(root+'/.env','utf8').split(/\r?\n/).find(v=>v.startsWith('APP_KEY='));
+              if(secret) assert(!(await page.content()).includes(secret),'APP_KEY leaked into PHP diagnostic page');
+            }
+            if(path==='/admin/env') assert.equal(await page.locator('h2').filter({hasText:'Variáveis de ambiente'}).count(),1,'Environment editor heading');
+            if(path==='/admin/advanced-config') assert(await page.locator('h2').count()>=1,'Advanced editor heading');
+            if(path==='/admin/new-user') assert.equal(await page.locator('form[action$="/admin/new-user"][method="POST"]').count(),1,'Explicit user-creation confirmation');
+            if(path==='/update') assert(await page.locator('h1').filter({hasText:'Atualização da instalação'}).count()===1,'Maintenance page content');
             assert(await page.locator('#sidebar-menu a.active').count()>0,path+' active indicator');
             assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),path+' horizontal overflow at '+width);
           }
