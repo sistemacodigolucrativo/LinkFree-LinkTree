@@ -146,6 +146,44 @@ async function run() {
         return {formsWithCsrf:true,post302:true,editorReached:true,createdExactlyOne:true};
       } finally {await context.close();}
     });
+    await check('ADMIN-NAV','All 17 administrative destinations and responsive sidebar',async()=>{
+      const {context,page}=await session('auditadmin');
+      try {
+        const paths=['/admin/overview','/admin/users','/admin/new-user','/admin/referrals','/admin/verification','/admin/reports','/admin/site','/admin/pages','/admin/theme','/admin/github-themes','/admin/linktype','/admin/config','/admin/backups','/admin/advanced-config','/admin/env','/admin/phpinfo','/update'];
+        for(const width of [1280,768,375]){
+          await page.setViewportSize({width,height:900});
+          for(const path of paths){
+            const res=await page.goto(base+path,{waitUntil:'domcontentloaded'});
+            assert.equal(res.status(),200,path+' HTTP '+res.status());
+            assert.equal(new URL(page.url()).pathname,path,'Unexpected destination '+path);
+            assert.equal(await page.locator('[data-panel-context="admin"]').count(),1,path+' panel context');
+            const active=page.locator('#sidebar-menu a.active').filter({hasNot:page.locator('.nav-accordion-toggle')});
+            assert(await page.locator('#sidebar-menu a.active').count()>0,path+' active indicator');
+            assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),path+' horizontal overflow at '+width);
+          }
+        }
+        return {destinations:paths.length,viewports:3};
+      } finally {await context.close();}
+    });
+    await check('ADMIN-ENV','Allowed environment edit preserves all other entries',async()=>{
+      const {context,page}=await session('auditadmin');
+      const file=root+'/.env';
+      const before=fs.readFileSync(file,'utf8');
+      try {
+        await page.goto(base+'/admin/env',{waitUntil:'domcontentloaded'});
+        const form=page.locator('form[action$="/admin/env"]');
+        assert.equal(await form.count(),1);
+        const name=form.locator('[name="APP_NAME"]');
+        await name.fill('Audit Safe Name');
+        assert.equal(await form.locator('[name="APP_KEY"],[name="DB_PASSWORD"],[name="altConfig"]').count(),0);
+        await Promise.all([page.waitForURL('**/admin/env'),form.locator('button[type="submit"]').click()]);
+        const after=fs.readFileSync(file,'utf8');
+        assert(after.includes('Audit Safe Name'),'Allowed value not saved');
+        const protectedLines=v=>v.split(/\r?\n/).filter(l=>!/^\s*(APP_NAME|APP_LOCALE|LOG_LEVEL)\s*=/.test(l)).filter(l=>l.trim()).sort();
+        assert.deepEqual(protectedLines(after),protectedLines(before),'Protected environment entries changed');
+        return {allowedWrite:true,protectedEntriesPreserved:true};
+      } finally {fs.writeFileSync(file,before);await context.close();}
+    });
     await check('TC-04-D','Impersonation browser start, member access and return',async()=>{
       const {context,page}=await session('auditadmin');
       try {
