@@ -491,7 +491,7 @@ def modular_config_write_persistence():
 check('TC-04-D','Modular configuration writes and restores synthetic .env',modular_config_write_persistence)
 
 def modular_config_toggle_persistence():
-    # Test a configuration option that does not change the session cookie name.
+    # Ordinary setting changes must preserve the current authenticated session.
     original=(ROOT/'.env').read_bytes()
     path='/admin/config/sections/application'
     try:
@@ -502,7 +502,15 @@ def modular_config_toggle_persistence():
         expect(status==302 and path in headers.get('Location',''),
                'Toggle did not redirect back to its own section')
         after=(ROOT/'.env').read_text()
-        expect(re.search(r'(?m)^ALLOW_REGISTRATION=false
+        expect('ALLOW_REGISTRATION=false' in after.splitlines(),
+               'Toggle was not saved in isolated .env')
+        status,_,_=admin.request('GET',path)
+        expect(status==200,'Admin session or section broke after normal toggle: HTTP '+str(status))
+        return 'toggle persisted, session and route available; synthetic .env restored'
+    finally:
+        (ROOT/'.env').write_bytes(original)
+
+check('TC-04-D','Modular configuration toggle persists without session interruption',modular_config_toggle_persistence)
 
 def generic_admin_editor():
     at=admin.token('/admin/users')
