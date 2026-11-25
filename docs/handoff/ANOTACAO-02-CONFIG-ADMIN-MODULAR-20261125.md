@@ -3,7 +3,7 @@
 **Data:** 25/11/2026  
 **Branch:** `feat/admin-config-modular-20261125`  
 **Commit inicial:** `88f5d28b98c376bdbc8d584261ea579240d01555`  
-**Status:** etapa inicial implementada em branch isolada; CI e validação funcional pendentes. **Sem merge, sem deploy.**
+**Status final da PR #34:** **integrada à main** em 25/11/2026; merge commit `8fad67d5036807488525ce0a313d047f062ac90e`. **Código de aplicação não publicado na VPS nesta etapa.** Homologação HTTP e Chromium aprovadas no escopo descrito abaixo; acessibilidade integral e Anotação Nº 03 permanecem separadas.
 
 ## Regra obrigatória: preservar a Sidebar
 
@@ -53,6 +53,30 @@ As opções do grupo Painel foram distribuídas em dois domínios, Painel e Apar
 - A navegação em tema escuro e os flashes brancos (Anotação Nº 03) **não** estão declarados resolvidos. Devem ser avaliados antes de deploy.
 - A Sidebar não é alterada; redundâncias no menu Sistema continuam explicitamente fora do escopo desta etapa.
 
-## Aceite pendente
+## Resultado técnico de fechamento e merge — 25/11/2026
 
-Executar e examinar CI; testar GET, reload, retrocompatibilidade de fragmentos, RBAC admin/membro/anônimo, CSRF, leitura, gravação e persistência/reversão em **base sintética**, contraste, teclado e mobile. Só avaliar merge depois de relatórios com evidência dinâmica. Não publicar na VPS nesta etapa.
+**PR:** [#34 — configurações administrativas em telas independentes](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/34). **Merge autorizado pelo responsável e confirmado no GitHub**.
+
+**Head de código homologado:** `beb7e5cfbe5981b2f74e421c7865de47ba68e533`. **Merge na main:** `8fad67d5036807488525ce0a313d047f062ac90e`.
+
+| Verificação | Evidência | Resultado |
+|---|---|---|
+| Regressão HTTP completa | [Job `http-behavior`](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45684365852/job/139452917215) | **23 PASS / 0 FAIL** |
+| Navegador Chromium em fixture isolada | [Job `config-browser-smoke`](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45684365852/job/139452916796) | **24 PASS / 0 FAIL** |
+| PHP syntax lint, security regression, SEO HTTP e Studio layout | Checks do head homologado | **success** |
+| Instalador isolado SQLite e MySQL | Checks do head homologado | **success** |
+| Acessibilidade de site inteiro (`browser-a11y`) | Check deliberadamente manual | **skipped — não homologado** |
+| Integridade da Sidebar | Diff de arquivos da PR #34 | **Não modificada** |
+
+**Cobertura do Chromium:** índice e dez páginas administrativas com títulos/formulários, navegação real, viewport desktop 1280 px no tema claro, viewport móvel 375 px no tema escuro, verificações de fundo escuro e ausência de overflow horizontal, gravação de configuração via clique real com persistência confirmada em nova consulta e negação a visitantes. O HTTP cobriu controle de acesso de administrador/membro/visitante, CSRF, rotas antigas, reautenticação necessária após mudança sintética de `APP_NAME`, persistência de toggle e demais operações da suíte.
+
+**Correções na homologação:** conserto de sintaxe de teste Python; redução de matrizes duplicadas do Chromium para evitar timeout; conserto de corrida de navegação em formulário; um travamento isolado do Chrome no `studio-layout` passou na repetição. Nenhum dos problemas foi classificado equivocadamente como defeito confirmado da aplicação.
+
+### Pendências distintas da autorização de merge
+
+- A bateria global `browser-a11y` foi mantida **fora dos checks obrigatórios** por determinação anterior; não equivale à aprovação WCAG integral. Teclado, leitor de tela, dispositivos Android/iOS físicos e todos os cruzamentos de tema/resolução não foram abrangidos pelo smoke.
+- O problema de flash branco no tema escuro (**Anotação Nº 03**) **não foi declarado corrigido**. Há uma inspeção de cor de fundo no início das páginas testadas, não uma aferição de todos os quadros durante transições. Exige investigação e homologação próprias.
+- Nem todas as operações de gravação sensíveis (SMTP real, manutenção e atualização em produção) foram exercitadas; testes sintéticos não substituem uma homologação operacional controlada.
+- **Merge não é deploy:** validar `--check`, backup e a checklist da VPS antes de publicar a nova versão; nenhum deploy foi realizado nesta etapa.
+
+**Conclusão:** requisitos de separação interna das configurações validados nos cenários executados e **código integrado à main**. Exceções permanecem explicitamente registradas para evitar conclusão indevida da acessibilidade total e do requisito separado de transições escuras.
