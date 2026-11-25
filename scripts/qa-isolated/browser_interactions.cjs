@@ -156,8 +156,13 @@ async function run() {
             const res=await page.goto(base+path,{waitUntil:'domcontentloaded'});
             assert.equal(res.status(),200,path+' HTTP '+res.status());
             assert.equal(new URL(page.url()).pathname,path,'Unexpected destination '+path);
+            if(path==='/admin/phpinfo'){
+              // The legacy PHP diagnostics view is a standalone page, not the sidebar layout.
+              assert.equal(await page.locator('h1').count(),1,path+' diagnostics heading');
+              assert(await page.locator('iframe[title="Informações técnicas do PHP"]').count()===1,path+' diagnostics iframe');
+              continue;
+            }
             assert.equal(await page.locator('[data-panel-context="admin"]').count(),1,path+' panel context');
-            const active=page.locator('#sidebar-menu a.active').filter({hasNot:page.locator('.nav-accordion-toggle')});
             assert(await page.locator('#sidebar-menu a.active').count()>0,path+' active indicator');
             assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),path+' horizontal overflow at '+width);
           }
