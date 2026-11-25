@@ -116,19 +116,22 @@ require('id="navbarSupportedContent"' in sidebar and 'id="navbarDropdown"' in si
 require('id="sidebar-scroll-region"' in sidebar and
         'class="sidebar-body pt-0 data-scrollbar"' not in sidebar,
         "Sidebar usa rolagem vertical independente sem conflito com o plugin")
-for group in ("admin-navigation", "nav-links", "nav-appearance"):
+for group in ("nav-links", "nav-appearance", "admin-users-menu", "admin-site-menu", "admin-themes-menu", "admin-system-menu"):
     require('id="' + group + '" data-bs-parent="#sidebar-menu"' in sidebar,
-            "Acordeão principal com fechamento exclusivo: " + group)
-for group in ("admin-users-menu", "admin-site-menu", "admin-themes-menu", "admin-system-menu"):
-    require('id="' + group + '" data-bs-parent="#admin-navigation"' in sidebar,
-            "Subcategoria administrativa com fechamento exclusivo: " + group)
-require(sidebar.count('class="nav-link nav-accordion-toggle') == 7,
-        "Sete categorias de acordeão após simplificar Inicio e Conta")
-require('id="nav-admin-panel"' in sidebar and "auth()->user()->role === 'admin'" in sidebar,
-        "Menu administrativo agrupado e restrito a administradores")
-require(sidebar.index('id="nav-admin-panel"') > sidebar.index('id="nav-appearance"') and
-        sidebar.index('id="nav-admin-panel"') < sidebar.index('<!-- Sidebar Menu End -->'),
-        "Administração ao final da navegação lateral, restrita a administradores")
+            "Acordeão contextual com fechamento exclusivo: " + group)
+require(sidebar.count('class="nav-link nav-accordion-toggle') == 6,
+        "Seis categorias distribuídas entre os dois contextos")
+require('id="nav-admin-panel"' not in sidebar and 'id="admin-navigation"' not in sidebar,
+        "Dropdown administrativo antigo removido")
+require("$isAdminPanel = $canAccessAdmin && request()->is(" in sidebar and
+        "auth()->user()->role === 'admin'" in sidebar and "@if(!$isAdminPanel)" in sidebar,
+        "Contexto derivado da rota e autorização")
+require(sidebar.index("@if(!$isAdminPanel)") < sidebar.index("Painel de Controle") <
+        sidebar.index("$adminUsersOpen") < sidebar.index('id="admin-users-menu"'),
+        "Menus separados por condição de renderização")
+require('class="sidebar-footer lf-panel-footer"' in sidebar and "@if($canAccessAdmin)" in sidebar and
+        "route($isAdminPanel ? 'panelIndex' : 'adminOverview')" in sidebar,
+        "Alternância autorizada no rodapé com destinos existentes")
 require('id="nav-account"' not in sidebar and 'id="nav-account"' not in sidebar,
         "Configurações de conta removidas da barra lateral")
 require('lf-panel-theme-link' in sidebar and 'messages.Panel Theme' in sidebar and
@@ -257,7 +260,8 @@ require('nav-accordion-toggle:is(.active,[aria-expanded="true"])' in nav_css,
         "Categoria aberta usa superfície distinta do link ativo")
 require('id="sidebar-scroll-region"' in sidebar and
         'data-bs-parent="#sidebar-menu"' in sidebar and
-        'data-bs-parent="#admin-navigation"' in sidebar,
+        sidebar.count('data-bs-parent="#sidebar-menu"') == 6 and
+        'data-bs-parent="#admin-navigation"' not in sidebar,
         "Rolagem e acordeão exclusivo preservados")
 
 print("AUDITORIA ESTÁTICA DO ESTÚDIO APROVADA")

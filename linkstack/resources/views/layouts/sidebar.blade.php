@@ -2,6 +2,9 @@
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use App\Models\User;
 $usrhandl = Auth::user()->littlelink_name;
+$canAccessAdmin = auth()->check() && auth()->user()->role === 'admin';
+$isAdminPanel = $canAccessAdmin && request()->is('admin', 'admin/*', 'update', 'update/*', 'backup', 'theme-updater');
+$panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
 @endphp
 <!doctype html>
 @include('layouts.lang')
@@ -291,9 +294,9 @@ $usrhandl = Auth::user()->littlelink_name;
       </div>    </div>
     <!-- loader END -->
 
-    <aside class="sidebar sidebar-default sidebar-white sidebar-base navs-rounded-all ">
+    <aside class="sidebar sidebar-default sidebar-white sidebar-base navs-rounded-all" aria-label="{{ $panelLabel }}" data-panel-context="{{ $isAdminPanel ? 'admin' : 'member' }}">
         <div class="sidebar-header d-flex align-items-center justify-content-start">
-            <a href="{{ route('panelIndex') }}" class="navbar-brand">
+            <a href="{{ route($isAdminPanel ? 'adminOverview' : 'panelIndex') }}" class="navbar-brand" aria-label="{{ $panelLabel }}">
 
                 <!--Logo start-->
                 <div class="logo-main">
@@ -329,7 +332,9 @@ $usrhandl = Auth::user()->littlelink_name;
         <div class="sidebar-body pt-0" id="sidebar-scroll-region" tabindex="0" aria-label="Navegação lateral rolável">
             <div class="sidebar-list">
                 <!-- Sidebar Menu Start -->
+                <div class="lf-panel-context-label">{{ $panelLabel }}</div>
                 <ul class="navbar-nav iq-main-menu" id="sidebar-menu">
+@if(!$isAdminPanel)
 @php
   $navLinksOpen = request()->is('studio/links*') || request()->is('studio/page-icons') || request()->is('studio/blocks') || request()->is('studio/add-link') || request()->is('studio/edit-link/*') || request()->is('studio/button-editor/*');
   $navAppearanceOpen = request()->is('studio/theme') || request()->is('studio/theme-preview/*');
@@ -368,21 +373,13 @@ $usrhandl = Auth::user()->littlelink_name;
 <li class="nav-item"><a class="nav-link {{ request()->is('studio/referrals*') ? 'active' : '' }}" href="{{ route('studio.referrals') }}"><i class="icon bi bi-people" aria-hidden="true"></i><span class="item-name">Minhas indicações</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('studio/verification*') ? 'active' : '' }}" href="{{ route('studio.verification') }}"><i class="icon bi bi-patch-check" aria-hidden="true"></i><span class="item-name">Selo verificado</span></a></li>
 
-@if(auth()->check() && auth()->user()->role === 'admin')
+@else
 @php
   $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user') || request()->is('admin/referrals*') || request()->is('admin/verification*') || request()->is('admin/reports*');
   $adminSiteOpen = request()->is('admin/site*') || request()->is('admin/pages*');
   $adminThemesOpen = request()->is('admin/theme') || request()->is('admin/github-themes*') || request()->is('admin/linktype*');
   $adminSystemOpen = request()->is('admin/config') || request()->is('admin/backups') || request()->is('admin/advanced-config') || request()->is('admin/env') || request()->is('admin/phpinfo') || request()->is('update');
-  $adminMenuOpen = $adminUsersOpen || $adminSiteOpen || $adminThemesOpen || $adminSystemOpen || request()->is('admin/*');
 @endphp
-<li class="nav-item nav-accordion-group nav-accordion-admin" id="nav-admin-panel">
-  <a class="nav-link nav-accordion-toggle {{ $adminMenuOpen ? 'active' : '' }}" href="#admin-navigation" data-bs-toggle="collapse" role="button" aria-expanded="{{ $adminMenuOpen ? 'true' : 'false' }}" aria-controls="admin-navigation">
-    <i class="icon bi bi-shield-lock" aria-hidden="true"></i>
-    <span class="item-name">{{__('messages.Administration')}}</span>
-    <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
-  </a>
-  <ul class="sub-nav collapse {{ $adminMenuOpen ? 'show' : '' }}" id="admin-navigation" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/overview') ? 'active' : '' }}" href="{{ route('adminOverview') }}"><i class="icon bi bi-graph-up-arrow" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Overview')}}</span></a></li>
     <li class="nav-item nav-accordion-group nav-accordion-admin">
   <a class="nav-link nav-accordion-toggle {{ $adminUsersOpen ? 'active' : '' }}" href="#admin-users-menu" data-bs-toggle="collapse" role="button" aria-expanded="{{ $adminUsersOpen ? 'true' : 'false' }}" aria-controls="admin-users-menu">
@@ -390,7 +387,7 @@ $usrhandl = Auth::user()->littlelink_name;
     <span class="item-name">{{__('messages.Nav Admin Users')}}</span>
     <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
   </a>
-  <ul class="sub-nav collapse {{ $adminUsersOpen ? 'show' : '' }}" id="admin-users-menu" data-bs-parent="#admin-navigation">
+  <ul class="sub-nav collapse {{ $adminUsersOpen ? 'show' : '' }}" id="admin-users-menu" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') ? 'active' : '' }}" href="{{ route('showUsers') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">{{__('messages.Manage Users')}}</span></a></li>
 <li class="nav-item"><form method="POST" action="{{ route('createNewUser') }}" class="m-0">@csrf<button type="submit" class="nav-link w-100 text-start border-0"><i class="icon bi bi-person-plus" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin New User')}}</span></button></form></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/referrals*') ? 'active' : '' }}" href="{{ route('admin.referrals') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">Indicações</span></a></li>
@@ -404,7 +401,7 @@ $usrhandl = Auth::user()->littlelink_name;
     <span class="item-name">{{__('messages.Nav Admin Site')}}</span>
     <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
   </a>
-  <ul class="sub-nav collapse {{ $adminSiteOpen ? 'show' : '' }}" id="admin-site-menu" data-bs-parent="#admin-navigation">
+  <ul class="sub-nav collapse {{ $adminSiteOpen ? 'show' : '' }}" id="admin-site-menu" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/site*') ? 'active' : '' }}" href="{{ route('showSite') }}"><i class="icon bi bi-palette" aria-hidden="true"></i><span class="item-name">{{__('messages.Site Customization')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/pages*') ? 'active' : '' }}" href="{{ route('showSitePage') }}"><i class="icon bi bi-file-earmark-text" aria-hidden="true"></i><span class="item-name">{{__('messages.Footer Pages')}}</span></a></li>
   </ul>
@@ -415,7 +412,7 @@ $usrhandl = Auth::user()->littlelink_name;
     <span class="item-name">{{__('messages.Nav Admin Themes')}}</span>
     <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
   </a>
-  <ul class="sub-nav collapse {{ $adminThemesOpen ? 'show' : '' }}" id="admin-themes-menu" data-bs-parent="#admin-navigation">
+  <ul class="sub-nav collapse {{ $adminThemesOpen ? 'show' : '' }}" id="admin-themes-menu" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/theme') ? 'active' : '' }}" href="{{ route('showThemes') }}"><i class="icon bi bi-brush" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Theme Manager')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/github-themes*') ? 'active' : '' }}" href="{{ route('githubThemes') }}"><i class="icon bi bi-github" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin GitHub Themes')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/linktype*') ? 'active' : '' }}" href="{{ url('/admin/linktype') }}"><i class="icon bi bi-grid" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Block Types')}}</span></a></li>
@@ -427,7 +424,7 @@ $usrhandl = Auth::user()->littlelink_name;
     <span class="item-name">{{__('messages.Nav Admin System')}}</span>
     <i class="right-icon bi bi-chevron-down" aria-hidden="true"></i>
   </a>
-  <ul class="sub-nav collapse {{ $adminSystemOpen ? 'show' : '' }}" id="admin-system-menu" data-bs-parent="#admin-navigation">
+  <ul class="sub-nav collapse {{ $adminSystemOpen ? 'show' : '' }}" id="admin-system-menu" data-bs-parent="#sidebar-menu">
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/config') ? 'active' : '' }}" href="{{ route('showConfig') }}"><i class="icon bi bi-sliders" aria-hidden="true"></i><span class="item-name">{{__('messages.Config')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/backups') ? 'active' : '' }}" href="{{ route('showBackups') }}"><i class="icon bi bi-database" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Backups')}}</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/advanced-config') ? 'active' : '' }}" href="{{ route('showFileEditor') }}"><i class="icon bi bi-gear-wide-connected" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Advanced Config')}}</span></a></li>
@@ -436,13 +433,18 @@ $usrhandl = Auth::user()->littlelink_name;
 <li class="nav-item"><a class="nav-link {{ request()->is('update') ? 'active' : '' }}" href="{{ url('/update') }}"><i class="icon bi bi-arrow-repeat" aria-hidden="true"></i><span class="item-name">{{__('messages.Nav Admin Updates')}}</span></a></li>
   </ul>
 </li>
-  </ul>
-</li>
 @endif
 </ul>
                 <!-- Sidebar Menu End -->        </div>
         </div>
-        <div class="sidebar-footer"></div>
+        <div class="sidebar-footer lf-panel-footer">
+          @if($canAccessAdmin)
+          <a class="lf-panel-switch" href="{{ route($isAdminPanel ? 'panelIndex' : 'adminOverview') }}" aria-label="{{ $isAdminPanel ? 'Painel de Membros' : 'Área de Administração' }}" title="{{ $isAdminPanel ? 'Painel de Membros' : 'Área de Administração' }}">
+            <i class="bi {{ $isAdminPanel ? 'bi-person-circle' : 'bi-shield-lock' }}" aria-hidden="true"></i>
+            <span>{{ $isAdminPanel ? 'Painel de Membros' : 'Área de Administração' }}</span>
+          </a>
+          @endif
+        </div>
     </aside>    <main class="main-content">
       <div class="position-relative iq-banner">
         <!--Nav Start-->

@@ -249,24 +249,30 @@ body .sidebar.sidebar-default .sidebar-body .sidebar-list #sidebar-menu
   }
 }
 
-/* Administracao: ultima secao, junto ao fim da area lateral (tambem no mobile).
-   Mantem o accordion no mesmo #sidebar-menu e a rolagem independente. */
-.sidebar.sidebar-default > .sidebar-body#sidebar-scroll-region > .sidebar-list {
-  display:flex;
-  flex-direction:column;
-  min-height:100%;
+/* Contexto de painel: rodapé independente da área rolável. */
+.sidebar.sidebar-default .lf-panel-context-label {
+  padding: .65rem; color:var(--lf-sidebar-fg); font-size:.85rem;
+  font-weight:600; overflow-wrap:anywhere;
 }
-.sidebar.sidebar-default #sidebar-menu {
-  display:flex;
-  flex-direction:column;
-  flex:1 1 auto;
-  min-height:100%;
+.sidebar.sidebar-default > .lf-panel-footer {
+  padding:.5rem; padding-bottom:calc(.5rem + env(safe-area-inset-bottom,0px));
 }
-.sidebar.sidebar-default #sidebar-menu > #nav-admin-panel {
-  margin-top:auto;
-  padding-top:12px;
+.sidebar.sidebar-default > .lf-panel-footer:has(.lf-panel-switch) {
   border-top:1px solid var(--lf-sidebar-divider);
 }
+.sidebar.sidebar-default .lf-panel-switch {
+  display:flex; align-items:center; gap:.55rem; min-height:44px;
+  padding:.5rem .65rem; border-radius:10px; color:var(--lf-sidebar-fg);
+  text-decoration:none; line-height:1.35; overflow-wrap:anywhere;
+}
+.sidebar.sidebar-default .lf-panel-switch i {flex:0 0 20px;text-align:center}
+.sidebar.sidebar-default .lf-panel-switch:hover,
+.sidebar.sidebar-default .lf-panel-switch:focus-visible {
+  background:var(--lf-sidebar-hover-bg);color:var(--lf-sidebar-fg);
+}
+.sidebar.sidebar-default.sidebar-mini .lf-panel-context-label,
+.sidebar.sidebar-default.sidebar-mini .lf-panel-switch span {display:none}
+.sidebar.sidebar-default.sidebar-mini .lf-panel-switch {justify-content:center;padding-inline:0}
 .sidebar.sidebar-default #sidebar-menu .lf-panel-theme-link {
   border:0;
   background:transparent;
