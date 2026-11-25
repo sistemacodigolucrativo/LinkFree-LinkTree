@@ -34,3 +34,7 @@ jobs:
         run: node --check linkstack/assets/js/main-dashboard.js
       - name: Security and accessibility static guards
         run: python3 scripts/audit-get-mutation-a11y.py
+      - name: Configuracoes administrativas modulares - testes estaticos
+        run: python3 scripts/audit-admin-config-modules.py
+      - name: Sintaxe do AdminController
+        run: php -l linkstack/app/Http/Controllers/AdminController.php
