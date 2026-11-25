@@ -96,11 +96,33 @@ async function run(){
             assert.equal(await page.locator('h1').filter({hasText:'Gerenciar Usuários'}).isVisible(),false,'Old mobile title still occupies content');
           }
           await page.screenshot({path:shots+'/users-'+width+'-'+mode+'.png',fullPage:true});
-          return {status:200,searchAbove:true,columnFooter:true,createLink:true,mobileTitle:width===375};
+          if(width===375){
+            await search.fill('auditfree');
+            await page.waitForFunction(()=>{
+              const text=document.querySelector('.lf-users-results-card tbody')?.textContent||'';
+              return text.includes('auditfree') && !text.includes('auditadmin');
+            },null,{timeout:20000});
+            await search.fill('');
+            await page.waitForFunction(()=>{
+              const text=document.querySelector('.lf-users-results-card tbody')?.textContent||'';
+              return text.includes('auditadmin') && text.includes('auditfree');
+            },null,{timeout:20000});
+          }
+          return {status:200,searchAbove:true,columnFooter:true,searchFunctional:width===375,createLink:true,mobileTitle:width===375};
         });
         await check('Column selector slim and GET creation '+width,async()=>{
           await page.locator('#lf-user-columns-trigger').click();
           assert(await page.locator('#lf-user-columns-menu').isVisible(),'Slim dropdown did not open');
+          if(width===375){
+            const options=page.locator('#lf-user-columns-menu input[value]');
+            assert(await options.count()>0,'No selectable columns');
+            const first=options.first();
+            const initial=await page.locator('.lf-users-results-card thead th').count();
+            await first.setChecked(!(await first.isChecked()));
+            await page.waitForFunction(count=>
+              document.querySelectorAll('.lf-users-results-card thead th').length!==count,
+              initial,{timeout:20000});
+          }
           await page.locator('.lf-users-add-icon').click();
           await page.waitForURL('**/admin/new-user',{timeout:18000});
           assert.equal(await page.locator('#lf-admin-create-user').count(),1);
@@ -145,7 +167,7 @@ async function run(){
               let response=await member.goto(base+'/studio/links',{waitUntil:'domcontentloaded'});
               assert.equal(response.status(),200);
               const body=member.locator('#links-table-body');
-              const rows=body.locator('[data-id]');
+              const rows=body.locator(':scope > .row[data-id]');
               assert.equal(await rows.count(),20,'First page must render 20 links');
               assert.equal(await body.getAttribute('data-per-page'),'20');
               assert(await member.locator('nav[aria-label="Paginação dos meus links"] a[href*="page=2"]').count()>=1);
