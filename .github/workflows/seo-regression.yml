@@ -7,6 +7,7 @@ on:
       - 'linkstack/app/Http/Controllers/SeoController.php'
       - 'linkstack/app/Http/Controllers/SocialPreviewController.php'
       - 'linkstack/app/Http/Controllers/UserController.php'
+      - 'linkstack/resources/lang/**'
       - 'linkstack/resources/views/**'
       - 'linkstack/routes/web.php'
       - 'linkstack/assets/linkstack/images/**'

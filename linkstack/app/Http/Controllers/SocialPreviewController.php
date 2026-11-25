@@ -23,11 +23,10 @@ class SocialPreviewController extends Controller
 
     public function profile(Request $request, int $id)
     {
-        $user = User::query()->select('id', 'name', 'littlelink_description', 'littlelink_name', 'block')->findOrFail($id);
+        $user = User::query()->select('id', 'name', 'littlelink_name', 'block', 'image', 'theme', 'verified_at', 'verification_visible')->findOrFail($id);
         abort_if($user->block === 'yes' || empty($user->littlelink_name), 404);
         return $this->image($request, PublicSeo::plain($user->name) ?: $user->littlelink_name,
-            PublicSeo::description($user->littlelink_description, 'Confira meus links e canais de contato', 240),
-            PublicSeo::avatar($id));
+            PublicSeo::profileSlogan($user), PublicSeo::avatar($id), true, PublicSeo::profileBadge($user));
     }
 
     public function profileWide(Request $request, int $id)
@@ -35,7 +34,7 @@ class SocialPreviewController extends Controller
         return $this->profile($request, $id);
     }
 
-    private function image(Request $request, string $name, string $description, ?string $avatarPath)
+    private function image(Request $request, string $name, string $description, ?string $avatarPath, bool $profile = false, bool $verified = false)
     {
         if (!function_exists('imagecreatetruecolor') || !function_exists('imagejpeg')) {
             abort(503, 'GD image extension is required for social previews.');
@@ -44,7 +43,7 @@ class SocialPreviewController extends Controller
         $version = $avatarPath ? (@hash_file('sha256', $avatarPath) ?: 'brand') : 'brand';
         // Changing the format changes the ETag, even if no user data changed.
         $fingerprint = hash('sha256', PublicSeo::CARD_VERSION
-            . '|' . $name . '|' . $description . '|' . $version);
+            . '|' . $name . '|' . $description . '|' . $version . '|' . (int) $profile . '|' . (int) $verified);
         $etag = '"' . substr($fingerprint, 0, 32) . '"';
         $headers = [
             'Content-Type' => 'image/jpeg',
@@ -94,9 +93,20 @@ class SocialPreviewController extends Controller
         $cleanDescription = $this->cleanText($description, 240);
 
         $this->drawText($canvas, 'LinkFree', 33, 558, 155, $green, true);
-        [$fittedName, $nameSize] = $this->fitName($cleanName, 550);
+        [$fittedName, $nameSize, $badgeX] = $this->titleLayout($cleanName, $verified);
         $this->drawText($canvas, $fittedName, $nameSize, 558, 253, $white, true);
-        $this->drawLines($canvas, $cleanDescription !== '' ? $cleanDescription : 'Confira meus links e canais de contato', 25, 558, 350, 550, 5, $muted, false, 36);
+        if ($verified) $this->drawBadge($canvas, $badgeX, 232);
+        if ($profile) {
+            [$sloganLines, $sloganSize] = $this->sloganLayout($cleanDescription);
+            // Centre the short quote vertically in the existing text area.
+            $spacing = $sloganSize + 15;
+            $firstY = 396 - (int) round((count($sloganLines) - 1) * $spacing / 2);
+            foreach ($sloganLines as $index => $line) {
+                $this->drawText($canvas, $line, $sloganSize, 558, $firstY + $index * $spacing, $white, false);
+            }
+        } else {
+            $this->drawLines($canvas, $cleanDescription !== '' ? $cleanDescription : 'Confira meus links e canais de contato', 25, 558, 350, 550, 5, $muted, false, 36);
+        }
         imagefilledrectangle($canvas, 558, 524, 1117, 527, $stroke);
         $this->drawText($canvas, 'Um link. Todos os seus caminhos.', 21, 558, 562, $muted, false);
         ob_start();
@@ -109,6 +119,57 @@ class SocialPreviewController extends Controller
         }
         $headers['Content-Length'] = (string) strlen($binary);
         return response($binary, 200, $headers);
+    }
+
+    /** Keep the badge inside the right column and reserve its space before fitting. */
+    private function titleLayout(string $name, bool $verified): array
+    {
+        [$text, $size] = $this->fitName($name, $verified ? 502 : 550);
+        return [$text, $size, 558 + $this->width($text, $size, true) + 27];
+    }
+
+    private function drawBadge($canvas, int $x, int $y): void
+    {
+        // Raster counterpart of the existing blue seal, never a user-supplied emoji.
+        $blue = imagecolorallocate($canvas, 23, 156, 240);
+        $white = imagecolorallocate($canvas, 252, 252, 252);
+        $points = [];
+        for ($i = 0; $i < 48; $i++) {
+            $angle = $i * M_PI / 24 - M_PI / 2;
+            $radius = $i % 4 === 0 ? 16 : ($i % 4 === 2 ? 13 : 15);
+            $points[] = $x + (int) round(cos($angle) * $radius);
+            $points[] = $y + (int) round(sin($angle) * $radius);
+        }
+        imagefilledpolygon($canvas, $points, $blue);
+        imagesetthickness($canvas, 3);
+        imageline($canvas, $x - 7, $y, $x - 2, $y + 5, $white);
+        imageline($canvas, $x - 2, $y + 5, $x + 8, $y - 7, $white);
+        imagesetthickness($canvas, 1);
+    }
+
+    private function sloganLayout(string $text): array
+    {
+        $text = trim($text, " \t\n\r\0\x0B");
+        $text = preg_replace('/^[“”❝❞"«»\s]+|[“”❝❞"«»\s]+$/u', '', $text) ?? '';
+        if ($text === '') $text = 'Confira meus links e canais de contato.';
+        // DejaVu supports ornamental quotes. Use typographic/ascii quotes on
+        // fallback fonts rather than risking missing glyphs.
+        $font = $this->font(false);
+        [$open, $close] = $font && function_exists('imagettftext')
+            ? (str_contains($font, 'DejaVu') ? ['❝', '❞'] : ['“', '”']) : ['"', '"'];
+        $quote = $open . ' ' . $text . ' ' . $close;
+        for ($size = 32; $size >= 24; $size--) {
+            $lines = $this->wrapText($quote, $size, 550, false, 5);
+            if (implode(' ', $lines) === $quote) return [$lines, $size];
+        }
+        $lines = $this->wrapText($quote, 24, 550, false, 5);
+        // Preserve the closing quotation mark even when a very long word is cut.
+        $last = array_key_last($lines);
+        if (!str_ends_with($lines[$last], $close)) {
+            $lastText = preg_replace('/…$/u', '', $lines[$last]) ?? '';
+            $lines[$last] = $this->ellipsize($lastText, 24, 550 - $this->width(' ' . $close, 24, false), false, true) . ' ' . $close;
+        }
+        return [$lines, 24];
     }
 
     /** A single line, with a readable minimum size and grapheme-safe ellipsis. */

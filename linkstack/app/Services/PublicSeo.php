@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 /** Public metadata only. Never use private account fields in cards or markup. */
 final class PublicSeo
 {
-    public const CARD_VERSION = 'linkfree-horizontal-v4';
+    public const CARD_VERSION = 'linkfree-horizontal-v5';
 
     public static function plain(?string $text): string
     {
@@ -121,6 +121,50 @@ final class PublicSeo
         $stat = $avatar ? @stat($avatar) : false;
         $fileVersion = $stat ? basename($avatar) . '|' . $stat['mtime'] . '|' . $stat['size'] : 'brand';
         return substr(hash('sha256', self::CARD_VERSION . '|' . $name . '|' . $description . '|' . $updated . '|' . $fileVersion), 0, 16);
+    }
+
+    public const SLOGAN_LIMIT = 100;
+
+    public static function storedSlogan(?string $settings): string
+    {
+        $data = json_decode((string) $settings, true);
+        $value = is_array($data) ? ($data['social_slogan'] ?? '') : '';
+        return is_string($value) ? self::plain($value) : '';
+    }
+
+    public static function profileSlogan(User $user): string
+    {
+        return self::storedSlogan($user->image) ?: 'Confira meus links e canais de contato.';
+    }
+
+    /** Match public verification visibility, including global and theme switches. */
+    public static function profileBadge(User $user): bool
+    {
+        if (empty($user->verified_at) || !(bool) $user->verification_visible
+            || env('HIDE_VERIFICATION_CHECKMARK') == true) return false;
+        $theme = (string) $user->theme;
+        if ($theme === '' || $theme === 'default') return true;
+        // Only installed, trusted theme configuration inside its own directory.
+        if (!preg_match('/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/D', $theme)) return false;
+        $root = realpath(base_path('themes'));
+        if ($root === false) return false;
+        $directory = $root . DIRECTORY_SEPARATOR . $theme;
+        if (realpath($directory) !== $directory) return false;
+        $file = $directory . DIRECTORY_SEPARATOR . 'config.php';
+        if (!file_exists($file)) return true;
+        if (realpath($file) !== $file || !is_readable($file)) return false;
+        try {
+            $settings = (static function (string $path) { return include $path; })($file);
+            return is_array($settings) && ($settings['disable_verification_badge'] ?? null) != 'true';
+        } catch (\Throwable $exception) {
+            return false;
+        }
+    }
+
+    public static function profileCardVersion(User $user, string $name): string
+    {
+        return self::version($name, self::profileSlogan($user), self::avatar((int) $user->id),
+            (string) $user->updated_at . '|' . (self::profileBadge($user) ? 'verified' : 'unverified'));
     }
 
     public static function homeTitle(): string
