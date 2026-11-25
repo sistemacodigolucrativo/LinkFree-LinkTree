@@ -95,20 +95,19 @@ class SocialPreviewController extends Controller
         $this->drawText($canvas, 'LinkFree', 33, 558, 155, $green, true);
         [$fittedName, $nameSize, $badgeX] = $this->titleLayout($cleanName, $verified);
         $this->drawText($canvas, $fittedName, $nameSize, 558, 253, $white, true);
-        if ($verified) $this->drawBadge($canvas, $badgeX, 232);
+        if ($verified) $this->drawBadge($canvas, $badgeX, $this->badgeCenterY($fittedName, $nameSize, 253));
         if ($profile) {
             [$sloganLines, $sloganSize] = $this->sloganLayout($cleanDescription);
             // Centre the short quote vertically in the existing text area.
-            $spacing = $sloganSize + 15;
-            $firstY = 396 - (int) round((count($sloganLines) - 1) * $spacing / 2);
-            foreach ($sloganLines as $index => $line) {
-                $this->drawText($canvas, $line, $sloganSize, 558, $firstY + $index * $spacing, $white, false);
+            foreach ($this->centeredSlogan($sloganLines, $sloganSize) as [$line, $x, $y]) {
+                $this->drawText($canvas, $line, $sloganSize, $x, $y, $white, false);
             }
         } else {
             $this->drawLines($canvas, $cleanDescription !== '' ? $cleanDescription : 'Confira meus links e canais de contato', 25, 558, 350, 550, 5, $muted, false, 36);
         }
         imagefilledrectangle($canvas, 558, 524, 1117, 527, $stroke);
-        $this->drawText($canvas, 'Um link. Todos os seus caminhos.', 21, 558, 562, $muted, false);
+        $footer = 'Um link. Todos os seus caminhos.';
+        $this->drawText($canvas, $footer, 21, $this->centeredX($footer, 21), 562, $muted, false);
         ob_start();
         $ok = imagejpeg($canvas, null, 86);
         $binary = ob_get_clean();
@@ -124,8 +123,8 @@ class SocialPreviewController extends Controller
     /** Keep the badge inside the right column and reserve its space before fitting. */
     private function titleLayout(string $name, bool $verified): array
     {
-        [$text, $size] = $this->fitName($name, $verified ? 502 : 550);
-        return [$text, $size, 558 + $this->width($text, $size, true) + 27];
+        [$text, $size] = $this->fitName($name, $verified ? 492 : 550);
+        return [$text, $size, 558 + $this->width($text, $size, true) + 36];
     }
 
     private function drawBadge($canvas, int $x, int $y): void
@@ -136,15 +135,48 @@ class SocialPreviewController extends Controller
         $points = [];
         for ($i = 0; $i < 48; $i++) {
             $angle = $i * M_PI / 24 - M_PI / 2;
-            $radius = $i % 4 === 0 ? 16 : ($i % 4 === 2 ? 13 : 15);
+            $radius = $i % 4 === 0 ? 24 : ($i % 4 === 2 ? 19.5 : 22.5);
             $points[] = $x + (int) round(cos($angle) * $radius);
             $points[] = $y + (int) round(sin($angle) * $radius);
         }
         imagefilledpolygon($canvas, $points, $blue);
-        imagesetthickness($canvas, 3);
-        imageline($canvas, $x - 7, $y, $x - 2, $y + 5, $white);
-        imageline($canvas, $x - 2, $y + 5, $x + 8, $y - 7, $white);
+        imagesetthickness($canvas, 5);
+        imageline($canvas, $x - 11, $y, $x - 3, $y + 8, $white);
+        imageline($canvas, $x - 3, $y + 8, $x + 12, $y - 11, $white);
         imagesetthickness($canvas, 1);
+    }
+
+    private function textBounds(string $text, int $size, bool $bold): array
+    {
+        $font = $this->font($bold);
+        $b = $font && function_exists('imagettfbbox') ? imagettfbbox($size, 0, $font, $text) : false;
+        return is_array($b) ? [min($b[0], $b[2], $b[4], $b[6]), min($b[1], $b[3], $b[5], $b[7]), max($b[0], $b[2], $b[4], $b[6]), max($b[1], $b[3], $b[5], $b[7])] : [0, -18, $this->width($text, $size, $bold), -18 + imagefontheight(5)];
+    }
+
+    private function centeredX(string $text, int $size): int
+    {
+        [$left, , $right] = $this->textBounds($text, $size, false);
+        return (int) round((558 + 1117 - $left - $right) / 2);
+    }
+
+    private function badgeCenterY(string $text, int $size, int $baseline): int
+    {
+        [, $top, , $bottom] = $this->textBounds($text, $size, true);
+        return $baseline + (int) round(($top + $bottom) / 2);
+    }
+
+    private function centeredSlogan(array $lines, int $size): array
+    {
+        $spacing = $size + 15;
+        $top = PHP_INT_MAX;
+        $bottom = PHP_INT_MIN;
+        foreach ($lines as $i => $line) {
+            [, $t, , $b] = $this->textBounds($line, $size, false);
+            $top = min($top, $t + $i * $spacing);
+            $bottom = max($bottom, $b + $i * $spacing);
+        }
+        $baseline = (int) round(396 - ($top + $bottom) / 2);
+        return array_map(fn ($line, $i) => [$line, $this->centeredX($line, $size), $baseline + $i * $spacing], $lines, array_keys($lines));
     }
 
     private function sloganLayout(string $text): array
