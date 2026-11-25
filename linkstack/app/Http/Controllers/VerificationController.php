@@ -87,8 +87,8 @@ class VerificationController extends Controller
             ->leftJoin('users as a', 'a.id', '=', 'h.actor_id')
             ->select('h.*', 'u.name as member_name', 'a.name as actor_name')
             ->orderByDesc('h.created_at')
-            ->limit(30)
-            ->get();
+            ->orderByDesc('h.id')
+            ->paginate(20, ['*'], 'history_page')->withQueryString();
 
         return view('panel.verification', [
             'applications' => $applications,
