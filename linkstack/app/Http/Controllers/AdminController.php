@@ -166,11 +166,11 @@ class AdminController extends Controller
       });
 
       return redirect()
-        ->route("showConfig")
+        ->route("admin.config.section", ['section' => 'smtp'])
         ->with("success", "Test email sent successfully!");
     } catch (\Exception $e) {
       return redirect()
-        ->route("showConfig")
+        ->route("admin.config.section", ['section' => 'smtp'])
         ->with("fail", "Failed to send test email.");
     }
   }
@@ -678,7 +678,7 @@ class AdminController extends Controller
       file_put_contents("config/advanced-config.php", $request->AdvancedConfig);
     }
 
-    return redirect("/admin/config#2");
+    return redirect()->route('showFileEditor');
   }
 
   //Saves .env config
@@ -747,9 +747,32 @@ class AdminController extends Controller
   }
 
   //Shows config file editor page
+  private const CONFIG_SECTIONS = [
+    'application' => ['Aplicação', 'Cadastro, verificação, endereço inicial e identidade.'],
+    'panel' => ['Comportamento do painel', 'Notificações e controles de administração.'],
+    'appearance' => ['Aparência e decoração', 'Controles visuais, temas e fundos.'],
+    'security' => ['Segurança e permissões', 'HTML, temas, exportação e importação.'],
+    'advanced' => ['Operação avançada', 'Manutenção, atualização e ajustes avançados.'],
+    'smtp' => ['E-mail e SMTP', 'Envio e configuração de e-mails.'],
+    'footer' => ['Links do rodapé', 'Exibição e destinos dos links do rodapé.'],
+    'debug' => ['Depuração', 'Configurações de debug.'],
+    'language' => ['Idioma', 'Idioma da aplicação.'],
+    'diagnostics' => ['Diagnóstico', 'Informações de diagnóstico sem modificação de dados.'],
+  ];
+
   public function showConfig(request $request)
   {
-    return view("/panel/config-editor");
+    return view('panel.config-editor', ['configSections' => self::CONFIG_SECTIONS]);
+  }
+
+  public function showConfigSection(request $request, string $section)
+  {
+    abort_unless(array_key_exists($section, self::CONFIG_SECTIONS), 404);
+    return view('panel.config-section', [
+      'section' => $section,
+      'sectionTitle' => self::CONFIG_SECTIONS[$section][0],
+      'sectionDescription' => self::CONFIG_SECTIONS[$section][1],
+    ]);
   }
 
   //Shows config file editor page
@@ -871,7 +894,16 @@ class AdminController extends Controller
       }
     }
 
-    return Redirect("/admin/config");
+    // Safe return to a known local configuration section after a POST.
+    $previous = url()->previous();
+    $previousPath = parse_url($previous, PHP_URL_PATH);
+    if (parse_url($previous, PHP_URL_HOST) === $request->getHost()
+        && is_string($previousPath)
+        && preg_match('#^/admin/config/sections/([a-z-]+)$#D', $previousPath, $matches)
+        && array_key_exists($matches[1], self::CONFIG_SECTIONS)) {
+      return redirect()->route('admin.config.section', ['section' => $matches[1]]);
+    }
+    return redirect()->route('showConfig');
   }
 
   //Shows theme editor page

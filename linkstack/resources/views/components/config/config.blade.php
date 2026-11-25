@@ -148,7 +148,7 @@ input[type=radio] + label {
     padding-left: 20px;
 }
 .ch2{
-    padding-top: 60px;
+    padding-top: 8px;
 }
 /* Restrito às abas desta página: não recolorir menu lateral nem a aba ativa. */
 #exTab2 #myTab.nav-tabs .nav-link:not(.active) {
@@ -230,6 +230,7 @@ function text($key){
 ?>
 
 
+@if($section === 'application')
 <a name="Application"><h2 class="ch2">{{__('messages.Application')}}</h2></a>
 
 @if(!config('linkstack.single_user_mode'))
@@ -278,8 +279,9 @@ foreach($users as $user){if($user->littlelink_name != $configValue2){echo '<opti
 
 
 {{toggle('ENABLE_REPORT_ICON')}}
+@endif
 
-
+@if($section === 'panel')
 <a name="Panel-settings"><h2 class="ch2">{{__('messages.Panel settings')}}</h2></a>
 
 {{toggle('NOTIFY_EVENTS')}}
@@ -288,18 +290,27 @@ foreach($users as $user){if($user->littlelink_name != $configValue2){echo '<opti
 {{toggle('NOTIFY_UPDATES')}}
 
 
-{{toggle('ENABLE_BUTTON_EDITOR')}}
 
 
-{{toggle('USE_THEME_PREVIEW_IFRAME')}}
 
 
-{{toggle('ALLOW_CUSTOM_BACKGROUNDS')}}
+
+
+
 
 
 {{toggle('ENABLE_ADMIN_BAR_USERS')}}
+@endif
 
+@if($section === 'appearance')
+<h2 class="ch2">Aparência e personalização</h2>
+<p class="text-muted">Controles de apresentação, edição visual e fundos.</p>
+{{toggle('ENABLE_BUTTON_EDITOR')}}
+{{toggle('USE_THEME_PREVIEW_IFRAME')}}
+{{toggle('ALLOW_CUSTOM_BACKGROUNDS')}}
+@endif
 
+@if($section === 'security')
 <a name="Security"><h2 class="ch2">{{__('messages.Security')}}</h2></a>
 
 
@@ -316,9 +327,9 @@ foreach($users as $user){if($user->littlelink_name != $configValue2){echo '<opti
 
 
 {{toggle('ALLOW_USER_IMPORT')}}
+@endif
 
-
-
+@if($section === 'advanced')
 <a name="Advanced"><h2 class="ch2">{{__('messages.Advanced')}}</h2></a>
 
 {{toggle('JOIN_BETA')}}
@@ -358,6 +369,9 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 
 
 {{-- start SMTP settings --}}
+@endif
+
+@if($section === 'smtp')
 <a name="SMTP"><h2 class="ch2">{{__('messages.SMTP')}}</h2></a>
 <form id="smtp-form" action="{{route('editConfig')}}" enctype="multipart/form-data" method="post">
 <div class="form-group col-lg-8">
@@ -404,6 +418,9 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 
 
 {{-- start footer settings --}}
+@endif
+
+@if($section === 'footer')
 <a name="Footer"><h2 class="ch2">{{__('messages.Footer links')}}</h2></a>
 
 {{toggle('DISPLAY_FOOTER')}}
@@ -443,6 +460,9 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 
 
 {{-- start debug settings --}}
+@endif
+
+@if($section === 'debug')
 <a name="Debug"><h2 class="ch2">{{__('messages.Debug')}}</h2></a>
 <form id="debug-form" action="{{route('editConfig')}}" enctype="multipart/form-data" method="post">
 <div class="form-group col-lg-8">
@@ -459,6 +479,9 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 {{-- end debug settings --}}
 
 {{-- start language --}}
+@endif
+
+@if($section === 'language')
 <a name="Language"><h2 class="ch2">{{__('messages.Language')}}</h2></a>
 <?php $configValue2 = str_replace('"', "", EnvEditor::getKey('LOCALE')); ?>
 <form id="language-form" action="{{route('editConfig')}}" enctype="multipart/form-data" method="post">
@@ -497,23 +520,4 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
     </script>
 </form>
 {{-- end language --}}
-
-
-<br><br><br><br><br>
-
-<script src="{{ asset('assets/external-dependencies/jquery-3.4.1.min.js') }}"></script>
-
-<script type="text/javascript">
-$(document).ready(function () {
-
-    if (localStorage.getItem("my_app_name_here-quote-scroll") != null) {
-        $(window).scrollTop(localStorage.getItem("my_app_name_here-quote-scroll"));
-    }
-
-    $(window).on("scroll", function() {
-        localStorage.setItem("my_app_name_here-quote-scroll", $(window).scrollTop());
-    });
-
-  });
-</script>
-
+@endif
