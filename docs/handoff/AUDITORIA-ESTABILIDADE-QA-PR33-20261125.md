@@ -1,10 +1,12 @@
 # Auditoria técnica: estabilidade do servidor PHP em homologação isolada
 
+> **Atualização após deploy — 25/11/2026:** este documento registra a investigação da instabilidade do CI, **não um teste definitivo de cura do travamento**. Após novas execuções demoradas, o operador determinou adiar `browser-a11y` para `workflow_dispatch`; no último head da PR #33, **7 checks automáticos concluíram em `success` e o browser ficou `skipped`**. Houve merge e deploy posteriores (`88e508554f99faa43fb16142c864897a0da65bf1`). Para a homologação da VPS e os testes manuais autenticados, consulte o [relatório pós-deploy](HOMOLOGACAO-POS-DEPLOY-PR33-20261125.md).
+
 **Data:** 25/11/2026  
 **Projeto:** LinkFree-LinkTree  
 **PR:** https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/33  
 **Branch:** `fix/admin-navigation-audit-20261125`  
-**Ambiente:** GitHub Actions, aplicação sintética local. **Sem alterações na VPS ou deploy.**
+**Ambiente da investigação inicial:** GitHub Actions, aplicação sintética local. **Essa intervenção não alterou a VPS nem realizou deploy; a publicação ocorreu posteriormente, por iniciativa do operador.**
 
 ## 1. Sintoma, investigação e causa provável
 
@@ -38,7 +40,7 @@ A inspeção do workflow e do commit `c4b778d20c420e9005b113d311d58c2dcd28da43` 
 
 Não alterei código de produção, rotas, controllers, banco da VPS ou a cobertura dos testes. Os jobs têm ambientes isolados; a mesma porta é usada apenas dentro de cada job.
 
-## 5. Verificações e resultados
+## 5. Verificações e resultados (snapshot anterior à decisão de adiar o navegador)
 
 | Item | Resultado constatado |
 |---|---|
@@ -54,13 +56,13 @@ Não alterei código de produção, rotas, controllers, banco da VPS ou a cobert
 
 O sucesso pontual de `kill -0` e `curl` verifica atividade naquele instante; não comprova estabilidade durante toda a suíte.
 
-## 6. Homologação obrigatória antes de merge ou deploy
+## 6. Situação final da PR #33 e separação de escopos
 
-1. Conferir [os checks da PR #33](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/33/checks), assegurando que correspondem ao SHA mais recente.
-2. Exigir aprovação dos oito checks; examinar especialmente `browser-a11y`, `http-behavior`, `installer-isolated (sqlite)` e `installer-isolated (mysql)`.
-3. Inspecionar logs, os dois health checks e artefatos de navegador/HTTP, preservando testes ADMIN-NAV, ADMIN-RBAC, ADMIN-ENV, CSRF, interações e acessibilidade.
-4. Se persistirem falhas, correlacionar logs do PHP, timeouts e erros do navegador; distinguir reinício de servidor, processamento single-thread, erro de aplicação e condição de teste. Corrigir apenas defeitos reproduzíveis.
-5. Somente então avaliar merge e publicação. **Nenhum deploy executado nesta atividade.**
+Após repetidos atrasos na etapa `Scan anonymous, member and admin pages with axe-core Chromium`, a execução automática de `browser-a11y` foi **desativada por decisão do operador**, mantendo o job disponível sob acionamento manual (`workflow_dispatch`) e após as dependências HTTP/instalador. Isso **removeu o bloqueio do pipeline**, mas **não validou a estabilidade desse job** e **não é aprovação de acessibilidade**.
+
+No head final da PR `bca238873fd9e3a53e8598f82b49d208bf7b53d4`, os checks `php-lint`, `regression`, `seo-http`, `studio-layout`, `http-behavior` e os dois `installer-isolated` (SQLite e MySQL) terminaram com `success`; `browser-a11y` foi `skipped`. A PR foi integrada à `main` no merge `88e508554f99faa43fb16142c864897a0da65bf1`, posteriormente publicada na VPS pelo operador, com homologação técnica read-only aprovada e verificações manuais informadas.
+
+**Pendência remanescente:** executar, investigar ou reestruturar a suíte manual de navegador/acessibilidade, preservando evidências dos cenários `ADMIN-NAV`, `ADMIN-RBAC`, `ADMIN-ENV`, interações e WCAG. Não afirmar que `ERR_EMPTY_RESPONSE`, timeouts ou bloqueios de navegador foram definitivamente eliminados; o mecanismo de recarga do `.env` era hipótese técnica plausível, não causa exclusiva demonstrada. O [relatório pós-deploy](HOMOLOGACAO-POS-DEPLOY-PR33-20261125.md) delimita quais testes foram efetivamente realizados na produção.
 
 ## 7. Referências da auditoria
 
