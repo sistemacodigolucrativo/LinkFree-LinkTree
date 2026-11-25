@@ -100,7 +100,7 @@ final class PublicSiteContent
                 ],
             ],
             'footer' => [
-                'title' => 'Rodapé e páginas institucionais',
+                'title' => 'Textos dos links do rodapé',
                 'description' => 'Rótulos dos links públicos; ativação dos links e conteúdo legal continuam nas configurações existentes.',
                 'fields' => [
                     'footer_home' => ['label' => 'Texto do link: Início', 'default' => 'Início', 'max' => 80],
