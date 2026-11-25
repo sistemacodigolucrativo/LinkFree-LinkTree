@@ -114,36 +114,34 @@ async function run() {
         return {cancelNoMutation:true,postDeleteOverride:true,redirect302:true,reloadPersisted:true,otherAccountIntact:true};
       } finally {await context.close();}
     });
-    await check('TC-04-D','Admin sidebar confirmation is read-only and explicit POST creates exactly one user',async()=>{
+    await check('TC-04-D','Every admin creation shortcut opens read-only form; only Salvar creates',async()=>{
       const {context,page}=await session('auditadmin');
       try {
         for (const path of ['/admin/overview','/admin/users']) {
           await page.goto(base+path,{waitUntil:'domcontentloaded'});
-          const forms=page.locator('form[action$="/admin/new-user"]');
-          assert((await forms.count())>=1,'Missing creation controls: '+path);
-          assert.equal(await page.locator('a[href$="/admin/new-user"]').count(),1);
-          for (const form of await forms.all()) {
-            assert.equal(await form.getAttribute('method'),'POST');
-            assert.equal(await form.locator('input[name="_token"]').count(),1);
-            assert.equal(await form.locator('button[type="submit"]').count(),1);
-          }
+          assert((await page.locator('a[href$="/admin/new-user"]').count())>=1,'Missing GET shortcut: '+path);
+          assert.equal(await page.locator('form[action$="/admin/new-user"]').count(),0,
+            'Navigation must not submit a POST: '+path);
         }
         const before=scalar('SELECT COUNT(*) FROM users');
         await page.goto(base+'/admin/new-user',{waitUntil:'domcontentloaded'});
         assert.equal(scalar('SELECT COUNT(*) FROM users'),before);
         await page.reload({waitUntil:'domcontentloaded'});
         assert.equal(scalar('SELECT COUNT(*) FROM users'),before);
-        const form=page.locator('form[action$="/admin/new-user"]');
-        assert.equal(await form.count(),1);
+        const form=page.locator('#lf-admin-create-user');
         assert.equal(await form.getAttribute('method'),'POST');
         assert.equal(await form.locator('input[name="_token"]').count(),1);
-        const button=form.locator('button[type="submit"]');
+        await form.locator('[name=name]').fill('Admin-Created-Browser');
+        await form.locator('[name=email]').fill('admin-created-browser@example.test');
+        await form.locator('[name=password]').fill('Synthetic-password-789');
+        assert.equal(scalar('SELECT COUNT(*) FROM users'),before,
+          'Typing into the form must not persist anything');
         const response=page.waitForResponse(res=>new URL(res.url()).pathname==='/admin/new-user'&&res.request().method()==='POST',{timeout:20000});
-        await button.click({timeout:10000});
+        await form.locator('button[type=submit]').click({timeout:10000});
         assert.equal((await response).status(),302);
         await page.waitForURL('**/admin/edit-user/*',{timeout:20000});
         assert.equal(scalar('SELECT COUNT(*) FROM users'),before+1);
-        return {formsWithCsrf:true,post302:true,editorReached:true,createdExactlyOne:true};
+        return {getReadOnly:true,fillReadOnly:true,post302:true,editorReached:true,createdExactlyOne:true};
       } finally {await context.close();}
     });
     await check('TC-04-D','Impersonation browser start, member access and return',async()=>{
@@ -162,7 +160,7 @@ async function run() {
         const returnButton=bar.locator('form[action$="/auth-as"] button[type=submit]');
         await Promise.all([page.waitForURL('**/admin/users',{timeout:20000}),returnButton.click({timeout:20000})]);
         assert.equal(await page.locator('.lf-impersonation-bar').count(),0);
-        await page.locator('form[action$="/admin/new-user"]').first().waitFor({state:'attached'});
+        await page.locator('a[href$="/admin/new-user"]').first().waitFor({state:'attached'});
         return {memberOnly:true,returnButton:true,adminRestored:true};
       } finally {await context.close();}
     });
@@ -221,7 +219,7 @@ async function run() {
             }
             if(path==='/admin/env') assert.equal(await page.locator('h2').filter({hasText:'Variáveis de ambiente'}).count(),1,'Environment editor heading');
             if(path==='/admin/advanced-config') assert(await page.locator('h2').count()>=1,'Advanced editor heading');
-            if(path==='/admin/new-user') assert.equal(await page.locator('form[action$="/admin/new-user"][method="POST"]').count(),1,'Explicit user-creation confirmation');
+            if(path==='/admin/new-user') assert.equal(await page.locator('form[action$="/admin/new-user"][method="POST"]').count(),1,'Direct user-creation form');
             if(path==='/update') assert(await page.locator('h1').filter({hasText:'Atualização da instalação'}).count()===1,'Maintenance page content');
             const leaf=page.locator('#sidebar-menu a.nav-link.active:not(.nav-accordion-toggle)');
             assert.equal(await leaf.count(),1,path+' must have exactly one active destination');

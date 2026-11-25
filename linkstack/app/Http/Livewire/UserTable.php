@@ -20,6 +20,13 @@ class UserTable extends DataTableComponent
         $this->setColumnSelectEnabled();
     }
 
+    // Reuse Rappasoft's state, columns and pagination while changing only
+    // this table's layout; other Livewire tables retain the vendor renderer.
+    public function render()
+    {
+        return view('livewire.admin-user-table', parent::render()->getData());
+    }
+
     public function columns(): array
     {
         return [

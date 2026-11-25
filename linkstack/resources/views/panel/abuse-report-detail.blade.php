@@ -90,6 +90,7 @@
               <li class="list-group-item px-0 text-muted">Nenhum evento registrado.</li>
             @endforelse
           </ol>
+          <nav class="mt-3" aria-label="Páginas do histórico de denúncias">{{ $events->links() }}</nav>
         </div>
       </section>
     </div>

@@ -5,6 +5,7 @@
 
 @section('content')
 <div class="container-fluid content-inner py-2 lf-site-settings-page">
+  @if($siteSection === '')
   <header class="mb-3">
     <h1 class="h3 mb-2"><i class="bi bi-palette" aria-hidden="true"></i> {{ __('messages.Site Customization') }}</h1>
     <p class="text-muted mb-0">Configure a página inicial por áreas, sem percorrer um formulário interminável. As páginas pessoais de cada membro continuam independentes.</p>
@@ -18,17 +19,42 @@
          @if($siteSection === $sectionKey) aria-current="page" @endif>{{ $sectionInfo['title'] }}</a>
     @endforeach
   </nav>
-
-  @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
-  @if(session('fail'))<div class="alert alert-danger" role="alert">{{ session('fail') }}</div>@endif
-  @if($errors->any())
-    <div class="alert alert-danger" role="alert">
-      <strong>Revise os campos informados:</strong>
-      <ul class="mb-0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+  @else
+    <div class="lf-site-section-toolbar mb-3">
+      <h1 class="h5 m-0">
+        {{ $siteSection === 'identity' ? 'Marca e identidade' : $siteSections[$siteSection]['title'] }}
+      </h1>
+      <a href="{{ route('showSite') }}" class="btn btn-sm btn-outline-secondary lf-site-close"
+         aria-label="Fechar seção e voltar à Personalização do Site" title="Voltar à lista de seções">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </a>
     </div>
   @endif
 
-  @if($siteSection === 'identity')
+  @if(session('success') || session('fail') || $errors->any())
+    <div class="lf-site-toast-stack" aria-live="polite">
+      <div class="toast show lf-site-message {{ session('fail') || $errors->any() ? 'lf-site-message-error' : 'lf-site-message-success' }}"
+           role="{{ session('fail') || $errors->any() ? 'alert' : 'status' }}"
+           aria-atomic="true" data-bs-autohide="{{ session('fail') || $errors->any() ? 'false' : 'true' }}"
+           data-bs-delay="6500">
+        <div class="toast-header">
+          <strong class="me-auto">{{ session('fail') || $errors->any() ? 'Não foi possível salvar' : 'Alteração salva' }}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Fechar notificação"></button>
+        </div>
+        <div class="toast-body">
+          @if(session('success')){{ session('success') }}@endif
+          @if(session('fail')){{ session('fail') }}@endif
+          @if($errors->any())
+            <ul class="mb-0 ps-3">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+          @endif
+        </div>
+      </div>
+    </div>
+  @endif
+
+  @if($siteSection === '')
+    {{-- Hub only: the section editor is not rendered below these links. --}}
+  @elseif($siteSection === 'identity')
     <section class="card rounded lf-site-form-card" aria-labelledby="lf-site-brand-title">
       <div class="card-body p-3 p-md-4">
         <h2 id="lf-site-brand-title" class="h4 mb-2">Marca, imagens e mensagem inicial</h2>
@@ -126,4 +152,13 @@
     @endif
   @endif
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.lf-site-message.toast').forEach(function (node) {
+    if (window.bootstrap && window.bootstrap.Toast) {
+      window.bootstrap.Toast.getOrCreateInstance(node).show();
+    }
+  });
+});
+</script>
 @endsection

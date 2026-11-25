@@ -1,0 +1,51 @@
+name: Admin UX targeted regression (synthetic)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'linkstack/app/Http/Controllers/AdminController.php'
+      - 'linkstack/app/Http/Controllers/VerificationController.php'
+      - 'linkstack/app/Http/Controllers/AbuseReportController.php'
+      - 'linkstack/app/Http/Livewire/UserTable.php'
+      - 'linkstack/app/Services/PublicSiteContent.php'
+      - 'linkstack/resources/views/panel/**'
+      - 'linkstack/resources/views/layouts/sidebar.blade.php'
+      - 'linkstack/resources/views/livewire/admin-user-table.blade.php'
+      - 'linkstack/assets/css/linkfree-admin-management.css'
+      - 'scripts/qa-isolated/admin_ux_smoke.cjs'
+      - 'scripts/qa-isolated/run_config_browser_smoke.sh'
+      - '.github/workflows/admin-ux-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  admin-ux-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate changed PHP, JavaScript and fixture shell syntax
+        run: |
+          php -l linkstack/app/Http/Controllers/AdminController.php
+          php -l linkstack/app/Http/Controllers/VerificationController.php
+          php -l linkstack/app/Http/Controllers/AbuseReportController.php
+          php -l linkstack/app/Http/Livewire/UserTable.php
+          node --check scripts/qa-isolated/admin_ux_smoke.cjs
+          bash -n scripts/qa-isolated/run_config_browser_smoke.sh
+      - name: Run isolated Chromium only on newly affected UX paths
+        timeout-minutes: 10
+        env:
+          QA_ADMIN_UX_ONLY: '1'
+        run: bash scripts/qa-isolated/run_config_browser_smoke.sh
+      - name: Upload evidence without production data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linkfree-admin-ux-synthetic
+          path: |
+            /tmp/linkfree-audit/admin-ux-smoke-results.json
+            /tmp/linkfree-audit/admin-ux-screenshots/
+          if-no-files-found: warn
+          retention-days: 30

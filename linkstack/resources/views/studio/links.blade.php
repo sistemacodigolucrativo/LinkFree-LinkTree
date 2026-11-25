@@ -423,9 +423,12 @@ if (isset($_COOKIE['LinkCount'])) {
                                     </script>
                                 </div>
 
-                                <div class="d-flex justify-content-center">
-                                    {!! $links ?? ''->links() !!}
-                                </div>
+                                <nav class="d-flex flex-wrap align-items-center justify-content-between gap-2"
+                                     aria-label="Paginação dos meus links">
+                                    <span class="small text-muted">Showing {{ $links->firstItem() ?? 0 }}
+                                      to {{ $links->lastItem() ?? 0 }} of {{ $links->total() }} results</span>
+                                    {{ $links->links() }}
+                                </nav>
 
                                 </div>
                             </section>

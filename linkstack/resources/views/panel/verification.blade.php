@@ -91,6 +91,7 @@
           </tbody>
         </table>
       </div>
+      <nav aria-label="Páginas do histórico de selos">{{ $history->links() }}</nav>
     </div>
   </div>
 </div>

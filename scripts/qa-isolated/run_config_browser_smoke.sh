@@ -56,6 +56,8 @@ done
 cd "$GITHUB_WORKSPACE"
 if [ "${QA_DARK_TRANSITION_ONLY:-0}" = "1" ]; then
   timeout 360s node scripts/qa-isolated/dark_transition_filmstrip.cjs
+elif [ "${QA_ADMIN_UX_ONLY:-0}" = "1" ]; then
+  timeout 360s node scripts/qa-isolated/admin_ux_smoke.cjs
 else
   timeout 360s node scripts/qa-isolated/config_browser_smoke.cjs
 fi

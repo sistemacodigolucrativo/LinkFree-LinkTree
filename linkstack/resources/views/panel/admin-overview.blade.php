@@ -11,14 +11,14 @@
     $sections = [
       __('messages.lf_admin_users') => [
         ['route' => 'showUsers', 'icon' => 'bi-people', 'label' => __('messages.Manage Users')],
-        ['route' => 'createNewUser', 'icon' => 'bi-person-plus', 'label' => __('messages.Nav Admin New User')],
+        ['route' => 'showNewUser', 'icon' => 'bi-person-plus', 'label' => __('messages.Nav Admin New User')],
          ['route' => 'admin.referrals', 'icon' => 'bi-people', 'label' => 'Indicações'],
          ['route' => 'admin.verification', 'icon' => 'bi-patch-check', 'label' => 'Solicitações de selo'],
          ['route' => 'admin.abuse-reports.index', 'icon' => 'bi-flag', 'label' => 'Central de denúncias'],
       ],
       __('messages.lf_admin_site') => [
         ['route' => 'showSite', 'icon' => 'bi-globe', 'label' => __('messages.Site Customization')],
-        ['route' => 'showSitePage', 'icon' => 'bi-file-earmark-text', 'label' => __('messages.Footer Pages')],
+        ['route' => 'showSitePage', 'icon' => 'bi-file-earmark-text', 'label' => 'Páginas institucionais'],
       ],
       __('messages.lf_admin_themes') => [
         ['route' => 'showThemes', 'icon' => 'bi-brush', 'label' => __('messages.Nav Admin Theme Manager')],
@@ -37,15 +37,9 @@
      <h3 class="h6 fw-bold">{{ $title }}</h3>
      <div class="d-grid gap-2">
       @foreach($items as $item)
-       @if($item['route'] === 'createNewUser')
-        <form method="POST" action="{{ route('createNewUser') }}" class="d-grid m-0">@csrf
-         <button type="submit" class="btn btn-outline-primary text-start"><i class="bi {{ $item['icon'] }}" aria-hidden="true"></i> {{ $item['label'] }}</button>
-        </form>
-       @else
-        <a class="btn btn-outline-primary text-start" href="{{ route($item['route']) }}">
+       <a class="btn btn-outline-primary text-start" href="{{ route($item['route']) }}">
          <i class="bi {{ $item['icon'] }}" aria-hidden="true"></i> {{ $item['label'] }}
-        </a>
-       @endif
+       </a>
       @endforeach
      </div>
     </div>
