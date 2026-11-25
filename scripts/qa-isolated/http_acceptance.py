@@ -101,7 +101,7 @@ def get_mutations():
             status,_,_ = cli.request('GET',url)
             expect(status == 405, f'GET {url} not rejected with 405 (got {status})')
     status, _, body = admin.request('GET', '/admin/new-user')
-    expect(status == 200, f'New user confirmation returned {status}')
+    expect(status == 200, f'New user form returned {status}')
     for cli in (member, anonymous):
         status, _, _ = cli.request('GET', '/admin/new-user')
         expect(status in (302, 403), f'Unauthorized confirmation returned {status}')
@@ -203,17 +203,43 @@ def admin_create_user():
         status, headers, _ = admin.request('POST', '/admin/new-user', payload, json_response=True)
         expect(value('SELECT COUNT(*) FROM users') == before, 'Account created without valid CSRF')
         expect(status == 419 or (status == 302 and urllib.parse.urlparse(headers.get('Location','')).path == '/login'), f'Unexpected CSRF response {status}')
+
     token = member.token('/studio/links')
     status, _, _ = member.request('POST', '/admin/new-user', {'_token':token}, json_response=True)
     expect(status in (302, 403), f'Non-admin creation returned {status}')
     expect(value('SELECT COUNT(*) FROM users') == before, 'Non-admin created account')
-    token = admin.token('/admin/users')
-    status, headers, _ = admin.request('POST', '/admin/new-user', {'_token':token})
-    expect(status == 302 and '/admin/edit-user/' in headers.get('Location',''), f'Admin creation did not redirect: {status}')
-    expect(value('SELECT COUNT(*) FROM users') == before + 1, 'Expected exactly one new account')
+
+    status, _, html = admin.request('GET', '/admin/new-user')
+    expect(status == 200 and 'id="lf-admin-create-user"' in html and 'Salvar usuário' in html,
+           'GET must render the direct creation form')
+    expect(value('SELECT COUNT(*) FROM users') == before, 'GET persisted an account')
+
+    token = admin.token('/admin/new-user')
+    status, _, _ = admin.request('POST', '/admin/new-user', {'_token': token}, json_response=True)
+    expect(status == 422, f'Incomplete form must reject with 422: {status}')
+    expect(value('SELECT COUNT(*) FROM users') == before, 'Validation failure created a user')
+
+    payload = {'_token': token, 'name': 'Admin-Created-Audit',
+               'email': 'admin-created-audit@example.test', 'password': 'Synthetic-password-456',
+               'role': 'admin', 'block': 'yes'}
+    status, headers, _ = admin.request('POST', '/admin/new-user', payload)
+    expect(status == 302 and '/admin/edit-user/' in headers.get('Location',''),
+           f'Admin save did not redirect to editor: {status}')
+    expect(value('SELECT COUNT(*) FROM users') == before + 1, 'Save should create exactly one user')
     new_id = int(headers['Location'].rstrip('/').split('/')[-1])
-    expect(value("SELECT COUNT(*) FROM users WHERE id=? AND name LIKE 'Admin-Created-%'", (new_id,)) == 1, 'Created account missing')
-    return {'csrfDenied':True,'nonAdminDenied':True,'createdExactlyOne':True,'redirectedToEditor':True}
+    expect(value("SELECT COUNT(*) FROM users WHERE id=? AND name=?", (new_id,'Admin-Created-Audit')) == 1,
+           'Saved user missing')
+    expect(value("SELECT role FROM users WHERE id=?", (new_id,)) != 'admin',
+           'Caller-selected admin role was persisted')
+    expect(value("SELECT block FROM users WHERE id=?", (new_id,)) == 'no',
+           'Caller-selected blocked state was persisted')
+    status, _, _ = admin.request('POST', '/admin/new-user', payload, json_response=True)
+    expect(status == 422, 'Duplicate email must be rejected')
+    expect(value('SELECT COUNT(*) FROM users') == before + 1,
+           'Duplicate submission created another user')
+    return {'getReadOnly':True,'invalidFormReadOnly':True,
+            'csrfDenied':True,'nonAdminDenied':True,'serverControlledRole':True,
+            'createdExactlyOne':True,'duplicateBlocked':True,'redirectedToEditor':True}
 
 check('TC-04-D','Admin account creation requires POST, CSRF and administrator privileges',admin_create_user)
 
