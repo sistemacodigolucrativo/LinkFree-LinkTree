@@ -3,7 +3,7 @@
 **Data:** 25/11/2026  
 **Repositório:** sistemacodigolucrativo/LinkFree-LinkTree  
 **Branch:** `test/dark-transition-filmstrip-20261125`  
-**Estado:** teste focado implementado; não declarar resultado antes de examinar o job. Nenhum arquivo de aplicação, Sidebar ou banco de produção modificado.
+**Estado:** primeira execução encontrou flash claro no reload; correção cirúrgica implementada apenas no bootstrap de tema, **aguardando reexecução**. Sidebar não modificada; nenhuma alteração em produção.
 
 ## 1. Verificação prévia: não repetir verificações existentes
 
@@ -17,7 +17,7 @@ O head da PR #34, `beb7e5cfbe5981b2f74e421c7865de47ba68e533`, foi integrado à `
 | Exame `browser-a11y` completo | `skipped`, execução manual | Não interpretar como aprovação |
 | Captura de quadros **durante** navegação/post/reload para detecção de flash | Busca por `Page.startScreencast` e `screencastFrame` não identificou harness anterior | **Lacuna comprovada** |
 
-**Critério de reutilização:** se uma alteração posterior mudar um arquivo ou comportamento diretamente abrangido por um desses testes, a evidência anterior deixa de ser suficiente para aquele escopo. A presente PR adiciona apenas harness e documentação, sem alterar layout, tema, rotas ou regras de negócio. O runner original mantém a execução anterior quando `QA_DARK_TRANSITION_ONLY` não está configurado.
+**Critério de reutilização:** se uma alteração posterior mudar um arquivo ou comportamento diretamente abrangido por um desses testes, a evidência anterior deixa de ser suficiente para aquele escopo. A primeira revisão adicionou apenas harness e documentação. **Após a falha observada no reload, esta PR passou a modificar exclusivamente `assets/js/detect-dark-mode.js`**, que é parte direta do mecanismo de tema. Por isso os testes diretamente afetados, incluindo o Chromium de configurações e as verificações de modo claro/escuro/automático, devem ser executados novamente. As evidências HTTP de rotas e banco permanecem reaproveitáveis quanto ao seu escopo, embora o CI também possa dispará-las automaticamente. O runner original mantém a execução anterior quando `QA_DARK_TRANSITION_ONLY` não está configurado.
 
 ## 2. Mecanismos existentes — não corrigir por presunção
 
@@ -51,4 +51,25 @@ A suíte `scripts/qa-isolated/dark_transition_filmstrip.cjs` trabalha exclusivam
 
 Somente após logs e PNGs objetivos é permitido classificar os casos executados como **PASS** ou **FAIL**. Se houver frames brancos, investigar a causa antes de modificar código; se forem todos verdes, registrar que o fluxo representativo foi aprovado, mantendo pendências restritas aos ambientes não cobertos.
 
-**Sem merge, sem deploy nesta etapa de instrumentação.** Uma eventual correção do tema exigirá nova validação direta dos comportamentos afetados, sem reutilizar indevidamente resultados anteriores.
+## 5. Primeira execução — diagnóstico real e correção localizada
+
+**PR:** [#35](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/pull/35)  
+**Execução inicial:** [Run 45687935291](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45687935291)  
+**Artefato:** `linkfree-dark-transition-filmstrip-synthetic`, id `15057536973`.
+
+| Caso | Quadros válidos | Máxima porcentagem quase branca | Resultado |
+|---|---:|---:|---|
+| Navegação móvel 375px tema escuro | 43 | 17,65% | PASS |
+| POST + redirecionamento móvel | 52 | 0% | PASS |
+| Reload móvel 375px | 38 | **98,93%** | **FAIL** |
+| Navegação desktop 1280px escuro | 40 | 15,51% | PASS |
+
+O PNG `reload-375-worst.png` foi inspecionado: mostra a barra lateral e a área central temporariamente no **visual do tema claro** durante o reload, e não apenas uma página branca vazia. O primeiro e o último frame do mesmo caso mostram fundo `#222738`, comprovando um estado intermediário claro. Assim, a hipótese inicial de simples erro do gravador de frames ficou enfraquecida.
+
+**Causa técnica correlacionada com o código:** `layouts/sidebar.blade.php` já aplicava a classe `lf-prepaint-dark` no elemento `html` cedo, mas a paleta de componentes em `linkfree-color-modes.css` depende de `body.dark`, que era aplicado pelo `setting.js` carregado no rodapé. Isso permitia pintar os componentes com o tema claro durante a reconstrução do DOM.
+
+**Correção cirúrgica:** no arquivo `linkstack/assets/js/detect-dark-mode.js`, carregado no `head`, pré-aplicar `html.lf-prepaint-dark` e registrar `MutationObserver` que adiciona `body.dark` assim que o elemento `body` nasce, antes da próxima oportunidade de renderização. Preservam-se os demais atributos e classes; `setting.js` continua responsável por controles e mudanças de tema. A regra do usuário de **não modificar a Sidebar** permanece integralmente atendida.
+
+**Regressões exigidas após a alteração direta:** reexecutar as quatro capturas, verificar preferência automática `auto` com sistema em claro e escuro, e a suíte Chromium de configurações (o script de bootstrap é compartilhado). Não declarar sucesso até examinar os logs da nova revisão; se houver flash residual, revisar os quadros antes de novo ajuste.
+
+**Sem merge, sem deploy nesta etapa de validação.** A implementação e os resultados devem permanecer rastreáveis e não se deve afirmar que a anomalia acabou em todos os navegadores e dispositivos com base apenas em Chromium isolado.
