@@ -219,8 +219,10 @@ require("auth()->user()->role === 'admin'" in admin_overview and
         "Route::get('/admin/overview'" in web_routes and
         "route('adminOverview')" in sidebar,
         "Admin statistics guarded and reachable in administrative menu")
-require('<h5 class="mb-2">{{__(\'messages.Select Action\')}}:</h5>' in users_view,
-        "Admin users heading closes correctly")
+require("@section('mobile-navbar-title')" in users_view and
+        '<h1 class="h4 mb-3 d-none d-lg-block">' in users_view and
+        '</h1>' in users_view,
+        "Admin users heading uses mobile navbar slot and desktop semantic H1")
 require('style="height:100vh;"' not in profile_view,
         "Account deletion confirmation cannot force a whole extra viewport")
 require('min-height:420px' not in theme and 'height:min(60dvh,640px)' in theme,
