@@ -146,108 +146,6 @@ async function run() {
         return {formsWithCsrf:true,post302:true,editorReached:true,createdExactlyOne:true};
       } finally {await context.close();}
     });
-    await check('ADMIN-NAV','All 17 administrative destinations and responsive sidebar',async()=>{
-      const {context,page}=await session('auditadmin');
-      try {
-        const paths=['/admin/overview','/admin/users','/admin/new-user','/admin/referrals','/admin/verification','/admin/reports','/admin/site','/admin/pages','/admin/theme','/admin/github-themes','/admin/linktype','/admin/config','/admin/backups','/admin/advanced-config','/admin/env','/admin/phpinfo','/update'];
-        for(const width of [1280,768,375]){
-          await page.setViewportSize({width,height:900});
-          for(const path of paths){
-            const res=await page.goto(base+path,{waitUntil:'domcontentloaded'});
-            assert.equal(res.status(),200,path+' HTTP '+res.status());
-            assert.equal(new URL(page.url()).pathname,path,'Unexpected destination '+path);
-            assert.equal(await page.locator('[data-panel-context="admin"]').count(),1,path+' panel context');
-            if(path==='/admin/phpinfo'){
-              assert.equal(await page.locator('#php-diagnostics').count(),1,'Safe PHP diagnostic content');
-              assert.equal(await page.locator('iframe[title="Informações técnicas do PHP"]').count(),0,'Raw phpinfo must not be rendered');
-              assert.equal(await page.locator('#download-php-diagnostics').count(),1,'Diagnostic download preserved');
-              const secret=fs.readFileSync(root+'/.env','utf8').split(/\r?\n/).find(v=>v.startsWith('APP_KEY='));
-              if(secret) assert(!(await page.content()).includes(secret),'APP_KEY leaked into PHP diagnostic page');
-            }
-            if(path==='/admin/env') assert.equal(await page.locator('h2').filter({hasText:'Variáveis de ambiente'}).count(),1,'Environment editor heading');
-            if(path==='/admin/advanced-config') assert(await page.locator('h2').count()>=1,'Advanced editor heading');
-            if(path==='/admin/new-user') assert.equal(await page.locator('form[action$="/admin/new-user"][method="POST"]').count(),1,'Explicit user-creation confirmation');
-            if(path==='/update') assert(await page.locator('h1').filter({hasText:'Atualização da instalação'}).count()===1,'Maintenance page content');
-            const leaf=page.locator('#sidebar-menu a.nav-link.active:not(.nav-accordion-toggle)');
-            assert.equal(await leaf.count(),1,path+' must have exactly one active destination');
-            assert.equal(new URL(await leaf.getAttribute('href'),base).pathname,path,path+' active link points elsewhere');
-            const submenu=leaf.locator('xpath=ancestor::ul[contains(concat(" ", normalize-space(@class), " "), " sub-nav ")]');
-            if(await submenu.count()){
-              assert((await submenu.getAttribute('class')).includes('show'),path+' parent submenu is collapsed');
-              const menuId=await submenu.getAttribute('id');
-              assert.equal(await page.locator('#sidebar-menu a[aria-controls="'+menuId+'"]').getAttribute('aria-expanded'),'true',path+' accordion indicator');
-            }
-            assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),path+' horizontal overflow at '+width);
-          }
-        }
-        return {destinations:paths.length,viewports:3};
-      } finally {await context.close();}
-    });
-    await check('ADMIN-ACCORDIONS','Administrative category accordions expand and collapse on desktop and mobile',async()=>{
-      const {context,page}=await session('auditadmin');
-      try {
-        await page.goto(base+'/admin/overview',{waitUntil:'load'});
-        for(const id of ['admin-users-menu','admin-site-menu','admin-themes-menu','admin-system-menu']){
-          const toggle=page.locator('#sidebar-menu a[aria-controls="'+id+'"]');
-          const submenu=page.locator('#'+id);
-          assert.equal(await toggle.getAttribute('aria-expanded'),'false',id+' expected collapsed');
-          await toggle.click();
-          await submenu.waitFor({state:'visible',timeout:10000});
-          assert.equal(await toggle.getAttribute('aria-expanded'),'true',id+' did not expand');
-          await toggle.click();
-          await page.waitForFunction(menuId=>!document.getElementById(menuId).classList.contains('show'),id,{timeout:10000});
-          assert.equal(await toggle.getAttribute('aria-expanded'),'false',id+' did not collapse');
-        }
-        await page.setViewportSize({width:375,height:900});
-        await page.goto(base+'/admin/overview',{waitUntil:'load'});
-        const sidebar=page.locator('.sidebar-default');
-        const toggle=page.locator('.main-content [data-toggle="sidebar"]').first();
-        assert.equal(await toggle.count(),1,'Mobile sidebar toggle missing');
-        if((await sidebar.getAttribute('class')).includes('sidebar-mini')){
-          await toggle.click();
-          await page.waitForFunction(()=>!document.querySelector('.sidebar-default').classList.contains('sidebar-mini'));
-        }
-        const category=page.locator('#sidebar-menu a[aria-controls="admin-users-menu"]');
-        await category.click();
-        assert.equal(await category.getAttribute('aria-expanded'),'true','Mobile submenu not expanded');
-        await page.keyboard.press('Escape');
-        await page.waitForFunction(()=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini'));
-        return {desktopAccordions:4,mobileExpanded:true,escapeCloses:true};
-      } finally {await context.close();}
-    });
-    await check('ADMIN-RBAC','Admin-only destinations reject member and anonymous clients',async()=>{
-      const routes=['/admin/overview','/admin/users','/admin/new-user','/admin/referrals','/admin/verification','/admin/reports','/admin/site','/admin/pages','/admin/theme','/admin/github-themes','/admin/linktype','/admin/config','/admin/backups','/admin/advanced-config','/admin/env','/admin/phpinfo','/update'];
-      const {context:member}=await session('auditfree');
-      const guest=await browser.newContext();
-      try {
-        for(const path of routes){
-          const memberResponse=await member.request.get(base+path,{maxRedirects:0});
-          assert([302,401,403].includes(memberResponse.status()),path+' unauthorized member HTTP '+memberResponse.status());
-          const guestResponse=await guest.request.get(base+path,{maxRedirects:0});
-          assert([302,401,403].includes(guestResponse.status()),path+' anonymous HTTP '+guestResponse.status());
-        }
-        return {destinations:routes.length,memberDenied:true,anonymousDenied:true};
-      } finally {await member.close();await guest.close();}
-    });
-    await check('ADMIN-ENV','Allowed environment edit preserves all other entries',async()=>{
-      const {context,page}=await session('auditadmin');
-      const file=root+'/.env';
-      const before=fs.readFileSync(file,'utf8');
-      try {
-        await page.goto(base+'/admin/env',{waitUntil:'domcontentloaded'});
-        const form=page.locator('form[action$="/admin/env"]');
-        assert.equal(await form.count(),1);
-        const name=form.locator('[name="APP_NAME"]');
-        await name.fill('Audit Safe Name');
-        assert.equal(await form.locator('[name="APP_KEY"],[name="DB_PASSWORD"],[name="altConfig"]').count(),0);
-        await Promise.all([page.waitForURL('**/admin/env'),form.locator('button[type="submit"]').click()]);
-        const after=fs.readFileSync(file,'utf8');
-        assert(after.includes('Audit Safe Name'),'Allowed value not saved');
-        const protectedLines=v=>v.split(/\r?\n/).filter(l=>!/^\s*(APP_NAME|APP_LOCALE|LOG_LEVEL)\s*=/.test(l)).filter(l=>l.trim()).sort();
-        assert.deepEqual(protectedLines(after),protectedLines(before),'Protected environment entries changed');
-        return {allowedWrite:true,protectedEntriesPreserved:true};
-      } finally {fs.writeFileSync(file,before);await context.close();}
-    });
     await check('TC-04-D','Impersonation browser start, member access and return',async()=>{
       const {context,page}=await session('auditadmin');
       try {
@@ -302,6 +200,114 @@ async function run() {
         assert.equal(scalar('SELECT COUNT(*) FROM users WHERE id=1'),1);
         return {cancelPreserves:true,confirmed:true,reloadPersisted:true,rootPreserved:true};
       } finally {await context.close();}
+    });
+    await check('ADMIN-NAV','All 17 administrative destinations and responsive sidebar',async()=>{
+      const {context,page}=await session('auditadmin');
+      try {
+        const paths=['/admin/overview','/admin/users','/admin/new-user','/admin/referrals','/admin/verification','/admin/reports','/admin/site','/admin/pages','/admin/theme','/admin/github-themes','/admin/linktype','/admin/config','/admin/backups','/admin/advanced-config','/admin/env','/admin/phpinfo','/update'];
+        for(const width of [1280,768,375]){
+          await page.setViewportSize({width,height:900});
+          for(const path of paths){
+            const res=await page.goto(base+path,{waitUntil:'domcontentloaded'});
+            assert.equal(res.status(),200,path+' HTTP '+res.status());
+            assert.equal(new URL(page.url()).pathname,path,'Unexpected destination '+path);
+            assert.equal(await page.locator('[data-panel-context="admin"]').count(),1,path+' panel context');
+            if(path==='/admin/phpinfo'){
+              assert.equal(await page.locator('#php-diagnostics').count(),1,'Safe PHP diagnostic content');
+              assert.equal(await page.locator('iframe[title="Informações técnicas do PHP"]').count(),0,'Raw phpinfo must not be rendered');
+              assert.equal(await page.locator('#download-php-diagnostics').count(),1,'Diagnostic download preserved');
+              const secret=fs.readFileSync(root+'/.env','utf8').split(/\r?\n/).find(v=>v.startsWith('APP_KEY='));
+              if(secret) assert(!(await page.content()).includes(secret),'APP_KEY leaked into PHP diagnostic page');
+            }
+            if(path==='/admin/env') assert.equal(await page.locator('h2').filter({hasText:'Variáveis de ambiente'}).count(),1,'Environment editor heading');
+            if(path==='/admin/advanced-config') assert(await page.locator('h2').count()>=1,'Advanced editor heading');
+            if(path==='/admin/new-user') assert.equal(await page.locator('form[action$="/admin/new-user"][method="POST"]').count(),1,'Explicit user-creation confirmation');
+            if(path==='/update') assert(await page.locator('h1').filter({hasText:'Atualização da instalação'}).count()===1,'Maintenance page content');
+            const leaf=page.locator('#sidebar-menu a.nav-link.active:not(.nav-accordion-toggle)');
+            assert.equal(await leaf.count(),1,path+' must have exactly one active destination');
+            assert.equal(new URL(await leaf.getAttribute('href'),base).pathname,path,path+' active link points elsewhere');
+            const submenu=leaf.locator('xpath=ancestor::ul[contains(concat(" ", normalize-space(@class), " "), " sub-nav ")]');
+            if(await submenu.count()){
+              assert((await submenu.getAttribute('class')).includes('show'),path+' parent submenu is collapsed');
+              const menuId=await submenu.getAttribute('id');
+              assert.equal(await page.locator('#sidebar-menu a[aria-controls="'+menuId+'"]').getAttribute('aria-expanded'),'true',path+' accordion indicator');
+            }
+            assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),path+' horizontal overflow at '+width);
+          }
+        }
+        return {destinations:paths.length,viewports:3};
+      } finally {await context.close();}
+    });
+    await check('ADMIN-ACCORDIONS','Administrative category accordions expand and collapse on desktop and mobile',async()=>{
+      const {context,page}=await session('auditadmin');
+      try {
+        await page.goto(base+'/admin/overview',{waitUntil:'load'});
+        for(const id of ['admin-users-menu','admin-site-menu','admin-themes-menu','admin-system-menu']){
+          const toggle=page.locator('#sidebar-menu a[aria-controls="'+id+'"]');
+          const submenu=page.locator('#'+id);
+          assert.equal(await toggle.getAttribute('aria-expanded'),'false',id+' expected collapsed');
+          await toggle.click();
+          await page.waitForFunction(menuId=>{
+            const el=document.getElementById(menuId);
+            return el.classList.contains('show')&&!el.classList.contains('collapsing');
+          },id,{timeout:10000});
+          assert.equal(await toggle.getAttribute('aria-expanded'),'true',id+' did not expand');
+          await toggle.click();
+          await page.waitForFunction(menuId=>{
+            const el=document.getElementById(menuId);
+            return !el.classList.contains('show')&&!el.classList.contains('collapsing');
+          },id,{timeout:10000});
+          assert.equal(await toggle.getAttribute('aria-expanded'),'false',id+' did not collapse');
+        }
+        await page.setViewportSize({width:375,height:900});
+        await page.goto(base+'/admin/overview',{waitUntil:'load'});
+        const sidebar=page.locator('.sidebar-default');
+        const toggle=page.locator('.main-content [data-toggle="sidebar"]').first();
+        assert.equal(await toggle.count(),1,'Mobile sidebar toggle missing');
+        if((await sidebar.getAttribute('class')).includes('sidebar-mini')){
+          await toggle.click();
+          await page.waitForFunction(()=>!document.querySelector('.sidebar-default').classList.contains('sidebar-mini'));
+        }
+        const category=page.locator('#sidebar-menu a[aria-controls="admin-users-menu"]');
+        await category.click();
+        assert.equal(await category.getAttribute('aria-expanded'),'true','Mobile submenu not expanded');
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(()=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini'));
+        return {desktopAccordions:4,mobileExpanded:true,escapeCloses:true};
+      } finally {await context.close();}
+    });
+    await check('ADMIN-RBAC','Admin-only destinations reject member and anonymous clients',async()=>{
+      const routes=['/admin/overview','/admin/users','/admin/new-user','/admin/referrals','/admin/verification','/admin/reports','/admin/site','/admin/pages','/admin/theme','/admin/github-themes','/admin/linktype','/admin/config','/admin/backups','/admin/advanced-config','/admin/env','/admin/phpinfo','/update'];
+      const {context:member}=await session('auditfree');
+      const guest=await browser.newContext();
+      try {
+        for(const path of routes){
+          const memberResponse=await member.request.get(base+path,{maxRedirects:0});
+          assert([302,401,403].includes(memberResponse.status()),path+' unauthorized member HTTP '+memberResponse.status());
+          const guestResponse=await guest.request.get(base+path,{maxRedirects:0});
+          assert([302,401,403].includes(guestResponse.status()),path+' anonymous HTTP '+guestResponse.status());
+        }
+        return {destinations:routes.length,memberDenied:true,anonymousDenied:true};
+      } finally {await member.close();await guest.close();}
+    });
+    await check('ADMIN-ENV','Allowed environment edit preserves all other entries',async()=>{
+      const {context,page}=await session('auditadmin');
+      const file=root+'/.env';
+      const before=fs.readFileSync(file,'utf8');
+      try {
+        await page.goto(base+'/admin/env',{waitUntil:'domcontentloaded'});
+        const form=page.locator('form[action$="/admin/env"]');
+        assert.equal(await form.count(),1);
+        const name=form.locator('[name="APP_NAME"]');
+        await name.fill('Audit Safe Name');
+        assert.equal(await form.locator('[name="APP_KEY"],[name="DB_PASSWORD"],[name="altConfig"]').count(),0);
+        await Promise.all([page.waitForURL('**/admin/env'),form.locator('button[type="submit"]').click()]);
+        const after=fs.readFileSync(file,'utf8');
+        assert(after.includes('Audit Safe Name'),'Allowed value not saved');
+        const protectedLines=v=>v.split(/\r?\n/).filter(l=>!/^\s*(APP_NAME|APP_LOCALE|LOG_LEVEL)\s*=/.test(l)).filter(l=>l.trim()).sort();
+        assert.deepEqual(protectedLines(after),protectedLines(before),'Protected environment entries changed');
+        return {allowedWrite:true,protectedEntriesPreserved:true};
+      } finally {fs.writeFileSync(file,before);await context.close();}
     });
   } finally {await browser.close();}
   return {status:results.every(x=>x.status==='PASS')?'PASS':'FAIL',sourceSha:process.env.GITHUB_SHA||'',results};
