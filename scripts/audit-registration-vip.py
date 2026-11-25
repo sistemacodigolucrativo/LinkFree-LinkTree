@@ -47,9 +47,10 @@ check("RegistrationVip::roleForNewUser()" in manual and
 check("if (!$user) {" in social and
       "$created->role = RegistrationVip::roleForNewUser();" in social,
       'Social login changes role only on account creation')
-check("$user->role = RegistrationVip::roleForNewUser();" in admin and
-      "return redirect(\"admin/edit-user/\" . $user->id);" in admin,
-      'Admin-created accounts respect preference')
+check("$created->role = RegistrationVip::roleForNewUser();" in admin and
+      "redirect()->route('showUser', ['id' => $user->id])" in admin and
+      "User::create(" in admin.split('function createNewUser(')[1].split('public function deleteUser')[0],
+      'Admin-created accounts respect preference and create only on save')
 check("'role'," not in user_model and "'role'\n" not in user_model,
       'Role remains unfillable from public mass assignment')
 check("with('fail'" in admin and "with('success'" in admin,
