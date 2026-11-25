@@ -87,7 +87,8 @@ jobs:
         run: |
           set -euo pipefail
           cd /tmp/linkfree-audit/linkstack
-          php artisan serve --host=127.0.0.1 --port=18765 > /tmp/linkfree-audit/server.log 2>&1 &
+          # Same router as browser QA; no Laravel .env restart watcher.
+          php -S 127.0.0.1:18765 server.php > /tmp/linkfree-audit/server.log 2>&1 &
           echo $! > /tmp/linkfree-audit/server.pid
           for i in $(seq 1 45); do
             if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:18765/login; then
@@ -104,6 +105,12 @@ jobs:
           QA_EXPECTED_SITE: http://127.0.0.1:18765
           QA_OUTPUT: /tmp/linkfree-audit/http-results.json
         run: python3 scripts/qa-isolated/http_acceptance.py
+      - name: Verify isolated HTTP server remained alive
+        if: always()
+        run: |
+          test -s /tmp/linkfree-audit/server.pid
+          kill -0 "$(cat /tmp/linkfree-audit/server.pid)"
+          curl --fail --silent --show-error --max-time 10 http://127.0.0.1:18765/login >/dev/null
       - name: Upload sanitized evidence
         if: always()
         uses: actions/upload-artifact@v4
