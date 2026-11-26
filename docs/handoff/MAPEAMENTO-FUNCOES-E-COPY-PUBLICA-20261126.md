@@ -53,3 +53,21 @@
 **Padrão de validação:** reaproveitar os testes existentes de Studio, SEO, acessibilidade escopada, HTTP e QA sintético; acrescentar somente checks de páginas e copy pública onde a cobertura atual for insuficiente.
 
 **Gates:** não fazer merge nem deploy automaticamente, não modificar produção, não alterar telas autenticadas nem perfis dos usuários.
+
+## Implementação entregue na PR #39 (branch, não publicada)
+
+- **Copy principal:** `app/Services/PublicSiteContent.php` teve 33 valores **default** revistos, preservando todas as chaves e o CMS. `app/Services/PublicSeo.php` teve o título padrão de busca alinhado à proposta de valor.
+- **Homepage:** `resources/views/home.blade.php` ganhou navegação para recursos e próximas implementações, seção de orientação comercial, CTA do catálogo e links no rodapé. Os controles de exibição e cadastro existentes permaneceram preservados.
+- **Catálogo único de benefícios verificados:** `app/Services/PublicFeatureCatalog.php` oferece cinco agrupamentos, com dezessete recursos e marcação de disponibilidade para funções VIP/condicionais.
+- **Páginas públicas:** `resources/views/public/features.blade.php` e `resources/views/public/roadmap.blade.php`, layout compartilhado `layouts/public-marketing.blade.php` e estilos responsivos `assets/css/linkfree-public-pages.css`.
+- **Rotas públicas:** `GET /plataforma/recursos` e `GET /plataforma/proximas-implementacoes`, nomeadas `public.features` / `public.roadmap` em `routes/home.php`. O segmento duplo `/plataforma/...` foi escolhido para não ocupar os caminhos `/{littlelink}` que podem pertencer a perfis de usuários. Em domínios personalizados destinados a perfis, as rotas de marketing não são registradas.
+- **SEO público:** `SeoController::homeEntries()` inclui as duas páginas no sitemap do site principal sem ignorar `noindex`, domínio personalizado ou opção de desativar homepage. Templates usam título, descrição, canonical, OG e Twitter Card com o gerador de imagem já existente.
+- **Roadmap sem propaganda enganosa:** `PublicFeatureCatalog::upcoming()` retorna `[]` no estado atual, e o template mostra uma mensagem editorial em vez de inventar ferramentas, datas ou listagens de recursos já existentes.
+- **Testes reaproveitados:** os jobs de HTTP, SEO, segurança, Studio, admin e Chromium existentes permanecem. `scripts/qa-isolated/public_marketing_acceptance.py` e `public_marketing_browser_smoke.cjs` foram adicionados a **essas fixtures preexistentes**, com evidências segregadas e sem novos dados reais.
+
+### Limites intencionais
+- A customização persistida do conteúdo de produção (`storage/app/linkfree/public-site.json`) não é alterada pelo repositório: **textos do CMS que já tiverem override explícito não serão substituídos automaticamente** pelos novos defaults. A nova seção fixa da Home e as duas páginas adicionais usam nova copy independentemente desses overrides.
+- Páginas legais, dados de membros, autenticação, bancos e permissões permanecem intactos.
+- A PR #38 de UI de membros segue independente; nenhum trabalho dela foi trazido para a PR #39.
+- As verificações em HTTP/browser sintético não substituem inspeção em dispositivos físicos ou publicação em VPS.
+- **Sem merge nem deploy nesta etapa.**
