@@ -124,7 +124,7 @@ else:
     assert any(x.get('@type')=='WebSite' for x in home.schemas)
     # Reuse the existing SEO contract on both new public marketing routes.
     home_sitemap_urls = locs(xml('/sitemap-home.xml'))
-    for new_path in ('/recursos', '/proximas-implementacoes'):
+    for new_path in ('/plataforma/recursos', '/plataforma/proximas-implementacoes'):
         marketing,_=page(new_path)
         expected = BASE + new_path
         assert marketing.one('canonical') == expected, (new_path, marketing.one('canonical'))
