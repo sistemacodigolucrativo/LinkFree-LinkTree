@@ -101,6 +101,7 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 @media(max-width:767px){.lf-phone{animation:lf-float-mobile 6s ease-in-out infinite}.lf-footer .footer-body{flex-direction:column;align-items:center;text-align:center}.lf-footer .left-panel{flex:0 1 auto;justify-content:center}.lf-footer .right-panel{flex:0 1 auto}.lf-links .lf-actions{align-items:center}.lf-card-art{height:125px}}
 @keyframes lf-float-mobile{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @media(prefers-reduced-motion:reduce){.lf-phone{animation:none}.lf-card,.lf-step,.lf-art-float{transition:none}}
+.lf-explore-links{text-align:center;margin-top:38px}.lf-explore-links p{color:var(--lf-muted);margin:0 auto 18px;max-width:620px}.lf-roadmap-promo{display:flex;justify-content:space-between;align-items:center;gap:32px}.lf-roadmap-promo>div{max-width:720px}.lf-roadmap-promo h2{color:white;font-size:clamp(1.8rem,3.6vw,2.75rem);line-height:1.16;letter-spacing:-.04em;margin:12px 0}.lf-roadmap-promo p{color:var(--lf-muted);margin:0}.lf-roadmap-promo .lf-button{flex-shrink:0}.lf-nav-inner .lf-links{gap:16px}.lf-links>a{font-size:.92rem}@media(max-width:1130px){.lf-nav-inner{flex-wrap:wrap;padding:14px 0;gap:12px}.lf-menu{display:block}.lf-links{display:none;flex:0 0 100%;margin:0;align-items:stretch;flex-direction:column;gap:0;padding:8px 0}.lf-links.open{display:flex}.lf-links>a{padding:12px 0}.lf-actions{padding-top:10px;gap:16px;flex-wrap:wrap}}@media(max-width:767px){.lf-roadmap-promo{display:block}.lf-roadmap-promo .lf-button{margin-top:24px}.lf-explore-links .lf-button{width:100%;max-width:340px}}
 </style>
   </head>
 
@@ -115,7 +116,10 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 <button class="lf-menu" type="button" aria-expanded="false" aria-controls="lf-navigation">Menu ☰</button>
 <nav class="lf-links" id="lf-navigation" aria-label="Navegação principal">@if(\App\Services\PublicSiteContent::enabled('features'))<a href="#recursos">{{ \App\Services\PublicSiteContent::text('nav_features') }}</a>@endif
 @if(\App\Services\PublicSiteContent::enabled('steps'))<a href="#como-funciona">{{ \App\Services\PublicSiteContent::text('nav_steps') }}</a>@endif
-@if(\App\Services\PublicSiteContent::enabled('faq'))<a href="#duvidas">{{ \App\Services\PublicSiteContent::text('nav_faq') }}</a>@endif<div class="lf-actions">
+@if(\App\Services\PublicSiteContent::enabled('faq'))<a href="#duvidas">{{ \App\Services\PublicSiteContent::text('nav_faq') }}</a>@endif
+<a href="{{ route('public.resources') }}">{{ \App\Services\PublicSiteContent::text('nav_catalog') }}</a>
+<a href="{{ route('public.roadmap') }}">{{ \App\Services\PublicSiteContent::text('nav_roadmap') }}</a>
+<div class="lf-actions">
 @auth<a class="lf-button" href="{{ url('dashboard') }}">{{ \App\Services\PublicSiteContent::text('button_my_panel') }}</a>@else
 @if(Route::has('login'))<a href="{{ route('login') }}">{{ \App\Services\PublicSiteContent::text('button_login') }}</a>@endif
 @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">{{ \App\Services\PublicSiteContent::text('button_register') }}</a>@endif
@@ -131,7 +135,7 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 <article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="63" y="25" width="114" height="70" rx="14" fill="#253b28" stroke="#71945f"/><rect x="78" y="38" width="84" height="9" rx="4.5" fill="#a5f33d"/><rect x="78" y="55" width="84" height="9" rx="4.5" fill="#799c71"/><rect x="78" y="72" width="58" height="9" rx="4.5" fill="#799c71"/></g><circle cx="50" cy="34" r="4" fill="#a5f33d"/><circle cx="190" cy="85" r="3" fill="#a5f33d"/></svg></div><span class="lf-icon">↗</span><h3>{{ \App\Services\PublicSiteContent::text('feature1_title') }}</h3><p>{{ \App\Services\PublicSiteContent::text('feature1_description') }}</p></article>
 <article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="78" y="18" width="84" height="84" rx="16" fill="#253b28" stroke="#71945f"/><circle cx="120" cy="45" r="14" fill="#a5f33d"/><path d="M96 80c2-14 10-21 24-21s22 7 24 21" fill="#799c71"/><circle cx="167" cy="32" r="12" fill="#a5f33d"/><path d="M167 26v12m-6-6h12" stroke="#1d3018" stroke-width="2"/></g></svg></div><span class="lf-icon">✦</span><h3>{{ \App\Services\PublicSiteContent::text('feature2_title') }}</h3><p>{{ \App\Services\PublicSiteContent::text('feature2_description') }}</p></article>
 <article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="70" y="29" width="100" height="62" rx="14" fill="#253b28" stroke="#71945f"/><rect x="85" y="44" width="70" height="9" rx="4.5" fill="#a5f33d"/><rect x="85" y="61" width="44" height="7" rx="3.5" fill="#799c71"/><circle cx="154" cy="76" r="17" fill="#a5f33d"/><path d="M148 76h12m-5-5 5 5-5 5" stroke="#1d3018" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div><span class="lf-icon">▦</span><h3>{{ \App\Services\PublicSiteContent::text('feature3_title') }}</h3><p>{{ \App\Services\PublicSiteContent::text('feature3_description') }}</p></article>
-</div></div></section>
+</div><div class="lf-explore-links lf-reveal"><p>Seu painel reúne ainda mais possibilidades para organizar e personalizar a página.</p><a class="lf-button alt" href="{{ route('public.resources') }}">{{ \App\Services\PublicSiteContent::text('button_explore') }}</a></div></div></section>
 @endif
 @if(\App\Services\PublicSiteContent::enabled('steps'))
 <section class="lf-section alt" id="como-funciona"><div class="lf-container lf-split"><div class="lf-reveal"><span class="lf-eyebrow">{{ \App\Services\PublicSiteContent::text('steps_eyebrow') }}</span><h2>{{ \App\Services\PublicSiteContent::text('steps_title') }}</h2><p>{{ \App\Services\PublicSiteContent::text('steps_intro') }}</p></div><div class="lf-steps">
@@ -146,6 +150,12 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 <details><summary>{{ \App\Services\PublicSiteContent::text('faq2_question') }}</summary><p>{{ \App\Services\PublicSiteContent::text('faq2_answer') }}</p></details>
 <details><summary>{{ \App\Services\PublicSiteContent::text('faq3_question') }}</summary><p>{{ \App\Services\PublicSiteContent::text('faq3_answer') }}</p></details>
 </div></div></section>
+@endif
+@if(count(\App\Services\MemberFeatureCatalog::upcoming()) > 0)
+<section class="lf-section alt" aria-labelledby="lf-home-roadmap-title"><div class="lf-container lf-roadmap-promo lf-reveal">
+  <div><span class="lf-eyebrow">Novas experiências em preparação</span><h2 id="lf-home-roadmap-title">O que vem a seguir no LinkFree?</h2><p>Conheça as ferramentas em validação. Não exibimos recursos já lançados nem anunciamos datas antes da confirmação.</p></div>
+  <a class="lf-button alt" href="{{ route('public.roadmap') }}">Próximas implementações</a>
+</div></section>
 @endif
 @if(\App\Services\PublicSiteContent::enabled('final'))
 <section class="lf-section alt"><div class="lf-container"><div class="lf-final lf-reveal"><span class="lf-eyebrow">{{ \App\Services\PublicSiteContent::text('final_eyebrow') }}</span><h2>{{ \App\Services\PublicSiteContent::text('final_title') }}</h2><p>{{ \App\Services\PublicSiteContent::text('final_description') }}</p><div class="lf-cta">@auth<a class="lf-button" href="{{ url('dashboard') }}">{{ \App\Services\PublicSiteContent::text('button_dashboard') }}</a>@else @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">{{ \App\Services\PublicSiteContent::text('button_register') }}</a>@elseif(Route::has('login'))<a class="lf-button" href="{{ route('login') }}">{{ \App\Services\PublicSiteContent::text('button_login') }}</a>@endif @endauth</div></div></div></section>
