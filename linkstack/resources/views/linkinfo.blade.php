@@ -77,7 +77,7 @@
                     </div>
                   <!--logo End-->
                   
-                  <h4 class="logo-title">{{env('APP_NAME')}}</h4>
+                  <h4 class="logo-title">{{ config('app.name') }}</h4>
               </a>
             </div>
           </nav>

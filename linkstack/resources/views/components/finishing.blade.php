@@ -141,9 +141,8 @@ if (EnvEditor::keyExists('ADMIN_EMAIL')) {
     }
 }
 
-if (env('APP_NAME') == 'LittleLink Custom' or env('APP_NAME') == 'LittleLink') {
-    EnvEditor::editKey('APP_NAME', 'LinkStack');
-}
+// APP_NAME belongs to the installer and the administrative settings.
+ // Never overwrite the name selected by the operator during setup.
 
 if (EnvEditor::keyExists('ALLOW_REGISTRATION')) {
     /* Do nothing if key already exists */

@@ -40,7 +40,7 @@ if (!$isAdminPanel) {
   <head>
     <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <title>{{ $memberNavbarTitle ? $memberNavbarTitle.' — ' : '' }}{{env('APP_NAME')}}</title>
+      <title>{{ $memberNavbarTitle ? $memberNavbarTitle.' — ' : '' }}{{config('app.name')}}</title>
 
       <script src="{{asset('assets/js/detect-dark-mode.js')}}"></script>
       {{-- Fundo visivel antes de baixar CSS/JS: impede flash branco nas trocas de pagina. --}}
@@ -397,7 +397,7 @@ if (!$isAdminPanel) {
                 </div>
                 <!--logo End-->
 
-                <h4 class="logo-title">{{env('APP_NAME')}}</h4>
+                <h4 class="logo-title">{{config('app.name')}}</h4>
             </a>
             <button type="button" class="sidebar-toggle" data-toggle="sidebar" data-active="true" aria-label="Recolher menu lateral" aria-expanded="true" data-label-expanded="Recolher menu lateral" data-label-collapsed="Expandir menu lateral" style="border:0;background:transparent;padding:0;">
                 <i class="icon">
@@ -553,7 +553,7 @@ if (!$isAdminPanel) {
                 <!--logo End-->
 
 
-                <h4 class="logo-title">{{env('APP_NAME')}}</h4>
+                <h4 class="logo-title">{{config('app.name')}}</h4>
             </a>
             <button type="button" class="sidebar-toggle" data-toggle="sidebar" data-active="true" aria-label="Recolher menu lateral" aria-expanded="true" data-label-expanded="Recolher menu lateral" data-label-collapsed="Expandir menu lateral" style="border:0;background:transparent;padding:0;">
                 <i class="icon">
