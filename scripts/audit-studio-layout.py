@@ -227,8 +227,10 @@ require('style="height:100vh;"' not in profile_view,
         "Account deletion confirmation cannot force a whole extra viewport")
 require('min-height:420px' not in theme and 'height:min(60dvh,640px)' in theme,
         "Theme preview adjusts to compact mobile screens")
-require('id="studio-my-links-title" class="card-header mb-3 d-flex flex-wrap' in links,
-        "My Links heading flex-wraps with its action")
+require('id="studio-my-links-title"' not in links and
+        'class="lf-links-actions px-3 pt-3"' in links and
+        "route('showBlocks')" in links,
+        "Links page title is only in Topbar, with accessible standalone block CTA")
 require('href="{{ route(\'showThemes\') }}">Voltar ao gerenciamento' in github_view,
         "Admin themes return to admin management")
 
