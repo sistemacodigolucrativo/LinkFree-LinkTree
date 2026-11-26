@@ -1,4 +1,4 @@
-<label for="predefined-button" class='form-label'>{{__('messages.Select a predefined site')}}</label>
+<label for="predefined-button" class='form-label'>{{ __('member_ui.button_icon') }}</label>
 <?php use App\Models\Button; $button = Button::find($button_id); if(isset($button->name)){$buttonName = $button->name;}else{$buttonName = 0;} ?>
 
 <select id='predefined-button' name='button' class='form-control'>
