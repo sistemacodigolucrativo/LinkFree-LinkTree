@@ -247,7 +247,7 @@ if (strpos($data['page']->contact, 'info@littlelink-custom.com') !== false or st
 $data['page'] = Page::select('home_message')->first();
 if (strpos($data['page']->home_message, 'LittleLink Custom') !== false) {
     $home_message = '
-            <p>Take control of your online presence with&nbsp;<a href="https://linkstack.org/"><strong>LinkStack</strong></a> the privacy-focused, open-source <strong>link management platform</strong>. Create a customizable profile page to manage <strong>all your important links in one convenient location</strong> and give your audience a seamless browsing experience.</p>
+            <p>Take control of your online presence with&nbsp;<strong>' . e(config('app.name', 'LinkFree')) . '</strong>, the privacy-focused, open-source <strong>link management platform</strong>. Create a customizable profile page to manage <strong>all your important links in one convenient location</strong> and give your audience a seamless browsing experience.</p>
             ';
     Page::first()->update(['home_message' => $home_message]);
 }
