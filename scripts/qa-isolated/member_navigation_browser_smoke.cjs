@@ -235,6 +235,26 @@ async function run() {
         }
         await check('CTA keyboard click pointer click and browser back '+width,
           ()=>linksFlow(page,width,mode));
+        if(width===1280) {
+          await check('Desktop platform icon and theme-faithful preview',async()=>{
+            const response=await page.goto(base+'/studio/add-link?block=predefined',{waitUntil:'domcontentloaded'});
+            assert.equal(response?.status(),200);
+            await page.locator('.lf-platform-picker.is-enhanced').waitFor({state:'visible',timeout:15000});
+            const trigger=page.locator('#lf-platform-trigger');
+            await trigger.click();
+            const deezer=page.locator('.lf-platform-expand').filter({hasText:'Deezer'}).first();
+            assert((await deezer.locator('img').getAttribute('src')).endsWith('/deezer.svg'));
+            await deezer.click();
+            assert.equal(await page.locator('#predefined-button').inputValue(),'');
+            const frame=deezer.locator('xpath=following-sibling::div//iframe');
+            const markup=await frame.getAttribute('srcdoc');
+            assert(markup.includes('button-deezer') && markup.includes('deezer.svg'));
+            const bounds=await frame.boundingBox();
+            assert(bounds && bounds.x>=-3 && bounds.x+bounds.width<=width+3,
+              'Platform preview must fit desktop viewport');
+            return {viewport:width,expanded:true,selectedOnFirstClick:false};
+          });
+        }
         if(width===375||width===1280) {
           await check('Screenshot '+width+' '+mode,async()=>{
             await verifyTopbar(page,'/studio/links','Links e Blocos',width);
