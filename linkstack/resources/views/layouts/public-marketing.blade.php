@@ -20,7 +20,15 @@
   <meta property="og:description" content="{{ $marketingDescription }}">
   <meta property="og:url" content="{{ $marketingCanonical }}">
   <meta property="og:image" content="{{ $marketingImage }}">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Prévia do LinkFree">
+  @if(str_starts_with($marketingImage, 'https://'))
+    <meta property="og:image:secure_url" content="{{ $marketingImage }}">
+  @endif
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="{{ $marketingCanonical }}">
   <meta name="twitter:title" content="{{ $marketingTitle }}">
   <meta name="twitter:description" content="{{ $marketingDescription }}">
   <meta name="twitter:image" content="{{ $marketingImage }}">
