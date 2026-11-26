@@ -1,14 +1,46 @@
-<label for="predefined-button" class='form-label'>{{ __('member_ui.button_icon') }}</label>
+@php
+  // Match the same brand/skeleton resources used by the member's public page.
+  $lfPreviewTheme = (string) (auth()->user()->theme ?? '');
+  $lfPreviewThemeValid = $lfPreviewTheme !== '' && $lfPreviewTheme !== 'default'
+    && preg_match('/\A[A-Za-z0-9_-]+\z/', $lfPreviewTheme);
+  $lfPreviewThemeDir = $lfPreviewThemeValid ? base_path('themes/'.$lfPreviewTheme) : null;
+  $lfPreviewThemeConfig = $lfPreviewThemeDir && is_file($lfPreviewThemeDir.'/config.php')
+    ? (include $lfPreviewThemeDir.'/config.php') : [];
+  $lfPreviewThemeConfig = is_array($lfPreviewThemeConfig) ? $lfPreviewThemeConfig : [];
+  $lfPreviewBrands = $lfPreviewThemeDir && ($lfPreviewThemeConfig['use_default_buttons'] ?? '') !== 'true'
+    && is_file($lfPreviewThemeDir.'/brands.css')
+    ? asset('themes/'.$lfPreviewTheme.'/brands.css')
+    : asset('assets/linkstack/css/brands.css');
+  $lfPreviewSkeleton = $lfPreviewThemeDir && is_file($lfPreviewThemeDir.'/skeleton-auto.css')
+    ? asset('themes/'.$lfPreviewTheme.'/skeleton-auto.css')
+    : asset('assets/linkstack/css/skeleton-auto.css');
+  $lfPreviewCustomIcons = $lfPreviewThemeDir && ($lfPreviewThemeConfig['use_custom_icons'] ?? '') === 'true';
+  $lfPreviewIconExtension = (string) ($lfPreviewThemeConfig['custom_icon_extension'] ?? '.svg');
+  if (!preg_match('/\A\.(svg|png|webp|jpg|jpeg)\z/i', $lfPreviewIconExtension)) {
+    $lfPreviewIconExtension = '.svg';
+  }
+@endphp
+<label for="predefined-button" class="form-label">{{ __('member_ui.button_icon') }}</label>
 <?php use App\Models\Button; $button = Button::find($button_id); if(isset($button->name)){$buttonName = $button->name;}else{$buttonName = 0;} ?>
 
-<select id='predefined-button' name='button' class='form-control'>
-        @if($buttonName != 0)<option value='{{$buttonName}}'>{{ucfirst($buttonName)}}</option>@endif
+<div class="lf-platform-picker"
+     data-brand-css="{{ $lfPreviewBrands }}"
+     data-skeleton-css="{{ $lfPreviewSkeleton }}"
+     data-icon-base="{{ asset('assets/linkstack/icons') }}"
+     data-custom-icon-base="{{ $lfPreviewCustomIcons ? asset('themes/'.$lfPreviewTheme.'/extra/custom-icons') : '' }}"
+     data-custom-icon-extension="{{ $lfPreviewIconExtension }}">
+  <select id="predefined-button" name="button" class="form-control" required>
+    <option value="" disabled {{ $buttonName === 0 ? 'selected' : '' }}>Selecione uma plataforma</option>
+    @if($buttonName !== 0)
+      <option value="{{ $buttonName }}" selected>{{ ucfirst($buttonName) }}</option>
+    @endif
     @foreach ($buttons as $b)
-        @if($b["exclude"] != true)
-        <option class='button button-{{$b["name"]}}' value='{{$b["name"]}}' {{ $b["selected"] == true ? "selected" : ""}}>{{$b["title"]}}</option>
-        @endif
+      @if(!$b['exclude'] && $b['name'] !== $buttonName)
+        <option class="button button-{{ $b['name'] }}" value="{{ $b['name'] }}">{{ $b['title'] }}</option>
+      @endif
     @endforeach
-</select>
+  </select>
+</div>
 
 <label for='field-title' class='form-label'>{{__('messages.Custom Title')}}</label>
 <input type='text' name='title' value='{{$title}}' class='form-control' id="field-title" />

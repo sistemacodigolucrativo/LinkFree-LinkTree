@@ -4,6 +4,7 @@
 
 @push('sidebar-stylesheets')
 <script src="{{ asset('assets/external-dependencies/fontawesome.js') }}" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="{{ asset('assets/css/linkfree-platform-picker.css') }}?v={{ filemtime(base_path('assets/css/linkfree-platform-picker.css')) }}">
 @endpush
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
@@ -21,7 +22,6 @@
 
                     <section class='text-gray-400 link-editor'>
 
-                        <h3 class="card-header"><i class="bi bi-journal-plus"> @if($LinkID !== 0) {{__('messages.Edit')}} @else {{__('messages.Add')}} @endif {{__('messages.Block')}}</i></h3>
 
                         <div class='card-body'>
                             @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
@@ -89,13 +89,16 @@
 @endsection
 
 @push("sidebar-scripts")
+<script src="{{ asset('assets/js/linkfree-platform-picker.js') }}?v={{ filemtime(base_path('assets/js/linkfree-platform-picker.js')) }}"></script>
 <script>
 $(function() {
     LoadLinkTypeParams($("input[name='typename']").val() , $("input[name=linkid]").val());
 
     function LoadLinkTypeParams($TypeId, $LinkId) {
         var baseURL = <?php echo "\"" . url('') . "\""; ?>;
-        $("#link_params").html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>').load(baseURL + `/studio/linkparamform_part/${$TypeId}/${$LinkId}`);
+        $("#link_params").html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>').load(baseURL + `/studio/linkparamform_part/${$TypeId}/${$LinkId}`, function(response, status) {
+            if (status === 'success' && window.LinkFreePlatformPicker) window.LinkFreePlatformPicker.init(this);
+        });
         setTimeout(function() { document.dispatchEvent(new Event('contentLoaded')); }, 300);
     }
 });

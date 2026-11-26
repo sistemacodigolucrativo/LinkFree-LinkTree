@@ -112,7 +112,6 @@
 
                   <div>
                   <section class="shadow text-gray-400">
-                  <h2 class="mb-4 card-header"><i class="bi bi-pen">{{__('messages.Button Editor')}}</i></h2>
                           <div class="card-body p-0 p-md-3">
 
                   <a class="btn btn-primary" href="{{ url('/studio/links') }}"><i class="bi bi-arrow-left-short"></i>{{__('messages.Back')}}</a><br><br>

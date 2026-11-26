@@ -51,18 +51,22 @@ check("->name('showButtons')" in routes and
 check("{{ __('member_ui.add_link_block') }}" in links and
       "aria-label=\"{{ __('member_ui.add_link_block') }} — {{ __('member_ui.add_link_block_action') }}\"" in links,
       "CTA label and accessible action match")
-check("{{ __('member_ui.links_blocks') }}" in links and
-      "memberNavbarTitle.' — '" in sidebar,
-      "Links e Blocos appears in card, topbar and HTML title")
-check("<label for=\"predefined-button\" class='form-label'>{{ __('member_ui.button_icon') }}</label>" in form and
-      "id='predefined-button'" in form and "name='button'" in form and
-      "foreach ($buttons as $b)" in form,
-      "Select label changed without altering its options or form name")
+check('aria-label="{{ __(\'member_ui.links_blocks\') }}"' in links and
+      "memberNavbarTitle.' — '" in sidebar and
+      'id="studio-my-links-title"' not in links,
+      "Links e Blocos is only in member Topbar; card remains accessible")
+check('for="predefined-button"' in form and
+      "member_ui.button_icon" in form and
+      'id="predefined-button"' in form and 'name="button"' in form and
+      "foreach ($buttons as $b)" in form and
+      "lf-platform-picker" in form and "data-brand-css" in form,
+      "Native option source preserved and icon-preview picker enabled")
 check("{{ __('member_ui.manage_blocks') }}" in blocks and
       "lf-block-grid" in blocks, "Blocks screen and selection remain present")
-check("@include('components.verify-svg')" in verification and
-      '<i class="bi bi-patch-check"' not in verification,
-      "Verified title uses public profile exact badge, not alternate icon")
+check("@include('components.verify-svg')" not in verification and
+      'member_ui.verified_badge' not in verification and
+      "@include('components.verify-svg')" in sidebar,
+      "Verified title and canonical badge are rendered only by member Topbar")
 keys = (
     "dashboard", "visitor_sources", "links_blocks", "add_block",
     "edit_block", "page_icons", "manage_blocks", "custom_backgrounds",
