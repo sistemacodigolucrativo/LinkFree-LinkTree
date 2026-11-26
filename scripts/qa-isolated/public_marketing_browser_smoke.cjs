@@ -65,7 +65,7 @@ async function axe(page, selector) {
         const page = await context.newPage();
         page.setDefaultTimeout(10000);
         await check('Resources responsive '+width, async()=>{
-          const metrics=await safeVisit(page,'/recursos');
+          const metrics=await safeVisit(page,'/plataforma/recursos');
           assert.equal(await page.locator('main h1').count(),1);
           assert((await page.locator('main h1').innerText()).includes('Seu espaço na internet'));
           assert((await page.locator('.lfp-card').count()) >= 15);
@@ -77,7 +77,7 @@ async function axe(page, selector) {
           return metrics;
         });
         await check('Roadmap responsive and no false announcements '+width, async()=>{
-          const metrics=await safeVisit(page,'/proximas-implementacoes');
+          const metrics=await safeVisit(page,'/plataforma/proximas-implementacoes');
           assert.equal(await page.locator('main h1').count(),1);
           assert(await page.locator('#roadmap-empty-title').isVisible());
           assert.equal(await page.locator('.lfp-feature-tag').count(),0,
@@ -86,13 +86,13 @@ async function axe(page, selector) {
         });
         if(width === 375 || width === 1280){
           await check('Public nav and keyboard '+width, async()=>{
-            await safeVisit(page,'/recursos');
-            const link=page.locator('.lfp-links a[href$="/proximas-implementacoes"]');
+            await safeVisit(page,'/plataforma/recursos');
+            const link=page.locator('.lfp-links a[href$="/plataforma/proximas-implementacoes"]');
             assert(await link.isVisible());
             await link.focus();
             assert(await link.evaluate(el=>document.activeElement===el));
             await page.keyboard.press('Enter');
-            await page.waitForURL('**/proximas-implementacoes');
+            await page.waitForURL('**/plataforma/proximas-implementacoes');
             assert(await page.locator('#roadmap-empty-title').isVisible());
             return {keyboardNavigation:true};
           });
