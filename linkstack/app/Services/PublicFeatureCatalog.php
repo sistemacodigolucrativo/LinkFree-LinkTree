@@ -74,11 +74,25 @@ final class PublicFeatureCatalog
     }
 
     /**
-     * Only future tools explicitly approved, not yet implemented and with a
-     * confirmed scope belong here. There are currently no verified entries.
+     * Approved but not yet published member tools only.
+     *
+     * The platform-specific two-step preview was explicitly requested and
+     * implemented in PR #38, which is not on main/production as of 26/11/2026.
+     * Hide it automatically once its real asset exists in this installation.
+     * This avoids promoting an already available tool as "coming soon".
      */
     public static function upcoming(): array
     {
-        return [];
+        if (is_file(base_path('assets/js/linkfree-platform-picker.js'))) {
+            return [];
+        }
+
+        return [
+            [
+                'title' => 'Prévia interativa dos botões por plataforma',
+                'description' => 'Antes de confirmar uma plataforma, você poderá expandir a opção e visualizar o ícone e a aparência do botão. O desenvolvimento já existe, mas a publicação depende da validação e integração.',
+                'status' => 'Em validação',
+            ],
+        ];
     }
 }
