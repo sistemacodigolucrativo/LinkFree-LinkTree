@@ -266,7 +266,6 @@
                   @endif
                 </div>
                 <section class='text-gray-400'>
-                <h3 class="mb-4 card-header"><i class="bi bi-file-earmark-break"> {{__('messages.My Profile')}}</i></h3>
                 @if($errors->any())
                 <div class="alert alert-danger d-flex align-items-center" role="alert">
                     <svg class="bi flex-shrink-0 me-2" width="24" height="24">
