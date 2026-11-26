@@ -109,7 +109,7 @@
     </section>
     <section class="lf-catalog-section lf-catalog-bridge">
       <div class="lf-public-wrap lf-bridge-inner">
-        <div><span class="lf-kicker">Disponível agora</span><h2>Quer conhecer o que você já pode fazer?</h2><p>Veja os recursos atuais do LinkFree, organizados por objetivo e com indicação de restrições quando necessário.</p></div>
+        <div><span class="lf-kicker">Disponível agora</span><h2>Quer conhecer o que você já pode fazer?</h2><p>Veja os recursos atuais do {{ config('app.name') }}, organizados por objetivo e com indicação de restrições quando necessário.</p></div>
         <a class="lf-action lf-action-outline" href="{{ route('public.resources') }}">Conhecer recursos atuais</a>
       </div>
     </section>
