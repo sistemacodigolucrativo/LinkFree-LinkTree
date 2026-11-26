@@ -5,6 +5,34 @@ $usrhandl = Auth::user()->littlelink_name;
 $canAccessAdmin = auth()->check() && auth()->user()->role === 'admin';
 $isAdminPanel = $canAccessAdmin && request()->is('admin', 'admin/*', 'update', 'update/*', 'backup', 'theme-updater');
 $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
+// Member page identification, independent from the sidebar menu and routes.
+$memberNavbarTitle = null;
+$memberNavbarKey = null;
+if (!$isAdminPanel) {
+    $memberNavbarRoutes = [
+        'dashboard' => 'dashboard',
+        'studio/visitors' => 'visitor_sources',
+        'studio/links' => 'links_blocks',
+        'studio/add-link' => 'add_block',
+        'studio/edit-link/*' => 'edit_block',
+        'studio/page-icons' => 'page_icons',
+        'studio/blocks' => 'manage_blocks',
+        'studio/theme' => 'custom_backgrounds',
+        'studio/referrals' => 'referrals',
+        'studio/verification' => 'verified_badge',
+        'studio/page' => 'my_profile',
+        'studio/no_page_name' => 'my_profile',
+        'studio/profile' => 'account_info',
+        'studio/button-editor/*' => 'button_editor',
+    ];
+    foreach ($memberNavbarRoutes as $routePath => $titleKey) {
+        if (request()->is($routePath)) {
+            $memberNavbarKey = $titleKey;
+            $memberNavbarTitle = __('member_ui.'.$titleKey);
+            break;
+        }
+    }
+}
 @endphp
 <!doctype html>
 @include('layouts.lang')
@@ -12,7 +40,7 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
   <head>
     <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-      <title>{{env('APP_NAME')}}</title>
+      <title>{{ $memberNavbarTitle ? $memberNavbarTitle.' — ' : '' }}{{env('APP_NAME')}}</title>
 
       <script src="{{asset('assets/js/detect-dark-mode.js')}}"></script>
       {{-- Fundo visivel antes de baixar CSS/JS: impede flash branco nas trocas de pagina. --}}
@@ -310,6 +338,31 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
     grid-template-columns:38px minmax(0,1fr) auto!important;
   }
 }
+/* Member titles reuse the Admin mobile slot, with a desktop fallback. */
+.lf-member-verified-icon{display:inline-flex;align-items:center;flex:0 0 auto}
+.lf-member-nav-title .lf-member-verified-icon svg.badge{height:1em;width:1em;margin:0}
+@media(max-width:991.98px){
+  .main-content .mobile-unified-nav .lf-member-nav-title{
+    display:flex;align-items:center;justify-content:center;gap:5px;
+    white-space:normal;overflow:visible;line-height:1.2;
+    min-height:44px;padding-inline:4px;
+  }
+  .main-content .mobile-unified-nav .lf-member-nav-copy{
+    min-width:0;overflow-wrap:anywhere;text-align:center;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+    overflow:hidden;
+  }
+}
+@media(min-width:992px){
+  .main-content .mobile-unified-nav .lf-member-nav-title{
+    display:flex;flex:1 1 auto;min-width:0;max-width:42ch;
+    align-items:center;justify-content:center;gap:7px;
+    margin-inline:clamp(8px,2vw,20px);
+    font-size:clamp(.88rem,1.15vw,1.05rem);font-weight:700;line-height:1.35;
+    white-space:normal;overflow-wrap:anywhere;color:var(--lf-text);
+  }
+  .main-content .mobile-unified-nav .lf-member-titled-nav #navbarSupportedContent{flex:0 0 auto}
+}
 </style>
 </head>
   <body class="  ">
@@ -475,7 +528,7 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
       <div class="position-relative iq-banner">
         <!--Nav Start-->
         <nav class="nav navbar navbar-expand-lg navbar-light iq-navbar mobile-unified-nav">
-          <div class="container-fluid navbar-inner @hasSection('mobile-navbar-title') lf-mobile-titled-nav @endif">
+          <div class="container-fluid navbar-inner @hasSection('mobile-navbar-title') lf-mobile-titled-nav @endif @if($memberNavbarTitle) lf-mobile-titled-nav lf-member-titled-nav @endif">
             <a href="{{ route('panelIndex') }}" class="navbar-brand">
 
                 <!--Logo start-->
@@ -508,8 +561,17 @@ $panelLabel = $isAdminPanel ? 'Painel Administrativo' : 'Painel de Membros';
                 </svg>
                 </i>
             </button>
-            @hasSection('mobile-navbar-title')
-              <span class="lf-mobile-nav-title" aria-label="Página atual">@yield('mobile-navbar-title')</span>
+            @if($memberNavbarTitle)
+              <span class="lf-mobile-nav-title lf-member-nav-title">
+                <span class="lf-member-nav-copy">{{ $memberNavbarTitle }}</span>
+                @if($memberNavbarKey === 'verified_badge')
+                  <span class="lf-member-verified-icon" aria-hidden="true">@include('components.verify-svg')</span>
+                @endif
+              </span>
+            @else
+              @hasSection('mobile-navbar-title')
+                <span class="lf-mobile-nav-title" aria-label="Página atual">@yield('mobile-navbar-title')</span>
+              @endif
             @endif
             {{-- <div class="input-group search-input">
               <span class="input-group-text" id="search-input">

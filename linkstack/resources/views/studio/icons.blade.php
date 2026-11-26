@@ -16,7 +16,7 @@
 <div class="row"><div class="col-12">
 <section class='links-section-card page-icons-card card rounded mt-3 mb-3 text-gray-400' aria-labelledby='studio-page-icons-title'>
                             <a name="icons"></a>
-                            <h3 id="studio-page-icons-title" class="mb-3 card-header"><i class="fa-solid fa-icons"></i> {{__('messages.Page Icons')}}</h3>
+                            <h3 id="studio-page-icons-title" class="mb-3 card-header"><i class="fa-solid fa-icons"></i> {{ __('member_ui.page_icons') }}</h3>
                             <div class="card-body p-3">
 
                             <form action="{{ route('editIcons') }}" enctype="multipart/form-data" method="post">

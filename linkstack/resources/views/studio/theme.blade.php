@@ -92,7 +92,7 @@
                     @if(env('ALLOW_CUSTOM_BACKGROUNDS') == true)
                     <form action="{{ route('themeBackground') }}" enctype="multipart/form-data" method="post">
                         @csrf
-                        <h3 class="mb-4 card-header">{{__('messages.Custom background')}}</h3>
+                        <h3 class="mb-4 card-header">{{ __('member_ui.custom_backgrounds') }}</h3>
                         <div style="display: none;" class="form-group col-lg-8">
                             <select class="form-control" name="theme">
                                 <option>{{ $page->theme }}</option>
