@@ -46,6 +46,16 @@ class SeoController extends Controller
         if (!in_array($disabled, ['true', 'redirect', true], true)) {
             $home = $hasProfile ? url(config('advanced-config.custom_home_url', '/home')) : url('/');
             if (PublicSeo::canonical($home) === $home) $entries[] = $home;
+            // Public marketing pages belong to the main site, never member custom domains.
+            if ($domain === null) {
+                foreach (['public.features', 'public.roadmap'] as $routeName) {
+                    if (!\Illuminate\Support\Facades\Route::has($routeName)) continue;
+                    $marketingUrl = route($routeName);
+                    if (PublicSeo::canonical($marketingUrl) === $marketingUrl) {
+                        $entries[] = $marketingUrl;
+                    }
+                }
+            }
         }
         return array_values(array_unique($entries));
     }
