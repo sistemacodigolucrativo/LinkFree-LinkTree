@@ -39,10 +39,11 @@
 | Solicitação de selo verificado e gestão de aprovação | Rotas, controller e telas existentes | **Não** |
 | Canal público de denúncias | Rotas públicas e gestão administrativa existentes | **Não** |
 | Personalização e temas PolySleek/Galaxy | Diretórios `themes/PolySleek` e `themes/galaxy` já presentes; não são novas ferramentas confirmadas | **Não** |
-| Prévia de blocos e seleção de plataformas | Funcionalidades de código na `main` e PR #38 em desenvolvimento; não anunciar como novidade futura | **Não** |
+| Prévia genérica de blocos e seleção textual de plataformas | Funcionalidades já existentes na `main` | **Não** |
+| Prévia interativa **por plataforma** com ícones e confirmação em duas ações | Solicitada anteriormente; implementação presente somente na PR #38 (draft, não integrada ou publicada) | **Sim — Em validação, até sua publicação** |
 | Auditorias, LGPD, SMTP/OAuth, homologação e infraestrutura | Pendências técnicas/de operação, não novas ferramentas de membro aprovadas | **Não** |
 
-**Conclusão rastreável:** não existe no material consultado uma proposta identificável de **nova ferramenta para membros** que seja simultaneamente aprovada, ainda não implementada e adequada para divulgação pública. A página `/plataforma/proximas-implementacoes` exibirá um estado vazio transparente e estruturado, preparado para futuras inclusões **somente após uma ferramenta efetivamente ser aprovada e confirmada como ausente**. Isto respeita o pedido explícito de não listar ferramentas existentes e não cria promessas fictícias.
+**Conclusão rastreável:** a única nova ferramenta de membro identificada que foi solicitada mas **ainda não está publicada na `main`** é a prévia interativa por plataforma da **PR #38**, com estágio **Em validação**. A página `/plataforma/proximas-implementacoes` anuncia somente essa melhoria e a oculta automaticamente quando a instalação já contém `assets/js/linkfree-platform-picker.js`. Todos os demais recursos identificados já existem ou não têm escopo de ferramenta futura confirmado. Quando nenhuma inovação não publicada restar, o template exibe um estado vazio transparente. Não há promessa de data.
 
 ## Implementação e validação
 
@@ -62,7 +63,7 @@
 - **Páginas públicas:** `resources/views/public/features.blade.php` e `resources/views/public/roadmap.blade.php`, layout compartilhado `layouts/public-marketing.blade.php` e estilos responsivos `assets/css/linkfree-public-pages.css`.
 - **Rotas públicas:** `GET /plataforma/recursos` e `GET /plataforma/proximas-implementacoes`, nomeadas `public.features` / `public.roadmap` em `routes/home.php`. O segmento duplo `/plataforma/...` foi escolhido para não ocupar os caminhos `/{littlelink}` que podem pertencer a perfis de usuários. Em domínios personalizados destinados a perfis, as rotas de marketing não são registradas.
 - **SEO público:** `SeoController::homeEntries()` inclui as duas páginas no sitemap do site principal sem ignorar `noindex`, domínio personalizado ou opção de desativar homepage. Templates usam título, descrição, canonical, OG e Twitter Card com o gerador de imagem já existente.
-- **Roadmap sem propaganda enganosa:** `PublicFeatureCatalog::upcoming()` retorna `[]` no estado atual, e o template mostra uma mensagem editorial em vez de inventar ferramentas, datas ou listagens de recursos já existentes.
+- **Roadmap sem propaganda enganosa:** `PublicFeatureCatalog::upcoming()` inclui apenas a **prévia interativa por plataforma** (`Em validação`, PR #38), enquanto não estiver presente o arquivo `assets/js/linkfree-platform-picker.js` na instalação. Quando o recurso estiver presente, a lista volta a ser vazia e o template exibe mensagem editorial, sem repetir ferramentas lançadas.
 - **Testes reaproveitados:** os jobs de HTTP, SEO, segurança, Studio, admin e Chromium existentes permanecem. `scripts/qa-isolated/public_marketing_acceptance.py` e `public_marketing_browser_smoke.cjs` foram adicionados a **essas fixtures preexistentes**, com evidências segregadas e sem novos dados reais.
 
 ### Limites intencionais
