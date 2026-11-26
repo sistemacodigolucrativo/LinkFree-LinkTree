@@ -53,7 +53,7 @@ final class PublicFeatureCatalog
                 'title' => 'Mais clareza sobre sua presença online',
                 'description' => 'Compartilhe seus destinos e acompanhe os dados disponibilizados para o seu perfil.',
                 'items' => [
-                    ['title' => 'Compartilhamento prático', 'description' => 'Divulgue seu endereço de perfil e facilite o acesso do público aos canais reunidos.'],
+                    ['title' => 'Link e QR Code', 'description' => 'Divulgue o endereço do seu perfil, use as ações de compartilhamento e visualize o QR Code da página quando a geração estiver disponível.'],
                     ['title' => 'Cliques no painel', 'description' => 'Acompanhe indicadores de interação com seus links apresentados no painel de membros.'],
                     ['title' => 'Origem das visitas', 'description' => 'Em contas VIP, consulte o relatório de fontes de visitantes disponibilizado pelo sistema.', 'note' => 'Recurso VIP'],
                 ],
