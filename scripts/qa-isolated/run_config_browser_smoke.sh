@@ -31,6 +31,9 @@ ALLOW_REGISTRATION=true
 REGISTER_AUTH=auth
 FORCE_ROUTE_HTTPS=false
 EOF
+if [ "${QA_MEMBER_NAV_ONLY:-0}" = "1" ]; then
+  echo "LOCALE=pt-BR" >> "$QA_APP_ROOT/.env"
+fi
 cd "$QA_APP_ROOT"
 php artisan migrate --force --no-interaction > /tmp/linkfree-audit/config-migrations.log
 QA_APP_ROOT="$QA_APP_ROOT" php "$GITHUB_WORKSPACE/scripts/qa-isolated/seed.php"
@@ -40,6 +43,8 @@ cd /tmp/linkfree-qa-node
 npm init -y > /dev/null
 if [ "${QA_DARK_TRANSITION_ONLY:-0}" = "1" ]; then
   timeout 180s npm install --no-audit --no-fund playwright pngjs
+elif [ "${QA_MEMBER_NAV_ONLY:-0}" = "1" ]; then
+  timeout 180s npm install --no-audit --no-fund playwright @axe-core/playwright
 else
   timeout 180s npm install --no-audit --no-fund playwright
 fi
@@ -58,6 +63,8 @@ if [ "${QA_DARK_TRANSITION_ONLY:-0}" = "1" ]; then
   timeout 360s node scripts/qa-isolated/dark_transition_filmstrip.cjs
 elif [ "${QA_ADMIN_UX_ONLY:-0}" = "1" ]; then
   timeout 360s node scripts/qa-isolated/admin_ux_smoke.cjs
+elif [ "${QA_MEMBER_NAV_ONLY:-0}" = "1" ]; then
+  timeout 360s node scripts/qa-isolated/member_navigation_browser_smoke.cjs
 else
   timeout 360s node scripts/qa-isolated/config_browser_smoke.cjs
 fi
