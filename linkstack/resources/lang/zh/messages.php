@@ -1147,7 +1147,7 @@ foreach ([
     'support.msg1', 'support.msg5', 'support.msg6',
 ] as $brandLabel) {
     if (isset($messages[$brandLabel]) && is_string($messages[$brandLabel])) {
-        $messages[$brandLabel] = preg_replace('/\bLink\s*Stack\b/i',
+        $messages[$brandLabel] = preg_replace('/Link\s*Stacks?/i',
             (string) config('app.name', 'LinkFree'), $messages[$brandLabel]);
     }
 }
@@ -1159,4 +1159,6 @@ if (isset($messages['HOME.MESSAGE'])) {
         e(config('app.name', 'LinkFree')),
         $messages['HOME.MESSAGE']);
 }
+// Legacy translation had malformed upstream anchors. Render the configured brand safely.
+$messages['HOME.MESSAGE'] = '<p>使用 <strong>' . e(config('app.name', 'LinkFree')) . '</strong> 管理您的个人资料和重要链接，并为访客提供便捷的浏览体验。</p>';
 return $messages;
