@@ -98,7 +98,7 @@ async function axe(page, selector) {
           });
           await check('Scoped public WCAG '+width, async()=>axe(page,'main'));
           for(const route of ['recursos','proximas-implementacoes']){
-            await safeVisit(page,'/'+route);
+            await safeVisit(page,'/plataforma/'+route);
             const dest=path.join(screenshots,route+'-'+width+'.png');
             await page.screenshot({path:dest,fullPage:true,timeout:12000});
           }
