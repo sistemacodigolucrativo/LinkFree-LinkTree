@@ -208,6 +208,8 @@ async function run() {
             assert(srcdoc.includes('button-amazon') && srcdoc.includes('amazon.svg') &&
               srcdoc.includes('brands.css') && srcdoc.includes('skeleton-'),
               'Preview must reuse public button assets');
+            await page.screenshot({path:path.join(screenshots,'member-platform-375-light.png'),
+              fullPage:true,timeout:15000});
             const confirm=page.locator('.lf-platform-confirm').filter({hasText:'Amazon'}).first();
             await confirm.focus();
             await page.keyboard.press('Enter');
@@ -252,6 +254,8 @@ async function run() {
             const bounds=await frame.boundingBox();
             assert(bounds && bounds.x>=-3 && bounds.x+bounds.width<=width+3,
               'Platform preview must fit desktop viewport');
+            await page.screenshot({path:path.join(screenshots,'member-platform-1280-dark.png'),
+              fullPage:true,timeout:15000});
             return {viewport:width,expanded:true,selectedOnFirstClick:false};
           });
         }
