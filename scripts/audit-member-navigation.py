@@ -39,10 +39,10 @@ check("@include('components.verify-svg')" in sidebar and
       'fill="#179cf0"' in badge and 'fill="#fcfcfc"' in badge,
       "Verified badge reuses original public-profile SVG")
 check("route('showBlocks')" in links and
-      "route('showBlocks')" in routes and
+      "->name('showBlocks')" in routes and
       "Route::get('/studio/blocks'" in routes,
       "CTA reuses existing authenticated Gerenciar Blocos route")
-check("route('showButtons')" in routes and
+check("->name('showButtons')" in routes and
       "Route::get('/studio/add-link'" in routes,
       "Original Adicionar Bloco route remains available")
 check("{{ __('member_ui.add_link_block') }}" in links and
