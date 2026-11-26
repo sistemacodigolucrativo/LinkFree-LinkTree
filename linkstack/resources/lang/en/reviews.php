@@ -3,6 +3,7 @@
 return [
     'platform_logo' => 'Logo of :appName',
     'notification_title' => 'Enjoying :appName?',
+    'admin_no_notifications' => 'All caught up! No pending notifications.',
     'notification_link' => 'Leave a review',
     'heading' => 'Your opinion makes a difference',
     'eyebrow' => 'Your experience matters',
