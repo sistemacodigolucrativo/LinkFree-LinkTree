@@ -31,6 +31,9 @@
     const img = document.createElement('img');
     const sources = iconSources(wrapper, value);
     img.className = 'lf-platform-icon';
+    if (['appstore', 'discord', 'deezer'].includes(iconName(value))) {
+      img.classList.add('lf-platform-icon-light');
+    }
     img.alt = '';
     img.loading = 'lazy';
     img.src = sources.preferred;
