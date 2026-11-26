@@ -21,7 +21,6 @@
 
                     <section class='text-gray-400 link-editor'>
 
-                        <h3 class="card-header"><i class="bi bi-journal-plus"> @if($LinkID !== 0) {{__('messages.Edit')}} @else {{__('messages.Add')}} @endif {{__('messages.Block')}}</i></h3>
 
                         <div class='card-body'>
                             @if($errors->any())<div class="alert alert-danger" role="alert">{{ $errors->first() }}</div>@endif
