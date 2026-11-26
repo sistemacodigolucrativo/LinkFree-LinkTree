@@ -85,8 +85,6 @@
       trigger.className = 'lf-platform-trigger';
       trigger.setAttribute('aria-expanded', 'false');
       trigger.setAttribute('aria-controls', 'lf-platform-options');
-      trigger.setAttribute('aria-haspopup', 'true');
-      trigger.setAttribute('aria-required', 'true');
 
       const triggerText = document.createElement('span');
       triggerText.className = 'lf-platform-trigger-text';
