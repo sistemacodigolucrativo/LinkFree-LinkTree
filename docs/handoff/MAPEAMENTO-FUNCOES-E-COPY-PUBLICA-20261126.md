@@ -22,7 +22,7 @@
 | Ícones | Organização dos ícones da página | `studio/icons.blade.php`, `editIcons`, `clearIcon` | Disponibilidade depende das configurações |
 | Aparência | Temas, prévia de tema e opções visuais; fundos personalizados quando ativados | `studio/theme.blade.php`, `ThemePreviewController`, `ThemeOptions` | Editor avançado pode depender de flags da instância |
 | Botões | Edição de estilo de botões próprios | `studio/button-editor.blade.php`, `showCSS` / `editCSS` | Funcionalidade sujeita a `ENABLE_BUTTON_EDITOR` |
-| Compartilhamento | Endereço público e ações de compartilhamento da página | `layouts/sidebar.blade.php`, `linkstack/modules/share-button.blade.php` | Não prometer distribuição automática |
+| Compartilhamento | Endereço público, ações de compartilhar e QR Code do perfil | `layouts/sidebar.blade.php` (menu e modal QR), `linkstack/modules/share-button.blade.php` | Renderização pode cair no fallback; download PNG depende do suporte Imagick; não prometer distribuição automática |
 | Visualização | Prévia real de página ou de blocos conforme componentes existentes | `studio/links.blade.php`, `studio/blocks.blade.php` | Prévia de alguns modelos é ilustrativa |
 | Estatísticas | Cliques e contagens no painel; relatório de origem dos visitantes | `panel/index.blade.php`, `studio/visitor-reports.blade.php` | Origens de visitantes são restritas a VIP e admin |
 | Indicações | Link de convite, cadastros atribuídos e histórico | `studio/referrals.blade.php`, `ReferralController` | Não constitui remuneração nem bônus automático |
