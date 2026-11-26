@@ -75,3 +75,20 @@ Após revisão/autorização do merge, em janela supervisionada, o procedimento 
 ## 6. Fora de escopo
 
 As outras cinco anotações ainda não foram solicitadas nesta execução e permanecem sem alterações deliberadas. Não modificar o menu lateral fora do item necessário à moderação, nem tela de pagamentos, sistema de doações ou endereços de terceiros. **Não integrar PR nem fazer deploy nesta fase sem aprovação.**
+
+
+## 7. Revisão do dispatcher oficial (correção necessária para o deploy)
+
+O executável `/root/atualizar-linkstack.sh` pode ser o **dispatcher estável** instalado pelo repositório via `scripts/instalar-deploy-unificado.sh`. Nesse cenário, o dispatcher legado permitia `--check`, `--deploy`, `--deploy-m13` e `--homologar`, mas **não reconhecia `--deploy-reviews`**, embora a versão nova de `scripts/atualizar-linkstack.sh` já implementasse o modo.
+
+**Correções realizadas na PR #42:** o instalador do dispatcher inclui `--deploy-reviews` na lista fechada de modos e na homologação read-only após publicação, preservando os modos anteriores; testes de regressão M13 foram adaptados. `scripts/audit-review-deploy.py` verifica o encaminhamento, rejeição de migração com modo genérico, existência de backup, execução do fluxo de migração com banco SQLite sintético, verificação da tabela e integridade. O job `script-quality` de `deploy-unificado.yml` executa essa auditoria.
+
+**Ordem operacional obrigatória — após merge, não executada nesta sessão:**
+
+1. Verificar a revisão de produção via acesso autorizado à VPS e preservar backup do arquivo do dispatcher em `/root`. Confirmar que o checkout persistente é o repositório correto e que a branch é `main` sem alterações locais.
+2. Usar o GitHub **na SHA aprovada** para recuperar `scripts/instalar-deploy-unificado.sh`, conferir assinatura/commit e validar `bash -n`. Instalar a nova versão do dispatcher de forma controlada por root **sem executar deploy**; ele preserva cópia de segurança da versão anterior.
+3. Fazer `sudo bash /root/atualizar-linkstack.sh --check`, inspecionar lista e conflitos. Se houver outras migrações simultâneas ou `--check` falhar, parar e investigar: **não contornar o bloqueio**.
+4. Em janela aprovada e com pré-condições atendidas, fazer `sudo bash /root/atualizar-linkstack.sh --deploy-reviews`. O dispatcher executa homologação read-only após a publicação.
+5. Confirmar com SSH, `sqlite3 -readonly` e smoke autenticado; registrar SHA de produção no handoff. Não confundir CI GitHub com validação direta da VPS.
+
+**Atenção:** o GitHub Actions não possui neste repositório uma etapa autenticada de deploy SSH da VPS. Sua verificação pública de `https://linkfree.website` não instala código. A ausência de acesso à VPS impede afirmar que a publicação ou a homologação física aconteceram.
