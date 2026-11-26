@@ -25,9 +25,9 @@ foreach ($customConfigs as $config) {
 
 // Public marketing pages are available on the main LinkFree site only.
 // Mapped custom domains above remain dedicated to their member profiles.
-Route::get('/recursos', fn () => view('public.features'))
+Route::get('/plataforma/recursos', fn () => view('public.features'))
     ->name('public.features');
-Route::get('/proximas-implementacoes', fn () => view('public.roadmap'))
+Route::get('/plataforma/proximas-implementacoes', fn () => view('public.roadmap'))
     ->name('public.roadmap');
 
 $customHomeUrl = config('advanced-config.custom_home_url', '/home');
