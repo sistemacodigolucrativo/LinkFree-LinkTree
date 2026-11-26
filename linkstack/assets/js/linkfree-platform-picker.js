@@ -48,8 +48,7 @@
     const safeClass = /^[a-z0-9_ -]+$/i.test(name) ? name : 'default';
     const assets = iconSources(wrapper, name);
     const sheet = (url) => url ? '<link rel="stylesheet" href="' + htmlEscape(url) + '">' : '';
-    const img = '<img class="icon hvr-icon" alt="" src="' + htmlEscape(assets.preferred) + '" ' +
-      'onerror="this.onerror=null;this.src=\'' + htmlEscape(assets.official) + '\'">';
+    const img = '<img class="icon hvr-icon" alt="" src="' + htmlEscape(assets.preferred) + '">';
     // No links or scripts run in this sandboxed iframe.
     return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width, initial-scale=1">' +
