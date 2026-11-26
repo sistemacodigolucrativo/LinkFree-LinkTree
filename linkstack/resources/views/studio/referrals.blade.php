@@ -4,7 +4,6 @@
 <div class="container-fluid content-inner py-0">
     <div class="card rounded-4">
         <div class="card-body p-3 p-md-4">
-            <h1 class="h3 mb-2"><i class="bi bi-people" aria-hidden="true"></i> {{ __('member_ui.referrals') }}</h1>
             <p class="text-muted">Compartilhe seu convite. Um cadastro novo feito pelo link será atribuído à sua conta. Não há recompensa financeira automática.</p>
 
             @if(session('success'))
