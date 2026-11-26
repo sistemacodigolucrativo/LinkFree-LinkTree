@@ -38,6 +38,11 @@ if (isset($_COOKIE['LinkCount'])) {
 <style>
 /* Estúdio > Meus Links: cards independentes, sem prévia embutida. */
 .studio-links-page .links-workspace { width:100%; min-width:0; }
+/* The Free usage notice precedes the workspace. Undo only the desktop/tablet
+   negative top margin when that notice is present, preventing card overlap. */
+@media (min-width: 576px) {
+  .studio-links-page.lf-links-has-limit { margin-top:0!important; }
+}
 .studio-links-page .links-workspace > .card-body { padding:0; }
 .studio-links-page .pre-left { width:100%; min-width:0; box-sizing:border-box; }
 .studio-links-page .links-section-card { width:100%; min-width:0; overflow-wrap:anywhere; }
@@ -265,7 +270,7 @@ if (isset($_COOKIE['LinkCount'])) {
 
 <?php if(!function_exists('strp')){function strp($urlStrp){return str_replace(array('http://', 'https://'), '', $urlStrp);}} ?>
 
-<div class="conatiner-fluid content-inner mt-n5 py-0 studio-links-page">
+<div class="conatiner-fluid content-inner mt-n5 py-0 studio-links-page{{ auth()->user()->role === 'user' ? ' lf-links-has-limit' : '' }}">
     <div class="row">
 
         <div class="col-lg-12">
