@@ -125,8 +125,13 @@ body .main-content .lf-review-page :is(.lf-review-quiet,.lf-review-errors,.lf-re
  * As selecionadas têm fundo contrastante para manter WCAG AA no tema claro
  * e continuam amarelas no tema escuro. O radio nativo permanece acessível.
  */
+body .main-content .lf-review-page .lf-review-stars {
+  background-color: #263854;
+  border-radius: 12px;
+  padding: 5px 8px;
+}
 body .main-content .lf-review-page .lf-review-stars label {
-  color: #986700 !important;
+  color: #eab92f !important;
   -webkit-text-stroke: .45px #684900;
   border-radius: 7px;
   padding: 0 4px;
@@ -138,7 +143,7 @@ body.dark .main-content .lf-review-page .lf-review-stars label {
 }
 body .main-content .lf-review-page .lf-review-stars :is(label.lf-selected,.lf-rating-input:checked+label) {
   color: #ffcc36 !important;
-  background-color: #263854;
+  background-color: #40516f;
   -webkit-text-stroke: .65px #755000;
 }
 body .main-content .lf-review-page .lf-review-stars .lf-rating-input:focus-visible+label {
