@@ -16,7 +16,6 @@ const result = {origin:base, fixture:'ephemeral SQLite / synthetic member only',
   sourceSha:process.env.GITHUB_SHA || '',checks:[]};
 const pages = [
   ['/dashboard','Painel de Controle'],
-  ['/studio/visitors','Origem dos Visitantes'],
   ['/studio/links','Links e Blocos'],
   ['/studio/add-link','Adicionar Bloco'],
   ['/studio/page-icons','Ícones da Página'],
@@ -45,10 +44,10 @@ async function check(label, fn) {
   }
   save();
 }
-async function login(page) {
+async function login(page, user='auditfree') {
   await page.goto(base+'/login',{waitUntil:'domcontentloaded',timeout:20000});
   const form=page.locator('form[action$="/login"]').first();
-  await form.locator('[name=email]').fill('auditfree@example.test');
+  await form.locator('[name=email]').fill(user+'@example.test');
   await form.locator('[name=password]').fill('Synthetic-password-123');
   await Promise.all([
     page.waitForURL('**/dashboard',{timeout:20000}),
@@ -103,14 +102,13 @@ async function linksFlow(page,width,mode) {
   assert(await action.evaluate(el=>document.activeElement===el),'CTA is not keyboard focusable');
   await page.keyboard.press('Enter');
   await page.waitForURL('**/studio/blocks',{timeout:15000});
-  await verifyTopbar(page,'/studio/blocks','Gerenciar Blocos',width);
-  await page.goBack({waitUntil:'domcontentloaded',timeout:15000});
-  // The prior verifyTopbar() is an explicit GET of /studio/blocks; goBack returns there.
-  assert.equal(new URL(page.url()).pathname,'/studio/blocks');
+  assert.equal((await page.locator('.lf-member-nav-copy').innerText()).trim(),'Gerenciar Blocos');
   await page.goBack({waitUntil:'domcontentloaded',timeout:15000});
   assert.equal(new URL(page.url()).pathname,'/studio/links','Browser back must restore links');
   await page.locator('#studio-my-links-title a.btn-primary').click();
   await page.waitForURL('**/studio/blocks',{timeout:15000});
+  await page.goBack({waitUntil:'domcontentloaded',timeout:15000});
+  assert.equal(new URL(page.url()).pathname,'/studio/links','Browser back after pointer click');
   return {viewport:width,mode,keyboardActivation:true,pointerActivation:true,history:true};
 }
 async function run() {
@@ -142,6 +140,24 @@ async function run() {
       try {
         await check('Login member '+width+' '+mode,async()=>{await login(page);return {width,mode};});
         if(width===375) {
+          await check('Free member cannot access VIP visitor report',async()=>{
+            const response=await page.goto(base+'/studio/visitors',{waitUntil:'domcontentloaded'});
+            assert.equal(response?.status(),403,'Free visitor reports must be blocked');
+            return {freeStatus:403};
+          });
+          await check('VIP member visitor report Topbar',async()=>{
+            const vip=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
+            try {
+              await vip.route('**/*',r=>{
+                try {if(new URL(r.request().url()).origin===base)return r.continue();}
+                catch (_) {}
+                return r.abort('blockedbyclient');
+              });
+              const vipPage=await vip.newPage();
+              await login(vipPage,'auditvip');
+              return await verifyTopbar(vipPage,'/studio/visitors','Origem dos Visitantes',width);
+            } finally {await vip.close();}
+          });
           for(const [route,label] of pages) {
             await check('Authenticated route '+route,()=>verifyTopbar(page,route,label,width));
           }
@@ -154,7 +170,7 @@ async function run() {
             return {sameCanonicalBadge:true};
           });
           await check('Edit link icon selector label and preserved options',async()=>{
-            const response=await page.goto(base+'/studio/edit-link/101',{waitUntil:'domcontentloaded'});
+            const response=await page.goto(base+'/studio/add-link?block=predefined',{waitUntil:'domcontentloaded'});
             assert.equal(response?.status(),200);
             const label=page.locator('label[for="predefined-button"]');
             await label.waitFor({state:'visible',timeout:12000});
