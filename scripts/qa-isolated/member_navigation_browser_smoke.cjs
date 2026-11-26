@@ -88,6 +88,13 @@ async function assertAxe(page, selector) {
 }
 async function linksFlow(page,width,mode) {
   await verifyTopbar(page,'/studio/links','Links e Blocos',width);
+  const usage=page.locator('main.main-content > .alert.alert-info[role="status"]').first();
+  assert.equal(await usage.count(),1,'Free usage notice should be visible');
+  const notice=await usage.boundingBox();
+  const linkCard=await page.locator('.studio-links-page .links-section-card').first().boundingBox();
+  assert(notice && linkCard,'Missing usage notice or links card geometry');
+  assert(linkCard.y >= notice.y+notice.height+7,
+    'Free notice overlaps the card at '+width+'px: '+JSON.stringify({notice,linkCard}));
   assert.equal((await page.locator('#studio-my-links-title').innerText()).includes('Links e Blocos'),true);
   const action=page.locator('#studio-my-links-title a.btn-primary');
   assert.equal(await action.count(),1,'Exactly one card CTA expected');
@@ -123,7 +130,7 @@ async function run() {
   save();
   const browser=await chromium.launch({headless:true});
   try {
-    for(const [width,mode] of [[320,'dark'],[375,'light'],[768,'dark'],
+    for(const [width,mode] of [[320,'dark'],[375,'light'],[575,'dark'],[576,'light'],[768,'dark'],
                                [1024,'light'],[1280,'dark']]){
       const context=await browser.newContext({
         viewport:{width,height:900},reducedMotion:'reduce',serviceWorkers:'block'});
