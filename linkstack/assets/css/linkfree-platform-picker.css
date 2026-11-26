@@ -1,0 +1,56 @@
+/* Only the predefined platform selector inside member link editing. */
+.lf-platform-picker { width:100%; max-width:100%; min-width:0; margin-bottom:16px; }
+.lf-platform-picker.is-enhanced > select { display:none; }
+.lf-platform-picker .lf-platform-enhanced { min-width:0; max-width:100%; }
+.lf-platform-picker .lf-platform-trigger {
+  display:flex; align-items:center; gap:11px; width:100%; min-height:48px;
+  padding:9px 12px; text-align:start; border:1px solid var(--lf-border,#75839a);
+  border-radius:9px; background:var(--lf-surface,#fff); color:var(--lf-text,#18243b);
+  font:inherit; cursor:pointer;
+}
+.lf-platform-picker .lf-platform-trigger:hover,
+.lf-platform-picker .lf-platform-expand:hover { background:var(--lf-hover,#eaf0fa); }
+.lf-platform-picker .lf-platform-trigger:focus-visible,
+.lf-platform-picker .lf-platform-expand:focus-visible,
+.lf-platform-picker .lf-platform-confirm:focus-visible {
+  outline:3px solid var(--lf-focus,#275fbd);outline-offset:2px;
+}
+.lf-platform-picker .lf-platform-trigger-text,
+.lf-platform-picker .lf-platform-name { flex:1 1 auto; min-width:0; overflow-wrap:anywhere; }
+.lf-platform-picker .lf-platform-trigger-icon { flex:0 0 24px; height:24px; display:grid; place-items:center; }
+.lf-platform-picker .lf-platform-icon { width:24px; height:24px; flex:0 0 24px; display:block; object-fit:contain; }
+.lf-platform-picker .lf-platform-chevron { flex:0 0 auto; font-size:1.3em;line-height:1; transition:transform .15s ease; }
+.lf-platform-picker [aria-expanded="true"] > .lf-platform-chevron { transform:rotate(180deg); }
+.lf-platform-picker .lf-platform-options {
+  box-sizing:border-box; max-height:min(60vh,540px); overflow-y:auto; overflow-x:hidden;
+  margin-top:6px; padding:6px; border:1px solid var(--lf-border,#75839a); border-radius:11px;
+  background:var(--lf-surface,#fff); color:var(--lf-text,#18243b);
+  scrollbar-gutter:stable; overscroll-behavior:contain;
+}
+.lf-platform-picker .lf-platform-option { min-width:0; margin:2px 0; border:1px solid transparent; border-radius:8px; }
+.lf-platform-picker .lf-platform-option:has(> .lf-platform-expand[aria-expanded="true"]) { border-color:var(--lf-border,#75839a); }
+.lf-platform-picker .lf-platform-expand {
+  box-sizing:border-box; width:100%; min-height:46px; padding:10px;
+  display:flex; align-items:center; gap:10px; border:0; border-radius:8px;
+  background:transparent; color:inherit; font:inherit; text-align:start; cursor:pointer;
+}
+.lf-platform-picker .lf-platform-details {
+  min-width:0; padding:8px 10px 13px; border-top:1px solid var(--lf-border,#75839a);
+}
+.lf-platform-picker .lf-platform-details[hidden], .lf-platform-picker .lf-platform-options[hidden] { display:none!important; }
+.lf-platform-picker .lf-platform-preview {
+  display:block; box-sizing:border-box; width:100%; height:135px; max-width:100%; margin:0 0 10px;
+  background:#fff; border:1px solid var(--lf-border,#75839a);border-radius:10px;
+  pointer-events:none;overflow:hidden;
+}
+.lf-platform-picker .lf-platform-confirm { min-height:44px; max-width:100%; white-space:normal; }
+.lf-platform-picker .lf-platform-feedback { margin:6px 2px 0; font-size:.86rem; color:var(--lf-muted,#4b5870); }
+.lf-platform-picker .lf-platform-feedback:empty { display:none; }
+@media(max-width:575px) {
+  .lf-platform-picker .lf-platform-options { max-height:min(55dvh,460px);padding:4px; }
+  .lf-platform-picker .lf-platform-confirm {width:100%;}
+  .lf-platform-picker .lf-platform-details {padding-inline:7px;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .lf-platform-picker .lf-platform-chevron {transition:none;}
+}
