@@ -27,7 +27,7 @@
   <header class="lf-login-heading">
     <span class="lf-login-kicker">{{ config('app.name') }}</span>
     <h1>{{ __('messages.Sign Up') }}</h1>
-    <p>{{ __('messages.Register to stay connected') }}.</p>
+    <p>{{ str_starts_with(strtolower(app()->getLocale()), 'pt') ? 'Crie sua página pública, organize seus canais e compartilhe um endereço único.' : __('messages.Register to stay connected') }}</p>
   </header>
   <x-auth-session-status class="mb-3" :status="session('status')" />
   <x-auth-validation-errors class="mb-3" :errors="$errors" />
