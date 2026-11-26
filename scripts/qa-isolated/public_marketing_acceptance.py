@@ -34,7 +34,7 @@ def verify(label, fn):
 def test_home():
     code, headers, page = get("/")
     assert code == 200
-    assert "/recursos" in page and "/proximas-implementacoes" in page
+    assert "/plataforma/recursos" in page and "/plataforma/proximas-implementacoes" in page
     assert "Recursos reais. Evolução transparente." in page
     assert "Conhecer todos os recursos" in page
     assert "Criar minha página" in page
@@ -42,7 +42,7 @@ def test_home():
     return "Home links both public pages; no auth required"
 
 def test_resources():
-    code, headers, page = get("/recursos")
+    code, headers, page = get("/plataforma/recursos")
     assert code == 200
     for fragment in (
         "Mais do que um link.", "Seu espaço na internet.",
@@ -51,18 +51,18 @@ def test_resources():
         "Selo verificado", "Portabilidade condicionada",
     ):
         assert fragment in page, f"Missing verified feature: {fragment}"
-    assert 'href="http://127.0.0.1:18765/recursos"' in page, "Canonical missing"
+    assert 'href="http://127.0.0.1:18765/plataforma/recursos"' in page, "Canonical missing"
     assert "<meta name=\"description\" content=" in page
     assert "/assets/css/linkfree-public-pages.css" in page
     assert headers.get("Set-Cookie") is None, "Feature page should not set cookie"
     return "Public catalog renders verified member features and tier disclaimers"
 
 def test_roadmap():
-    code, headers, page = get("/proximas-implementacoes")
+    code, headers, page = get("/plataforma/proximas-implementacoes")
     assert code == 200
     assert "Nenhuma nova ferramenta anunciada no momento." in page
     assert "Sem datas inventadas" in page
-    assert 'href="http://127.0.0.1:18765/proximas-implementacoes"' in page
+    assert 'href="http://127.0.0.1:18765/plataforma/proximas-implementacoes"' in page
     # Previously requested tools have existing routes and must not be re-announced.
     for delivered in ("Programa de indicações", "Central de denúncias", "Solicitação de selo"):
         assert delivered not in page
