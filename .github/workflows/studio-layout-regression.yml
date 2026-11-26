@@ -38,6 +38,17 @@ on:
       - 'linkstack/app/Http/Controllers/SeoController.php'
       - 'linkstack/resources/views/public/**'
       - 'linkstack/assets/css/linkfree-public-catalog.css'
+      - 'linkstack/app/Http/Controllers/PlatformReviewController.php'
+      - 'linkstack/app/Services/PlatformReviewPublication.php'
+      - 'linkstack/database/migrations/2026_11_26_000001_create_platform_reviews_table.php'
+      - 'linkstack/resources/views/studio/platform-review.blade.php'
+      - 'linkstack/resources/views/panel/platform-reviews.blade.php'
+      - 'linkstack/resources/views/public/platform-reviews.blade.php'
+      - 'linkstack/resources/lang/**/messages.php'
+      - 'linkstack/resources/lang/**/reviews.php'
+      - 'linkstack/assets/css/linkfree-platform-reviews.css'
+      - 'scripts/audit-reviews-and-branding.py'
+      - 'scripts/atualizar-linkstack.sh'
       - 'scripts/audit-new-improvements.php'
       - 'scripts/audit-auth-blade-boot.php'
       - 'scripts/audit-new-improvements.py'
@@ -120,6 +131,17 @@ on:
       - 'linkstack/app/Http/Controllers/SeoController.php'
       - 'linkstack/resources/views/public/**'
       - 'linkstack/assets/css/linkfree-public-catalog.css'
+      - 'linkstack/app/Http/Controllers/PlatformReviewController.php'
+      - 'linkstack/app/Services/PlatformReviewPublication.php'
+      - 'linkstack/database/migrations/2026_11_26_000001_create_platform_reviews_table.php'
+      - 'linkstack/resources/views/studio/platform-review.blade.php'
+      - 'linkstack/resources/views/panel/platform-reviews.blade.php'
+      - 'linkstack/resources/views/public/platform-reviews.blade.php'
+      - 'linkstack/resources/lang/**/messages.php'
+      - 'linkstack/resources/lang/**/reviews.php'
+      - 'linkstack/assets/css/linkfree-platform-reviews.css'
+      - 'scripts/audit-reviews-and-branding.py'
+      - 'scripts/atualizar-linkstack.sh'
       - 'scripts/audit-new-improvements.php'
       - 'scripts/audit-auth-blade-boot.php'
       - 'scripts/audit-new-improvements.py'
@@ -210,6 +232,14 @@ jobs:
           php -l linkstack/app/Services/PublicSiteContent.php
           php -l linkstack/app/Http/Controllers/AdminController.php
           php -l linkstack/routes/web.php
+      - name: Audit reviews, consent, dynamic brand and migration
+        run: |
+          python scripts/audit-reviews-and-branding.py
+          bash -n scripts/atualizar-linkstack.sh
+          php -l linkstack/app/Http/Controllers/PlatformReviewController.php
+          php -l linkstack/app/Services/PlatformReviewPublication.php
+          php -l linkstack/database/migrations/2026_11_26_000001_create_platform_reviews_table.php
+          for lang in linkstack/resources/lang/*/messages.php; do php -l "$lang"; done
       - name: Compile authentication views with bootstrapped Laravel
         run: php scripts/audit-auth-blade-boot.php
       - name: Audit ten new scoped enhancements
