@@ -55,7 +55,7 @@ examples = {
 
 with sync_playwright() as playwright:
     browser = playwright.chromium.launch(
-        channel="chrome", headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"]
+        headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"]
     )
     try:
         for width in (320, 390, 768, 1280):
