@@ -278,7 +278,7 @@ if (isset($_COOKIE['LinkCount'])) {
                             <section class='pre-left links-section-card card rounded mb-3 text-gray-400' aria-labelledby='studio-my-links-title'>
                                 <h3 id="studio-my-links-title" class="card-header mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
                                     <span><i class="bi bi-link-45deg" aria-hidden="true"></i> {{ __('member_ui.links_blocks') }}</span>
-                                    <a class="btn btn-primary" href="{{ route('showBlocks') }}" aria-label="{{ __('member_ui.add_link_block_action') }}" title="{{ __('member_ui.add_link_block_action') }}">{{ __('member_ui.add_link_block') }}</a>
+                                    <a class="btn btn-primary" href="{{ route('showBlocks') }}" aria-label="{{ __('member_ui.add_link_block') }} — {{ __('member_ui.add_link_block_action') }}" title="{{ __('member_ui.add_link_block_action') }}">{{ __('member_ui.add_link_block') }}</a>
                                 </h3>
 
                                 <div class="card-body px-3 pb-3">
