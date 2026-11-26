@@ -46,8 +46,8 @@ if (isset($_COOKIE['LinkCount'])) {
 .studio-links-page .links-workspace > .card-body { padding:0; }
 .studio-links-page .pre-left { width:100%; min-width:0; box-sizing:border-box; }
 .studio-links-page .links-section-card { width:100%; min-width:0; overflow-wrap:anywhere; }
-.studio-links-page .links-section-card .card-header { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; justify-content:space-between; }
-.studio-links-page .links-section-card .card-header > .btn { float:none!important; margin-left:auto; }
+.studio-links-page .lf-links-actions { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; justify-content:flex-end; }
+.studio-links-page .lf-links-actions > .btn { float:none!important; margin-left:auto; }
 .studio-links-page .links-section-card .card-body { width:100%; min-width:0; }
 .studio-links-page #links-table-body { width:100%; min-width:0; }
 .studio-links-page .page-icons-card .form-group { width:100%; max-width:760px; min-width:0; }
@@ -78,7 +78,7 @@ if (isset($_COOKIE['LinkCount'])) {
 .studio-links-preview-modal iframe { display:block; width:100%; height:100%; border:0; background:#fff; }
 @media(max-width:767px) {
   .studio-links-page .links-section-card .card-body { padding:14px!important; }
-  .studio-links-page .links-section-card .card-header > .btn { width:100%; margin-left:0; }
+  .studio-links-page .lf-links-actions > .btn { width:100%; margin-left:0; }
   .studio-links-preview-fab { right:16px; bottom:calc(16px + env(safe-area-inset-bottom, 0px)); }
 }
 @media(max-width:359px) { .studio-links-preview-fab { padding:12px 15px; } }
@@ -280,11 +280,10 @@ if (isset($_COOKIE['LinkCount'])) {
                       <div class="col-sm-12">
 
                         <div class="studio-links-sections">
-                            <section class='pre-left links-section-card card rounded mb-3 text-gray-400' aria-labelledby='studio-my-links-title'>
-                                <h3 id="studio-my-links-title" class="card-header mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2">
-                                    <span><i class="bi bi-link-45deg" aria-hidden="true"></i> {{ __('member_ui.links_blocks') }}</span>
+                            <section class='pre-left links-section-card card rounded mb-3 text-gray-400' aria-label="{{ __('member_ui.links_blocks') }}">
+                                <div class="lf-links-actions px-3 pt-3">
                                     <a class="btn btn-primary" href="{{ route('showBlocks') }}" aria-label="{{ __('member_ui.add_link_block') }} — {{ __('member_ui.add_link_block_action') }}" title="{{ __('member_ui.add_link_block_action') }}">{{ __('member_ui.add_link_block') }}</a>
-                                </h3>
+                                </div>
 
                                 <div class="card-body px-3 pb-3">
 
