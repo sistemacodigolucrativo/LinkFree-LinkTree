@@ -22,7 +22,7 @@ body.lf-public-catalog{margin:0;min-width:0;background:var(--lfp-bg);color:var(-
 .lf-kicker{text-transform:uppercase;letter-spacing:.12em;font-size:.78rem;font-weight:800;color:var(--lfp-green);margin:0}
 .lf-catalog-hero{padding:clamp(64px,8vw,115px) 0 80px;background:radial-gradient(circle at 90% 15%,#25401f 0,transparent 45%)}
 .lf-catalog-hero .lf-public-wrap{max-width:900px}
-.lf-catalog-hero h1{margin:14px 0 22px;max-width:900px;font-size:clamp(2.65rem,5.8vw,5.15rem);font-weight:830;letter-spacing:-.05em;line-height:1.08}
+.lf-catalog-hero h1{margin:14px 0 22px;max-width:900px;font-size:clamp(2.65rem,5.8vw,5.15rem);font-weight:830;letter-spacing:-.05em;line-height:1.08;overflow-wrap:anywhere}
 .lf-catalog-hero h1 span{color:var(--lfp-green)}
 .lf-catalog-lead{font-size:clamp(1.05rem,2vw,1.24rem);max-width:760px;color:var(--lfp-muted);margin:0 0 16px}
 .lf-small-note{font-size:.92rem;color:#b6c7b5;max-width:720px;margin:0}
