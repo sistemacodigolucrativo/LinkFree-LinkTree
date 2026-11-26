@@ -196,6 +196,14 @@ async function run() {
             await trigger.focus();
             await page.keyboard.press('Enter');
             assert.equal(await trigger.getAttribute('aria-expanded'),'true');
+            const names=await page.locator('.lf-platform-name').allTextContents();
+            assert(names.length>5 && names.every(name=>name.trim()),'Every platform must display a name');
+            const store=page.locator('.lf-platform-expand').filter({hasText:'Apple Store'}).first();
+            assert.equal(await store.locator('img.lf-platform-icon-light').count(),1,
+              'Light Apple Store icon requires a contrasting backdrop');
+            const discordIcon=page.locator('.lf-platform-expand').filter({hasText:'Discord'}).first();
+            assert.equal(await discordIcon.locator('img.lf-platform-icon-light').count(),1,
+              'Light Discord icon requires a contrasting backdrop');
             const amazon=page.locator('.lf-platform-expand').filter({hasText:'Amazon'}).first();
             assert((await amazon.locator('img').getAttribute('src')).endsWith('/amazon.svg'));
             await amazon.focus();
