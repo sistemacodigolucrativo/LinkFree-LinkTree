@@ -36,13 +36,13 @@
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Prévia do LinkFree">
+<meta property="og:image:alt" content="Prévia do {{ config('app.name') }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="{{ $homeCanonical }}">
 <meta name="twitter:title" content="{{ $homeTitle }}">
 <meta name="twitter:description" content="{{ $homeDescription }}">
 <meta name="twitter:image" content="{{ $homeImage }}">
-<meta name="twitter:image:alt" content="Prévia do LinkFree">
+<meta name="twitter:image:alt" content="Prévia do {{ config('app.name') }}">
 <script type="application/ld+json">{!! json_encode($homeSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) !!}</script>
 
       <!-- Favicon -->
