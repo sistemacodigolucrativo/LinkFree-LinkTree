@@ -15,6 +15,9 @@ on:
       - 'linkstack/assets/linkstack/css/**'
       - 'linkstack/themes/**'
       - 'linkstack/app/Services/ThemeOptions.php'
+      - 'linkstack/app/Services/PublicSiteContent.php'
+      - 'linkstack/app/Services/MemberFeatureCatalog.php'
+      - 'scripts/audit-public-member-catalog.py'
   pull_request:
     branches: [main]
     paths:
@@ -30,6 +33,9 @@ on:
       - 'linkstack/assets/linkstack/css/**'
       - 'linkstack/themes/**'
       - 'linkstack/app/Services/ThemeOptions.php'
+      - 'linkstack/app/Services/PublicSiteContent.php'
+      - 'linkstack/app/Services/MemberFeatureCatalog.php'
+      - 'scripts/audit-public-member-catalog.py'
   workflow_dispatch:
 
 permissions:
@@ -172,6 +178,33 @@ jobs:
           path: |
             /tmp/linkfree-audit/member-navigation-results.json
             /tmp/linkfree-audit/member-navigation-screenshots/
+          if-no-files-found: warn
+          retention-days: 30
+
+  public-catalog-browser:
+    # Fast public only: 320–1280px, axe scoped to main, user-flow and no secrets.
+    # Does not replace the manually dispatched site-wide accessibility matrix.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate public browser test and existing fixture runner
+        run: |
+          node --check scripts/qa-isolated/public_catalog_browser_smoke.cjs
+          bash -n scripts/qa-isolated/run_config_browser_smoke.sh
+      - name: Validate homepage, member catalog and future-only roadmap
+        timeout-minutes: 12
+        run: QA_PUBLIC_CATALOG_ONLY=1 bash scripts/qa-isolated/run_config_browser_smoke.sh
+      - name: Upload public acceptance and viewport screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linkfree-qa-public-catalog-synthetic
+          path: |
+            /tmp/linkfree-audit/public-catalog-results.json
+            /tmp/linkfree-audit/public-catalog-screenshots/
           if-no-files-found: warn
           retention-days: 30
 

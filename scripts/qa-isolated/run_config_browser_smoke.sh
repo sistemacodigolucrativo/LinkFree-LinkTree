@@ -43,7 +43,7 @@ cd /tmp/linkfree-qa-node
 npm init -y > /dev/null
 if [ "${QA_DARK_TRANSITION_ONLY:-0}" = "1" ]; then
   timeout 180s npm install --no-audit --no-fund playwright pngjs
-elif [ "${QA_MEMBER_NAV_ONLY:-0}" = "1" ]; then
+elif [ "${QA_MEMBER_NAV_ONLY:-0}" = "1" ] || [ "${QA_PUBLIC_CATALOG_ONLY:-0}" = "1" ]; then
   timeout 180s npm install --no-audit --no-fund playwright @axe-core/playwright
 else
   timeout 180s npm install --no-audit --no-fund playwright
@@ -65,6 +65,8 @@ elif [ "${QA_ADMIN_UX_ONLY:-0}" = "1" ]; then
   timeout 360s node scripts/qa-isolated/admin_ux_smoke.cjs
 elif [ "${QA_MEMBER_NAV_ONLY:-0}" = "1" ]; then
   timeout 360s node scripts/qa-isolated/member_navigation_browser_smoke.cjs
+elif [ "${QA_PUBLIC_CATALOG_ONLY:-0}" = "1" ]; then
+  timeout 360s node scripts/qa-isolated/public_catalog_browser_smoke.cjs
 else
   timeout 360s node scripts/qa-isolated/config_browser_smoke.cjs
 fi

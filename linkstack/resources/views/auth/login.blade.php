@@ -26,7 +26,7 @@ foreach($pages as $page)
         <span class="lf-login-visual-emblem"><i class="bi bi-grid-1x2-fill"></i></span>
         <p class="lf-login-visual-eyebrow">LINKFREE</p>
         <h2>{{ config('app.name') }}</h2>
-        <p>{{ __('messages.Login to stay connected') }}.</p>
+        <p>{{ str_starts_with(strtolower(app()->getLocale()), 'pt') ? 'Reúna sua página, seus links e suas conexões em um só lugar.' : __('messages.Login to stay connected') }}</p>
       </div>
       <div class="lf-login-visual-accent"><span></span><span></span><span></span></div>
     </aside>
@@ -45,7 +45,7 @@ foreach($pages as $page)
       <header class="lf-login-heading">
         <span class="lf-login-kicker">{{ config('app.name') }}</span>
         <h1 id="lf-login-title">{{ __('messages.Sign In') }}</h1>
-        <p>{{ __('messages.Login to stay connected') }}.</p>
+        <p>{{ str_starts_with(strtolower(app()->getLocale()), 'pt') ? 'Entre para organizar blocos, personalizar sua página e acompanhar cliques.' : __('messages.Login to stay connected') }}</p>
       </header>
 
       <x-auth-session-status class="mb-3" :status="session('status')" />
