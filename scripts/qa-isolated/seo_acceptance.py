@@ -122,6 +122,13 @@ elif mode == 'home-profile':
 else:
     home,_=page('/')
     assert any(x.get('@type')=='WebSite' for x in home.schemas)
+    home_markup=get('/')[2].decode('utf-8', 'replace')
+    assert 'Sua página de links, com identidade própria' in home.one('og:title')
+    assert 'Sua página de links, com identidade própria' in home_markup
+    catalog_status,_,catalog_html=get('/plataforma/recursos')
+    assert catalog_status == 200
+    assert 'Compartilhamento por QR Code' in catalog_html.decode('utf-8', 'replace')
+    print('PASS public title and QR catalog availability without changing member QR flow')
     profile,_=page('/@auditfree')
     assert profile.one('og:title') == 'auditfree'
     assert any(x.get('@type')=='ProfilePage' and x['mainEntity']['name']=='auditfree' for x in profile.schemas)
