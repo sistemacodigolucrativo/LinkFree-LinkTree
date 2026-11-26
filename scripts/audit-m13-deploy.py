@@ -10,7 +10,7 @@ for file in ('2026_11_23_000002_create_referral_tables.php',
 assert 'database/migrations/*) manual+=' in dep
 assert 'if [[ "$MODE" == --deploy-m13 ]]; then' in dep
 assert '"$MODE" != --check && "$MODE" != --deploy-m13' in dep
-assert '--deploy-consent|--deploy-m13|--homologar)' in boot
+assert '--deploy-consent|--deploy-m13|--deploy-reviews|--homologar)' in boot
 assert dep.index('sqlite-before-deploy.sqlite') < dep.index('php artisan migrate --path="$migration"')
 assert dep.index('php artisan migrate --path="$migration"') < dep.index('deploy_started=true')
 assert 'PRAGMA foreign_key_check' in dep
