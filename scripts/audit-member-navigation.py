@@ -109,7 +109,7 @@ html_template = """<!doctype html><html lang="pt-BR"><head>
 <li class="nav-item"><a class="nav-link" href="#" aria-label="Perfil">●</a></li>
 </ul></div></div></nav></main></body></html>"""
 with sync_playwright() as playwright:
-    browser = playwright.chromium.launch(headless=True)
+    browser = playwright.chromium.launch(channel="chrome", headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
     try:
         for title, use_badge in (("Fundos Personalizados", False),
                                  ("Selo Verificado", True)):
