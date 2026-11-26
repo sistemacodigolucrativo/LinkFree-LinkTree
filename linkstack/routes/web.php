@@ -66,6 +66,7 @@ Route::get('/plataforma/recursos', [\App\Http\Controllers\PublicCatalogControlle
     ->name('public.resources')->middleware('disableCookies');
 Route::get('/plataforma/proximas-implementacoes', [\App\Http\Controllers\PublicCatalogController::class, 'roadmap'])
     ->name('public.roadmap')->middleware('disableCookies');
+Route::get('/plataforma/avaliacoes', [\App\Http\Controllers\PlatformReviewController::class, 'publicPage'])->name('public.platform-reviews')->middleware('disableCookies');
 
 
 // SEO and public social previews; unavailable in installer/maintenance mode.
@@ -151,6 +152,9 @@ Route::post('/studio/background', [UserController::class, 'themeBackground'])->n
 Route::post('/studio/rem-background', [UserController::class, 'removeBackground'])->name('removeBackground');
 Route::get('/studio/profile', [UserController::class, 'showProfile'])->name('showProfile');
 Route::post('/studio/profile', [UserController::class, 'editProfile'])->name('editProfile');
+Route::get('/studio/avaliar', [\App\Http\Controllers\PlatformReviewController::class, 'member'])->name('studio.platform-review');
+Route::post('/studio/avaliar', [\App\Http\Controllers\PlatformReviewController::class, 'store'])->name('studio.platform-review.store')->middleware('throttle:3,60');
+Route::post('/studio/avaliar/retirar', [\App\Http\Controllers\PlatformReviewController::class, 'withdraw'])->name('studio.platform-review.withdraw')->middleware('throttle:6,60');
 // Returning to the form URL with GET must not resubmit changes.
 Route::get('/edit-icons', fn () => redirect()->route('showPageIcons'));
 Route::post('/edit-icons', [UserController::class, 'editIcons'])->name('editIcons');
@@ -195,6 +199,8 @@ Route::group([
     Route::get('/admin/users', [AdminController::class, 'users'])->name('showUsers');
     Route::get('/admin/referrals', [ReferralController::class, 'adminIndex'])->name('admin.referrals');
     Route::get('/admin/verification', [VerificationController::class, 'admin'])->name('admin.verification');
+    Route::get('/admin/avaliacoes', [\App\Http\Controllers\PlatformReviewController::class, 'admin'])->name('admin.platform-reviews');
+    Route::post('/admin/avaliacoes/{id}/moderar', [\App\Http\Controllers\PlatformReviewController::class, 'moderate'])->whereNumber('id')->name('admin.platform-reviews.moderate')->middleware('throttle:20,1');
     Route::get('/admin/reports', [AbuseReportController::class, 'index'])->name('admin.abuse-reports.index');
     Route::get('/admin/reports/{id}', [AbuseReportController::class, 'show'])->whereNumber('id')->name('admin.abuse-reports.show');
     Route::post('/admin/reports/{id}/status', [AbuseReportController::class, 'update'])->whereNumber('id')->name('admin.abuse-reports.update');
