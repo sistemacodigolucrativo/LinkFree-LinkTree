@@ -70,6 +70,8 @@ on:
       - 'linkstack/assets/js/linkfree-auth.js'
       - 'linkstack/assets/js/plugins/setting.js'
       - 'scripts/audit-responsive-mobile.py'
+      - 'scripts/audit-member-navigation.py'
+      - 'linkstack/resources/lang/**/member_ui.php'
       - 'scripts/audit-profile-editor-gradient.py'
       - 'scripts/audit-linkfree-interactions.py'
       - 'scripts/audit-color-contrast.py'
@@ -144,6 +146,8 @@ on:
       - 'linkstack/assets/js/linkfree-auth.js'
       - 'linkstack/assets/js/plugins/setting.js'
       - 'scripts/audit-responsive-mobile.py'
+      - 'scripts/audit-member-navigation.py'
+      - 'linkstack/resources/lang/**/member_ui.php'
       - 'scripts/audit-profile-editor-gradient.py'
       - 'scripts/audit-linkfree-interactions.py'
       - 'scripts/audit-color-contrast.py'
@@ -172,6 +176,10 @@ jobs:
         run: python scripts/audit-block-previews.py
       - name: Test mobile widths in headless Chrome
         run: python scripts/audit-responsive-mobile.py
+      - name: Verify member topbar, localized labels and viewport reflow
+        run: |
+          for file in linkstack/resources/lang/*/member_ui.php; do php -l "$file"; done
+          python scripts/audit-member-navigation.py
       - name: Test sidebar closing, inline link buttons and notification viewport
         run: python scripts/audit-linkfree-interactions.py
       - name: Test profile avatar, CKEditor contrast and light gradient
