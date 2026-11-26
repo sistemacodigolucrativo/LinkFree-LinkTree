@@ -4,6 +4,7 @@
 
 @push('sidebar-stylesheets')
 <script src="{{ asset('assets/external-dependencies/fontawesome.js') }}" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="{{ asset('assets/css/linkfree-platform-picker.css') }}?v={{ filemtime(base_path('assets/css/linkfree-platform-picker.css')) }}">
 @endpush
 
 <div class="conatiner-fluid content-inner mt-n5 py-0">
@@ -88,13 +89,16 @@
 @endsection
 
 @push("sidebar-scripts")
+<script src="{{ asset('assets/js/linkfree-platform-picker.js') }}?v={{ filemtime(base_path('assets/js/linkfree-platform-picker.js')) }}"></script>
 <script>
 $(function() {
     LoadLinkTypeParams($("input[name='typename']").val() , $("input[name=linkid]").val());
 
     function LoadLinkTypeParams($TypeId, $LinkId) {
         var baseURL = <?php echo "\"" . url('') . "\""; ?>;
-        $("#link_params").html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>').load(baseURL + `/studio/linkparamform_part/${$TypeId}/${$LinkId}`);
+        $("#link_params").html('<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>').load(baseURL + `/studio/linkparamform_part/${$TypeId}/${$LinkId}`, function(response, status) {
+            if (status === 'success' && window.LinkFreePlatformPicker) window.LinkFreePlatformPicker.init(this);
+        });
         setTimeout(function() { document.dispatchEvent(new Event('contentLoaded')); }, 300);
     }
 });
