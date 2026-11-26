@@ -112,7 +112,7 @@
      data-preview-icon-base="{{ asset('assets/linkstack/icons') }}">
 <div class="row"><div class="col-12">
 <section class="card rounded" aria-labelledby="lf-blocks-title"><div class="card-body p-4">
-<h1 class="h3 mb-2" id="lf-blocks-title"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> Gerenciar blocos</h1>
+<h1 class="h3 mb-2" id="lf-blocks-title"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> {{ __('member_ui.manage_blocks') }}</h1>
 <p class="text-muted mb-4">{{ __('messages.Select Block') }} — {{ __('messages.Click to change link blocks') }}</p>
 <div class="lf-block-grid">
 @foreach ($LinkTypes as $lt)
