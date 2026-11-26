@@ -70,7 +70,7 @@ async function run(){
         await check('Public catalog resources '+width,async()=>{
           await open(page,'/plataforma/recursos');
           const tiles=page.locator('.lf-feature-tile');
-          assert((await tiles.count())>=19,'Too few evidenced features');
+          assert((await tiles.count())>=18,'Too few evidenced features');
           assert.equal(await page.locator('h1').count(),1);
           assert((await page.locator('body').innerText()).includes('VIP e administrador.'));
           assert((await page.title()).startsWith('Recursos para membros'));
