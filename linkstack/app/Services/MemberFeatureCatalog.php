@@ -53,6 +53,7 @@ final class MemberFeatureCatalog
                 'description' => 'Indicadores claros para revisar a organização e o destaque dos seus conteúdos.',
                 'items' => [
                     ['title' => 'Visão geral', 'description' => 'Acompanhe a quantidade de links e o total de cliques exibidos no painel.'],
+                    ['title' => 'Compartilhamento por QR Code', 'description' => 'Abra o QR Code do perfil no painel para facilitar o acesso à sua página. O download em PNG depende do suporte disponível na instalação.', 'note' => 'QR Code da própria página.'],
                     ['title' => 'Links mais acessados', 'description' => 'Identifique os destinos com mais cliques no resumo dos seus links.'],
                     ['title' => 'Origem dos visitantes', 'description' => 'Consulte um resumo das fontes de visita dos últimos 30 dias.', 'note' => 'Disponível para VIP e administrador.'],
                 ],
