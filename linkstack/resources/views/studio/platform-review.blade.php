@@ -22,10 +22,10 @@
         <h2>{{ __('reviews.review_status') }}</h2>
         <p><strong>{{ __('reviews.review_'.$existingReview->status) }}</strong> · {{ $existingReview->rating }} ★</p>
         @if($existingReview->testimonial)<blockquote>{{ $existingReview->testimonial }}</blockquote>@endif
-        <form method="post" action="{{ route('studio.platform-review.withdraw') }}">
+        <form method="post" action="{{ route('studio.platform-review.withdraw') }}" id="lf-review-withdraw" data-confirm="{{ __('reviews.withdraw_confirm') }}">
           @csrf
           <button type="submit" class="lf-review-quiet"
-                  onclick="return confirm(@json(__('reviews.withdraw_confirm')))">{{ __('reviews.withdraw') }}</button>
+>{{ __('reviews.withdraw') }}</button>
         </form>
       </div>
     @else
@@ -67,6 +67,10 @@
 </div>
 <script>
 (() => {
+  const withdraw = document.getElementById('lf-review-withdraw');
+  withdraw?.addEventListener('submit', (event) => {
+    if (!window.confirm(withdraw.dataset.confirm || '')) event.preventDefault();
+  });
   const area = document.querySelector('.lf-review-stars');
   if (!area) return;
   const radios = [...area.querySelectorAll('input[type="radio"]')];
