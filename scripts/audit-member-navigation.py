@@ -15,6 +15,7 @@ sidebar = (views / "layouts/sidebar.blade.php").read_text(encoding="utf-8")
 links = (views / "studio/links.blade.php").read_text(encoding="utf-8")
 form = (views / "components/pageitems/predefined-form.blade.php").read_text(encoding="utf-8")
 blocks = (views / "studio/blocks.blade.php").read_text(encoding="utf-8")
+verification = (views / "studio/verification.blade.php").read_text(encoding="utf-8")
 routes = (root / "routes/web.php").read_text(encoding="utf-8")
 badge = (views / "components/verify-svg.blade.php").read_text(encoding="utf-8")
 
@@ -57,6 +58,9 @@ check("<label for=\"predefined-button\" class='form-label'>{{ __('member_ui.butt
       "Select label changed without altering its options or form name")
 check("{{ __('member_ui.manage_blocks') }}" in blocks and
       "lf-block-grid" in blocks, "Blocks screen and selection remain present")
+check("@include('components.verify-svg')" in verification and
+      '<i class="bi bi-patch-check"' not in verification,
+      "Verified title uses public profile exact badge, not alternate icon")
 keys = (
     "dashboard", "visitor_sources", "links_blocks", "add_block",
     "edit_block", "page_icons", "manage_blocks", "custom_backgrounds",
