@@ -6,7 +6,7 @@
 
 1. Mapear funções observáveis nas rotas autenticadas, templates e serviços, **sem presumir disponibilidade irrestrita** em todas as contas.
 2. Atualizar a copy de entrada em `PublicSiteContent::sections()` (mantendo o CMS administrativo) e tornar o conjunto real de recursos acessível por uma página pública específica.
-3. Criar a página pública `/proximas-implementacoes`, **sem incluir qualquer ferramenta já existente**. Não inventar lançamentos, nomes de recursos, compromissos de data ou estados de desenvolvimento.
+3. Criar a página pública `/plataforma/proximas-implementacoes`, **sem incluir qualquer ferramenta já existente**. Não inventar lançamentos, nomes de recursos, compromissos de data ou estados de desenvolvimento.
 4. Manter páginas legais, perfis públicos dos membros, autenticação, rotas de administração, banco e dados persistentes intactos. Não ativar recursos condicionais.
 
 ## Inventário técnico das funcionalidades de membros
@@ -42,7 +42,7 @@
 | Prévia de blocos e seleção de plataformas | Funcionalidades de código na `main` e PR #38 em desenvolvimento; não anunciar como novidade futura | **Não** |
 | Auditorias, LGPD, SMTP/OAuth, homologação e infraestrutura | Pendências técnicas/de operação, não novas ferramentas de membro aprovadas | **Não** |
 
-**Conclusão rastreável:** não existe no material consultado uma proposta identificável de **nova ferramenta para membros** que seja simultaneamente aprovada, ainda não implementada e adequada para divulgação pública. A página `/proximas-implementacoes` exibirá um estado vazio transparente e estruturado, preparado para futuras inclusões **somente após uma ferramenta efetivamente ser aprovada e confirmada como ausente**. Isto respeita o pedido explícito de não listar ferramentas existentes e não cria promessas fictícias.
+**Conclusão rastreável:** não existe no material consultado uma proposta identificável de **nova ferramenta para membros** que seja simultaneamente aprovada, ainda não implementada e adequada para divulgação pública. A página `/plataforma/proximas-implementacoes` exibirá um estado vazio transparente e estruturado, preparado para futuras inclusões **somente após uma ferramenta efetivamente ser aprovada e confirmada como ausente**. Isto respeita o pedido explícito de não listar ferramentas existentes e não cria promessas fictícias.
 
 ## Implementação e validação
 
