@@ -171,7 +171,7 @@ async function run() {
             assert.equal(await page.locator('input[name="publication_consent"]').isChecked(),true);
             const dimensions=await page.evaluate(()=>{
               const css=el=>getComputedStyle(document.querySelector(el));
-              const toRgb=value=>(value.match(/[\\d.]+/g)||[]).slice(0,3).map(Number);
+              const toRgb=value=>value.slice(value.indexOf('(')+1,value.indexOf(')')).split(',').slice(0,3).map(Number);
               const luminosity=rgb=>rgb.map(n=>{
                 const channel=n/255;
                 return channel<=0.04045?channel/12.92:((channel+0.055)/1.055)**2.4;
