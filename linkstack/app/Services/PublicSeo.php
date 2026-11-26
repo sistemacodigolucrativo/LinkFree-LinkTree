@@ -169,7 +169,7 @@ final class PublicSeo
 
     public static function homeTitle(): string
     {
-        $title = self::plain(config('app.name', 'LinkFree')) . ' | Crie sua página de links gratuita';
+        $title = self::plain(config('app.name', 'LinkFree')) . ' | Sua página de links, com identidade própria';
         if (env('CUSTOM_META_TAGS') === 'true' && trim((string) config('advanced-config.title', '')) !== '') return self::plain(config('advanced-config.title'));
         return $title;
     }
