@@ -117,7 +117,7 @@ $notifyID = Auth::user()->id;
     @else
         @php $GLOBALS['activenotify'] = false; @endphp
         @push('notifications')
-        <div class="p-3 text-center" role="status">
+        <div class="p-3 text-center lf-notifications-empty" role="status">
             @if(auth()->user()->role === 'admin')
                 {{ __('reviews.admin_no_notifications') }}
             @else
