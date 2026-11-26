@@ -86,7 +86,8 @@ async function assertAxe(page, selector) {
   const report=await new AxeBuilder({page}).include(selector)
     .withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
   const violations=report.violations.map(v=>({id:v.id,impact:v.impact,
-    targets:v.nodes.slice(0,3).map(n=>n.target)}));
+    targets:v.nodes.slice(0,3).map(n=>n.target),
+    details:v.nodes.slice(0,3).map(n=>String(n.failureSummary||'').slice(0,600))}));
   assert.equal(violations.length,0,'Scoped axe violations: '+JSON.stringify(violations));
   return {violations:0,incomplete:report.incomplete.map(v=>v.id)};
 }
@@ -169,14 +170,46 @@ async function run() {
               'Selected rating must be visibly reflected in the stars');
             await page.locator('input[name="publication_consent"]').check();
             assert.equal(await page.locator('input[name="publication_consent"]').isChecked(),true);
-            const dimensions=await page.evaluate(()=>({
-              width:innerWidth,scroll:document.documentElement.scrollWidth,
-              foreground:getComputedStyle(document.querySelector('.lf-review-page')).color,
-              background:getComputedStyle(document.querySelector('.lf-review-page')).backgroundColor
-            }));
+            const dimensions=await page.evaluate(()=>{
+              const css=el=>getComputedStyle(document.querySelector(el));
+              const toRgb=value=>value.slice(value.indexOf('(')+1,value.indexOf(')')).split(',').slice(0,3).map(Number);
+              const luminosity=rgb=>rgb.map(n=>{
+                const channel=n/255;
+                return channel<=0.04045?channel/12.92:((channel+0.055)/1.055)**2.4;
+              }).reduce((sum,n,index)=>sum+n*[.2126,.7152,.0722][index],0);
+              const ratio=(first,second)=>{
+                const a=luminosity(toRgb(first)),b=luminosity(toRgb(second));
+                return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+              };
+              const pageStyle=css('.lf-review-page');
+              const card=css('.lf-review-shell');
+              const heading=css('.lf-review-shell h1');
+              const intro=css('.lf-review-lead');
+              const consent=css('.lf-review-consent');
+              const star=css('#lf-rating-4 + label');
+              return {
+                width:innerWidth,scroll:document.documentElement.scrollWidth,
+                dark:document.body.classList.contains('dark'),
+                background:pageStyle.backgroundColor,
+                cardBackground:card.backgroundColor,
+                textContrast:ratio(heading.color,card.backgroundColor),
+                introContrast:ratio(intro.color,card.backgroundColor),
+                consentContrast:ratio(consent.color,consent.backgroundColor),
+                starFill:star.color,
+                starBackground:star.backgroundColor,
+                starContrast:ratio(star.color,star.backgroundColor)
+              };
+            });
             assert(dimensions.scroll<=width+3,'Review page overflows viewport '+JSON.stringify(dimensions));
-            assert.equal(dimensions.background,'rgb(255, 255, 255)',
-              'Premium review page must retain its white background in '+mode+' mode');
+            assert.equal(dimensions.dark,mode==='dark','Wrong panel color mode '+JSON.stringify(dimensions));
+            assert.equal(dimensions.background,mode==='dark'?'rgb(21, 24, 36)':'rgb(245, 247, 252)',
+              'Review page must follow native panel canvas in '+mode+' '+JSON.stringify(dimensions));
+            assert.equal(dimensions.cardBackground,mode==='dark'?'rgb(34, 39, 56)':'rgb(255, 255, 255)',
+              'Review card must follow native panel surface in '+mode+' '+JSON.stringify(dimensions));
+            for(const key of ['textContrast','introContrast','consentContrast','starContrast'])
+              assert(dimensions[key]>=4.5,'Insufficient '+key+' '+JSON.stringify(dimensions));
+            assert.equal(dimensions.starFill,'rgb(255, 204, 54)',
+              'Selected stars must be yellow in '+mode+' '+JSON.stringify(dimensions));
             const axe=await assertAxe(page,'.lf-review-shell');
             await page.screenshot({path:path.join(screenshots,'review-member-'+width+'-'+mode+'.png'),
               fullPage:true,timeout:15000});
@@ -198,6 +231,29 @@ async function run() {
                 {waitUntil:'domcontentloaded',timeout:25000});
               assert.equal(response?.status(),200);
               assert.equal(await reviewer.locator('h1').filter({hasText:'Moderação de avaliações'}).count(),1);
+              const bell=reviewer.locator('#notification-drop');
+              await bell.click();
+              const panel=reviewer.locator('.notification-panel');
+              await panel.waitFor({state:'visible',timeout:10000});
+              const bellText=await panel.innerText();
+              assert(!bellText.includes('Está gostando de LinkFreeQA'),
+                'Admin must never receive a member review invitation');
+              if(await panel.locator('.iq-sub-card').count()===0)
+                assert(bellText.includes('Parabéns! Nenhuma notificação pendente.'),
+                  'Admin empty bell must use its own message');
+              const empty=panel.locator('.lf-notifications-empty');
+              if(await empty.count()){
+                await reviewer.waitForTimeout(350);
+                const colors=await empty.evaluate(el=>{
+                  const cs=node=>{const c=getComputedStyle(node);return {
+                    color:c.color,background:c.backgroundColor,opacity:c.opacity,
+                    visibility:c.visibility,filter:c.filter,display:c.display
+                  }};
+                  return {self:cs(el),parent:cs(el.parentElement),
+                    panel:cs(el.closest('.notification-panel')),bodyClass:document.body.className};
+                });
+                console.log('ADMIN EMPTY PALETTE',JSON.stringify(colors));
+              }
               const axe=await assertAxe(reviewer,'.card-body');
               await reviewer.screenshot({path:path.join(screenshots,'review-admin-375.png'),
                 fullPage:true,timeout:15000});

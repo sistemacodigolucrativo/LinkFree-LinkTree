@@ -3,6 +3,7 @@
 return [
     'platform_logo' => 'Logotipo de :appName',
     'notification_title' => 'Está gostando de :appName?',
+    'admin_no_notifications' => 'Parabéns! Nenhuma notificação pendente.',
     'notification_link' => 'Deixe uma avaliação',
     'heading' => 'Sua opinião faz a diferença',
     'eyebrow' => 'Sua experiência importa',

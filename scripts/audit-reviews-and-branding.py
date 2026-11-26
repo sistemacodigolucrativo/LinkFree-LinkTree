@@ -87,4 +87,26 @@ require("REVIEW_MIGRATION='database/migrations/2026_11_26_000001_create_platform
         and '"$backup/sqlite-before-deploy.sqlite"' in deployment
         and "PRAGMA foreign_key_check" in deployment,
         "New additive migration requires explicit guarded deployment with online backup")
+# Homologação funcional: paleta do painel e segmentação da notificação.
+require("auth()->user()->role !== 'admin'" in notify
+        and "reviews.admin_no_notifications" in notify
+        and "reviews.notification_title" in notify
+        and "'admin_no_notifications'" in read("linkstack/resources/lang/pt-BR/reviews.php")
+        and "'admin_no_notifications'" in read("linkstack/resources/lang/en/reviews.php"),
+        "Admin does not receive member review solicitation and empty notifications are localized")
+require("body.dark .main-content .lf-review-page" in css
+        and "--lf-canvas" in css
+        and "--lf-surface" in css
+        and "--lf-text" in css
+        and "--lf-muted" in css
+        and "color: #ffcc36 !important" in css
+        and "background-color: #263854" in css
+        and "background-color: #40516f" in css
+        and "color: #eab92f !important" in css,
+        "Review form follows dashboard palette and selected stars are contrast-safe yellow")
+require("starContrast" in read("scripts/qa-isolated/member_navigation_browser_smoke.cjs")
+        and "admin_no_notifications" in notify
+        and "Nenhuma notificação pendente" in read("linkstack/resources/lang/pt-BR/reviews.php"),
+        "Authenticated browser regression tests color contrast and admin empty state")
+
 print("PASS: review/privacy/branding/deployment source-level contracts")

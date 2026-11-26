@@ -97,7 +97,7 @@ $notifyID = Auth::user()->id;
                 'icon' => 'bi bi-heart-fill',
                 'title' => __('reviews.notification_title', ['appName' => config('app.name')]),
                 'message' => __('reviews.notification_link'),
-                'condition' => UserData::getData($notifyID, 'hide-star-notification') !== true,
+                'condition' => auth()->user()->role !== 'admin' && UserData::getData($notifyID, 'hide-star-notification') !== true,
                 'dismiss' => __('messages.Hide this notification'),
                 'adminonly' => false,
             ],
@@ -117,7 +117,13 @@ $notifyID = Auth::user()->id;
     @else
         @php $GLOBALS['activenotify'] = false; @endphp
         @push('notifications')
-        <center class='p-2'><i>{{__('messages.No notifications')}}</i></center>
+        <div class="p-3 text-center lf-notifications-empty" role="status">
+            @if(auth()->user()->role === 'admin')
+                {{ __('reviews.admin_no_notifications') }}
+            @else
+                {{ __('messages.No notifications') }}
+            @endif
+        </div>
         @endpush
     @endif
 
@@ -126,11 +132,13 @@ $notifyID = Auth::user()->id;
 {{-- Notification Modals --}}
 @push('sidebar-scripts') @php
 notification('', 'modal-1', __('messages.Your security is at risk!'), '<b>'.__('messages.security.msg1').'</b> '.__('messages.security.msg2').'<br><br>'.__('messages.security.msg3').'<br><a href="'.url('admin/config#5').'">'.__('messages.security.msg3').'</a>.');
-notification('hide-star-notification', 'modal-star',
-    e(__('reviews.notification_title', ['appName' => config('app.name')])),
-    e(__('reviews.intro', ['appName' => config('app.name')]))
-    .'<br><br><a href="'.e(route('studio.platform-review')).'">'
-    .e(__('reviews.notification_link')).'</a>');
+if (auth()->user()->role !== 'admin') {
+    notification('hide-star-notification', 'modal-star',
+        e(__('reviews.notification_title', ['appName' => config('app.name')])),
+        e(__('reviews.intro', ['appName' => config('app.name')]))
+        .'<br><br><a href="'.e(route('studio.platform-review')).'">'
+        .e(__('reviews.notification_link')).'</a>');
+}
 @endphp @endpush
 
 @php 

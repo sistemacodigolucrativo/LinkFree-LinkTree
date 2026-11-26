@@ -44,3 +44,112 @@
 .lf-home-reviews-action{color:#842b43;text-underline-offset:3px}
 @media(max-width:480px){.lf-review-shell{padding:24px 16px;border-radius:15px}.lf-review-page{padding:16px 10px}.lf-review-quote{padding:16px}}
 @media(prefers-reduced-motion:reduce){.lf-review-stars label{transition:none}}
+
+/*
+ * Homologação funcional 2026-11-26 — o formulário autenticado acompanha
+ * a paleta nativa do painel (linkfree-color-modes.css).
+ * Os seletores abaixo são intencionalmente específicos: a folha de estilo
+ * das avaliações é carregada antes do CSS do template e do modo escuro.
+ * Não altera páginas públicas nem o tema dos perfis de membros.
+ */
+body .main-content .lf-review-page {
+  --rv-panel-surface: var(--lf-surface, #ffffff);
+  --rv-panel-raised: var(--lf-raised, #f5f7fc);
+  --rv-panel-text: var(--lf-text, #18243b);
+  --rv-panel-muted: var(--lf-muted, #4b5870);
+  --rv-panel-border: var(--lf-border, #75839a);
+  --rv-panel-link: var(--lf-link, #204a9b);
+  --rv-panel-focus: var(--lf-focus, #275fbd);
+  background: var(--rv-panel-raised) !important;
+  color: var(--rv-panel-text) !important;
+}
+body.dark .main-content .lf-review-page {
+  background: var(--lf-canvas, #151824) !important;
+}
+body .main-content .lf-review-page .lf-review-shell {
+  color: var(--rv-panel-text) !important;
+  background: var(--rv-panel-surface) !important;
+  border-color: var(--rv-panel-border) !important;
+  border-top-color: var(--bs-primary, #3a57e8) !important;
+}
+body .main-content .lf-review-page :is(
+  .lf-review-shell h1,
+  .lf-review-fieldset legend,
+  .lf-review-label,
+  .lf-review-consent,
+  .lf-review-consent span,
+  .lf-review-existing,
+  .lf-review-existing h2,
+  .lf-review-contribution h2
+) { color: var(--rv-panel-text) !important; }
+body .main-content .lf-review-page :is(
+  .lf-review-lead,
+  .lf-review-privacy,
+  .lf-review-contribution p,
+  .lf-review-pending
+) { color: var(--rv-panel-muted) !important; }
+body .main-content .lf-review-page :is(.lf-review-kicker,.lf-review-back,.lf-review-quiet,.lf-review-contribution a) {
+  color: var(--rv-panel-link) !important;
+}
+body .main-content .lf-review-page :is(.lf-review-existing,.lf-review-contribution,.lf-review-consent) {
+  background: var(--rv-panel-raised) !important;
+  border-color: var(--rv-panel-border) !important;
+}
+body .main-content .lf-review-page .lf-review-form textarea {
+  background: var(--lf-input, #fff) !important;
+  color: var(--rv-panel-text) !important;
+  border-color: var(--rv-panel-border) !important;
+}
+body .main-content .lf-review-page .lf-review-form textarea::placeholder {
+  color: var(--rv-panel-muted) !important;
+  opacity: 1;
+}
+body .main-content .lf-review-page .lf-review-form textarea:focus-visible {
+  outline-color: var(--rv-panel-focus) !important;
+}
+body .main-content .lf-review-page .lf-review-submit {
+  background: var(--bs-primary, #3a57e8) !important;
+  color: #ffffff !important;
+  border: 1px solid transparent !important;
+}
+body .main-content .lf-review-page .lf-review-thanks {
+  color: var(--rv-panel-text) !important;
+  background: var(--rv-panel-raised) !important;
+  border-left-color: var(--lf-warning, #986700) !important;
+}
+body .main-content .lf-review-page :is(.lf-review-quiet,.lf-review-errors,.lf-review-alert) {
+  border-color: var(--rv-panel-border);
+}
+
+/* Estrelas realmente amarelas, inclusive antes de selecionar.
+ * As selecionadas têm fundo contrastante para manter WCAG AA no tema claro
+ * e continuam amarelas no tema escuro. O radio nativo permanece acessível.
+ */
+body .main-content .lf-review-page .lf-review-stars {
+  background-color: #263854;
+  border-radius: 12px;
+  padding: 5px 8px;
+}
+body .main-content .lf-review-page .lf-review-stars label {
+  color: #eab92f !important;
+  -webkit-text-stroke: .45px #684900;
+  border-radius: 7px;
+  padding: 0 4px;
+  transition: color .13s, background-color .13s;
+}
+body.dark .main-content .lf-review-page .lf-review-stars label {
+  color: var(--lf-warning, #f6c65b) !important;
+  -webkit-text-stroke: .35px #503d18;
+}
+body .main-content .lf-review-page .lf-review-stars :is(label.lf-selected,.lf-rating-input:checked+label) {
+  color: #ffcc36 !important;
+  background-color: #40516f;
+  -webkit-text-stroke: .65px #755000;
+}
+body .main-content .lf-review-page .lf-review-stars .lf-rating-input:focus-visible+label {
+  outline-color: var(--rv-panel-focus) !important;
+  outline-width: 3px;
+}
+@media (prefers-reduced-motion:reduce) {
+  body .main-content .lf-review-page .lf-review-stars label { transition: none; }
+}
