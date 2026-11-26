@@ -44,7 +44,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Check HTTP acceptance Python syntax first
-        run: python3 -m py_compile scripts/qa-isolated/http_acceptance.py
+        run: python3 -m py_compile scripts/qa-isolated/http_acceptance.py scripts/qa-isolated/public_marketing_acceptance.py
       - name: Install PHP SQLite driver if absent
         run: |
           if ! php -m | grep -qi '^pdo_sqlite$'; then
@@ -106,7 +106,9 @@ jobs:
         env:
           QA_EXPECTED_SITE: http://127.0.0.1:18765
           QA_OUTPUT: /tmp/linkfree-audit/http-results.json
-        run: python3 scripts/qa-isolated/http_acceptance.py
+        run: |
+          python3 scripts/qa-isolated/http_acceptance.py
+          python3 scripts/qa-isolated/public_marketing_acceptance.py
       - name: Verify isolated HTTP server remained alive
         if: always()
         run: |
@@ -118,7 +120,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: linkfree-qa-http-synthetic
-          path: /tmp/linkfree-audit/http-results.json
+          path: |
+            /tmp/linkfree-audit/http-results.json
+            /tmp/linkfree-audit/public-marketing-http.json
           if-no-files-found: warn
           retention-days: 30
 
@@ -160,6 +164,7 @@ jobs:
       - name: Validate member browser script and existing fixture runner
         run: |
           node --check scripts/qa-isolated/member_navigation_browser_smoke.cjs
+          node --check scripts/qa-isolated/public_marketing_browser_smoke.cjs
           bash -n scripts/qa-isolated/run_config_browser_smoke.sh
       - name: Member title, button, history and responsive WCAG smoke
         timeout-minutes: 12
@@ -172,6 +177,8 @@ jobs:
           path: |
             /tmp/linkfree-audit/member-navigation-results.json
             /tmp/linkfree-audit/member-navigation-screenshots/
+            /tmp/linkfree-audit/public-marketing-browser.json
+            /tmp/linkfree-audit/public-marketing-screenshots/
           if-no-files-found: warn
           retention-days: 30
 
