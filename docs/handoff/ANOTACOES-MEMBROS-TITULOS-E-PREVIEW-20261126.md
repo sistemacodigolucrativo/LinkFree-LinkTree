@@ -92,3 +92,17 @@ Os títulos da Topbar são gerados por `layouts/sidebar.blade.php`, que não foi
 - A execução de navegador do código revisado `3f6778c5d050a3dd1eeae7baef1761faa2c7019a`, no [job 139626027910](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45735009506/job/139626027910), confirmou **46 testes PASS / 0 FAIL** e capturas em `375px/light` e `1280px/dark`, incluindo a área expandida da plataforma e sua confirmação por teclado.
 - As capturas revisadas mostram o item Apple Store, Deezer e Discord legíveis no tema claro e ausência de linha de plataforma vazia. A documentação e as capturas refletem o build sintético, não dados reais da VPS.
 - Os demais workflows no mesmo head devem ser verificados antes de promover a PR. **Não houve merge nem deploy.**
+
+
+### Fechamento da validação automatizada (26/11/2026)
+
+O commit de código final `3f6778c5d050a3dd1eeae7baef1761faa2c7019a` concluiu os **cinco workflows disparados pela PR com status `success`**:
+1. `Security and accessibility regression guards` — sucesso.
+2. `SEO and social cards regression (isolated)` — sucesso.
+3. `Studio, dashboard and mobile layout regression` — sucesso.
+4. `Admin UX targeted regression (synthetic)` — sucesso.
+5. `Isolated HTTP and browser a11y acceptance (no production)` — sucesso, com todos os cinco jobs efetivamente executados aprovados: `member-navigation-browser` (**46/46**), `config-browser-smoke`, `http-behavior`, `installer-isolated (mysql)` e `installer-isolated (sqlite)`.
+
+**Distinção:** o sexto job `browser-a11y` desse workflow permanece `skipped` por configuração de execução manual; não é equivalente à auditoria global de acessibilidade. Os testes são sintéticos e não substituem inspeção em dispositivos reais ou homologação na VPS.
+
+**Liberação:** PR #38 mantida **draft**, sem merge e sem deploy, até aceite/solicitação posterior.
