@@ -51,7 +51,7 @@ require("class MemberFeatureCatalog" in catalog and
         "Inventory comes from a dedicated server-side catalog")
 require("filter_var(env('ALLOW_USER_EXPORT')" in catalog and
         "filter_var(env('ALLOW_USER_IMPORT')" in catalog and
-        '"Disponível para VIP e administrador."' in catalog,
+        "Disponível para VIP e administrador." in catalog,
         "Restricted reports and optional transfers are not advertised without qualification")
 
 # The only previously discussed new member tool still outside main.
