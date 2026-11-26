@@ -1,10 +1,14 @@
 @extends('layouts.sidebar')
 
 @section('content')
+<style>
+.lf-verified-title-badge{display:inline-flex;align-items:center;vertical-align:middle}
+.lf-verified-title-badge svg.badge{width:1em;height:1em;margin:0 .35em 0 0}
+</style>
 <div class="container-fluid content-inner py-0">
   <div class="card rounded-4">
     <div class="card-body p-3 p-md-4">
-      <h1 class="h3 mb-2"><i class="bi bi-patch-check" aria-hidden="true"></i> {{ __('member_ui.verified_badge') }}</h1>
+      <h1 class="h3 mb-2"><span class="lf-verified-title-badge" aria-hidden="true">@include('components.verify-svg')</span> {{ __('member_ui.verified_badge') }}</h1>
       <p class="text-muted">O selo confirma que o perfil recebeu aprovação administrativa. Somente o administrador pode conceder ou revogar a verificação.</p>
 
       @if(session('success'))
