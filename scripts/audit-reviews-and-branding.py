@@ -100,7 +100,9 @@ require("body.dark .main-content .lf-review-page" in css
         and "--lf-text" in css
         and "--lf-muted" in css
         and "color: #ffcc36 !important" in css
-        and "background-color: #263854" in css,
+        and "background-color: #263854" in css
+        and "background-color: #40516f" in css
+        and "color: #eab92f !important" in css,
         "Review form follows dashboard palette and selected stars are contrast-safe yellow")
 require("starContrast" in read("scripts/qa-isolated/member_navigation_browser_smoke.cjs")
         and "admin_no_notifications" in notify
