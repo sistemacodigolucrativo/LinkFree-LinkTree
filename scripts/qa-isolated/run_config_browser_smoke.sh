@@ -65,6 +65,7 @@ elif [ "${QA_ADMIN_UX_ONLY:-0}" = "1" ]; then
   timeout 360s node scripts/qa-isolated/admin_ux_smoke.cjs
 elif [ "${QA_MEMBER_NAV_ONLY:-0}" = "1" ]; then
   timeout 360s node scripts/qa-isolated/member_navigation_browser_smoke.cjs
+  timeout 180s node scripts/qa-isolated/public_marketing_browser_smoke.cjs
 else
   timeout 360s node scripts/qa-isolated/config_browser_smoke.cjs
 fi
