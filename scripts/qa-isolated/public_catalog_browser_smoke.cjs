@@ -45,6 +45,8 @@ async function run(){
   const env=fs.readFileSync(appRoot+'/.env','utf8');
   for(const fragment of ['APP_ENV=local','DB_CONNECTION=sqlite','MAIL_MAILER=log'])
     assert(env.includes(fragment),'Fixture missing '+fragment);
+  const pickerAsset=path.join(appRoot,'assets/js/linkfree-platform-picker.js');
+  const pickerInstalled=fs.existsSync(pickerAsset);
   fs.mkdirSync(captures,{recursive:true});save();
   const browser=await chromium.launch({headless:true});
   try{
@@ -86,10 +88,16 @@ async function run(){
           await open(page,'/plataforma/proximas-implementacoes');
           assert.equal(await page.locator('h1').count(),1);
           const items=page.locator('.lf-upcoming-card');
-          assert.equal(await items.count(),1,'Only one strictly documented future tool');
-          assert((await items.first().innerText()).includes('Pré-visualização interativa'));
-          assert.equal((await items.first().locator('.lf-roadmap-state').textContent()).trim(),'Em validação');
-          assert(!(await items.first().innerText()).includes('Selo verificado'));
+          if (pickerInstalled) {
+            assert.equal(await items.count(),0,'Released platform preview cannot remain on roadmap');
+            assert(await page.locator('.lf-empty-roadmap').isVisible(),
+              'Released feature should display an accurate empty roadmap');
+          } else {
+            assert.equal(await items.count(),1,'Only one strictly documented future tool');
+            assert((await items.first().innerText()).includes('Pré-visualização interativa'));
+            assert.equal((await items.first().locator('.lf-roadmap-state').textContent()).trim(),'Em validação');
+            assert(!(await items.first().innerText()).includes('Selo verificado'));
+          }
           assert((await page.locator('link[rel="canonical"]').getAttribute('href')).endsWith('/plataforma/proximas-implementacoes'));
           const geometry=await horizontal(page,width);
           if(width===375||width===1280){
@@ -101,18 +109,35 @@ async function run(){
       }finally{await context.close()}
     }
 
-    await check('Shipped feature is removed from future roadmap',async()=>{
-      const fixtureFile=path.join(appRoot,'assets/js/linkfree-platform-picker.js');
-      assert(!fs.existsSync(fixtureFile),'Base main fixture should not contain PR38 asset yet');
-      fs.mkdirSync(path.dirname(fixtureFile),{recursive:true});
-      fs.writeFileSync(fixtureFile,'/* synthetic feature marker; not product code */');
+    await check('Roadmap handles both shipped and pending platform feature',async()=>{
+      // Mutate only a disposable localhost fixture and always restore it.
+      const backup=pickerAsset+'.qa-temporary-hidden';
+      assert(!fs.existsSync(backup),'Unexpected leftover QA marker');
       const page=await browser.newPage();
+      let state='unchanged';
       try{
+        if(pickerInstalled){
+          fs.renameSync(pickerAsset,backup);
+          state='hidden';
+        }else{
+          fs.mkdirSync(path.dirname(pickerAsset),{recursive:true});
+          fs.writeFileSync(pickerAsset,'/* isolated QA marker, not production */');
+          state='created';
+        }
         await open(page,'/plataforma/proximas-implementacoes');
-        assert.equal(await page.locator('.lf-upcoming-card').count(),0);
-        assert(await page.locator('.lf-empty-roadmap').isVisible());
-        return {emptyState:true};
-      }finally{await page.close();fs.unlinkSync(fixtureFile)}
+        if(pickerInstalled){
+          assert.equal(await page.locator('.lf-upcoming-card').count(),1,
+            'Unshipped feature must be announced in pending fixture');
+        }else{
+          assert.equal(await page.locator('.lf-upcoming-card').count(),0);
+          assert(await page.locator('.lf-empty-roadmap').isVisible());
+        }
+        return {originallyInstalled:pickerInstalled,oppositeStateVerified:true};
+      }finally{
+        await page.close();
+        if(state==='hidden')fs.renameSync(backup,pickerAsset);
+        else if(state==='created')fs.unlinkSync(pickerAsset);
+      }
     });
     await check('Public pages do not disclose restricted member data',async()=>{
       const ctx=await browser.newContext();
