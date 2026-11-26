@@ -643,7 +643,7 @@ foreach ([
     'support.msg1', 'support.msg5', 'support.msg6',
 ] as $brandLabel) {
     if (isset($messages[$brandLabel]) && is_string($messages[$brandLabel])) {
-        $messages[$brandLabel] = preg_replace('/\bLink\s*Stack\b/i',
+        $messages[$brandLabel] = preg_replace('/Link\s*Stacks?/i',
             (string) config('app.name', 'LinkFree'), $messages[$brandLabel]);
     }
 }
