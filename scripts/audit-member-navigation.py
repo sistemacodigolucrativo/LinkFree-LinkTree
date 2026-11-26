@@ -38,7 +38,8 @@ check("if (!$isAdminPanel)" in sidebar and
       "Member titles do not replace Admin-specific navbar")
 check("@include('components.verify-svg')" in sidebar and
       'fill="#179cf0"' in badge and 'fill="#fcfcfc"' in badge and
-      'svg.badge{' in badge and '      .badge{' not in badge,
+      'svg.badge{' in badge and '      .badge{' not in badge and
+      'id="Layer_1"' not in badge,
       "Verified badge reuses original public-profile SVG")
 check("route('showBlocks')" in links and
       "->name('showBlocks')" in routes and
