@@ -80,6 +80,8 @@ async function axe(page, selector) {
           const metrics=await safeVisit(page,'/plataforma/proximas-implementacoes');
           assert.equal(await page.locator('main h1').count(),1);
           assert(await page.locator('#roadmap-empty-title').isVisible());
+          const titleRects=await page.locator('.lfp-roadmap-heading em').evaluate(el=>el.getClientRects().length);
+          assert.equal(titleRects,1,'Roadmap headline keyword must not split mid-word at '+width);
           assert.equal(await page.locator('.lfp-feature-tag').count(),0,
             'Roadmap must not expose existing or unapproved tool cards');
           return metrics;
