@@ -763,3 +763,11 @@ body .main-content .bg-primary:not(.btn):not(.btn-primary) :is(.text-primary,.li
   color:#ffffff!important;
 }
 
+
+
+/* Bell empty-state text must contrast with the active panel surface.
+   Applies to both administrators and members without notifications. */
+body .main-content .notification-panel .lf-notifications-empty {
+  color: var(--lf-text, #18243b) !important;
+  background-color: var(--lf-surface, #ffffff) !important;
+}
