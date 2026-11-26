@@ -78,7 +78,7 @@ def run_case(case: str, valid_backup: bool, expect: int):
             "TARGET=synthetic-head\n"
             "REVIEW_MIGRATION=database/migrations/2026_11_26_000001_create_platform_reviews_table.php\n"
             f"MIGRATION_SOURCE={shlex.quote(str(migration))}\n"
-            + r"""
+            + r'''
 gitrepo() {
     [[ "$1" == show && "$2" == "$TARGET:linkstack/$REVIEW_MIGRATION" ]] || return 73
     cat -- "$MIGRATION_SOURCE"
@@ -98,7 +98,7 @@ with sqlite3.connect(sys.argv[1]) as c:
     c.execute("insert into migrations values ('2026_11_26_000001_create_platform_reviews_table')")
 PY_SQL
 }
-"""
+'''
         )
         result = subprocess.run(["bash", "-c", starter + fragment], capture_output=True,
                                 text=True, timeout=18)
