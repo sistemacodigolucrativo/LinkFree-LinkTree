@@ -60,7 +60,16 @@ def test_resources():
 def test_roadmap():
     code, headers, page = get("/plataforma/proximas-implementacoes")
     assert code == 200
-    assert "Nenhuma nova ferramenta anunciada no momento." in page
+    picker_installed = os.path.isfile(
+        "/tmp/linkfree-audit/linkstack/assets/js/linkfree-platform-picker.js"
+    )
+    if picker_installed:
+        assert "Nenhuma nova ferramenta anunciada no momento." in page
+        assert "Prévia interativa dos botões por plataforma" not in page
+    else:
+        assert "Prévia interativa dos botões por plataforma" in page
+        assert "Em validação" in page
+        assert "Nenhuma nova ferramenta anunciada no momento." not in page
     assert "Sem datas inventadas" in page
     assert 'href="http://127.0.0.1:18765/plataforma/proximas-implementacoes"' in page
     # Previously requested tools have existing routes and must not be re-announced.
