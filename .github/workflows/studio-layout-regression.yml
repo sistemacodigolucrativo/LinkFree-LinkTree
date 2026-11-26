@@ -32,6 +32,12 @@ on:
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-public-site-editor.py'
+      - 'scripts/audit-public-member-catalog.py'
+      - 'linkstack/app/Services/MemberFeatureCatalog.php'
+      - 'linkstack/app/Http/Controllers/PublicCatalogController.php'
+      - 'linkstack/app/Http/Controllers/SeoController.php'
+      - 'linkstack/resources/views/public/**'
+      - 'linkstack/assets/css/linkfree-public-catalog.css'
       - 'scripts/audit-new-improvements.php'
       - 'scripts/audit-auth-blade-boot.php'
       - 'scripts/audit-new-improvements.py'
@@ -108,6 +114,12 @@ on:
       - 'linkstack/assets/css/linkfree-navigation-polish.css'
       - 'scripts/audit-studio-layout.py'
       - 'scripts/audit-public-site-editor.py'
+      - 'scripts/audit-public-member-catalog.py'
+      - 'linkstack/app/Services/MemberFeatureCatalog.php'
+      - 'linkstack/app/Http/Controllers/PublicCatalogController.php'
+      - 'linkstack/app/Http/Controllers/SeoController.php'
+      - 'linkstack/resources/views/public/**'
+      - 'linkstack/assets/css/linkfree-public-catalog.css'
       - 'scripts/audit-new-improvements.php'
       - 'scripts/audit-auth-blade-boot.php'
       - 'scripts/audit-new-improvements.py'
@@ -191,6 +203,10 @@ jobs:
       - name: Verify sectional public site editor
         run: |
           python scripts/audit-public-site-editor.py
+          python scripts/audit-public-member-catalog.py
+          php -l linkstack/app/Services/MemberFeatureCatalog.php
+          php -l linkstack/app/Http/Controllers/PublicCatalogController.php
+          php -l linkstack/app/Http/Controllers/SeoController.php
           php -l linkstack/app/Services/PublicSiteContent.php
           php -l linkstack/app/Http/Controllers/AdminController.php
           php -l linkstack/routes/web.php
