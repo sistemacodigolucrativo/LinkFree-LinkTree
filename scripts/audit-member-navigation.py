@@ -46,7 +46,7 @@ check("->name('showButtons')" in routes and
       "Route::get('/studio/add-link'" in routes,
       "Original Adicionar Bloco route remains available")
 check("{{ __('member_ui.add_link_block') }}" in links and
-      "aria-label=\"{{ __('member_ui.add_link_block_action') }}\"" in links,
+      "aria-label=\"{{ __('member_ui.add_link_block') }} — {{ __('member_ui.add_link_block_action') }}\"" in links,
       "CTA label and accessible action match")
 check("{{ __('member_ui.links_blocks') }}" in links and
       "memberNavbarTitle.' — '" in sidebar,
