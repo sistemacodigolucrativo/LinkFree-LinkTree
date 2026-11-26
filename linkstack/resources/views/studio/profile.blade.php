@@ -25,7 +25,7 @@
 
               @if(($_SERVER['QUERY_STRING'] ?? '') === '')
               <section class="text-gray-400">
-                      <h3 class="mb-4 card-header"><i class="bi bi-person">{{__('messages.Account Settings')}}</i></h3>
+                      <h3 class="mb-4 card-header"><i class="bi bi-person">{{ __('member_ui.account_info') }}</i></h3>
               <div class="card-body p-0 p-md-3">
 
                       @foreach($profile as $profile)
