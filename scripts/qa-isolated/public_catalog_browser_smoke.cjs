@@ -84,6 +84,22 @@ async function run(){
           }
           return {tiles:await tiles.count(),geometry};
         });
+        await check('Public reviews premium responsive '+width,async()=>{
+          await open(page,'/plataforma/avaliacoes');
+          assert.equal(await page.locator('main h1').count(),1);
+          assert(await page.locator('.lf-review-shell').isVisible());
+          assert.equal(await page.locator('body.lf-review-public').count(),1);
+          assert((await page.title()).includes('LinkFreeQA'),
+            'Public reviews must respect the configured APP_NAME');
+          assert.equal(await page.locator('.lf-review-quote').count(),0,
+            'Unmoderated testimonials must not appear publicly');
+          const geometry=await horizontal(page,width);
+          if(width===375||width===1280) {
+            await axe(page,'main');
+            await page.screenshot({path:path.join(captures,'reviews-'+width+'.png'),fullPage:true,timeout:20000});
+          }
+          return geometry;
+        });
         await check('Public roadmap excludes existing tools '+width,async()=>{
           await open(page,'/plataforma/proximas-implementacoes');
           assert.equal(await page.locator('h1').count(),1);
