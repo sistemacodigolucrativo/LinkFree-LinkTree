@@ -76,6 +76,10 @@ async function verifyTopbar(page, route, label, width) {
   assert(metrics.barLeft>=-3 && metrics.barRight<=width+3,
     'Topbar extends beyond viewport '+JSON.stringify(metrics));
   assert(metrics.scrollWidth<=width+3,'Horizontal document overflow '+JSON.stringify(metrics));
+  const duplicates=await page.locator('main.main-content h1,main.main-content h2,main.main-content h3,main.main-content h4')
+    .allInnerTexts();
+  assert.equal(duplicates.filter(s=>s.trim()===label).length,0,
+    'Duplicate heading outside Topbar: '+route+' '+label);
   return metrics;
 }
 async function assertAxe(page, selector) {
@@ -95,15 +99,16 @@ async function linksFlow(page,width,mode) {
   assert(notice && linkCard,'Missing usage notice or links card geometry');
   assert(linkCard.y >= notice.y+notice.height+7,
     'Free notice overlaps the card at '+width+'px: '+JSON.stringify({notice,linkCard}));
-  assert.equal((await page.locator('#studio-my-links-title').innerText()).includes('Links e Blocos'),true);
-  const action=page.locator('#studio-my-links-title a.btn-primary');
+  assert.equal(await page.locator('#studio-my-links-title').count(),0,
+    'Legacy duplicated title must be absent');
+  const action=page.locator('.studio-links-page .lf-links-actions a.btn-primary');
   assert.equal(await action.count(),1,'Exactly one card CTA expected');
   assert.equal((await action.innerText()).trim(),'+ Bloco-Link');
   assert((await action.getAttribute('aria-label')||'').includes('+ Bloco-Link'));
   assert.equal(new URL(await action.getAttribute('href'),base).pathname,'/studio/blocks');
   if(width===375) {
     await check('Member Topbar WCAG scope',()=>assertAxe(page,'.lf-member-titled-nav'));
-    await check('Links and Blocks CTA WCAG scope',()=>assertAxe(page,'#studio-my-links-title'));
+    await check('Links and Blocks CTA WCAG scope',()=>assertAxe(page,'.lf-links-actions'));
   }
   await action.focus();
   assert(await action.evaluate(el=>document.activeElement===el),'CTA is not keyboard focusable');
@@ -112,7 +117,7 @@ async function linksFlow(page,width,mode) {
   assert.equal((await page.locator('.lf-member-nav-copy').innerText()).trim(),'Gerenciar Blocos');
   await page.goBack({waitUntil:'domcontentloaded',timeout:15000});
   assert.equal(new URL(page.url()).pathname,'/studio/links','Browser back must restore links');
-  await page.locator('#studio-my-links-title a.btn-primary').click();
+  await page.locator('.studio-links-page .lf-links-actions a.btn-primary').click();
   await page.waitForURL('**/studio/blocks',{timeout:15000});
   await page.goBack({waitUntil:'domcontentloaded',timeout:15000});
   assert.equal(new URL(page.url()).pathname,'/studio/links','Browser back after pointer click');
@@ -176,15 +181,51 @@ async function run() {
             assert.equal(await mark.locator('path.badge-tick').getAttribute('fill'),'#fcfcfc');
             return {sameCanonicalBadge:true};
           });
-          await check('Edit link icon selector label and preserved options',async()=>{
+          await check('Platform icons, inline preview and explicit keyboard confirmation',async()=>{
             const response=await page.goto(base+'/studio/add-link?block=predefined',{waitUntil:'domcontentloaded'});
             assert.equal(response?.status(),200);
-            const label=page.locator('label[for="predefined-button"]');
-            await label.waitFor({state:'visible',timeout:12000});
+            await page.locator('.lf-platform-picker.is-enhanced').waitFor({state:'visible',timeout:15000});
+            const label=page.locator('label[for="lf-platform-trigger"]');
             assert.equal((await label.innerText()).trim(),'Selecionar ícone do botão');
             const select=page.locator('#predefined-button');
-            assert((await select.locator('option').count())>0,'Original choices disappeared');
-            return {nativeSelect:true,options:await select.locator('option').count()};
+            const options=await select.locator('option').allTextContents();
+            for(const name of ['Amazon','Apple Books','Deezer','Discord'])
+              assert(options.includes(name),'Missing original platform '+name);
+            assert.equal(await select.inputValue(),'','New platform must be unconfirmed');
+            const trigger=page.locator('#lf-platform-trigger');
+            await trigger.focus();
+            await page.keyboard.press('Enter');
+            assert.equal(await trigger.getAttribute('aria-expanded'),'true');
+            const amazon=page.locator('.lf-platform-expand').filter({hasText:'Amazon'}).first();
+            assert((await amazon.locator('img').getAttribute('src')).endsWith('/amazon.svg'));
+            await amazon.focus();
+            await page.keyboard.press('Enter');
+            assert.equal(await amazon.getAttribute('aria-expanded'),'true');
+            assert.equal(await select.inputValue(),'','First click cannot select Amazon');
+            const preview=amazon.locator('xpath=following-sibling::div//iframe');
+            assert(await preview.isVisible(),'Expanded preview not visible');
+            const srcdoc=await preview.getAttribute('srcdoc');
+            assert(srcdoc.includes('button-amazon') && srcdoc.includes('amazon.svg') &&
+              srcdoc.includes('brands.css') && srcdoc.includes('skeleton-'),
+              'Preview must reuse public button assets');
+            const confirm=page.locator('.lf-platform-confirm').filter({hasText:'Amazon'}).first();
+            await confirm.focus();
+            await page.keyboard.press('Enter');
+            assert.equal(await select.inputValue(),'amazon');
+            assert.equal(await trigger.getAttribute('aria-expanded'),'false');
+            assert((await trigger.innerText()).includes('Amazon'));
+            await trigger.click();
+            const discord=page.locator('.lf-platform-expand').filter({hasText:'Discord'}).first();
+            assert((await discord.locator('img').getAttribute('src')).endsWith('/discord.svg'));
+            await discord.click();
+            assert.equal(await select.inputValue(),'amazon','Preview cannot change current platform');
+            await discord.locator('xpath=following-sibling::div//button').click();
+            assert.equal(await select.inputValue(),'discord');
+            await trigger.click();
+            await page.keyboard.press('Escape');
+            assert.equal(await trigger.getAttribute('aria-expanded'),'false');
+            return {nativeOptions:options.length,firstClickSelected:false,
+              previewUsesOriginalCss:true,keyboardConfirmed:true};
           });
         } else {
           await check('Responsive Links Topbar '+width+' '+mode,
