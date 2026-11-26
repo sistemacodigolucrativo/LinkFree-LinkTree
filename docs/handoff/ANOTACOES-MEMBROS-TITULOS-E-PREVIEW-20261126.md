@@ -45,3 +45,42 @@
 - Testes direcionados HTML/HTTP/Playwright/axe (se disponíveis), cenários teclado/touch, 320–1280px, claro/escuro.
 - Registrar resultados verificáveis e pendências, sem equiparar CI sintético a aceite em produção.
 - Não realizar merge nem deploy nesta etapa sem autorização posterior.
+
+## Implementação realizada na branch (26/11/2026)
+
+**Situação:** código implementado; aguardando conclusão da bateria de CI no head final, revisão visual das capturas e aceite autenticado em produção. A `main` não foi alterada.
+
+### Nº 01 — mapeamento dos títulos removidos
+
+- `panel/index.blade.php` — Painel de Controle.
+- `studio/links.blade.php` — Links e Blocos; CTA `+ Bloco-Link` mantido numa área de ações independente e card identificado via `aria-label`.
+- `studio/blocks.blade.php` — Gerenciar Blocos; mantidos cards de seleção, introdução e prévias.
+- `studio/icons.blade.php` — Ícones da Página; formulário mantido.
+- `studio/edit-link.blade.php` — Adicionar/Editar Bloco; formulário e botões preservados.
+- `studio/page.blade.php` — Meu Perfil; editor de foto e controles preservados.
+- `studio/profile.blade.php` — Informações da Conta; títulos internos Email/Senha/etc. preservados.
+- `studio/theme.blade.php` — Fundos Personalizados; cabeçalho «Selecionar um tema» preservado por ser uma seção distinta.
+- `studio/referrals.blade.php` — Minhas Indicações; histórico preservado.
+- `studio/verification.blade.php` — Selo Verificado; SVG do selo mantido exclusivamente na Topbar.
+- `studio/visitor-reports.blade.php` — Origem dos Visitantes; tabela preservada.
+- `studio/button-editor.blade.php` — Editor de Botões; subcabeçalhos de configuração preservados.
+
+Os títulos da Topbar são gerados por `layouts/sidebar.blade.php`, que não foi modificado. Espaços dos headings removidos desapareceram com os elementos; o card de links passou a ter toolbar somente com a ação. Não foram alterados a sidebar, routes, controllers, banco ou dados privados.
+
+### Nº 02 — arquitetura implementada
+
+- `components/pageitems/predefined-form.blade.php`: `select[name="button"]` original com a mesma origem `$buttons` e os nomes existentes, placeholder obrigatório para novas escolhas e metadados dos CSS ativos.
+- `assets/js/linkfree-platform-picker.js`: enhancement progressivo; lista com SVGs, expansão/colapso com `aria-expanded`, prévia em iframe `sandbox=""` sem scripts e seleção por botão explícito. A primeira ação não altera o valor do `select`; a segunda dispara evento `change` para preservar a lógica do formulário (incluindo WhatsApp).
+- `assets/css/linkfree-platform-picker.css`: estilos locais do seletor, scroll interno, foco visível, áreas de toque, adaptação mobile e movimento reduzido.
+- `studio/edit-link.blade.php`: carregamento dos assets somente no editor e inicialização após o carregamento AJAX do formulário.
+- Prévia reutiliza as mesmas classes públicas `button button-<plataforma> button-hover icon-hover` com `brands.css`, `skeleton-auto.css` e o diretório de ícones do tema ou os assets padrão.
+- Inventário do `ButtonSeeder`: **104 plataformas ativas**; havia 103 SVGs equivalentes. O único ausente, Scribd, foi incluído em `assets/linkstack/icons/scribd.svg` a partir de [Simple Icons v15.0.0](https://github.com/simple-icons/simple-icons/blob/15.0.0/icons/scribd.svg), com licença CC0 (direitos de marca continuam pertencendo aos titulares). Nenhum CDN ou serviço externo foi adicionado.
+- Sem JavaScript, o `select` nativo permanece utilizável e exige seleção explícita.
+
+### Validações e limites
+
+- A suíte `member-navigation-browser` em fixture descartável já registrou **45/45 PASS**, incluindo ausência de duplicação de heading nas rotas exercitadas, seleção Amazon/Discord por teclado, primeiro clique sem seleção, uso de `brands.css` e responsividade a 320/375/575/576/768/1024/1280 px. Essa evidência é do commit de desenvolvimento `4b5a76c`, anterior ao acréscimo final do ícone Scribd, da captura desktop expandida e à documentação.
+- `studio-layout` aprovou a auditoria estática adaptada ao novo requisito de título exclusivo na Topbar.
+- Os checks do head final devem ser revalidados antes da PR sair de draft. O `browser-a11y` global, configurado para execução manual, não é considerado aprovado por estar `skipped`.
+- Validação autenticada na VPS/staging e em aparelhos físicos permanece uma etapa posterior, separada de CI sintético.
+- **Não executar merge nem deploy nesta etapa sem autorização expressa.**
