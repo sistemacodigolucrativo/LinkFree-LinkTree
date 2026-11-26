@@ -39,7 +39,6 @@
                <div class="row">
                    <div class="col-sm-12">  
 
-                    <h3 class="mb-4"><i class="bi bi-menu-up"></i> {{ __('member_ui.dashboard') }}</h3>
                     @if(in_array(auth()->user()->role, ['vip', 'admin'], true))
                       <p><a class="btn btn-outline-primary" href="{{ route('studio.visitors') }}"><i class="bi bi-bar-chart" aria-hidden="true"></i> {{ __('messages.lf_visitor_report') }}</a></p>
                     @endif
