@@ -46,6 +46,10 @@ class SeoController extends Controller
         if (!in_array($disabled, ['true', 'redirect', true], true)) {
             $home = $hasProfile ? url(config('advanced-config.custom_home_url', '/home')) : url('/');
             if (PublicSeo::canonical($home) === $home) $entries[] = $home;
+            // Mesma política de canonical/noindex aplicada à home institucional.
+            foreach ([route('public.resources'), route('public.roadmap')] as $publicUrl) {
+                if (PublicSeo::canonical($publicUrl) === $publicUrl) $entries[] = $publicUrl;
+            }
         }
         return array_values(array_unique($entries));
     }
