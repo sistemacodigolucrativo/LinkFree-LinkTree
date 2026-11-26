@@ -45,7 +45,7 @@ final class PlatformReviewController extends Controller
         $message = trim((string) ($data['testimonial'] ?? ''));
         DB::transaction(function () use ($data, $message) {
             // Serialize member submissions even on concurrent HTTP requests.
-            DB::table('users')->where('id', Auth::id())->lockForUpdate()->firstOrFail();
+            abort_unless(DB::table('users')->where('id', Auth::id())->lockForUpdate()->first(), 404);
             $previous = DB::table('platform_reviews')->where('user_id', Auth::id())->first();
             if ($previous && $previous->status !== 'rejected') {
                 throw ValidationException::withMessages([
