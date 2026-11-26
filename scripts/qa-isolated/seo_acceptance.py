@@ -122,6 +122,15 @@ elif mode == 'home-profile':
 else:
     home,_=page('/')
     assert any(x.get('@type')=='WebSite' for x in home.schemas)
+    # Reuse the existing SEO contract on both new public marketing routes.
+    home_sitemap_urls = locs(xml('/sitemap-home.xml'))
+    for new_path in ('/recursos', '/proximas-implementacoes'):
+        marketing,_=page(new_path)
+        expected = BASE + new_path
+        assert marketing.one('canonical') == expected, (new_path, marketing.one('canonical'))
+        assert marketing.one('og:url') == expected
+        assert expected in home_sitemap_urls, (new_path, home_sitemap_urls)
+    print('PASS public marketing metadata, social cards and sitemap entries')
     profile,_=page('/@auditfree')
     assert profile.one('og:title') == 'auditfree'
     assert any(x.get('@type')=='ProfilePage' and x['mainEntity']['name']=='auditfree' for x in profile.schemas)
