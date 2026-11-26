@@ -88,7 +88,7 @@ async function assertAxe(page, selector) {
 }
 async function linksFlow(page,width,mode) {
   await verifyTopbar(page,'/studio/links','Links e Blocos',width);
-  const usage=page.locator('main.main-content > .alert.alert-info[role="status"]').first();
+  const usage=page.locator('.alert.alert-info[role="status"]').first();
   assert.equal(await usage.count(),1,'Free usage notice should be visible');
   const notice=await usage.boundingBox();
   const linkCard=await page.locator('.studio-links-page .links-section-card').first().boundingBox();
