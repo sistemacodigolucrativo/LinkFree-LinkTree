@@ -4,7 +4,7 @@
 <div class="container-fluid content-inner py-0">
   <div class="card rounded-4">
     <div class="card-body p-3 p-md-4">
-      <h1 class="h3 mb-2"><i class="bi bi-patch-check" aria-hidden="true"></i> Selo verificado</h1>
+      <h1 class="h3 mb-2"><i class="bi bi-patch-check" aria-hidden="true"></i> {{ __('member_ui.verified_badge') }}</h1>
       <p class="text-muted">O selo confirma que o perfil recebeu aprovação administrativa. Somente o administrador pode conceder ou revogar a verificação.</p>
 
       @if(session('success'))
