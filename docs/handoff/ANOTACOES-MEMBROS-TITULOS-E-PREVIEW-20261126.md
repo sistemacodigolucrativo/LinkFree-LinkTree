@@ -19,7 +19,7 @@
 
 **Critério de aceite:** para cada rota afetada, somente a Topbar traz o título de página visível; o conteúdo mantém seus títulos internos quando exercem função distinta e fica alinhado sem lacuna decorrente do heading removido.
 
-**Status inicial:** PENDENTE — diagnóstico, implementação e testes.
+**Status:** IMPLEMENTADO na branch — validação automatizada dirigida aprovada, homologação real pendente.
 
 ## ANOTAÇÃO Nº 02 — Ícones oficiais e preview interativo no seletor de plataformas
 
@@ -36,7 +36,7 @@
 
 **Critério de aceite:** abertura da plataforma nunca altera o valor selecionado; confirmação o altera uma vez; o preview corresponde à configuração real cadastrada no projeto, com fallback consistente onde não exista estilização específica.
 
-**Status inicial:** PENDENTE — inventário das fontes de ícones/modelos, implementação e validação.
+**Status:** IMPLEMENTADO na branch — validação automatizada dirigida aprovada, homologação real pendente.
 
 ## Procedimento e evidências
 
@@ -84,3 +84,11 @@ Os títulos da Topbar são gerados por `layouts/sidebar.blade.php`, que não foi
 - Os checks do head final devem ser revalidados antes da PR sair de draft. O `browser-a11y` global, configurado para execução manual, não é considerado aprovado por estar `skipped`.
 - Validação autenticada na VPS/staging e em aparelhos físicos permanece uma etapa posterior, separada de CI sintético.
 - **Não executar merge nem deploy nesta etapa sem autorização expressa.**
+
+### Evidência após revisão visual final da interface
+
+- A primeira captura do teste sintético revelou duas falhas específicas da apresentação: uma opção vazia inserida pela fixture de QA e baixo contraste dos SVGs brancos de Apple Store, Deezer e Discord na lista clara.
+- O `seed.php` descartável passou a marcar o botão sintético como excluído, sem alterar os 104 botões de produção. O CSS do seletor acrescentou apenas um fundo escuro de contraste a esses três SVGs, preservando os próprios arquivos e a prévia do botão público.
+- A execução de navegador do código revisado `3f6778c5d050a3dd1eeae7baef1761faa2c7019a`, no [job 139626027910](https://github.com/sistemacodigolucrativo/LinkFree-LinkTree/actions/runs/45735009506/job/139626027910), confirmou **46 testes PASS / 0 FAIL** e capturas em `375px/light` e `1280px/dark`, incluindo a área expandida da plataforma e sua confirmação por teclado.
+- As capturas revisadas mostram o item Apple Store, Deezer e Discord legíveis no tema claro e ausência de linha de plataforma vazia. A documentação e as capturas refletem o build sintético, não dados reais da VPS.
+- Os demais workflows no mesmo head devem ser verificados antes de promover a PR. **Não houve merge nem deploy.**
