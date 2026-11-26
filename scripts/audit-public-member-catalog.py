@@ -19,6 +19,8 @@ page = read("resources/views/public/catalog.blade.php")
 home = read("resources/views/home.blade.php")
 content = read("app/Services/PublicSiteContent.php")
 seo = read("app/Http/Controllers/SeoController.php")
+seo_service = read("app/Services/PublicSeo.php")
+member_layout = read("resources/views/layouts/sidebar.blade.php")
 styles = read("assets/css/linkfree-public-catalog.css")
 auth = read("resources/views/auth/login.blade.php")
 register = read("resources/views/auth/lf-variants.blade.php")
@@ -49,6 +51,15 @@ require("class MemberFeatureCatalog" in catalog and
         "public static function groups()" in catalog and
         "public static function upcoming()" in catalog,
         "Inventory comes from a dedicated server-side catalog")
+require("Compartilhamento por QR Code" in catalog and
+        "O download em PNG depende do suporte" in catalog and
+        "bi bi-qr-code-scan" in member_layout and
+        "QrCode::gradient" in member_layout,
+        "QR Code already exists in the member sidebar and is accurately described in public catalog")
+require("Sua página de links, com identidade própria" in seo_service and
+        "CUSTOM_META_TAGS" in seo_service,
+        "Public homepage SEO headline is updated without overriding configured metadata")
+
 require("filter_var(env('ALLOW_USER_EXPORT')" in catalog and
         "filter_var(env('ALLOW_USER_IMPORT')" in catalog and
         "Disponível para VIP e administrador." in catalog,
