@@ -101,6 +101,13 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 @media(max-width:767px){.lf-phone{animation:lf-float-mobile 6s ease-in-out infinite}.lf-footer .footer-body{flex-direction:column;align-items:center;text-align:center}.lf-footer .left-panel{flex:0 1 auto;justify-content:center}.lf-footer .right-panel{flex:0 1 auto}.lf-links .lf-actions{align-items:center}.lf-card-art{height:125px}}
 @keyframes lf-float-mobile{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 @media(prefers-reduced-motion:reduce){.lf-phone{animation:none}.lf-card,.lf-step,.lf-art-float{transition:none}}
+/* Keep the expanded public navigation within desktop width. */
+@media(min-width:1001px){.lf-nav-inner{gap:14px}.lf-links{gap:13px}.lf-links>a{font-size:.93rem}}
+.lf-public-paths{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.lf-public-paths .lf-card{display:flex;flex-direction:column;align-items:flex-start}
+.lf-public-paths .lf-card .lf-button{margin-top:auto}
+.lf-public-paths .lf-card p{margin-bottom:22px}
+@media(max-width:767px){.lf-public-paths{grid-template-columns:minmax(0,1fr)}}
 </style>
   </head>
 
@@ -113,9 +120,10 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 <header class="lf-nav"><div class="lf-container lf-nav-inner">
 <a class="lf-brand" href="{{ url('/') }}">@if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))<img src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" alt="">@else<img src="{{ asset('assets/linkstack/images/favicon.svg') }}" alt="">@endif <span>{{ config('app.name') }}</span></a>
 <button class="lf-menu" type="button" aria-expanded="false" aria-controls="lf-navigation">Menu ☰</button>
-<nav class="lf-links" id="lf-navigation" aria-label="Navegação principal">@if(\App\Services\PublicSiteContent::enabled('features'))<a href="#recursos">{{ \App\Services\PublicSiteContent::text('nav_features') }}</a>@endif
+<nav class="lf-links" id="lf-navigation" aria-label="Navegação principal"><a href="{{ route('public.features') }}">{{ \App\Services\PublicSiteContent::text('nav_features') }}</a>
 @if(\App\Services\PublicSiteContent::enabled('steps'))<a href="#como-funciona">{{ \App\Services\PublicSiteContent::text('nav_steps') }}</a>@endif
-@if(\App\Services\PublicSiteContent::enabled('faq'))<a href="#duvidas">{{ \App\Services\PublicSiteContent::text('nav_faq') }}</a>@endif<div class="lf-actions">
+@if(\App\Services\PublicSiteContent::enabled('faq'))<a href="#duvidas">{{ \App\Services\PublicSiteContent::text('nav_faq') }}</a>@endif
+<a href="{{ route('public.roadmap') }}">Próximas implementações</a><div class="lf-actions">
 @auth<a class="lf-button" href="{{ url('dashboard') }}">{{ \App\Services\PublicSiteContent::text('button_my_panel') }}</a>@else
 @if(Route::has('login'))<a href="{{ route('login') }}">{{ \App\Services\PublicSiteContent::text('button_login') }}</a>@endif
 @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">{{ \App\Services\PublicSiteContent::text('button_register') }}</a>@endif
@@ -131,7 +139,7 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 <article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="63" y="25" width="114" height="70" rx="14" fill="#253b28" stroke="#71945f"/><rect x="78" y="38" width="84" height="9" rx="4.5" fill="#a5f33d"/><rect x="78" y="55" width="84" height="9" rx="4.5" fill="#799c71"/><rect x="78" y="72" width="58" height="9" rx="4.5" fill="#799c71"/></g><circle cx="50" cy="34" r="4" fill="#a5f33d"/><circle cx="190" cy="85" r="3" fill="#a5f33d"/></svg></div><span class="lf-icon">↗</span><h3>{{ \App\Services\PublicSiteContent::text('feature1_title') }}</h3><p>{{ \App\Services\PublicSiteContent::text('feature1_description') }}</p></article>
 <article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="78" y="18" width="84" height="84" rx="16" fill="#253b28" stroke="#71945f"/><circle cx="120" cy="45" r="14" fill="#a5f33d"/><path d="M96 80c2-14 10-21 24-21s22 7 24 21" fill="#799c71"/><circle cx="167" cy="32" r="12" fill="#a5f33d"/><path d="M167 26v12m-6-6h12" stroke="#1d3018" stroke-width="2"/></g></svg></div><span class="lf-icon">✦</span><h3>{{ \App\Services\PublicSiteContent::text('feature2_title') }}</h3><p>{{ \App\Services\PublicSiteContent::text('feature2_description') }}</p></article>
 <article class="lf-card lf-reveal"><div class="lf-card-art" aria-hidden="true"><svg viewBox="0 0 240 120" fill="none"><circle cx="120" cy="60" r="46" stroke="#42653b"/><g class="lf-art-float"><rect x="70" y="29" width="100" height="62" rx="14" fill="#253b28" stroke="#71945f"/><rect x="85" y="44" width="70" height="9" rx="4.5" fill="#a5f33d"/><rect x="85" y="61" width="44" height="7" rx="3.5" fill="#799c71"/><circle cx="154" cy="76" r="17" fill="#a5f33d"/><path d="M148 76h12m-5-5 5 5-5 5" stroke="#1d3018" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g></svg></div><span class="lf-icon">▦</span><h3>{{ \App\Services\PublicSiteContent::text('feature3_title') }}</h3><p>{{ \App\Services\PublicSiteContent::text('feature3_description') }}</p></article>
-</div></div></section>
+</div><div class="lf-cta" style="justify-content:center"><a class="lf-button alt" href="{{ route('public.features') }}">Conhecer todos os recursos</a></div></div></section>
 @endif
 @if(\App\Services\PublicSiteContent::enabled('steps'))
 <section class="lf-section alt" id="como-funciona"><div class="lf-container lf-split"><div class="lf-reveal"><span class="lf-eyebrow">{{ \App\Services\PublicSiteContent::text('steps_eyebrow') }}</span><h2>{{ \App\Services\PublicSiteContent::text('steps_title') }}</h2><p>{{ \App\Services\PublicSiteContent::text('steps_intro') }}</p></div><div class="lf-steps">
@@ -150,11 +158,33 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 @if(\App\Services\PublicSiteContent::enabled('final'))
 <section class="lf-section alt"><div class="lf-container"><div class="lf-final lf-reveal"><span class="lf-eyebrow">{{ \App\Services\PublicSiteContent::text('final_eyebrow') }}</span><h2>{{ \App\Services\PublicSiteContent::text('final_title') }}</h2><p>{{ \App\Services\PublicSiteContent::text('final_description') }}</p><div class="lf-cta">@auth<a class="lf-button" href="{{ url('dashboard') }}">{{ \App\Services\PublicSiteContent::text('button_dashboard') }}</a>@else @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">{{ \App\Services\PublicSiteContent::text('button_register') }}</a>@elseif(Route::has('login'))<a class="lf-button" href="{{ route('login') }}">{{ \App\Services\PublicSiteContent::text('button_login') }}</a>@endif @endauth</div></div></div></section>
 @endif
+<section class="lf-section alt" aria-labelledby="lfp-paths-title"><div class="lf-container">
+  <div class="lf-heading"><span class="lf-eyebrow">Conheça a plataforma com clareza</span>
+    <h2 id="lfp-paths-title">Recursos reais. Evolução transparente.</h2>
+    <p>Encontre o que o LinkFree já oferece aos membros e acompanhe o planejamento sem confundir ideias, testes e funcionalidades disponíveis.</p>
+  </div>
+  <div class="lf-public-paths">
+    <article class="lf-card">
+      <span class="lf-icon" aria-hidden="true">✓</span>
+      <h3>O que você pode construir agora</h3>
+      <p>Veja como perfil, links, blocos, temas, indicadores e conexões ajudam a organizar sua presença digital. Alguns recursos dependem do plano.</p>
+      <a class="lf-button" href="{{ route('public.features') }}">Explorar recursos</a>
+    </article>
+    <article class="lf-card">
+      <span class="lf-icon" aria-hidden="true">↗</span>
+      <h3>Próximas implementações</h3>
+      <p>Um espaço para apresentar apenas ferramentas futuras realmente confirmadas, sem repetir recursos existentes nem anunciar datas sem definição.</p>
+      <a class="lf-button alt" href="{{ route('public.roadmap') }}">Acompanhar novidades</a>
+    </article>
+  </div>
+</div></section>
 </main>
           <!-- Footer Section Start -->
           <footer class="lf-footer">
             <div class="footer-body lf-container">
                 <ul class="left-panel list-inline mb-0 p-0">
+                  <li class="list-inline-item"><a href="{{ route('public.features') }}">Recursos</a></li>
+                  <li class="list-inline-item"><a href="{{ route('public.roadmap') }}">Próximas implementações</a></li>
                   @if(env('DISPLAY_FOOTER') === true)
                     @if(env('DISPLAY_FOOTER_HOME') === true)<li class="list-inline-item"><a class="list-inline-item" href="@if(str_replace('"', "", EnvEditor::getKey('HOME_FOOTER_LINK')) === "" ){{ url('') }}@else{{ str_replace('"', "", EnvEditor::getKey('HOME_FOOTER_LINK')) }}@endif">{{ \App\Services\PublicSiteContent::text('footer_home') }}</a></li>@endif
                     @if(env('DISPLAY_FOOTER_TERMS') === true)<li class="list-inline-item"><a class="list-inline-item" href="{{ url('') }}/pages/{{ strtolower(footer('Terms')) }}">{{ \App\Services\PublicSiteContent::text('footer_terms') }}</a></li>@endif
