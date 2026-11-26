@@ -88,7 +88,7 @@ async function run(){
           const items=page.locator('.lf-upcoming-card');
           assert.equal(await items.count(),1,'Only one strictly documented future tool');
           assert((await items.first().innerText()).includes('Pré-visualização interativa'));
-          assert((await items.first().innerText()).includes('Em validação'));
+          assert.equal((await items.first().locator('.lf-roadmap-state').textContent()).trim(),'Em validação');
           assert(!(await items.first().innerText()).includes('Selo verificado'));
           assert((await page.locator('link[rel="canonical"]').getAttribute('href')).endsWith('/plataforma/proximas-implementacoes'));
           const geometry=await horizontal(page,width);
