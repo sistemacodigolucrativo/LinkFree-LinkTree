@@ -86,7 +86,8 @@ async function assertAxe(page, selector) {
   const report=await new AxeBuilder({page}).include(selector)
     .withTags(['wcag2a','wcag2aa','wcag21aa','wcag22aa']).analyze();
   const violations=report.violations.map(v=>({id:v.id,impact:v.impact,
-    targets:v.nodes.slice(0,3).map(n=>n.target)}));
+    targets:v.nodes.slice(0,3).map(n=>n.target),
+    details:v.nodes.slice(0,3).map(n=>String(n.failureSummary||'').slice(0,600))}));
   assert.equal(violations.length,0,'Scoped axe violations: '+JSON.stringify(violations));
   return {violations:0,incomplete:report.incomplete.map(v=>v.id)};
 }
@@ -240,6 +241,19 @@ async function run() {
               if(await panel.locator('.iq-sub-card').count()===0)
                 assert(bellText.includes('Parabéns! Nenhuma notificação pendente.'),
                   'Admin empty bell must use its own message');
+              const empty=panel.locator('.lf-notifications-empty');
+              if(await empty.count()){
+                await reviewer.waitForTimeout(350);
+                const colors=await empty.evaluate(el=>{
+                  const cs=node=>{const c=getComputedStyle(node);return {
+                    color:c.color,background:c.backgroundColor,opacity:c.opacity,
+                    visibility:c.visibility,filter:c.filter,display:c.display
+                  }};
+                  return {self:cs(el),parent:cs(el.parentElement),
+                    panel:cs(el.closest('.notification-panel')),bodyClass:document.body.className};
+                });
+                console.log('ADMIN EMPTY PALETTE',JSON.stringify(colors));
+              }
               const axe=await assertAxe(reviewer,'.card-body');
               await reviewer.screenshot({path:path.join(screenshots,'review-admin-375.png'),
                 fullPage:true,timeout:15000});
