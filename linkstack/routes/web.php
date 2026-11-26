@@ -60,6 +60,14 @@ if(env('MAINTENANCE_MODE') != 'true'){
 
 require __DIR__.'/home.php';
 
+// Páginas institucionais públicas, sem sessão ou escrita, antes do catch-all de perfis.
+// Prefixo com dois segmentos evita capturar identificadores públicos /{littlelink}.
+Route::get('/plataforma/recursos', [\App\Http\Controllers\PublicCatalogController::class, 'resources'])
+    ->name('public.resources')->middleware('disableCookies');
+Route::get('/plataforma/proximas-implementacoes', [\App\Http\Controllers\PublicCatalogController::class, 'roadmap'])
+    ->name('public.roadmap')->middleware('disableCookies');
+
+
 // SEO and public social previews; unavailable in installer/maintenance mode.
 Route::get('/robots.txt', [\App\Http\Controllers\SeoController::class, 'robots'])->name('seo.robots')->middleware('disableCookies');
 Route::get('/sitemap.xml', [\App\Http\Controllers\SeoController::class, 'sitemap'])->name('seo.sitemap')->middleware('disableCookies');
