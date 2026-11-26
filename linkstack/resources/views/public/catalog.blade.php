@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     @php
         $isRoadmap = $page === 'roadmap';
+        $configuredBrand = (string) config('app.name', 'LinkFree');
         $pageTitle = $isRoadmap ? 'Próximas Implementações' : 'Recursos para membros';
         $description = $isRoadmap
-            ? 'Conheça as novas ferramentas do LinkFree em preparação. Sem datas prometidas e sem repetir funcionalidades já disponíveis.'
-            : 'Explore os recursos do LinkFree para criar sua página, personalizar links e blocos e acompanhar resultados conforme seu plano.';
+            ? 'Conheça as novas ferramentas do ' . $configuredBrand . ' em preparação. Sem datas prometidas e sem repetir funcionalidades já disponíveis.'
+            : 'Explore os recursos do ' . $configuredBrand . ' para criar sua página, personalizar links e blocos e acompanhar resultados conforme seu plano.';
         $canonical = $isRoadmap ? route('public.roadmap') : route('public.resources');
         $previewImage = route('socialPreview.site');
     @endphp
@@ -68,10 +69,10 @@
 <main id="conteudo">
   <section class="lf-catalog-hero">
     <div class="lf-public-wrap">
-      <p class="lf-kicker">{{ $isRoadmap ? 'Nosso próximo capítulo' : 'Descubra o LinkFree' }}</p>
+      <p class="lf-kicker">{{ $isRoadmap ? 'Nosso próximo capítulo' : 'Descubra ' . $configuredBrand }}</p>
       @if($isRoadmap)
         <h1>Próximas <span>Implementações</span></h1>
-        <p class="lf-catalog-lead">A evolução do LinkFree começa com experiências úteis. Aqui aparecem apenas novas ferramentas anunciadas e que ainda não estão disponíveis — sem repetir o que já funciona.</p>
+        <p class="lf-catalog-lead">A evolução do {{ config('app.name') }} começa com experiências úteis. Aqui aparecem apenas novas ferramentas anunciadas e que ainda não estão disponíveis — sem repetir o que já funciona.</p>
         <p class="lf-small-note">Itens em desenvolvimento não representam data de lançamento nem disponibilidade garantida.</p>
       @else
         <h1>Sua presença digital, <span>no seu ritmo.</span></h1>
@@ -108,7 +109,7 @@
     </section>
     <section class="lf-catalog-section lf-catalog-bridge">
       <div class="lf-public-wrap lf-bridge-inner">
-        <div><span class="lf-kicker">Disponível agora</span><h2>Quer conhecer o que você já pode fazer?</h2><p>Veja os recursos atuais do LinkFree, organizados por objetivo e com indicação de restrições quando necessário.</p></div>
+        <div><span class="lf-kicker">Disponível agora</span><h2>Quer conhecer o que você já pode fazer?</h2><p>Veja os recursos atuais do {{ config('app.name') }}, organizados por objetivo e com indicação de restrições quando necessário.</p></div>
         <a class="lf-action lf-action-outline" href="{{ route('public.resources') }}">Conhecer recursos atuais</a>
       </div>
     </section>
@@ -159,7 +160,7 @@
         @if(env('ALLOW_REGISTRATION') && !config('linkstack.single_user_mode') && Route::has('register'))
           <a class="lf-action" href="{{ route('register') }}">Criar minha página</a>
         @elseif(Route::has('login'))
-          <a class="lf-action" href="{{ route('login') }}">Entrar no LinkFree</a>
+          <a class="lf-action" href="{{ route('login') }}">Entrar no {{ config('app.name') }}</a>
         @endif
       @endauth
     </div>

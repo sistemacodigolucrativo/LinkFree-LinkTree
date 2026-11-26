@@ -24,7 +24,7 @@ foreach($pages as $page)
       </div>
       <div class="lf-login-visual-content">
         <span class="lf-login-visual-emblem"><i class="bi bi-grid-1x2-fill"></i></span>
-        <p class="lf-login-visual-eyebrow">LINKFREE</p>
+        <p class="lf-login-visual-eyebrow">{{ config('app.name') }}</p>
         <h2>{{ config('app.name') }}</h2>
         <p>{{ str_starts_with(strtolower(app()->getLocale()), 'pt') ? 'Reúna sua página, seus links e suas conexões em um só lugar.' : __('messages.Login to stay connected') }}</p>
       </div>

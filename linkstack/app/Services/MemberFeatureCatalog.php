@@ -17,7 +17,7 @@ final class MemberFeatureCatalog
                 'title' => 'Uma página que apresenta você',
                 'description' => 'Transforme seu endereço público em um ponto de encontro para sua audiência.',
                 'items' => [
-                    ['title' => 'Página com endereço próprio no LinkFree', 'description' => 'Reúna seus destinos em um perfil com nome, descrição e endereço público compartilhável.'],
+                    ['title' => 'Página com endereço próprio no ' . config('app.name', 'LinkFree'), 'description' => 'Reúna seus destinos em um perfil com nome, descrição e endereço público compartilhável.'],
                     ['title' => 'Imagem e apresentação pessoal', 'description' => 'Adicione imagem de perfil, descrição e uma apresentação alinhada à sua identidade.'],
                     ['title' => 'Presença em buscas e compartilhamentos', 'description' => 'Configure a preferência de indexação, o slogan de compartilhamento e a exibição do contador público de visitas.'],
                 ],
@@ -62,7 +62,7 @@ final class MemberFeatureCatalog
                 'id' => 'crescimento',
                 'eyebrow' => 'Confiança e comunidade',
                 'title' => 'Fortaleça as conexões com seu público',
-                'description' => 'Recursos para divulgar sua página e organizar sua presença dentro do LinkFree.',
+                'description' => 'Recursos para divulgar sua página e organizar sua presença dentro do ' . config('app.name', 'LinkFree') . '.',
                 'items' => [
                     ['title' => 'Indicações por convite', 'description' => 'Crie um link de convite, compartilhe-o e acompanhe cadastros atribuídos.', 'note' => 'Não há recompensa financeira automática.'],
                     ['title' => 'Selo de verificação', 'description' => 'Solicite a análise do administrador; depois da aprovação, controle a exibição do selo no perfil.', 'note' => 'A concessão depende de aprovação.'],

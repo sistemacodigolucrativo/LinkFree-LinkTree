@@ -1,6 +1,6 @@
 <?php
 
-return [
+$messages = [
 
     /*
     |--------------------------------------------------------------------------
@@ -1138,3 +1138,27 @@ return [
 
 
 ];
+// User-visible platform identification follows the configured APP_NAME.
+// Translation keys and upstream links/credits remain unchanged.
+foreach ([
+    'SMTP.description', 'LinkStack setup', 'Setup LinkStack',
+    'Welcome to the setup for LinkStack!', 'Update LinkStack',
+    'Enjoying Linkstack?', 'Support Linkstack',
+    'support.msg1', 'support.msg5', 'support.msg6',
+] as $brandLabel) {
+    if (isset($messages[$brandLabel]) && is_string($messages[$brandLabel])) {
+        $messages[$brandLabel] = preg_replace('/Link\s*Stacks?/i',
+            (string) config('app.name', 'LinkFree'), $messages[$brandLabel]);
+    }
+}
+// Historical default homepage content should not link the installed name
+// to the unrelated upstream project.
+if (isset($messages['HOME.MESSAGE'])) {
+    $messages['HOME.MESSAGE'] = str_ireplace(
+        '<a href="https://linkstack.org/"><strong>LinkStack</strong></a>',
+        e(config('app.name', 'LinkFree')),
+        $messages['HOME.MESSAGE']);
+}
+// Legacy translation had malformed upstream anchors. Render the configured brand safely.
+$messages['HOME.MESSAGE'] = '<p>使用 <strong>' . e(config('app.name', 'LinkFree')) . '</strong> 管理您的个人资料和重要链接，并为访客提供便捷的浏览体验。</p>';
+return $messages;

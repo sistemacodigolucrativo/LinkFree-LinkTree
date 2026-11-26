@@ -254,7 +254,7 @@ $("#select").change(function(){
 </script>
 
 <label for="field-app">{{__('messages.App Name:')}}</label>
-<input style="max-width:275px;" class="form-control" value="LinkStack" name="app" type="text" required id="field-app">
+<input style="max-width:275px;" class="form-control" value="{{ config('app.name', 'LinkFree') }}" name="app" type="text" required id="field-app">
 
 </div></div><br>
 <input type="hidden" name="_token" value="{{csrf_token()}}">

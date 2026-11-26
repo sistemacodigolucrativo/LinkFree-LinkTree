@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # LinkFree-LinkTree: atualizacao seletiva GitHub -> desenvolvimento -> producao.
-# Uso: sudo bash atualizar-linkstack.sh --check | --deploy | --deploy-consent | --deploy-m13
+# Uso: sudo bash atualizar-linkstack.sh --check | --deploy | --deploy-consent | --deploy-m13 | --deploy-reviews
 # Primeiro acesso: prepara clone persistente e estágio de código (sem dados privados).
 set -Eeuo pipefail
 umask 077
@@ -15,8 +15,8 @@ BACKUP_ROOT=/var/backups/linkfree-deploy
 SITE=https://linkfree.website
 
 MODE="${1:-}"
-if [[ "$MODE" != --check && "$MODE" != --deploy && "$MODE" != --deploy-consent && "$MODE" != --deploy-m13 ]]; then
-  echo 'Uso: bash atualizar-linkstack.sh --check | --deploy | --deploy-consent | --deploy-m13' >&2
+if [[ "$MODE" != --check && "$MODE" != --deploy && "$MODE" != --deploy-consent && "$MODE" != --deploy-m13 && "$MODE" != --deploy-reviews ]]; then
+  echo 'Uso: bash atualizar-linkstack.sh --check | --deploy | --deploy-consent | --deploy-m13 | --deploy-reviews' >&2
   exit 2
 fi
 if (( EUID != 0 )); then echo 'Execute como root (sudo).' >&2; exit 1; fi
@@ -175,11 +175,15 @@ M13_MIGRATION_05='database/migrations/2026_11_23_000002_create_referral_tables.p
 M13_MIGRATION_06='database/migrations/2026_11_23_000003_create_profile_verification_workflow.php'
 M13_MIGRATION_07='database/migrations/2026_11_23_000004_create_abuse_reports_tables.php'
 m13_pending=()
+# Migração isolada; requer autorização explícita do operador.
+REVIEW_MIGRATION='database/migrations/2026_11_26_000001_create_platform_reviews_table.php'
+review_migration=false
 for path in "${changed[@]}"; do
   rel="${path#linkstack/}"
   case "$rel" in
     "$CONSENT_MIGRATION") consent_migration=true; continue ;; # Migração aditiva conhecida, admitida no fluxo normal.
     "$M13_MIGRATION_05"|"$M13_MIGRATION_06"|"$M13_MIGRATION_07") m13_pending+=("$rel"); continue ;;
+    "$REVIEW_MIGRATION") review_migration=true; continue ;;
     database/migrations/*) manual+=("$rel"); continue ;; # As demais permanecem bloqueadas.
     .env|.env.*|config/advanced-config.php|storage/*|database/*|themes/*|vendor/*|node_modules/*|.git/*|assets/favicon/icons/*|INSTALLERLOCK|*.sqlite|*.sqlite-*|*.db|*.db-*) protected+=("$rel"); continue ;;
     composer.json|composer.lock|package.json|package-lock.json|yarn.lock|vite.config.*|webpack.mix.js) manual+=("$rel"); continue ;;
@@ -200,6 +204,18 @@ if ((${#manual[@]})); then
   exit 1
 fi
 
+# Avaliações exigem modo explícito, não modificam SQLite no --deploy regular.
+if [[ "$review_migration" == true ]]; then
+  [[ "$consent_migration" == false && ${#m13_pending[@]} -eq 0 ]] || {
+    echo 'Migração de avaliações e outra migração detectadas no mesmo salto.' >&2; exit 1;
+  }
+  if [[ "$MODE" != --check && "$MODE" != --deploy-reviews ]]; then
+    echo 'Migração de avaliações detectada. Use --check; após aprovação use --deploy-reviews.' >&2; exit 1
+  fi
+elif [[ "$MODE" == --deploy-reviews ]]; then
+  echo 'Sem migração de avaliações pendente; --deploy-reviews não se aplica.' >&2; exit 1
+fi
+
 # A M13 exige modo explícito: deploy normal não pode alterar seu esquema.
 if (( ${#m13_pending[@]} > 0 )); then
   if [[ "$MODE" != --check && "$MODE" != --deploy-m13 ]]; then
@@ -218,7 +234,7 @@ elif [[ "$MODE" == --deploy-m13 ]]; then
 fi
 
 # As migrations conhecidas exigem preflight de banco, inclusive no modo --check.
-if [[ "$consent_migration" == true || ${#m13_pending[@]} -gt 0 ]]; then
+if [[ "$consent_migration" == true || ${#m13_pending[@]} -gt 0 || "$review_migration" == true ]]; then
   # --deploy e --deploy-consent utilizam o MESMO preflight e backup.
   # Migrações desconhecidas continuam bloqueadas.
   [[ -f "$PROD/database/database.sqlite" && ! -L "$PROD/database/database.sqlite" ]] || {
@@ -243,6 +259,15 @@ if [[ "$consent_migration" == true || ${#m13_pending[@]} -gt 0 ]]; then
   gitrepo cat-file -e "$TARGET:linkstack/$CONSENT_MIGRATION" || { echo 'Migração ausente do commit remoto.' >&2; exit 1; }
   if [[ -e "$PROD/$CONSENT_MIGRATION" ]] && ! gitrepo show "$TARGET:linkstack/$CONSENT_MIGRATION" | cmp -s - "$PROD/$CONSENT_MIGRATION"; then
     echo 'Migração instalada diverge do commit remoto.' >&2; exit 1
+  fi
+  if [[ "$review_migration" == true ]]; then
+    [[ ! -L "$PROD/$REVIEW_MIGRATION" ]] || { echo 'Migration de avaliações via symlink recusada.' >&2; exit 1; }
+    gitrepo cat-file -e "$TARGET:linkstack/$REVIEW_MIGRATION" || {
+      echo 'Migration de avaliações não existe no commit remoto.' >&2; exit 1
+    }
+    if [[ -e "$PROD/$REVIEW_MIGRATION" ]] && ! gitrepo show "$TARGET:linkstack/$REVIEW_MIGRATION" | cmp -s - "$PROD/$REVIEW_MIGRATION"; then
+      echo 'Migration de avaliações instalada divergente.' >&2; exit 1
+    fi
   fi
   for migration in "${m13_pending[@]}"; do
     [[ ! -L "$PROD/$migration" ]] || { echo "Symlink recusado: $migration" >&2; exit 1; }
@@ -309,7 +334,9 @@ if [[ "$MODE" == --check ]]; then
   [[ -d "$DEV" ]] || echo "O estagio de codigo $DEV sera criado no primeiro --deploy (sem .env ou banco)."
   echo 'SIMULACAO CONCLUIDA: os destinos existentes passaram na verificacao de conflito.'
   echo 'Nenhum arquivo da aplicacao foi modificado.'
-  if (( ${#m13_pending[@]} > 0 )); then
+  if [[ "$review_migration" == true ]]; then
+    echo 'Migração de avaliações reconhecida. Em janela aprovada: bash /root/atualizar-linkstack.sh --deploy-reviews'
+  elif (( ${#m13_pending[@]} > 0 )); then
     echo 'M13 reconhecida. Após aprovação e backup, use: bash /root/atualizar-linkstack.sh --deploy-m13'
   elif [[ "$consent_migration" == true ]]; then
     echo 'Migração reconhecida: o comando deploy aplicará backup e migração automaticamente.'
@@ -532,6 +559,37 @@ if [[ "$MODE" == --deploy-m13 ]]; then
     echo 'Falha no foreign_key_check após migração M13.' >&2; exit 1;
   }
   echo 'Migrations 000002–000004 aplicadas e esquema verificado, antes de publicar código.'
+fi
+# Migrar avaliações no banco SQLite após backup online e antes do código novo.
+if [[ "$MODE" == --deploy-reviews ]]; then
+  [[ "$review_migration" == true && -f "$backup/sqlite-before-deploy.sqlite" ]] || {
+    echo 'Migração de avaliações ou backup SQLite não encontrado.' >&2; exit 1
+  }
+  [[ "$(sqlite3 "$backup/sqlite-before-deploy.sqlite" 'PRAGMA quick_check;')" == ok ]] || {
+    echo 'Backup SQLite inválido; migração cancelada.' >&2; exit 1
+  }
+  mkdir -p "$PROD/database/migrations"
+  gitrepo show "$TARGET:linkstack/$REVIEW_MIGRATION" > "$backup/reviews-migration.php"
+  php -l "$backup/reviews-migration.php" >/dev/null
+  if [[ ! -f "$PROD/$REVIEW_MIGRATION" ]]; then
+    install -m 644 "$backup/reviews-migration.php" "$PROD/$REVIEW_MIGRATION"
+  fi
+  (cd "$PROD" && runuser -u www-data -- php artisan migrate --path="$REVIEW_MIGRATION" --force --no-interaction)
+  for column in user_id rating testimonial publication_consent consented_at consent_version status reviewed_by reviewed_at; do
+    [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT COUNT(*) FROM pragma_table_info('platform_reviews') WHERE name='$column';")" == 1 ]] || {
+      echo "Coluna platform_reviews.$column ausente." >&2; exit 1
+    }
+  done
+  [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" "SELECT COUNT(*) FROM migrations WHERE migration='2026_11_26_000001_create_platform_reviews_table';")" == 1 ]] || {
+    echo 'Migração de avaliações não registrada.' >&2; exit 1
+  }
+  [[ "$(sqlite3 -readonly "$PROD/database/database.sqlite" 'PRAGMA quick_check;')" == ok ]] || {
+    echo 'SQLite inválido após migração de avaliações.' >&2; exit 1
+  }
+  [[ -z "$(sqlite3 -readonly "$PROD/database/database.sqlite" 'PRAGMA foreign_key_check;')" ]] || {
+    echo 'Foreign keys inválidas após migração de avaliações.' >&2; exit 1
+  }
+  echo 'Migração de avaliações aprovada antes da publicação.'
 fi
 # Só cria diretórios que não existem; nunca executa chown recursivo.
 if [[ ! -d "$PROD/storage/app/linkfree" ]]; then

@@ -188,7 +188,16 @@ final class PublicSiteContent
                     unset($stored[$key]);
                 }
             }
-            self::$cache = array_replace(self::defaults(), array_intersect_key($stored, self::defaults()));
+            $defaults = self::defaults();
+            $overrides = array_intersect_key($stored, $defaults);
+            // Adapt built-in marketing text to APP_NAME without changing custom
+            // operator copy or writing anything back to public-site.json.
+            foreach ($defaults as $key => $default) {
+                if (!array_key_exists($key, $overrides) && is_string($default)) {
+                    $defaults[$key] = str_replace('LinkFree', (string) config('app.name', 'LinkFree'), $default);
+                }
+            }
+            self::$cache = array_replace($defaults, $overrides);
         }
         return self::$cache;
     }

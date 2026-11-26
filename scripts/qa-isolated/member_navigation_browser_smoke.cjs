@@ -151,7 +151,59 @@ async function run() {
       page.setDefaultTimeout(12000);
       try {
         await check('Login member '+width+' '+mode,async()=>{await login(page);return {width,mode};});
+        if(width===375 || width===1280) {
+          await check('Premium review form, keyboard and WCAG '+width+' '+mode,async()=>{
+            const response=await page.goto(base+'/studio/avaliar',
+              {waitUntil:'domcontentloaded',timeout:25000});
+            assert.equal(response?.status(),200);
+            assert(await page.locator('.lf-review-shell').isVisible());
+            assert.equal(await page.locator('.lf-rating-input').count(),5);
+            assert.equal(await page.locator('input[name="publication_consent"]').count(),1);
+            assert.equal(await page.locator('form[action$="/studio/avaliar"] input[name="_token"]').count(),1);
+            assert((await page.locator('.lf-review-lead').innerText()).includes('LinkFreeQA'),
+              'Review form must use the APP_NAME configured in fixture');
+            await page.locator('#lf-rating-4').focus();
+            await page.keyboard.press('Space');
+            assert.equal(await page.locator('#lf-rating-4').isChecked(),true);
+            assert.equal(await page.locator('label.lf-selected').count(),4,
+              'Selected rating must be visibly reflected in the stars');
+            await page.locator('input[name="publication_consent"]').check();
+            assert.equal(await page.locator('input[name="publication_consent"]').isChecked(),true);
+            const dimensions=await page.evaluate(()=>({
+              width:innerWidth,scroll:document.documentElement.scrollWidth,
+              foreground:getComputedStyle(document.querySelector('.lf-review-page')).color,
+              background:getComputedStyle(document.querySelector('.lf-review-page')).backgroundColor
+            }));
+            assert(dimensions.scroll<=width+3,'Review page overflows viewport '+JSON.stringify(dimensions));
+            assert.equal(dimensions.background,'rgb(255, 255, 255)',
+              'Premium review page must retain its white background in '+mode+' mode');
+            const axe=await assertAxe(page,'.lf-review-shell');
+            await page.screenshot({path:path.join(screenshots,'review-member-'+width+'-'+mode+'.png'),
+              fullPage:true,timeout:15000});
+            return {width,mode,keyboard:true,consentOptIn:true,appName:true,axe,...dimensions};
+          });
+        }
         if(width===375) {
+          await check('Admin review moderation access and WCAG',async()=>{
+            const ctx=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
+            try {
+              await ctx.route('**/*',route=>{
+                try {if(new URL(route.request().url()).origin===base)return route.continue();}
+                catch (_) {}
+                return route.abort('blockedbyclient');
+              });
+              const reviewer=await ctx.newPage();
+              await login(reviewer,'auditadmin');
+              const response=await reviewer.goto(base+'/admin/avaliacoes',
+                {waitUntil:'domcontentloaded',timeout:25000});
+              assert.equal(response?.status(),200);
+              assert.equal(await reviewer.locator('h1').filter({hasText:'Moderação de avaliações'}).count(),1);
+              const axe=await assertAxe(reviewer,'.card-body');
+              await reviewer.screenshot({path:path.join(screenshots,'review-admin-375.png'),
+                fullPage:true,timeout:15000});
+              return {moderatorOnly:true,axe};
+            } finally {await ctx.close();}
+          });
           await check('Free member cannot access VIP visitor report',async()=>{
             const response=await page.goto(base+'/studio/visitors',{waitUntil:'domcontentloaded'});
             assert.equal(response?.status(),403,'Free visitor reports must be blocked');

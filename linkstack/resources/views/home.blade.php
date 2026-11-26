@@ -19,6 +19,7 @@
         'publisher' => ['@type' => 'Organization', 'name' => config('app.name', 'LinkFree'), 'url' => $homeCanonical]];
 @endphp
 <title>{{ $homeTitle }}</title>
+<link rel="stylesheet" href="{{ asset('assets/css/linkfree-platform-reviews.css') }}?v={{ filemtime(base_path('assets/css/linkfree-platform-reviews.css')) }}">
 <meta name="description" content="{{ $homeDescription }}">
 <meta name="robots" content="{{ \App\Services\PublicSeo::robots() }}">
 <link rel="canonical" href="{{ $homeCanonical }}">
@@ -35,13 +36,13 @@
 <meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Prévia do LinkFree">
+<meta property="og:image:alt" content="Prévia do {{ config('app.name') }}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="{{ $homeCanonical }}">
 <meta name="twitter:title" content="{{ $homeTitle }}">
 <meta name="twitter:description" content="{{ $homeDescription }}">
 <meta name="twitter:image" content="{{ $homeImage }}">
-<meta name="twitter:image:alt" content="Prévia do LinkFree">
+<meta name="twitter:image:alt" content="Prévia do {{ config('app.name') }}">
 <script type="application/ld+json">{!! json_encode($homeSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE) !!}</script>
 
       <!-- Favicon -->
@@ -153,12 +154,28 @@ body{background:#0b100d;color:var(--lf-ink);font-family:inherit}
 @endif
 @if(count(\App\Services\MemberFeatureCatalog::upcoming()) > 0)
 <section class="lf-section alt" aria-labelledby="lf-home-roadmap-title"><div class="lf-container lf-roadmap-promo lf-reveal">
-  <div><span class="lf-eyebrow">Novas experiências em preparação</span><h2 id="lf-home-roadmap-title">O que vem a seguir no LinkFree?</h2><p>Conheça as ferramentas em validação. Não exibimos recursos já lançados nem anunciamos datas antes da confirmação.</p></div>
+  <div><span class="lf-eyebrow">Novas experiências em preparação</span><h2 id="lf-home-roadmap-title">O que vem a seguir no {{ config('app.name') }}?</h2><p>Conheça as ferramentas em validação. Não exibimos recursos já lançados nem anunciamos datas antes da confirmação.</p></div>
   <a class="lf-button alt" href="{{ route('public.roadmap') }}">Próximas implementações</a>
 </div></section>
 @endif
 @if(\App\Services\PublicSiteContent::enabled('final'))
 <section class="lf-section alt"><div class="lf-container"><div class="lf-final lf-reveal"><span class="lf-eyebrow">{{ \App\Services\PublicSiteContent::text('final_eyebrow') }}</span><h2>{{ \App\Services\PublicSiteContent::text('final_title') }}</h2><p>{{ \App\Services\PublicSiteContent::text('final_description') }}</p><div class="lf-cta">@auth<a class="lf-button" href="{{ url('dashboard') }}">{{ \App\Services\PublicSiteContent::text('button_dashboard') }}</a>@else @if((env('ALLOW_REGISTRATION')) and !config('linkstack.single_user_mode'))<a class="lf-button" href="{{ route('register') }}">{{ \App\Services\PublicSiteContent::text('button_register') }}</a>@elseif(Route::has('login'))<a class="lf-button" href="{{ route('login') }}">{{ \App\Services\PublicSiteContent::text('button_login') }}</a>@endif @endauth</div></div></div></section>
+@endif
+@php $lfPublicReviews = \App\Services\PlatformReviewPublication::published(3); @endphp
+@if($lfPublicReviews->isNotEmpty())
+<section class="lf-home-reviews" aria-labelledby="lf-public-reviews-title"><div class="lf-container">
+ <span class="lf-eyebrow">{{ config('app.name') }}</span>
+ <h2 id="lf-public-reviews-title">{{ __('reviews.public_title') }}</h2>
+ <div class="lf-home-reviews-grid">
+ @foreach($lfPublicReviews as $review)
+ <article class="lf-review-quote">
+  <div class="lf-review-stars-read" aria-label="{{ __('reviews.stars', ['count' => $review->rating]) }}">{{ str_repeat('★', $review->rating) }}</div>
+  @if($review->testimonial)<blockquote>{{ $review->testimonial }}</blockquote>@endif
+  <p>{{ __('reviews.anonymous') }}</p>
+ </article>
+ @endforeach
+ </div><p><a class="lf-home-reviews-action" href="{{ route('public.platform-reviews') }}">{{ __('reviews.public_title') }}</a></p>
+</div></section>
 @endif
 </main>
           <!-- Footer Section Start -->

@@ -40,7 +40,9 @@ require("->middleware('disableCookies')" in routes and
 require("private const LEGACY_DEFAULTS" in content and
         "if (isset($stored[$key]) && $stored[$key] === $priorDefault)" in content and
         "unset($stored[$key]);" in content and
-        "array_replace(self::defaults(), array_intersect_key($stored, self::defaults()))" in content,
+        "array_replace($defaults, $overrides)" in content and
+        "array_intersect_key($stored, $defaults)" in content and
+        "str_replace('LinkFree', (string) config('app.name', 'LinkFree'), $default)" in content,
         "Existing operator copy remains in persistent JSON; only old defaults refreshed in memory")
 
 for key in ["nav_catalog", "nav_roadmap", "button_explore"]:
