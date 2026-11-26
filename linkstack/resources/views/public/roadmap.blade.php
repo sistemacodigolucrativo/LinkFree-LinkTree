@@ -7,7 +7,7 @@
 <section class="lfp-hero">
   <div class="lfp-container">
     <span class="lfp-kicker">Evolução do produto</span>
-    <h1>Próximas <em>implementações.</em></h1>
+    <h1 class="lfp-roadmap-heading">Próximas <em>implementações.</em></h1>
     <p class="lfp-intro">O LinkFree evolui com foco na experiência de quem cria, organiza e compartilha sua presença digital. Esta página apresenta apenas novas ferramentas ainda não disponibilizadas e com escopo confirmado.</p>
     <div class="lfp-actions">
       <a class="lfp-pill ghost" href="{{ route('public.features') }}">Conhecer os recursos disponíveis</a>
