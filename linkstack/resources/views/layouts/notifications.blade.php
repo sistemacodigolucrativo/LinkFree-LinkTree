@@ -132,11 +132,13 @@ $notifyID = Auth::user()->id;
 {{-- Notification Modals --}}
 @push('sidebar-scripts') @php
 notification('', 'modal-1', __('messages.Your security is at risk!'), '<b>'.__('messages.security.msg1').'</b> '.__('messages.security.msg2').'<br><br>'.__('messages.security.msg3').'<br><a href="'.url('admin/config#5').'">'.__('messages.security.msg3').'</a>.');
-notification('hide-star-notification', 'modal-star',
-    e(__('reviews.notification_title', ['appName' => config('app.name')])),
-    e(__('reviews.intro', ['appName' => config('app.name')]))
-    .'<br><br><a href="'.e(route('studio.platform-review')).'">'
-    .e(__('reviews.notification_link')).'</a>');
+if (auth()->user()->role !== 'admin') {
+    notification('hide-star-notification', 'modal-star',
+        e(__('reviews.notification_title', ['appName' => config('app.name')])),
+        e(__('reviews.intro', ['appName' => config('app.name')]))
+        .'<br><br><a href="'.e(route('studio.platform-review')).'">'
+        .e(__('reviews.notification_link')).'</a>');
+}
 @endphp @endpush
 
 @php 
