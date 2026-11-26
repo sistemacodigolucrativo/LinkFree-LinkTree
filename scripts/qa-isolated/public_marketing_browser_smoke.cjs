@@ -79,11 +79,18 @@ async function axe(page, selector) {
         await check('Roadmap responsive and no false announcements '+width, async()=>{
           const metrics=await safeVisit(page,'/plataforma/proximas-implementacoes');
           assert.equal(await page.locator('main h1').count(),1);
-          assert(await page.locator('#roadmap-empty-title').isVisible());
+          const featureInstalled=fs.existsSync(outputRoot+'/linkstack/assets/js/linkfree-platform-picker.js');
+          if(featureInstalled) {
+            assert(await page.locator('#roadmap-empty-title').isVisible());
+            assert.equal(await page.locator('.lfp-feature-tag').count(),0);
+          } else {
+            assert.equal(await page.locator('.lfp-card').count(),1,
+              'Only the approved and unpublished preview feature may appear');
+            assert((await page.locator('.lfp-card h3').innerText()).includes('Prévia interativa'));
+            assert.equal((await page.locator('.lfp-feature-tag').innerText()).trim(),'Em validação');
+          }
           const titleRects=await page.locator('.lfp-roadmap-heading em').evaluate(el=>el.getClientRects().length);
           assert.equal(titleRects,1,'Roadmap headline keyword must not split mid-word at '+width);
-          assert.equal(await page.locator('.lfp-feature-tag').count(),0,
-            'Roadmap must not expose existing or unapproved tool cards');
           return metrics;
         });
         if(width === 375 || width === 1280){
@@ -95,7 +102,9 @@ async function axe(page, selector) {
             assert(await link.evaluate(el=>document.activeElement===el));
             await page.keyboard.press('Enter');
             await page.waitForURL('**/plataforma/proximas-implementacoes');
-            assert(await page.locator('#roadmap-empty-title').isVisible());
+            const featureInstalled=fs.existsSync(outputRoot+'/linkstack/assets/js/linkfree-platform-picker.js');
+            if(featureInstalled) assert(await page.locator('#roadmap-empty-title').isVisible());
+            else assert(await page.locator('.lfp-card h3').isVisible());
             return {keyboardNavigation:true};
           });
           await check('Scoped public WCAG '+width, async()=>axe(page,'main'));
