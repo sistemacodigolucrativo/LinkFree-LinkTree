@@ -81,6 +81,17 @@ review_text = '<script>alert(1)</script> Plataforma de teste'
 status, _, _ = member.request('/studio/avaliar', {
     'rating':'4', 'testimonial':review_text, 'publication_consent':'1', '_token':token
 })
+if status == 500:
+    # The fixture contains synthetic data only. Print the exception header
+    # for forensic CI analysis without exposing cookies or submitted values.
+    error_log = ROOT / 'storage/logs/laravel.log'
+    if error_log.is_file():
+        lines = error_log.read_text(errors='replace').splitlines()
+        for line in lines:
+            if 'local.ERROR:' in line or 'production.ERROR:' in line:
+                print('QA SERVER ERROR:', line[:850], flush=True)
+    else:
+        print('QA SERVER ERROR: laravel.log missing', flush=True)
 assert status == 302, status
 record = rows()
 assert len(record) == 1 and record[0][1] == 2 and record[0][2] == 4
