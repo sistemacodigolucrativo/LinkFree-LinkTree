@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'platform_logo' => 'Logo of :appName',
     'notification_title' => 'Enjoying :appName?',
     'notification_link' => 'Leave a review',
     'heading' => 'Your opinion makes a difference',

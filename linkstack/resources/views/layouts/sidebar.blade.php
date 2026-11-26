@@ -381,17 +381,17 @@ if (!$isAdminPanel) {
                 <div class="logo-main">
                 @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
                 <div class="logo-normal">
-                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
+                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="{{ __('reviews.platform_logo', ['appName' => config('app.name')]) }}">
               </div>
               <div class="logo-mini">
-                <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
+                <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="{{ __('reviews.platform_logo', ['appName' => config('app.name')]) }}">
               </div>
                 @else
                 <div class="logo-normal">
-                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
+                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="{{ __('reviews.platform_logo', ['appName' => config('app.name')]) }}">
               </div>
               <div class="logo-mini">
-                <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
+                <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="{{ __('reviews.platform_logo', ['appName' => config('app.name')]) }}">
               </div>
                 @endif
                 </div>
@@ -454,7 +454,7 @@ if (!$isAdminPanel) {
 
 @else
 @php
-  $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user') || request()->is('admin/referrals*') || request()->is('admin/verification*') || request()->is('admin/reports*');
+  $adminUsersOpen = request()->is('admin/users*') || request()->is('admin/edit-user/*') || request()->is('admin/links/*') || request()->is('admin/new-user') || request()->is('admin/referrals*') || request()->is('admin/verification*') || request()->is('admin/reports*') || request()->is('admin/avaliacoes*');
   $adminSiteOpen = request()->is('admin/site*') || request()->is('admin/pages*');
   $adminThemesOpen = request()->is('admin/theme') || request()->is('admin/github-themes*', 'update/theme', 'theme-updater') || request()->is('admin/linktype*');
   $adminSystemOpen = request()->is('admin/config') || request()->is('admin/backups', 'backup') || request()->is('admin/advanced-config') || request()->is('admin/env') || request()->is('admin/phpinfo') || request()->is('update');
@@ -472,6 +472,7 @@ if (!$isAdminPanel) {
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/referrals*') ? 'active' : '' }}" href="{{ route('admin.referrals') }}"><i class="icon bi bi-people-fill" aria-hidden="true"></i><span class="item-name">Indicações</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/verification*') ? 'active' : '' }}" href="{{ route('admin.verification') }}"><i class="icon bi bi-patch-check" aria-hidden="true"></i><span class="item-name">Solicitações de selo</span></a></li>
 <li class="nav-item"><a class="nav-link {{ request()->is('admin/reports*') ? 'active' : '' }}" href="{{ route('admin.abuse-reports.index') }}"><i class="icon bi bi-flag" aria-hidden="true"></i><span class="item-name">Central de denúncias</span></a></li>
+<li class="nav-item"><a class="nav-link {{ request()->is('admin/avaliacoes*') ? 'active' : '' }}" href="{{ route('admin.platform-reviews') }}"><i class="icon bi bi-star-half" aria-hidden="true"></i><span class="item-name">{{ __('reviews.moderation_title') }}</span></a></li>
   </ul>
 </li>
     <li class="nav-item nav-accordion-group nav-accordion-admin">
@@ -535,17 +536,17 @@ if (!$isAdminPanel) {
                 <div class="logo-main">
                   @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
                   <div class="logo-normal">
-                    <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
+                    <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="{{ __('reviews.platform_logo', ['appName' => config('app.name')]) }}">
                 </div>
                 <div class="logo-mini">
-                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="Logotipo LinkFree">
+                  <img class="img logo" src="{{ asset('assets/linkstack/images/'.findFile('avatar')) }}" style="width:auto;height:30px;" alt="{{ __('reviews.platform_logo', ['appName' => config('app.name')]) }}">
                 </div>
                   @else
                   <div class="logo-normal">
-                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
+                    <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="{{ __('reviews.platform_logo', ['appName' => config('app.name')]) }}">
                 </div>
                 <div class="logo-mini">
-                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="Logotipo LinkFree">
+                  <img class="img logo" type="image/svg+xml" src="{{ asset('assets/linkstack/images/favicon.svg') }}" width="30px" height="30px" alt="{{ __('reviews.platform_logo', ['appName' => config('app.name')]) }}">
                 </div>
                   @endif
                   </div>
