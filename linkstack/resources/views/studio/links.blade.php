@@ -83,7 +83,7 @@ if (isset($_COOKIE['LinkCount'])) {
 }
 @media(max-width:359px) { .studio-links-preview-fab { padding:12px 15px; } }
 </style>
-<style>.delete{position:relative; color:transparent; background-color:var(--lf-danger-action); border-radius:5px; left:5px; padding:5px 12px; cursor: pointer;}.delete:hover{color:transparent;background-color:var(--lf-danger-action-hover);}html,body{max-width:100%;overflow-x:hidden;}</style>
+<style>.delete{position:relative; color:transparent; background-color:var(--lf-danger-action); border-radius:5px; left:5px; padding:5px 12px; cursor: pointer;}.delete:hover{color:transparent;background-color:var(--lf-danger-action-hover);}html,body{max-width:100%;overflow-x:clip;}</style>
 <style>
 @media(max-width:767px){
  .pre-left{min-width:0}
