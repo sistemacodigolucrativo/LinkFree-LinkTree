@@ -363,6 +363,17 @@ if (!$isAdminPanel) {
   }
   .main-content .mobile-unified-nav .lf-member-titled-nav #navbarSupportedContent{flex:0 0 auto}
 }
+
+/* The navigation is a direct child of main, so sticky is not bounded by the welcome banner. */
+.main-content > .mobile-unified-nav{position:sticky!important;top:0;z-index:889;background:var(--lf-surface,#fff)}
+.main-content .mobile-unified-nav .lf-nav-back{position:static;display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;padding:8px;border:0;background:transparent;color:#168342;cursor:pointer}
+.main-content .mobile-unified-nav .lf-nav-back:disabled{opacity:.4;cursor:default}
+.main-content .mobile-unified-nav .lf-nav-back:not(:disabled) svg{animation:lf-back-hint 1.8s ease-in-out infinite}
+.main-content .mobile-unified-nav .lf-nav-menu{border:0;background:transparent;cursor:pointer}
+.main-content .mobile-unified-nav :is(.lf-nav-back,.lf-nav-menu):focus-visible{outline:3px solid var(--lf-focus,#275fbd);outline-offset:2px}
+@keyframes lf-back-hint{0%,75%,100%{transform:translateX(0)}85%{transform:translateX(-3px)}}
+@media(prefers-reduced-motion:reduce){.main-content .mobile-unified-nav .lf-nav-back svg{animation:none!important}}
+@media(max-width:991.98px){.main-content .mobile-unified-nav .lf-nav-back{grid-column:1;grid-row:1;width:100%;min-width:0}.main-content .mobile-unified-nav .lf-nav-menu{width:100%}}
 </style>
 </head>
   <body class="  ">
@@ -526,10 +537,9 @@ if (!$isAdminPanel) {
           @endif
         </div>
     </aside>    <main class="main-content">
-      <div class="position-relative iq-banner">
         <!--Nav Start-->
         <nav class="nav navbar navbar-expand-lg navbar-light iq-navbar mobile-unified-nav">
-          <div class="container-fluid navbar-inner @hasSection('mobile-navbar-title') lf-mobile-titled-nav @endif @if($memberNavbarTitle) lf-mobile-titled-nav lf-member-titled-nav @endif">
+          <div class="container-fluid navbar-inner lf-mobile-titled-nav lf-member-titled-nav">
             <a href="{{ route('panelIndex') }}" class="navbar-brand">
 
                 <!--Logo start-->
@@ -555,25 +565,21 @@ if (!$isAdminPanel) {
 
                 <h4 class="logo-title">{{config('app.name')}}</h4>
             </a>
-            <button type="button" class="sidebar-toggle" data-toggle="sidebar" data-active="true" aria-label="Recolher menu lateral" aria-expanded="true" data-label-expanded="Recolher menu lateral" data-label-collapsed="Expandir menu lateral" style="border:0;background:transparent;padding:0;">
-                <i class="icon">
-                 <svg  width="20px" class="icon-20" viewBox="0 0 24 24">
-                    <path fill="currentColor" d="M4,11V13H16L10.5,18.5L11.92,19.92L19.84,12L11.92,4.08L10.5,5.5L16,11H4Z" />
-                </svg>
-                </i>
+            <button type="button" class="lf-nav-back" aria-label="{{ __('messages.Back') }}" title="{{ __('messages.Back') }}" disabled>
+              <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
             </button>
-            @if($memberNavbarTitle)
-              <span class="lf-mobile-nav-title lf-member-nav-title">
+            <button type="button" class="lf-mobile-nav-title lf-member-nav-title lf-nav-menu" data-toggle="sidebar" aria-controls="sidebar-menu" aria-expanded="true" aria-label="Expandir menu lateral" data-label-expanded="Recolher menu lateral" data-label-collapsed="Expandir menu lateral">
+              @if($memberNavbarTitle)
                 <span class="lf-member-nav-copy">{{ $memberNavbarTitle }}</span>
                 @if($memberNavbarKey === 'verified_badge')
                   <span class="lf-member-verified-icon" aria-hidden="true">@include('components.verify-svg')</span>
                 @endif
-              </span>
-            @else
-              @hasSection('mobile-navbar-title')
-                <span class="lf-mobile-nav-title" aria-label="Página atual">@yield('mobile-navbar-title')</span>
+              @elseif(View::hasSection('mobile-navbar-title'))
+                @yield('mobile-navbar-title')
+              @else
+                {{ $panelLabel }}
               @endif
-            @endif
+            </button>
             {{-- <div class="input-group search-input">
               <span class="input-group-text" id="search-input">
                 <svg class="icon-18" width="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -654,7 +660,9 @@ if (!$isAdminPanel) {
               </ul>
             </div>
           </div>
-        </nav>          <!-- Nav Header Component Start -->
+        </nav>
+      <div class="position-relative iq-banner">
+          <!-- Nav Header Component Start -->
         <style>.header-block{background-color:var(--bs-primary);border-bottom-left-radius:1rem;border-bottom-right-radius:1rem;}</style>
           <div class="iq-navbar-header header-block mb-2 welcome-slim" style="height:auto;">
         <style>
@@ -1038,6 +1046,7 @@ if (!$isAdminPanel) {
 
     <!-- App Script -->
     <script src="{{asset('assets/js/hope-ui.js')}}" defer></script>
+    <script src="{{ asset('assets/js/linkfree-nav-back.js') }}" defer></script>
     <script src="{{ asset('assets/js/sidebar-auto-close.js') }}?v={{ filemtime(base_path('assets/js/sidebar-auto-close.js')) }}" defer></script>
 
     <!-- Flatpickr Script -->
