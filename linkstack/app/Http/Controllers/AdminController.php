@@ -172,7 +172,7 @@ class AdminController extends Controller
       \Log::warning('SMTP test failed', ['exception_type' => get_class($exception)]);
       return redirect()
         ->route("admin.config.section", ['section' => 'smtp'])
-        ->with("fail", "Failed to send test email.");
+        ->with("fail", __("registration.smtp_test_failed"));
     }
   }
 

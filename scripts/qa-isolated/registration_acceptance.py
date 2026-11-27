@@ -40,3 +40,18 @@ assert status==302 and '/verify-email' in headers.get('Location',''),(status,hea
 assert count(email)==1
 status,_,body=c.req('/verify-email'); assert status==200 and 'não foi possível enviar o e-mail' in body
 print('PASS: refused SMTP does not cause HTTP 500 or duplicate account; verification remains required')
+
+# An actual local SMTP connection failure must stay generic to the administrator
+# while recording only a sanitized exception class, never supplied credentials.
+admin=Client(); token=admin.token('/login')
+status,_,_=admin.req('/login',{'_token':token,'email':'auditadmin@example.test','password':'Synthetic-password-123'})
+assert status==302,status
+token=admin.token('/admin/config/sections/smtp')
+status,headers,_=admin.req('/send-test-email',{'_token':token})
+assert status==302 and '/admin/config/sections/smtp' in headers.get('Location','')
+status,_,body=admin.req('/admin/config/sections/smtp')
+assert status==200 and 'Não foi possível enviar o e-mail de teste' in body
+log=Path('/tmp/linkfree-audit/registration-server.log').read_text()
+assert 'SMTP test failed' in log and 'exception_type' in log
+assert 'Synthetic-password-123' not in log and 'Synthetic-NoSend-123' not in log
+print('PASS: SMTP test failure shows a localized message and logs only safe metadata')
