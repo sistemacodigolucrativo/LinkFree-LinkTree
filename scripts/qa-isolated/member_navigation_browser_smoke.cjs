@@ -164,6 +164,13 @@ async function run() {
             assert.equal(await field.getAttribute('aria-describedby'),'username-error');
             assert.equal(await field.getAttribute('aria-invalid'),'true');
             assert((await message.innerText()).includes('já está em uso'));
+            const contrast=await message.evaluate(el=>{
+              const rgb=value=>value.match(/[\d.]+/g).slice(0,3).map(Number);
+              const lum=value=>rgb(value).map(n=>{const v=n/255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((sum,n,i)=>sum+n*[.2126,.7152,.0722][i],0);
+              const a=lum(getComputedStyle(el).color), b=lum(getComputedStyle(el.closest('.lf-login-panel')).backgroundColor);
+              return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+            });
+            assert(contrast>=4.5,'Validation message contrast below 4.5: '+contrast);
             return {width,fieldWidth:after.width,errorBelow:true};
           });
         }
