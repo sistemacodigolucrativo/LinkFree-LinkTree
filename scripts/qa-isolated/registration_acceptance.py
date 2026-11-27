@@ -52,6 +52,7 @@ assert status==302 and '/admin/config/sections/smtp' in headers.get('Location','
 status,_,body=admin.req('/admin/config/sections/smtp')
 assert status==200 and 'Não foi possível enviar o e-mail de teste' in body
 log=Path('/tmp/linkfree-audit/registration-server.log').read_text()
+assert len([line for line in log.splitlines() if 'registration_verification' in line]) == 1, 'Expected exactly one verification attempt'
 smtp_lines=[line for line in log.splitlines() if 'smtp_test' in line]
 assert smtp_lines and 'Email delivery failed' in smtp_lines[-1] and 'exception_type' in smtp_lines[-1] and 'connection' in smtp_lines[-1]
 assert 'Synthetic-password-123' not in log and 'Synthetic-NoSend-123' not in log
