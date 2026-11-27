@@ -153,11 +153,42 @@ async function run() {
       try {
         await check('Login member '+width+' '+mode,async()=>{await login(page);return {width,mode};});
         if(width===375 || width===1280) {
+          await check('Sticky topbar, menu keyboard and back '+width,async()=>{
+            await page.goto(base+'/studio/links',{waitUntil:'load'});
+            const bar=page.locator('.mobile-unified-nav');
+            const title=page.locator('.lf-nav-menu');
+            const sidebar=page.locator('.sidebar-default');
+            const back=page.locator('.lf-nav-back');
+            assert.equal(await title.getAttribute('data-toggle'),'sidebar');
+            assert.equal(await back.getAttribute('data-toggle'),null);
+            const before=await sidebar.evaluate(el=>el.classList.contains('sidebar-mini'));
+            await title.focus();
+            await page.keyboard.press('Enter');
+            await page.waitForFunction(state=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini')!==state,before);
+            await title.press('Enter');
+            await page.waitForFunction(state=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini')===state,before);
+            await page.evaluate(()=>{const el=document.createElement('div');el.id='lf-test-spacer';el.style.height='2000px';document.querySelector('main').append(el);window.scrollTo(0,800)});
+            await page.waitForTimeout(100);
+            const box=await bar.boundingBox();
+            assert(Math.abs(box.y)<2,'Topbar scrolled away: '+JSON.stringify(box));
+            await page.evaluate(()=>{document.querySelector('#lf-test-spacer').remove();window.scrollTo(0,0)});
+            await page.locator('.studio-links-page .lf-links-actions a.btn-primary').click();
+            await page.waitForURL('**/studio/blocks');
+            assert(await back.isEnabled(),'Back control should be enabled for same-origin history');
+            assert.equal(await back.locator('svg').evaluate(el=>getComputedStyle(el).animationName),'none','Reduced motion must stop animation');
+            await back.focus();
+            await page.keyboard.press('Enter');
+            await page.waitForURL('**/studio/links');
+            return {width,sticky:true,keyboard:true,history:true,reducedMotion:true};
+          });
+        }
+        if(width===375 || width===1280) {
           await check('Premium review form, keyboard and WCAG '+width+' '+mode,async()=>{
             const response=await page.goto(base+'/studio/avaliar',
               {waitUntil:'domcontentloaded',timeout:25000});
             assert.equal(response?.status(),200);
             assert(await page.locator('.lf-review-shell').isVisible());
+            assert.equal((await page.locator('.lf-member-nav-copy').innerText()).trim(),'Deixe uma avaliação');
             assert.equal(await page.locator('.lf-rating-input').count(),5);
             assert.equal(await page.locator('input[name="publication_consent"]').count(),1);
             assert.equal(await page.locator('form[action$="/studio/avaliar"] input[name="_token"]').count(),1);
@@ -312,6 +343,17 @@ async function run() {
             const discordIcon=page.locator('.lf-platform-expand').filter({hasText:'Discord'}).first();
             assert.equal(await discordIcon.locator('img.lf-platform-icon-light').count(),1,
               'Light Discord icon requires a contrasting backdrop');
+            for(const [name,expected] of [['WhatsApp','rgb(69, 90, 100)'],['YouTube Music','rgb(255, 0, 0)']]) {
+              const item=page.locator('.lf-platform-expand').filter({hasText:name}).first();
+              await item.click();
+              const frame=item.locator('xpath=following-sibling::div//iframe');
+              await frame.waitFor({state:'visible'});
+              const preview=frame.contentFrame().locator('.button');
+              await preview.waitFor({state:'visible'});
+              await preview.evaluate(async el=>{await Promise.all([...el.ownerDocument.querySelectorAll('link[rel=stylesheet]')].map(link=>link.sheet?Promise.resolve():new Promise(resolve=>{link.addEventListener('load',resolve,{once:true});link.addEventListener('error',resolve,{once:true});setTimeout(resolve,4000)})))});
+              const color=await preview.evaluate(el=>getComputedStyle(el).backgroundColor);
+              assert.equal(color,expected,'Wrong default theme preview color for '+name);
+            }
             const amazon=page.locator('.lf-platform-expand').filter({hasText:'Amazon'}).first();
             assert((await amazon.locator('img').getAttribute('src')).endsWith('/amazon.svg'));
             await amazon.focus();
@@ -324,6 +366,8 @@ async function run() {
             assert(srcdoc.includes('button-amazon') && srcdoc.includes('amazon.svg') &&
               srcdoc.includes('brands.css') && srcdoc.includes('skeleton-'),
               'Preview must reuse public button assets');
+            assert(srcdoc.indexOf('brands.css') < srcdoc.indexOf('skeleton-'),
+              'Preview stylesheet order must match the public page');
             await page.screenshot({path:path.join(screenshots,'member-platform-375-light.png'),
               fullPage:true,timeout:15000});
             const confirm=page.locator('.lf-platform-confirm').filter({hasText:'Amazon'}).first();

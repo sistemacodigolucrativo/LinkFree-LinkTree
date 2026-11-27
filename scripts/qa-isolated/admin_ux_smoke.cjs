@@ -72,6 +72,13 @@ async function run(){
         const page=await context.newPage();
         page.setDefaultTimeout(15000);
         await login(page);
+        await check('Admin contextual topbar '+width,async()=>{
+          for (const [url,label] of [['/admin/overview','Administration overview'],['/admin/users','Manage Users'],['/admin/site','Site Customization'],['/admin/avaliacoes','Review moderation']]) {
+            const response=await page.goto(base+url,{waitUntil:'domcontentloaded'});
+            assert.equal(response.status(),200,'HTTP '+url);
+            assert.equal((await page.locator('.lf-nav-menu').innerText()).trim(),label,'Topbar title for '+url);
+          }
+        });
         await check('Manage Users page '+width+' '+mode,async()=>{
           const response=await page.goto(base+'/admin/users',{waitUntil:'load'});
           assert.equal(response.status(),200);
@@ -89,12 +96,24 @@ async function run(){
           if(width===375){
             const title=page.locator('.lf-mobile-nav-title');
             assert(await title.isVisible(),'Mobile navbar title missing');
-            const back=await page.locator('.mobile-unified-nav .sidebar-toggle').first().boundingBox();
+            const back=await page.locator('.mobile-unified-nav .lf-nav-back').boundingBox();
             const bell=await page.locator('.mobile-unified-nav #notification-drop').boundingBox();
             const t=await title.boundingBox();
             assert(back.x+back.width<=t.x+5 && t.x+t.width<=bell.x+5,'Title not positioned between back and bell');
             assert.equal(await page.locator('h1').filter({hasText:'Gerenciar Usuários'}).isVisible(),false,'Old mobile title still occupies content');
           }
+          const menu=page.locator('.lf-nav-menu'), side=page.locator('.sidebar-default');
+          const initiallyMini=await side.evaluate(el=>el.classList.contains('sidebar-mini'));
+          await menu.focus();
+          await page.keyboard.press('Enter');
+          await page.waitForFunction(state=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini')!==state,initiallyMini);
+          await menu.press('Enter');
+          await page.waitForFunction(state=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini')===state,initiallyMini);
+          await page.evaluate(()=>{const el=document.createElement('div');el.id='lf-test-spacer';el.style.height='2000px';document.querySelector('main').append(el);window.scrollTo(0,800)});
+          await page.waitForTimeout(100);
+          const topbar=await page.locator('.mobile-unified-nav').boundingBox();
+          assert(Math.abs(topbar.y)<2,'Admin topbar moved while scrolling: '+JSON.stringify(topbar));
+          await page.evaluate(()=>{document.querySelector('#lf-test-spacer').remove();window.scrollTo(0,0)});
           await page.screenshot({path:shots+'/users-'+width+'-'+mode+'.png',fullPage:true});
           if(width===375){
             await search.fill('auditfree');

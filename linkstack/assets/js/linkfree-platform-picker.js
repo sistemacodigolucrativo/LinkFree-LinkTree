@@ -60,7 +60,7 @@
       '.lf-platform-stage .button{max-width:100%;box-sizing:border-box;overflow-wrap:anywhere;white-space:normal}' +
       '.lf-platform-stage .icon{max-width:28px;max-height:28px}' +
       '@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}' +
-      '</style>' + sheet(wrapper.dataset.skeletonCss) + sheet(wrapper.dataset.brandCss) +
+      '</style>' + sheet(wrapper.dataset.brandCss) + sheet(wrapper.dataset.skeletonCss) +
       '</head><body><div class="lf-platform-stage"><span class="button button-' +
       htmlEscape(safeClass) + ' button-hover icon-hover">' + img + ' ' +
       htmlEscape(title) + '</span></div></body></html>';
