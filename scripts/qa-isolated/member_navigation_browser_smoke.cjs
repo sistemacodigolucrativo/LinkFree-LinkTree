@@ -341,6 +341,17 @@ async function run() {
             const discordIcon=page.locator('.lf-platform-expand').filter({hasText:'Discord'}).first();
             assert.equal(await discordIcon.locator('img.lf-platform-icon-light').count(),1,
               'Light Discord icon requires a contrasting backdrop');
+            for(const [name,expected] of [['WhatsApp','rgb(69, 90, 100)'],['YouTube Music','rgb(255, 0, 0)']]) {
+              const item=page.locator('.lf-platform-expand').filter({hasText:name}).first();
+              await item.click();
+              const frame=item.locator('xpath=following-sibling::div//iframe');
+              await frame.waitFor({state:'visible'});
+              const preview=frame.contentFrame().locator('.button');
+              await preview.waitFor({state:'visible'});
+              await preview.evaluate(async el=>{await Promise.all([...el.ownerDocument.querySelectorAll('link[rel=stylesheet]')].map(link=>link.sheet?Promise.resolve():new Promise(resolve=>{link.addEventListener('load',resolve,{once:true});link.addEventListener('error',resolve,{once:true});setTimeout(resolve,4000)})))});
+              const color=await preview.evaluate(el=>getComputedStyle(el).backgroundColor);
+              assert.equal(color,expected,'Wrong default theme preview color for '+name);
+            }
             const amazon=page.locator('.lf-platform-expand').filter({hasText:'Amazon'}).first();
             assert((await amazon.locator('img').getAttribute('src')).endsWith('/amazon.svg'));
             await amazon.focus();

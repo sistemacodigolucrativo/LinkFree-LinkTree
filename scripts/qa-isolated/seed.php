@@ -28,7 +28,7 @@ $db->table('buttons')->insert([
     'created_at'=>$now, 'updated_at'=>$now
 ]);
 foreach (['amazon'=>'Amazon', 'apple-books'=>'Apple Books', 'appstore'=>'Apple Store',
-          'deezer'=>'Deezer', 'discord'=>'Discord', 'whatsapp'=>'WhatsApp'] as $name=>$alt) {
+          'deezer'=>'Deezer', 'discord'=>'Discord', 'whatsapp'=>'WhatsApp', 'youtube-music'=>'YouTube Music'] as $name=>$alt) {
     $db->table('buttons')->insert([
         'name'=>$name, 'alt'=>$alt, 'exclude'=>false, 'created_at'=>$now, 'updated_at'=>$now
     ]);
