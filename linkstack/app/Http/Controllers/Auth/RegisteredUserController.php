@@ -31,7 +31,7 @@ class RegisteredUserController extends Controller
         ]);
     
         if ($validator->fails()) {
-            return response()->json(['valid' => false]);
+            return response()->json(['valid' => false, 'reason' => $validator->errors()->has('littlelink_name') && isset($validator->failed()['littlelink_name']['Unique']) ? 'unique' : 'invalid']);
         }
     
         return response()->json(['valid' => true]);
@@ -39,13 +39,26 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request)
     {
+        $labels = [
+            'name' => __('messages.Display Name'), 'littlelink_name' => __('messages.Page URL'),
+            'email' => __('messages.Email'), 'password' => __('messages.Password'),
+        ];
+        $messages = ['accept_terms.accepted' => __('messages.lf_accept_required')];
+        foreach ($labels as $field => $label) {
+            foreach (['required', 'string', 'max', 'min', 'regex', 'email'] as $rule) {
+                $messages[$field.'.'.$rule] = __('registration.invalid', ['field' => $label]);
+            }
+        }
+        foreach (['littlelink_name', 'email'] as $field) {
+            $messages[$field.'.unique'] = __('registration.unique', ['field' => $labels[$field]]);
+        }
         $request->validate([
             'name' => 'required|string|max:255',
             'littlelink_name' => 'required|string|max:50|unique:users|regex:/^[\p{L}0-9-_]+$/u',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'accept_terms' => 'accepted',
-        ], ['accept_terms.accepted' => __('messages.lf_accept_required')]);
+        ], $messages);
 
         $name = $request->input('name');
 
@@ -55,43 +68,49 @@ class RegisteredUserController extends Controller
             $block = 'no';
         }
 
-        $user = DB::transaction(function () use ($request, $block) {
-            $created = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'littlelink_name' => $request->littlelink_name,
-                'password' => Hash::make($request->password),
-            ]);
-            $created->role = RegistrationVip::roleForNewUser();
-            $created->block = $block;
-            $created->save();
-            ConsentReceipt::record($created, 'email');
-            ReferralService::record($created, $request->session());
-            return $created;
-        });
+        try {
+            $user = DB::transaction(function () use ($request, $block) {
+                $created = User::create([
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'littlelink_name' => $request->littlelink_name,
+                    'password' => Hash::make($request->password),
+                ]);
+                $created->role = RegistrationVip::roleForNewUser();
+                $created->block = $block;
+                $created->save();
+                ConsentReceipt::record($created, 'email');
+                ReferralService::record($created, $request->session());
+                return $created;
+            });
+        } catch (\Throwable $exception) {
+            \Log::warning('Registration failed', ['exception_type' => get_class($exception)]);
+            return back()->withInput($request->except('password', 'password_confirmation'))
+                ->withErrors(['registration' => __('registration.failure')]);
+        }
         Auth::login($user);
         $request->session()->forget(ReferralService::SESSION_KEY);
 
 
-            $registeredName = $request->name;
-            $email = $request->email;
-            
-            if(env('REGISTER_AUTH') == 'verified'){
-                if(env('MANUAL_USER_VERIFICATION') == true){
-                try {
-                Mail::send('auth.user-confirmation', ['user' => $registeredName, 'email' => $email], function ($message) {
-                    $message->to(env('ADMIN_EMAIL'))
-                            ->subject('New user registration');
-                });
-            } catch (\Exception $e) {}
-        }
-    
+        if (env('REGISTER_AUTH') === 'verified' && env('MANUAL_USER_VERIFICATION') == true) {
             try {
-            $request->user()->sendEmailVerificationNotification();
-            } catch (\Exception $e) {}
+                Mail::send('auth.user-confirmation', ['user' => $request->name, 'email' => $request->email], function ($message) {
+                    $message->to(env('ADMIN_EMAIL'))->subject('New user registration');
+                });
+            } catch (\Throwable $exception) {
+                \App\Services\MailFailureDiagnostics::record('registration_admin_notification', $exception);
+            }
         }
 
-        event(new Registered($user));
+        try {
+            // The existing Registered listener sends the verification notification once.
+            event(new Registered($user));
+        } catch (\Throwable $exception) {
+            \App\Services\MailFailureDiagnostics::record('registration_verification', $exception);
+            if (env('REGISTER_AUTH') === 'verified') {
+                return redirect()->route('verification.notice')->with('verification_delivery_failed', true);
+            }
+        }
 
         return redirect(url('dashboard'));
     }

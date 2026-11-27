@@ -30,31 +30,36 @@
     <p>{{ str_starts_with(strtolower(app()->getLocale()), 'pt') ? 'Crie sua página pública, organize seus canais e compartilhe um endereço único.' : __('messages.Register to stay connected') }}</p>
   </header>
   <x-auth-session-status class="mb-3" :status="session('status')" />
-  <x-auth-validation-errors class="mb-3" :errors="$errors" />
+  @error('registration')<div class="alert alert-danger" role="alert">{{ $message }}</div>@enderror
   <form class="lf-login-form" method="POST" action="{{ route('register') }}">
     @csrf
     <div class="lf-login-field">
       <label for="lf-register-name" class="form-label">{{ __('messages.Display Name') }}</label>
       <input type="text" class="form-control" id="lf-register-name" name="name"
-             value="{{ old('name') }}" autocomplete="name" required>
+             value="{{ old('name') }}" autocomplete="name" required @error('name') aria-invalid="true" aria-describedby="lf-register-name-error" @enderror>
+      @error('name')<div id="lf-register-name-error" class="lf-field-error" role="alert">{{ $message }}</div>@enderror
     </div>
     <div class="lf-login-field">
       <label for="littlelink_name" class="form-label">{{ __('messages.Page URL') }}</label>
       <div class="input-group has-validation lf-login-handle">
         <span class="input-group-text">{{ str_replace(['http://', 'https://'], '', url('')) }}/@</span>
         <input type="text" class="form-control" id="littlelink_name" name="littlelink_name"
-               value="{{ old('littlelink_name') }}" autocomplete="off" required>
+               value="{{ old('littlelink_name') }}" autocomplete="off" required
+               aria-describedby="username-error" @error('littlelink_name') aria-invalid="true" @enderror>
       </div>
+      <div id="username-error" class="lf-field-error" role="status" aria-live="polite" @if(!$errors->has('littlelink_name')) hidden @endif>{{ $errors->first('littlelink_name') }}</div>
     </div>
     <div class="lf-login-field">
       <label for="lf-register-email" class="form-label">{{ __('messages.Email') }}</label>
       <input type="email" class="form-control" id="lf-register-email" name="email"
-             value="{{ old('email') }}" autocomplete="email" inputmode="email" required>
+             value="{{ old('email') }}" autocomplete="email" inputmode="email" required @error('email') aria-invalid="true" aria-describedby="lf-register-email-error" @enderror>
+      @error('email')<div id="lf-register-email-error" class="lf-field-error" role="alert">{{ $message }}</div>@enderror
     </div>
     <div class="lf-login-field">
       <label for="lf-register-password" class="form-label">{{ __('messages.Password') }}</label>
       <input type="password" class="form-control" id="lf-register-password" name="password"
-             autocomplete="new-password" required>
+             autocomplete="new-password" required @error('password') aria-invalid="true" aria-describedby="lf-register-password-error" @enderror>
+      @error('password')<div id="lf-register-password-error" class="lf-field-error" role="alert">{{ $message }}</div>@enderror
     </div>
     <div class="lf-login-remember-row">
       <label class="lf-login-remember" for="lf-register-remember">
@@ -65,7 +70,7 @@
     <div class="lf-login-field">
       <label class="d-flex align-items-start gap-2" for="lf-accept-terms" style="font-size:.86rem;line-height:1.5">
         <input type="checkbox" class="form-check-input mt-1" id="lf-accept-terms" name="accept_terms"
-          value="1" required @checked(old('accept_terms') == 1)>
+          value="1" required @checked(old('accept_terms') == 1) @error('accept_terms') aria-invalid="true" aria-describedby="lf-terms-error" @enderror>
         <span>
           {{ __('messages.lf_accept_intro') }}
           <a href="{{ route('pagesTerms') }}" target="_blank" rel="noopener noreferrer">{{ __('messages.lf_terms') }}</a>
@@ -73,6 +78,7 @@
           <a href="{{ route('pagesPrivacy') }}" target="_blank" rel="noopener noreferrer">{{ __('messages.lf_privacy') }}</a>.
         </span>
       </label>
+      @error('accept_terms')<div id="lf-terms-error" class="lf-field-error" role="alert">{{ $message }}</div>@enderror
     </div>
     <button id="submit-btn" type="submit" class="btn btn-primary lf-login-submit">{{ __('messages.Sign Up') }}</button>
     @if(env('ENABLE_SOCIAL_LOGIN') == 'true')
@@ -97,7 +103,7 @@
       <a data-lf-auth-target="login" href="{{ route('login') }}">{{ __('messages.Click here to sign in') }}</a>
     </p>
   </form>
-  @include('auth.url-validation')
+  @include('auth.url-validation', ['registrationHandleValidation' => true])
   <script>
   (function(){
     // Novo cadastro social: o aceite explicitamente marcado e enviado por POST com CSRF.

@@ -20,7 +20,12 @@ class EmailVerificationNotificationController extends Controller
             return redirect()->intended(RouteServiceProvider::HOME);
         }
 
-        $request->user()->sendEmailVerificationNotification();
+        try {
+            $request->user()->sendEmailVerificationNotification();
+        } catch (\Throwable $exception) {
+            \App\Services\MailFailureDiagnostics::record('verification_resend', $exception);
+            return back()->with('verification_delivery_failed', true);
+        }
 
         return back()->with('status', 'verification-link-sent');
     }

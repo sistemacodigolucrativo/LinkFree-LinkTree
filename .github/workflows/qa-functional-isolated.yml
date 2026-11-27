@@ -119,6 +119,21 @@ jobs:
           QA_EXPECTED_SITE: http://127.0.0.1:18765
           QA_OUTPUT: /tmp/linkfree-audit/http-results.json
         run: python3 scripts/qa-isolated/http_acceptance.py
+      - name: Verify registration with duplicate values and unavailable SMTP
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd /tmp/linkfree-audit/linkstack
+          REGISTER_AUTH=verified MANUAL_USER_VERIFICATION=false LOCALE=pt-BR MAIL_MAILER=smtp MAIL_HOST=127.0.0.1 MAIL_PORT=1 MAIL_ENCRYPTION=tls php -S 127.0.0.1:18766 server.php > /tmp/linkfree-audit/registration-server.log 2>&1 &
+          registration_pid=$!
+          trap 'kill "$registration_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:18766/register; then break; fi
+            if [ "$i" -eq 30 ]; then echo 'Registration fixture failed to start'; exit 1; fi
+            sleep 1
+          done
+          cd "$GITHUB_WORKSPACE"
+          QA_EXPECTED_REGISTRATION_SITE=http://127.0.0.1:18766 python3 scripts/qa-isolated/registration_acceptance.py
       - name: Verify isolated HTTP server remained alive
         if: always()
         run: |
