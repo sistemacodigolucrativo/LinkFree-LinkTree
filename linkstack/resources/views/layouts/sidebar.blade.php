@@ -603,9 +603,11 @@ if ($isAdminPanel) {
 
                 <h4 class="logo-title">{{config('app.name')}}</h4>
             </a>
+            @unless(request()->routeIs('panelIndex', 'adminOverview'))
             <button type="button" class="lf-nav-back" aria-label="{{ __('messages.Back') }}" title="{{ __('messages.Back') }}" disabled>
               <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
             </button>
+            @endunless
             <button type="button" class="lf-mobile-nav-title lf-member-nav-title lf-nav-menu" data-toggle="sidebar" aria-controls="sidebar-menu" aria-expanded="true" aria-label="Expandir menu lateral" data-label-expanded="Recolher menu lateral" data-label-collapsed="Expandir menu lateral">
               @if($memberNavbarTitle)
                 <span class="lf-member-nav-copy">{{ $memberNavbarTitle }}</span>

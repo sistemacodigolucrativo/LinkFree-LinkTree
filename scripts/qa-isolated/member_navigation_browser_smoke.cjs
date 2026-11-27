@@ -175,8 +175,12 @@ async function run() {
           });
         }
         await check('Login member '+width+' '+mode,async()=>{await login(page);return {width,mode};});
+        await check('Dashboard has no back control '+width,async()=>{assert.equal(await page.locator('.lf-nav-back').count(),0);});
         if(width===375 || width===1280) {
           await check('Sticky topbar, menu keyboard and back '+width,async()=>{
+            await page.goto(base+'/',{waitUntil:'load'});
+            await page.goto(base+'/studio/links',{waitUntil:'load'});
+            assert(await page.locator('.lf-nav-back').isDisabled(),'Back must not lead to a public page');
             await page.goto(base+'/studio/links',{waitUntil:'load'});
             const bar=page.locator('.mobile-unified-nav');
             const title=page.locator('.lf-nav-menu');

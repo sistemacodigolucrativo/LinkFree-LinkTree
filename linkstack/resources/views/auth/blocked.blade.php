@@ -4,8 +4,8 @@
         </x-slot>
 
         <div style="max-width:480px" class="container mt-5 w-100">
-          <div class="card p-5">
-              <a href="{{ url('') }}" class="d-flex align-items-center mb-3">
+          <div class="card p-4 p-sm-5 text-center lf-blocked-card">
+              <a href="{{ url('') }}" class="d-flex flex-wrap align-items-center justify-content-center mb-3">
                 <!--Logo start-->
                 <div class="logo-main">
                     @if(file_exists(base_path("assets/linkstack/images/").findFile('avatar')))
@@ -25,22 +25,21 @@
                     @endif
                     </div>
                     <!--logo End-->
-                <h4 class="logo-title ms-3">{{env('APP_NAME')}}</h4>
+                <h4 class="logo-title ms-3 text-break mw-100">{{env('APP_NAME')}}</h4>
               </a>
               <h2 class="mb-2 text-center mt-4">{{__('messages.Verification Status')}}</h2>
               <p class="text-center"><b>{{__('messages.auth_pending')}}</b></p>
               <p class="text-center mb-4">{{__('messages.auth_unverified')}}</p>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" class="text-center">
                     @csrf
     
                     <button type="submit" class="btn btn-primary mt-2">
                         {{ __('messages.Log out') }}
                     </button>
                 </form>
-            </div>
-            </div>
-          </div>          
+          </div>
+        </div>
 
     </x-auth-card>
 </x-guest-layout>
