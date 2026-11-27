@@ -366,6 +366,8 @@ async function run() {
             assert(srcdoc.includes('button-amazon') && srcdoc.includes('amazon.svg') &&
               srcdoc.includes('brands.css') && srcdoc.includes('skeleton-'),
               'Preview must reuse public button assets');
+            assert(srcdoc.indexOf('brands.css') < srcdoc.indexOf('skeleton-'),
+              'Preview stylesheet order must match the public page');
             await page.screenshot({path:path.join(screenshots,'member-platform-375-light.png'),
               fullPage:true,timeout:15000});
             const confirm=page.locator('.lf-platform-confirm').filter({hasText:'Amazon'}).first();
