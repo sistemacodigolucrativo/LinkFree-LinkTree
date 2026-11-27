@@ -77,7 +77,35 @@ async function run(){
             const response=await page.goto(base+url,{waitUntil:'domcontentloaded'});
             assert.equal(response.status(),200,'HTTP '+url);
             assert.equal((await page.locator('.lf-nav-menu').innerText()).trim(),label,'Topbar title for '+url);
+            if(url==='/admin/overview') assert.equal(await page.locator('.lf-nav-back').count(),0,'Admin dashboard must hide back');
           }
+        });
+        await check('Blocked account card alignment '+width,async()=>{
+          const setBlocked=value=>execFileSync('python3',['-c',"import sqlite3,sys; c=sqlite3.connect(sys.argv[1]); c.execute('update users set block=? where id=3',(sys.argv[2],)); c.commit()",db,value]);
+          setBlocked('yes');
+          const ctx=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
+          try {
+            await ctx.route('**/*',route=>{try{if(new URL(route.request().url()).origin===base)return route.continue()}catch(_){}return route.abort('blockedbyclient')});
+            const blocked=await ctx.newPage();
+            await blocked.goto(base+'/login',{waitUntil:'domcontentloaded'});
+            const form=blocked.locator('form[action$="/login"]').first();
+            await form.locator('[name=email]').fill('auditother@example.test');
+            await form.locator('[name=password]').fill('Synthetic-password-123');
+            await Promise.all([blocked.waitForURL('**/blocked',{timeout:20000}),form.locator('button[type=submit]').click()]);
+            const card=blocked.locator('.lf-blocked-card');
+            assert(await card.isVisible());
+            const metrics=await card.evaluate(el=>{
+              const b=el.getBoundingClientRect(), mid=b.left+b.width/2;
+              const center=node=>{const x=node.getBoundingClientRect();return x.left+x.width/2};
+              const mark=el.querySelector('.logo-main'), title=el.querySelector('.logo-title');
+              const a=mark.getBoundingClientRect(), t=title.getBoundingClientRect();
+              return {mid,brand:(a.left+t.right)/2,heading:center(el.querySelector('h2')),button:center(el.querySelector('button')),overflow:document.documentElement.scrollWidth-innerWidth};
+            });
+            for(const key of ['brand','heading','button'])assert(Math.abs(metrics[key]-metrics.mid)<3,key+' not centered '+JSON.stringify(metrics));
+            assert(metrics.overflow<=2,'Blocked page overflows');
+            await Promise.all([blocked.waitForURL(base+'/',{timeout:15000}),card.locator('button[type=submit]').click()]);
+            return {width,centered:true,logout:true};
+          } finally {await ctx.close();setBlocked('no');}
         });
         await check('Manage Users page '+width+' '+mode,async()=>{
           const response=await page.goto(base+'/admin/users',{waitUntil:'load'});
