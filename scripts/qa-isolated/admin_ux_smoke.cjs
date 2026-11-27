@@ -82,16 +82,15 @@ async function run(){
         });
         await check('Blocked account card alignment '+width,async()=>{
           const setBlocked=value=>execFileSync('python3',['-c',"import sqlite3,sys; c=sqlite3.connect(sys.argv[1]); c.execute('update users set block=? where id=3',(sys.argv[2],)); c.commit()",db,value]);
-          setBlocked('yes');
+          setBlocked('no');
           const ctx=await browser.newContext({viewport:{width,height:900},serviceWorkers:'block'});
           try {
             await ctx.route('**/*',route=>{try{if(new URL(route.request().url()).origin===base)return route.continue()}catch(_){}return route.abort('blockedbyclient')});
             const blocked=await ctx.newPage();
-            await blocked.goto(base+'/login',{waitUntil:'domcontentloaded'});
-            const form=blocked.locator('form[action$="/login"]').first();
-            await form.locator('[name=email]').fill('auditother@example.test');
-            await form.locator('[name=password]').fill('Synthetic-password-123');
-            await Promise.all([blocked.waitForURL('**/blocked',{timeout:20000}),form.locator('button[type=submit]').click()]);
+            await login(blocked,'auditother');
+            setBlocked('yes');
+            await blocked.goto(base+'/blocked',{waitUntil:'domcontentloaded'});
+            assert.equal(new URL(blocked.url()).pathname,'/blocked');
             const card=blocked.locator('.lf-blocked-card');
             assert(await card.isVisible());
             const metrics=await card.evaluate(el=>{
