@@ -33,6 +33,41 @@ if (!$isAdminPanel) {
         }
     }
 }
+$adminNavbarTitle = null;
+if ($isAdminPanel) {
+    // Reuse existing page labels; route matching keeps sidebar entries untouched.
+    $adminRouteTitles = [
+        'adminOverview' => __('messages.Nav Admin Overview'),
+        'showUsers' => __('messages.Manage Users'),
+        'showNewUser' => __('messages.Nav Admin New User'),
+        'showUser' => __('messages.Edit User'),
+        'showLinksUser' => __('messages.Links'),
+        'showSitePage' => __('messages.Footer Pages'),
+        'showSite' => __('messages.Site Customization'),
+        'showThemes' => __('messages.Nav Admin Theme Manager'),
+        'githubThemes' => __('messages.Nav Admin GitHub Themes'),
+        'showConfig' => __('messages.Settings'),
+        'showFileEditor' => __('messages.Nav Admin Advanced Config'),
+        'showEnvEditor' => __('messages.Nav Admin Env'),
+        'showBackups' => __('messages.Nav Admin Backups'),
+        'phpinfo' => __('messages.Nav Admin PHP Info'),
+        'admin.platform-reviews' => __('reviews.moderation_title'),
+        'admin.referrals' => 'Administração de indicações',
+        'admin.verification' => 'Solicitações de selo verificado',
+        'admin.abuse-reports.index' => 'Central de denúncias',
+        'admin.abuse-reports.show' => 'Denúncia #'.request()->route('id'),
+        'adminlinktype.index' => __('messages.Nav Admin Block Types'),
+        'adminlinktype.create' => 'Novo tipo de bloco',
+        'adminlinktype.edit' => 'Editar tipo de bloco',
+        'updateThemes' => __('messages.Nav Admin Updates'),
+    ];
+    $adminNavbarTitle = $adminRouteTitles[optional(request()->route())->getName()] ?? null;
+    if (request()->routeIs('admin.config.section') && isset($sectionTitle)) {
+        $adminNavbarTitle = $sectionTitle;
+    } elseif (request()->is('update', 'backup', 'theme-updater')) {
+        $adminNavbarTitle = request()->is('backup') ? __('messages.Nav Admin Backups') : __('messages.Nav Admin Updates');
+    }
+}
 @endphp
 <!doctype html>
 @include('layouts.lang')
@@ -576,6 +611,8 @@ if (!$isAdminPanel) {
                 @endif
               @elseif(View::hasSection('mobile-navbar-title'))
                 @yield('mobile-navbar-title')
+              @elseif($adminNavbarTitle)
+                {{ $adminNavbarTitle }}
               @else
                 {{ $panelLabel }}
               @endif

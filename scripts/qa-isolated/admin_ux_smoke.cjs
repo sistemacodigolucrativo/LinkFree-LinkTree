@@ -72,6 +72,13 @@ async function run(){
         const page=await context.newPage();
         page.setDefaultTimeout(15000);
         await login(page);
+        await check('Admin contextual topbar '+width,async()=>{
+          for (const [url,label] of [['/admin/overview','Administration overview'],['/admin/users','Manage Users'],['/admin/site','Site Customization'],['/admin/avaliacoes','Review moderation']]) {
+            const response=await page.goto(base+url,{waitUntil:'domcontentloaded'});
+            assert.equal(response.status(),200,'HTTP '+url);
+            assert.equal((await page.locator('.lf-nav-menu').innerText()).trim(),label,'Topbar title for '+url);
+          }
+        });
         await check('Manage Users page '+width+' '+mode,async()=>{
           const response=await page.goto(base+'/admin/users',{waitUntil:'load'});
           assert.equal(response.status(),200);
