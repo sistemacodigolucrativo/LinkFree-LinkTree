@@ -36,7 +36,7 @@ print('PASS: duplicate handle and email show localized field errors and preserve
 c=Client(); token=c.token(); email='registration-smtp-failure@example.test'
 assert count(email)==0
 status,headers,_=c.req('/register',form(token,'registrationfailureqa',email))
-assert status==302 and '/email/verify' in headers.get('Location',''),(status,headers.get('Location'))
+assert status==302 and '/verify-email' in headers.get('Location',''),(status,headers.get('Location'))
 assert count(email)==1
-status,_,body=c.req('/email/verify'); assert status==200 and 'não foi possível enviar o e-mail' in body
+status,_,body=c.req('/verify-email'); assert status==200 and 'não foi possível enviar o e-mail' in body
 print('PASS: refused SMTP does not cause HTTP 500 or duplicate account; verification remains required')
