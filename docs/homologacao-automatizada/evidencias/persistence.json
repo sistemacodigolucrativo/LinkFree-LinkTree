@@ -1,0 +1,14 @@
+[
+  {
+    "id": "TC-03-B",
+    "assertion": "site text persists across independent login and public render",
+    "pass": false,
+    "error": ""
+  },
+  {
+    "id": "TC-08-D",
+    "assertion": "HTTP dedup counter origin attribution and permissions",
+    "pass": false,
+    "error": "'NoneType' object is not subscriptable"
+  }
+]

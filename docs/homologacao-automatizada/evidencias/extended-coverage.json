@@ -1,0 +1,32 @@
+[
+    {
+        "id": "TC-05-D",
+        "assertion": "member 15 and admin 20 item pagination with exact totals",
+        "pass": true
+    },
+    {
+        "id": "TC-07-D",
+        "assertion": "report pagination 20 items and status filtered totals",
+        "pass": true
+    },
+    {
+        "id": "TC-07-F",
+        "assertion": "deleting reporter and reviewer preserves events",
+        "pass": true
+    },
+    {
+        "id": "TC-08-A",
+        "assertion": "persisted decorative blocks do not consume quota",
+        "pass": true
+    },
+    {
+        "id": "TC-03-B",
+        "assertion": "theme selection and permissions persist after cache flush",
+        "pass": true
+    },
+    {
+        "id": "TC-10-B",
+        "assertion": "synthetic 500 renders without private exception marker",
+        "pass": true
+    }
+]

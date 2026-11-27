@@ -1,0 +1,2344 @@
+{
+  "browsers": [
+    {
+      "name": "chromium",
+      "version": "159.0.8154.6",
+      "launched": true
+    },
+    {
+      "name": "firefox",
+      "version": "159.0",
+      "launched": true
+    },
+    {
+      "name": "webkit",
+      "launched": false,
+      "reason": "browserType.launch: \n╔══════════════════════════════════════════════════════╗\n║ Host system is missing dependencies to run browsers. ║\n║ Missing libraries:                                   ║\n║     libgtk-4.so.1                                    ║\n║     libvulkan.so.1                                   ║\n║     libgraphene-1.0.so.0                             ║\n║     libatomic.so.1                                   ║\n║     liblcms2.so.2                                    ║\n║     libevent-2.1.so.7"
+    }
+  ],
+  "pages": [
+    {
+      "browser": "chromium",
+      "role": "anon",
+      "path": "/",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "anon",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "anon",
+      "path": "/register",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "anon",
+      "path": "/report",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "anon",
+      "path": "/@auditfree",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditfree",
+      "path": "/studio/referrals",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditfree",
+      "path": "/studio/verification",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditfree",
+      "path": "/studio/links",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditfree",
+      "path": "/studio/page",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditfree",
+      "path": "/studio/theme",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditadmin",
+      "path": "/admin/referrals",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditadmin",
+      "path": "/admin/verification",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditadmin",
+      "path": "/admin/reports",
+      "status": 200
+    },
+    {
+      "browser": "chromium",
+      "role": "auditadmin",
+      "path": "/admin/users",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "anon",
+      "path": "/",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "anon",
+      "path": "/login",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "anon",
+      "path": "/register",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "anon",
+      "path": "/report",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "anon",
+      "path": "/@auditfree",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditfree",
+      "path": "/studio/referrals",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditfree",
+      "path": "/studio/verification",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditfree",
+      "path": "/studio/links",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditfree",
+      "path": "/studio/page",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditfree",
+      "path": "/studio/theme",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditadmin",
+      "path": "/admin/referrals",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditadmin",
+      "path": "/admin/verification",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditadmin",
+      "path": "/admin/reports",
+      "status": 200
+    },
+    {
+      "browser": "firefox",
+      "role": "auditadmin",
+      "path": "/admin/users",
+      "status": 200
+    }
+  ],
+  "layout": [
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "light",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 320,
+      "viewport": 320,
+      "scroll": 320,
+      "body": 320,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 360,
+      "viewport": 360,
+      "scroll": 360,
+      "body": 360,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 390,
+      "viewport": 390,
+      "scroll": 390,
+      "body": 390,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 768,
+      "viewport": 768,
+      "scroll": 768,
+      "body": 768,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 1024,
+      "viewport": 1024,
+      "scroll": 1024,
+      "body": 1024,
+      "pass": true
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "mode": "dark",
+      "width": 1440,
+      "viewport": 1440,
+      "scroll": 1440,
+      "body": 1440,
+      "pass": true
+    }
+  ],
+  "axe": [
+    {
+      "path": "/",
+      "role": "anon",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": [
+            {
+              "target": [
+                "iframe",
+                ".button-youtube"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.99 (foreground color: #ffffff, background color: #ff0000, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "iframe",
+                "section[aria-label=\"Exemplo 1 de 3\"] > .button-default.button:nth-child(6)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.62 (foreground color: #ffffff, background color: #0085ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "iframe",
+                ".button-default.button:nth-child(7)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.62 (foreground color: #ffffff, background color: #0085ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "iframe",
+                ".button-default.button:nth-child(5)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.62 (foreground color: #ffffff, background color: #0085ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "iframe",
+                "section[aria-label=\"Exemplo 2 de 3\"] > .button-default.button:nth-child(8)"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.62 (foreground color: #ffffff, background color: #0085ff, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/login",
+      "role": "anon",
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "path": "/register",
+      "role": "anon",
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "path": "/report",
+      "role": "anon",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": [
+            {
+              "target": [
+                "p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.16 (foreground color: #6c757d, background color: #222738, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ],
+      "incomplete": []
+    },
+    {
+      "path": "/@auditfree",
+      "role": "anon",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": [
+            {
+              "target": [
+                "h1"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.35 (foreground color: #dddddd, background color: #ffffff, font size: 18.0pt (24px), font weight: bold). Expected contrast ratio of 3:1"
+            },
+            {
+              "target": [
+                "p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.04 (foreground color: #fafafa, background color: #ffffff, font size: 13.5pt (18px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "#\\39 22063080"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.14 (foreground color: #1d93ff, background color: #ffffff, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "#\\39 11844685"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.41 (foreground color: #51acff, background color: #ffffff, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "#\\37 82157940"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 1.44 (foreground color: #b4dbff, background color: #ffffff, font size: 13.5pt (18px), font weight: bold). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ],
+      "incomplete": []
+    },
+    {
+      "path": "/studio/referrals",
+      "role": "auditfree",
+      "violations": [
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/studio/verification",
+      "role": "auditfree",
+      "violations": [
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/studio/links",
+      "role": "auditfree",
+      "violations": [
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/studio/page",
+      "role": "auditfree",
+      "violations": [
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            },
+            {
+              "target": [
+                ".rounded-pill"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/studio/theme",
+      "role": "auditfree",
+      "violations": [
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/admin/referrals",
+      "role": "auditadmin",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": [
+            {
+              "target": [
+                "code"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.66 (foreground color: #d63384, background color: #2e364d, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "description": "Ensure elements that have scrollable content are accessible by keyboard in Safari",
+          "nodes": [
+            {
+              "target": [
+                ".table-responsive"
+              ],
+              "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/admin/verification",
+      "role": "auditadmin",
+      "violations": [
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        },
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "description": "Ensure elements that have scrollable content are accessible by keyboard in Safari",
+          "nodes": [
+            {
+              "target": [
+                ".table-responsive:nth-child(5)"
+              ],
+              "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            },
+            {
+              "target": [
+                ".table-responsive:nth-child(7)"
+              ],
+              "summary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/admin/reports",
+      "role": "auditadmin",
+      "violations": [
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    },
+    {
+      "path": "/admin/users",
+      "role": "auditadmin",
+      "violations": [
+        {
+          "id": "aria-prohibited-attr",
+          "impact": "serious",
+          "description": "Ensure ARIA attributes are not prohibited for an element's role",
+          "nodes": [
+            {
+              "target": [
+                "tr:nth-child(5) > td:nth-child(13) > .flex.list-user-action.align-items-center > .btn-primary[data-original-title=\"Impersonate\"][aria-label=\"Impersonate\"]"
+              ],
+              "summary": "Fix all of the following:\n  aria-label attribute cannot be used on \"a\" elements with no valid role attribute."
+            }
+          ]
+        },
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+          "nodes": [
+            {
+              "target": [
+                "tr:nth-child(2) > td:nth-child(8) > .text-center > .user-email.text-danger[type=\"button\"] > .bg-success.badge"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.38 (foreground color: #ffffff, background color: #1aa053, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "tr:nth-child(2) > td:nth-child(9) > .text-center > .user-block.text-danger[type=\"button\"] > .bg-success.badge"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.38 (foreground color: #ffffff, background color: #1aa053, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "tr:nth-child(3) > td:nth-child(8) > .text-center > .user-email.text-danger[type=\"button\"] > .bg-success.badge"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.38 (foreground color: #ffffff, background color: #1aa053, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "tr:nth-child(3) > td:nth-child(9) > .text-center > .user-block.text-danger[type=\"button\"] > .bg-success.badge"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.38 (foreground color: #ffffff, background color: #1aa053, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "tr:nth-child(4) > td:nth-child(8) > .text-center > .user-email.text-danger[type=\"button\"] > .bg-success.badge"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.38 (foreground color: #ffffff, background color: #1aa053, font size: 9.0pt (12px), font weight: bold). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        },
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "description": "Ensure <img> elements have alternative text or a role of none or presentation",
+          "nodes": [
+            {
+              "target": [
+                ".sidebar-header > .navbar-brand > .logo-main > .logo-normal > .img.logo[type=\"image/svg+xml\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an alt attribute\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        },
+        {
+          "id": "select-name",
+          "impact": "critical",
+          "description": "Ensure select element has an accessible name",
+          "nodes": [
+            {
+              "target": [
+                "#perPage"
+              ],
+              "summary": "Fix any of the following:\n  Element does not have an implicit (wrapped) <label>\n  Element does not have an explicit <label>\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute\n  Element's default semantics were not overridden with role=\"none\" or role=\"presentation\""
+            }
+          ]
+        }
+      ],
+      "incomplete": [
+        "aria-prohibited-attr",
+        "color-contrast"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "browser": "chromium",
+      "action": "login auditfree",
+      "pass": true
+    },
+    {
+      "browser": "chromium",
+      "action": "login auditadmin",
+      "pass": true
+    },
+    {
+      "browser": "firefox",
+      "action": "login auditfree",
+      "pass": true
+    },
+    {
+      "browser": "firefox",
+      "action": "login auditadmin",
+      "pass": true
+    }
+  ]
+}

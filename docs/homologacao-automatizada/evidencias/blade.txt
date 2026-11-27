@@ -1,0 +1,2 @@
+Blade compilados e verificados: 116 | ignorados (componentes): 7 | erros: 0
+Autenticacao — templates compilados: 10 | erros: 0

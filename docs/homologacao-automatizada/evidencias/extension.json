@@ -1,0 +1,22 @@
+[
+    {
+        "id": "TC-08-A",
+        "assertion": "overquota and invalid import preserve existing links",
+        "pass": true
+    },
+    {
+        "id": "TC-08-E",
+        "assertion": "ordering persists and ignores foreign account link",
+        "pass": true
+    },
+    {
+        "id": "TC-05-D",
+        "assertion": "database uniqueness enforced for codes and invited account",
+        "pass": true
+    },
+    {
+        "id": "TC-04-B",
+        "assertion": "duplicate email rejected and creation failure rolls back complete controller",
+        "pass": true
+    }
+]

@@ -1,0 +1,4 @@
+PASS migration 2026_11_23_000002_create_referral_tables.php
+PASS migration 2026_11_23_000003_create_profile_verification_workflow.php
+PASS migration 2026_11_23_000004_create_abuse_reports_tables.php
+PASS: additive M13 migrations and writes in isolated SQLite

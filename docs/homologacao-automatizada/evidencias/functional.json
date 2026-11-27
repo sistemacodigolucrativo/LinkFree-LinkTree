@@ -1,0 +1,112 @@
+[
+    {
+        "id": "TC-01-D",
+        "assertion": "migration runner repeated twice is no-op",
+        "pass": true
+    },
+    {
+        "id": "TC-01-D",
+        "assertion": "failure rolls back user receipt and referral together",
+        "pass": true
+    },
+    {
+        "id": "TC-05-A",
+        "assertion": "unique stable 24 hex codes and HTTPS route",
+        "pass": true
+    },
+    {
+        "id": "TC-05-C",
+        "assertion": "invalid expired self blocked and authenticated invitations",
+        "pass": true
+    },
+    {
+        "id": "TC-05-B",
+        "assertion": "registration attributes exactly one invitation and private history",
+        "pass": true
+    },
+    {
+        "id": "TC-05-D",
+        "assertion": "owner isolation and admin filter data",
+        "pass": true
+    },
+    {
+        "id": "TC-06-A",
+        "assertion": "single pending request and visibility denied before approval",
+        "pass": true
+    },
+    {
+        "id": "TC-06-B",
+        "assertion": "approval refusal required reason and audit",
+        "pass": true
+    },
+    {
+        "id": "TC-06-C",
+        "assertion": "direct grant revoke persisted with audit",
+        "pass": true
+    },
+    {
+        "id": "TC-06-D",
+        "assertion": "visibility persistence and revoked control denied",
+        "pass": true
+    },
+    {
+        "id": "TC-06-E",
+        "assertion": "badge independent of role and email verification",
+        "pass": true
+    },
+    {
+        "id": "TC-07-A",
+        "assertion": "anonymous legacy explicit target and free URL report persisted",
+        "pass": true
+    },
+    {
+        "id": "TC-07-B",
+        "assertion": "invalid category url and overlength rejected",
+        "pass": true
+    },
+    {
+        "id": "TC-07-C",
+        "assertion": "simulated SMTP exception preserves report and event",
+        "pass": true
+    },
+    {
+        "id": "TC-07-D",
+        "assertion": "admin totals filter pagination and detail history",
+        "pass": true
+    },
+    {
+        "id": "TC-07-E",
+        "assertion": "review close requires reason archive reopen history preserved",
+        "pass": true
+    },
+    {
+        "id": "TC-07-F",
+        "assertion": "no automatic suspension and deleted target preserves case history",
+        "pass": true
+    },
+    {
+        "id": "TC-08-A",
+        "assertion": "five link limit enforced by controller with decorations excluded",
+        "pass": true
+    },
+    {
+        "id": "TC-08-B",
+        "assertion": "WhatsApp controller persists exact normalized encoded URL",
+        "pass": true
+    },
+    {
+        "id": "TC-08-C",
+        "assertion": "page noindex persists with fresh database read",
+        "pass": true
+    },
+    {
+        "id": "TC-08-D",
+        "assertion": "free analytics denied vip allowed and source persistence",
+        "pass": true
+    },
+    {
+        "id": "TC-04-D",
+        "assertion": "admin and blocked middleware enforced for roles",
+        "pass": true
+    }
+]

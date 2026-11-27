@@ -1,0 +1,62 @@
+[
+  {
+    "browser": "chromium",
+    "id": "TC-05-A",
+    "label": "copy invitation persists after reload",
+    "pass": true
+  },
+  {
+    "browser": "chromium",
+    "id": "TC-06-C",
+    "label": "admin badge grant and revoke rendered",
+    "pass": true
+  },
+  {
+    "browser": "chromium",
+    "id": "TC-06-D",
+    "label": "public badge show hide revocation and control gating",
+    "pass": true
+  },
+  {
+    "browser": "chromium",
+    "id": "TC-08-B",
+    "label": "public WhatsApp URL exact without contacting third party",
+    "pass": true
+  },
+  {
+    "browser": "chromium",
+    "id": "TC-09-D",
+    "label": "back forward reload second tab session retained",
+    "pass": true
+  },
+  {
+    "browser": "firefox",
+    "id": "TC-05-A",
+    "label": "copy invitation persists after reload",
+    "pass": true
+  },
+  {
+    "browser": "firefox",
+    "id": "TC-06-C",
+    "label": "admin badge grant and revoke rendered",
+    "pass": true
+  },
+  {
+    "browser": "firefox",
+    "id": "TC-06-D",
+    "label": "public badge show hide revocation and control gating",
+    "pass": true
+  },
+  {
+    "browser": "firefox",
+    "id": "TC-08-B",
+    "label": "public WhatsApp URL exact without contacting third party",
+    "pass": true
+  },
+  {
+    "browser": "firefox",
+    "id": "TC-09-D",
+    "label": "back forward reload second tab session retained",
+    "pass": true
+  }
+]

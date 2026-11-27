@@ -1,0 +1,22 @@
+PASS TC-01-D migration runner repeated twice is no-op
+PASS TC-01-D failure rolls back user receipt and referral together
+PASS TC-05-A unique stable 24 hex codes and HTTPS route
+PASS TC-05-C invalid expired self blocked and authenticated invitations
+PASS TC-05-B registration attributes exactly one invitation and private history
+PASS TC-05-D owner isolation and admin filter data
+PASS TC-06-A single pending request and visibility denied before approval
+PASS TC-06-B approval refusal required reason and audit
+PASS TC-06-C direct grant revoke persisted with audit
+PASS TC-06-D visibility persistence and revoked control denied
+PASS TC-06-E badge independent of role and email verification
+PASS TC-07-A anonymous legacy explicit target and free URL report persisted
+PASS TC-07-B invalid category url and overlength rejected
+PASS TC-07-C simulated SMTP exception preserves report and event
+PASS TC-07-D admin totals filter pagination and detail history
+PASS TC-07-E review close requires reason archive reopen history preserved
+PASS TC-07-F no automatic suspension and deleted target preserves case history
+PASS TC-08-A five link limit enforced by controller with decorations excluded
+PASS TC-08-B WhatsApp controller persists exact normalized encoded URL
+PASS TC-08-C page noindex persists with fresh database read
+PASS TC-08-D free analytics denied vip allowed and source persistence
+PASS TC-04-D admin and blocked middleware enforced for roles

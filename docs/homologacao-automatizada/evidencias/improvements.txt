@@ -1,0 +1,10 @@
+PASS: WhatsApp canonical URL with encoded message
+PASS: WCAG contrast calculation for accessible colors
+PASS: WCAG contrast detects insufficient contrast
+PASS: Regular link counts toward free quota
+PASS: Decorative heading does not count
+PASS: Import preflight checks link quota
+PASS: UTM Instagram attribution
+PASS: Direct access without referrer
+PASS: Telegram referrer attribution
+ENHANCEMENT PHP REGRESSION PASS
