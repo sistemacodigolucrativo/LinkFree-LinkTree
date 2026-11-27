@@ -172,7 +172,8 @@ async function run() {
             const box=await bar.boundingBox();
             assert(Math.abs(box.y)<2,'Topbar scrolled away: '+JSON.stringify(box));
             await page.evaluate(()=>{document.querySelector('#lf-test-spacer').remove();window.scrollTo(0,0)});
-            await page.goto(base+'/studio/blocks',{waitUntil:'load'});
+            await page.locator('.studio-links-page .lf-links-actions a.btn-primary').click();
+            await page.waitForURL('**/studio/blocks');
             assert(await back.isEnabled(),'Back control should be enabled for same-origin history');
             assert.equal(await back.locator('svg').evaluate(el=>getComputedStyle(el).animationName),'none','Reduced motion must stop animation');
             await back.focus();
