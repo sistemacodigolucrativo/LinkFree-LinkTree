@@ -153,6 +153,35 @@ async function run() {
       try {
         await check('Login member '+width+' '+mode,async()=>{await login(page);return {width,mode};});
         if(width===375 || width===1280) {
+          await check('Sticky topbar, menu keyboard and back '+width,async()=>{
+            await page.goto(base+'/studio/links',{waitUntil:'load'});
+            const bar=page.locator('.mobile-unified-nav');
+            const title=page.locator('.lf-nav-menu');
+            const sidebar=page.locator('.sidebar-default');
+            const back=page.locator('.lf-nav-back');
+            assert.equal(await title.getAttribute('data-toggle'),'sidebar');
+            assert.equal(await back.getAttribute('data-toggle'),null);
+            const before=await sidebar.evaluate(el=>el.classList.contains('sidebar-mini'));
+            await title.focus();
+            await page.keyboard.press('Enter');
+            await page.waitForFunction(state=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini')!==state,before);
+            await title.press('Enter');
+            await page.waitForFunction(state=>document.querySelector('.sidebar-default').classList.contains('sidebar-mini')===state,before);
+            await page.evaluate(()=>{const el=document.createElement('div');el.id='lf-test-spacer';el.style.height='2000px';document.querySelector('main').append(el);window.scrollTo(0,800)});
+            await page.waitForTimeout(100);
+            const box=await bar.boundingBox();
+            assert(Math.abs(box.y)<2,'Topbar scrolled away: '+JSON.stringify(box));
+            await page.evaluate(()=>{document.querySelector('#lf-test-spacer').remove();window.scrollTo(0,0)});
+            await page.goto(base+'/studio/blocks',{waitUntil:'load'});
+            assert(await back.isEnabled(),'Back control should be enabled for same-origin history');
+            assert.equal(await back.locator('svg').evaluate(el=>getComputedStyle(el).animationName),'none','Reduced motion must stop animation');
+            await back.focus();
+            await page.keyboard.press('Enter');
+            await page.waitForURL('**/studio/links');
+            return {width,sticky:true,keyboard:true,history:true,reducedMotion:true};
+          });
+        }
+        if(width===375 || width===1280) {
           await check('Premium review form, keyboard and WCAG '+width+' '+mode,async()=>{
             const response=await page.goto(base+'/studio/avaliar',
               {waitUntil:'domcontentloaded',timeout:25000});

@@ -89,7 +89,7 @@ async function run(){
           if(width===375){
             const title=page.locator('.lf-mobile-nav-title');
             assert(await title.isVisible(),'Mobile navbar title missing');
-            const back=await page.locator('.mobile-unified-nav .sidebar-toggle').first().boundingBox();
+            const back=await page.locator('.mobile-unified-nav .lf-nav-back').boundingBox();
             const bell=await page.locator('.mobile-unified-nav #notification-drop').boundingBox();
             const t=await title.boundingBox();
             assert(back.x+back.width<=t.x+5 && t.x+t.width<=bell.x+5,'Title not positioned between back and bell');
