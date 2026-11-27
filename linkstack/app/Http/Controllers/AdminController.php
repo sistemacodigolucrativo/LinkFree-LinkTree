@@ -169,7 +169,7 @@ class AdminController extends Controller
         ->route("admin.config.section", ['section' => 'smtp'])
         ->with("success", "Test email sent successfully!");
     } catch (\Throwable $exception) {
-      \Log::warning('SMTP test failed', ['exception_type' => get_class($exception)]);
+      \App\Services\MailFailureDiagnostics::record('smtp_test', $exception);
       return redirect()
         ->route("admin.config.section", ['section' => 'smtp'])
         ->with("fail", __("registration.smtp_test_failed"));

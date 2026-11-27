@@ -23,7 +23,7 @@ class EmailVerificationNotificationController extends Controller
         try {
             $request->user()->sendEmailVerificationNotification();
         } catch (\Throwable $exception) {
-            \Log::warning('Verification resend failed', ['exception_type' => get_class($exception)]);
+            \App\Services\MailFailureDiagnostics::record('verification_resend', $exception);
             return back()->with('verification_delivery_failed', true);
         }
 

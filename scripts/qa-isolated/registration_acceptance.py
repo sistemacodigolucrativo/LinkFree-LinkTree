@@ -52,6 +52,6 @@ assert status==302 and '/admin/config/sections/smtp' in headers.get('Location','
 status,_,body=admin.req('/admin/config/sections/smtp')
 assert status==200 and 'Não foi possível enviar o e-mail de teste' in body
 log=Path('/tmp/linkfree-audit/registration-server.log').read_text()
-assert 'SMTP test failed' in log and 'exception_type' in log
+assert 'Email delivery failed' in log and 'smtp_test' in log and 'exception_type' in log and 'connection' in log
 assert 'Synthetic-password-123' not in log and 'Synthetic-NoSend-123' not in log
 print('PASS: SMTP test failure shows a localized message and logs only safe metadata')

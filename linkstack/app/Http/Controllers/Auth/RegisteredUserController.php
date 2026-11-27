@@ -98,7 +98,7 @@ class RegisteredUserController extends Controller
                     $message->to(env('ADMIN_EMAIL'))->subject('New user registration');
                 });
             } catch (\Throwable $exception) {
-                \Log::warning('Registration administrator notification failed', ['exception_type' => get_class($exception)]);
+                \App\Services\MailFailureDiagnostics::record('registration_admin_notification', $exception);
             }
         }
 
@@ -106,7 +106,7 @@ class RegisteredUserController extends Controller
             // The existing Registered listener sends the verification notification once.
             event(new Registered($user));
         } catch (\Throwable $exception) {
-            \Log::warning('Registration verification notification failed', ['exception_type' => get_class($exception)]);
+            \App\Services\MailFailureDiagnostics::record('registration_verification', $exception);
             if (env('REGISTER_AUTH') === 'verified') {
                 return redirect()->route('verification.notice')->with('verification_delivery_failed', true);
             }
