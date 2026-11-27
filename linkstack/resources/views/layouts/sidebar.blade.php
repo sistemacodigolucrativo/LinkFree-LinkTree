@@ -32,6 +32,9 @@ if (!$isAdminPanel) {
             break;
         }
     }
+    if (request()->routeIs('studio.platform-review')) {
+        $memberNavbarTitle = __('reviews.notification_link');
+    }
 }
 $adminNavbarTitle = null;
 if ($isAdminPanel) {

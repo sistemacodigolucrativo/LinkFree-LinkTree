@@ -188,6 +188,7 @@ async function run() {
               {waitUntil:'domcontentloaded',timeout:25000});
             assert.equal(response?.status(),200);
             assert(await page.locator('.lf-review-shell').isVisible());
+            assert.equal((await page.locator('.lf-member-nav-copy').innerText()).trim(),'Deixe uma avaliação');
             assert.equal(await page.locator('.lf-rating-input').count(),5);
             assert.equal(await page.locator('input[name="publication_consent"]').count(),1);
             assert.equal(await page.locator('form[action$="/studio/avaliar"] input[name="_token"]').count(),1);
