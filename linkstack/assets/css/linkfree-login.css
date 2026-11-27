@@ -169,3 +169,7 @@ body.dark .lf-login-field .form-control:focus{box-shadow:0 0 0 3px rgba(242,196,
   border-radius:0 10px 10px 0;
 }
 .lf-auth-view .invalid-feedback{font-size:.8rem;color:#bb283e}
+
+/* Field errors remain outside the handle input group. */
+.lf-auth-view .lf-field-error{display:block;max-width:100%;margin-top:5px;font-size:.8rem;line-height:1.4;overflow-wrap:anywhere;color:#bb283e}
+.lf-auth-view .lf-field-error[hidden]{display:none}

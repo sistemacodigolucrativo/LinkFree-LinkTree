@@ -168,7 +168,8 @@ class AdminController extends Controller
       return redirect()
         ->route("admin.config.section", ['section' => 'smtp'])
         ->with("success", "Test email sent successfully!");
-    } catch (\Exception $e) {
+    } catch (\Throwable $exception) {
+      \Log::warning('SMTP test failed', ['exception_type' => get_class($exception)]);
       return redirect()
         ->route("admin.config.section", ['section' => 'smtp'])
         ->with("fail", "Failed to send test email.");

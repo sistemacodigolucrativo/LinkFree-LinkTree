@@ -31,6 +31,10 @@
                 {{__('messages.auth_thanks')}}
             </div>
     
+            @if (session('verification_delivery_failed'))
+                <div role="alert" class="alert alert-danger">{{ __('registration.verification_failed') }}</div>
+            @endif
+
             @if (session('status') == 'verification-link-sent')
                 <div class="font-medium text-sm text-green-600">
                   {{__('messages.auth_verification')}}

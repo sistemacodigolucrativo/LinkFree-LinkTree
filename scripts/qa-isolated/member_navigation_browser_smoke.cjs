@@ -151,6 +151,22 @@ async function run() {
       const page=await context.newPage();
       page.setDefaultTimeout(12000);
       try {
+        if(width===375 || width===1280) {
+          await check('Registration duplicate handle layout '+width,async()=>{
+            await page.goto(base+'/register',{waitUntil:'domcontentloaded'});
+            const field=page.locator('#littlelink_name'), message=page.locator('#username-error');
+            const before=await field.boundingBox();
+            await field.fill('auditfree');
+            await message.waitFor({state:'visible',timeout:15000});
+            const after=await field.boundingBox(), error=await message.boundingBox();
+            assert(Math.abs(before.width-after.width)<2,'Handle input width changed');
+            assert(error.y>=after.y+after.height-1,'Error must be below the input');
+            assert.equal(await field.getAttribute('aria-describedby'),'username-error');
+            assert.equal(await field.getAttribute('aria-invalid'),'true');
+            assert((await message.innerText()).includes('já está em uso'));
+            return {width,fieldWidth:after.width,errorBelow:true};
+          });
+        }
         await check('Login member '+width+' '+mode,async()=>{await login(page);return {width,mode};});
         if(width===375 || width===1280) {
           await check('Sticky topbar, menu keyboard and back '+width,async()=>{
