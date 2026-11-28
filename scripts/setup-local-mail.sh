@@ -50,6 +50,8 @@ else
   fi
   trap 'echo "Setup failed. Packages or configuration may have changed; inspect the server before retrying." >&2' ERR
   export DEBIAN_FRONTEND=noninteractive
+  # Prevent the package's first start from exposing an Internet-facing listener.
+  printf 'postfix postfix/main_mailer_type select Local only\npostfix postfix/mailname string %s\n' "$domain" | debconf-set-selections
   apt-get update -qq
   apt-get install -y postfix opendkim opendkim-tools
   install -d -m 0750 -o opendkim -g opendkim "/etc/opendkim/keys/$domain"
