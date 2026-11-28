@@ -431,7 +431,19 @@ if ($isAdminPanel) {
           if (types.includes('sidebar-hover')) sidebar.classList.add('sidebar-mini', 'sidebar-hover');
           else if (types.includes('sidebar-boxed')) sidebar.classList.add('sidebar-boxed');
           else if (types.includes('sidebar-mini')) sidebar.classList.add('sidebar-mini');
+          try {
+            var state = sessionStorage.getItem('lf-sidebar-mini');
+            if (window.innerWidth >= 1025 && (state === '1' || state === '0')) sidebar.classList.toggle('sidebar-mini', state === '1');
+          } catch (_) {}
           if (window.innerWidth < 1025 && !sidebar.classList.contains('sidebar-mini')) sidebar.classList.add('sidebar-mini', 'on-resize');
+          document.addEventListener('click', function (event) {
+            var target = event.target.closest('[data-toggle="sidebar"], [data-setting="sidebar"][data-name="sidebar-type"]');
+            if (!target) return;
+            try {
+              if (target.hasAttribute('data-setting')) sessionStorage.removeItem('lf-sidebar-mini');
+              else if (window.innerWidth >= 1025) sessionStorage.setItem('lf-sidebar-mini', sidebar.classList.contains('sidebar-mini') ? '1' : '0');
+            } catch (_) {}
+          });
         })();
       </script>
         <div class="sidebar-header d-flex align-items-center justify-content-start">

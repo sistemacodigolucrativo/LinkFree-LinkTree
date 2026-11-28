@@ -100,6 +100,15 @@ async function run(){
             await page.unroute('**/assets/js/hope-ui*.js*');
           }
         });
+        if(width>=1025) await check('Collapsed desktop sidebar persists through navigation',async()=>{
+          await page.goto(base+'/admin/overview',{waitUntil:'domcontentloaded'});
+          const sidebar=page.locator('.sidebar-default'), toggle=page.locator('.main-content [data-toggle="sidebar"]').first();
+          if(!await sidebar.evaluate(el=>el.classList.contains('sidebar-mini'))) await toggle.click();
+          assert(await sidebar.evaluate(el=>el.classList.contains('sidebar-mini')));
+          await page.goto(base+'/admin/config',{waitUntil:'domcontentloaded'});
+          assert(await sidebar.evaluate(el=>el.classList.contains('sidebar-mini')),'Collapsed state was lost');
+          await page.locator('.main-content [data-toggle="sidebar"]').first().click();
+        });
         await check('Admin contextual topbar '+width,async()=>{
           for (const [url,label] of [['/admin/overview','Administration overview'],['/admin/users','Manage Users'],['/admin/site','Site Customization'],['/admin/avaliacoes','Review moderation']]) {
             const response=await page.goto(base+url,{waitUntil:'domcontentloaded'});

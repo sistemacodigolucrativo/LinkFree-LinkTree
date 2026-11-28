@@ -137,6 +137,10 @@ Index Of Script
         sidebarTypeSetting = types;
         sidebar.classList.remove(...sidebarTypesValues);
         sidebar.classList.add(...types);
+        try {
+            const savedMini = sessionStorage.getItem('lf-sidebar-mini');
+            if (window.innerWidth >= 1025 && (savedMini === '1' || savedMini === '0')) sidebar.classList.toggle('sidebar-mini', savedMini === '1');
+        } catch (_) {}
         if (window.innerWidth < 1025 && !sidebar.classList.contains('sidebar-mini')) sidebar.classList.add('sidebar-mini', 'on-resize');
         else if (types.includes('sidebar-mini')) sidebar.classList.remove('on-resize');
         document.querySelectorAll('[data-setting="sidebar"][data-name="sidebar-type"]').forEach(el => {
