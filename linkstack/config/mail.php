@@ -34,6 +34,18 @@ return [
     */
 
     'mailers' => [
+        'local-php' => [
+            'transport' => 'local-php',
+            'from_address' => env('MAIL_FROM_ADDRESS'),
+            'domain' => env('LOCAL_MAIL_DOMAIN'),
+            'envelope_mode' => env('LOCAL_MAIL_ENVELOPE_MODE', 'from'),
+            'hourly_limit' => env('LOCAL_MAIL_HOURLY_LIMIT', 60),
+            'reply_to' => ['address' => env('MAIL_REPLY_TO_ADDRESS'), 'name' => env('MAIL_FROM_NAME', env('APP_NAME'))],
+            'from' => [
+                'address' => env('MAIL_FROM_ADDRESS'),
+                'name' => env('MAIL_FROM_NAME', env('APP_NAME')),
+            ],
+        ],
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL', '/usr/sbin/sendmail -bs'),

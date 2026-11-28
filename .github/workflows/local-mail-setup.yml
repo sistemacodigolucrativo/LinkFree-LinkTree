@@ -1,0 +1,58 @@
+name: Local mail setup on disposable Ubuntu
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/setup-local-mail.sh'
+      - '.github/workflows/local-mail-setup.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  setup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate script and preview without changing system configuration
+        run: |
+          bash -n scripts/setup-local-mail.sh
+          bash scripts/setup-local-mail.sh --plan example.test mail.example.test 192.0.2.10 dmarc@example.test
+      - name: Install only on this disposable runner and check repeatability
+        run: |
+          set -euo pipefail
+          sudo bash scripts/setup-local-mail.sh --install example.test mail.example.test 192.0.2.10 dmarc@example.test
+          selector="lf$(date -u +%Y)"
+          before=$(sudo sha256sum "/etc/opendkim/keys/example.test/$selector.private")
+          sudo bash scripts/setup-local-mail.sh --install example.test mail.example.test 192.0.2.10 dmarc@example.test
+          after=$(sudo sha256sum "/etc/opendkim/keys/example.test/$selector.private")
+          test "$before" = "$after"
+          test "$(postconf -h inet_interfaces)" = loopback-only
+          test "$(postconf -h default_transport)" = smtp
+          postconf -h smtpd_relay_restrictions | grep -q reject_unauth_destination
+          sudo systemctl is-active --quiet postfix opendkim
+      - name: Verify local milter signs a synthetic queued message
+        run: |
+          set -euo pipefail
+          # Keep the synthetic message on the runner: the local relay port has no listener.
+          sudo postconf -e 'relayhost = [127.0.0.1]:25252'
+          sudo systemctl reload postfix
+          printf 'From: sender@example.test\nTo: recipient@example.test\nSubject: synthetic test\n\nSynthetic message\n' | sudo /usr/sbin/sendmail -i -f sender@example.test recipient@example.test
+          signed=0
+          for attempt in $(seq 1 75); do
+            queue_id=$(sudo postqueue -j | python3 -c 'import sys,json; rows=[json.loads(line) for line in sys.stdin]; print(next((row["queue_id"] for row in rows if any(r.get("address") == "recipient@example.test" for r in row.get("recipients", []))), ""))')
+            if [ -n "$queue_id" ]; then
+              sudo postcat -q "$queue_id" > /tmp/synthetic-mail.txt || true
+              if grep -q 'DKIM-Signature:' /tmp/synthetic-mail.txt; then signed=1; break; fi
+            fi
+            sleep 1
+          done
+          if [ "$signed" != 1 ]; then
+            sudo journalctl -u opendkim -u postfix --no-pager -n 100
+            sudo journalctl -t postfix/master -t postfix/pickup -t postfix/cleanup --no-pager -n 100
+            sudo postfix status || true
+            cat /tmp/synthetic-mail.txt || true
+            exit 1
+          fi
