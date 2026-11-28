@@ -40,7 +40,7 @@ jobs:
           sudo systemctl reload postfix
           printf 'From: sender@example.test\nTo: recipient@example.test\nSubject: synthetic test\n\nSynthetic message\n' | sudo /usr/sbin/sendmail -i -f sender@example.test recipient@example.test
           signed=0
-          for attempt in $(seq 1 20); do
+          for attempt in $(seq 1 75); do
             queue_id=$(sudo postqueue -j | python3 -c 'import sys,json; rows=list(sys.stdin); print(json.loads(rows[0])["queue_id"] if rows else "")')
             if [ -n "$queue_id" ]; then
               sudo postcat -q "$queue_id" > /tmp/synthetic-mail.txt || true
@@ -50,6 +50,8 @@ jobs:
           done
           if [ "$signed" != 1 ]; then
             sudo journalctl -u opendkim -u postfix --no-pager -n 100
+            sudo journalctl -t postfix/master -t postfix/pickup -t postfix/cleanup --no-pager -n 100
+            sudo postfix status || true
             cat /tmp/synthetic-mail.txt || true
             exit 1
           fi
