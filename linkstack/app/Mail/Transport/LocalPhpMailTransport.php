@@ -28,6 +28,13 @@ final class LocalPhpMailTransport extends AbstractTransport
             throw new TransportException('The local mail transport requires a MIME email.');
         }
         $message = clone $message;
+        $domain = strtolower((string) ($this->options['domain'] ?? ''));
+        if (!filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME)) {
+            throw new TransportException('Invalid local mail domain.');
+        }
+        if (!$message->getHeaders()->has('Message-ID')) {
+            $message->getHeaders()->addIdHeader('Message-ID', bin2hex(random_bytes(16)).'@'.$domain);
+        }
         $html = $message->getHtmlBody();
         $plain = $message->getTextBody();
         if (is_string($html) && $plain === null) {

@@ -17,11 +17,11 @@ if (is_file($dir.'/rate.json')) unlink($dir.'/rate.json');
 $capture='/tmp/linkfree-audit/local-mail-message.eml';
 @unlink($capture);
 Illuminate\Support\Facades\Mail::mailer('local-php')->html('<p>Synthetic <strong>message</strong></p>',function($m){
-    $m->to('recipient@example.test')->subject('Teste seguro');
+    $m->to('recipient@example.test')->replyTo('reply@example.test')->subject('Verificação segura');
 });
 if (!is_file($capture)) throw new RuntimeException('Fake local MTA did not receive data');
 $raw=file_get_contents($capture);
-foreach (['multipart/alternative','text/plain','text/html','recipient@example.test','sender@example.test'] as $expected) {
+foreach (['multipart/alternative','text/plain','text/html','recipient@example.test','sender@example.test','reply@example.test','@example.test>','=?utf-8?'] as $expected) {
     if (!str_contains($raw,$expected)) throw new RuntimeException('Missing MIME or address: '.$expected);
 }
 if (str_contains($raw,"\nBcc:")) throw new RuntimeException('Bcc header leaked');
