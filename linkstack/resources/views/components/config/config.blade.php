@@ -384,6 +384,21 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 </div></div>
 <input type="hidden" name="_token" value="{{csrf_token()}}">
 <div style="max-width: 600px; padding-left: 20px;">
+<div class="mb-3 form-check">
+  <input type="checkbox" class="form-check-input" id="lf-local-mail" name="local_php" value="1" @checked(env('MAIL_MAILER') === 'local-php')>
+  <label class="form-check-label" for="lf-local-mail">{{ __('local_mail.enable') }}</label>
+  <p class="text-muted">{{ __('local_mail.description') }}</p>
+</div>
+<label for="lf-local-domain" class="form-label">{{ __('local_mail.domain') }}</label>
+<input id="lf-local-domain" class="form-control" name="LOCAL_MAIL_DOMAIN" value="{{ old('LOCAL_MAIL_DOMAIN', env('LOCAL_MAIL_DOMAIN')) }}" autocomplete="off">
+@error('LOCAL_MAIL_DOMAIN')<div class="text-danger" role="alert">{{ $message }}</div>@enderror
+<label for="lf-local-limit" class="form-label mt-2">{{ __('local_mail.hourly_limit') }}</label>
+<input id="lf-local-limit" type="number" min="1" max="10000" class="form-control" name="LOCAL_MAIL_HOURLY_LIMIT" value="{{ old('LOCAL_MAIL_HOURLY_LIMIT', env('LOCAL_MAIL_HOURLY_LIMIT', 60)) }}">
+<label for="lf-local-envelope" class="form-label mt-2">{{ __('local_mail.envelope') }}</label>
+<select id="lf-local-envelope" name="LOCAL_MAIL_ENVELOPE_MODE" class="form-control">
+  <option value="from" @selected(old('LOCAL_MAIL_ENVELOPE_MODE', env('LOCAL_MAIL_ENVELOPE_MODE', 'from')) === 'from')>{{ __('local_mail.envelope_from') }}</option>
+  <option value="provider" @selected(old('LOCAL_MAIL_ENVELOPE_MODE', env('LOCAL_MAIL_ENVELOPE_MODE', 'from')) === 'provider')>{{ __('local_mail.envelope_provider') }}</option>
+</select>
 <br><h5>{{__('messages.Custom SMTP server:')}}</h5>
 <label style="margin-top:15px">{{__('messages.Host')}}</label>
 <input type="text" class="form-control form-control-lg" class="form-control form-control-lg" name="MAIL_HOST" value="{{env('MAIL_HOST')}}" />

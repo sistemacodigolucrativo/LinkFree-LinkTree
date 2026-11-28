@@ -114,6 +114,16 @@ jobs:
         run: |
           python3 scripts/qa-isolated/reviews_acceptance.py
           php scripts/qa-isolated/reviews_brand_dynamic.php
+      - name: Verify local PHP mail with a fake local MTA
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/linkfree-audit/fake-sendmail <<'SHELL'
+          #!/usr/bin/env bash
+          cat > /tmp/linkfree-audit/local-mail-message.eml
+          SHELL
+          chmod 700 /tmp/linkfree-audit/fake-sendmail
+          QA_APP_ROOT=/tmp/linkfree-audit/linkstack php -d 'sendmail_path=/tmp/linkfree-audit/fake-sendmail' scripts/qa-isolated/local_mail_acceptance.php
       - name: Verify real HTTP GET/DELETE/POST and CSRF
         env:
           QA_EXPECTED_SITE: http://127.0.0.1:18765

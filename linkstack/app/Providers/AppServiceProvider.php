@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->app['mail.manager']->extend('local-php', fn (array $config) => new \App\Mail\Transport\LocalPhpMailTransport($config));
         Paginator::useBootstrap();
         Validator::extend('isunique', function ($attribute, $value, $parameters, $validator) {
             $value = strtolower($value);

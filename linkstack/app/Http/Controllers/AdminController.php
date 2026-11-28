@@ -165,9 +165,12 @@ class AdminController extends Controller
         $message->to($user->email)->subject("Test Email");
       });
 
+      $status = config('mail.default') === 'local-php'
+        ? __('local_mail.accepted')
+        : (config('mail.default') === 'log' ? __('local_mail.log_only') : 'Test email sent successfully!');
       return redirect()
         ->route("admin.config.section", ['section' => 'smtp'])
-        ->with("success", "Test email sent successfully!");
+        ->with("success", $status);
     } catch (\Throwable $exception) {
       \App\Services\MailFailureDiagnostics::record('smtp_test', $exception);
       return redirect()
@@ -827,10 +830,24 @@ class AdminController extends Controller
       }
       Page::first()->update(["register" => $register]);
     } elseif ($type === "smtp") {
-      if ($request->toggle != "") {
-        $value = "built-in";
+      if ($request->boolean('local_php')) {
+        $data = $request->validate([
+          'LOCAL_MAIL_DOMAIN' => ['required', 'string', 'max:253', 'regex:/^[A-Za-z0-9.-]+$/D'],
+          'MAIL_FROM_ADDRESS' => ['required', 'email', 'max:254'],
+          'LOCAL_MAIL_HOURLY_LIMIT' => ['required', 'integer', 'min:1', 'max:10000'],
+          'LOCAL_MAIL_ENVELOPE_MODE' => ['required', 'in:from,provider'],
+        ]);
+        $fromDomain = strtolower(substr(strrchr($data['MAIL_FROM_ADDRESS'], '@'), 1));
+        if (!filter_var($data['LOCAL_MAIL_DOMAIN'], FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) || $fromDomain !== strtolower($data['LOCAL_MAIL_DOMAIN'])) {
+          return back()->withErrors(['LOCAL_MAIL_DOMAIN' => __('local_mail.domain_error')])->withInput();
+        }
+        foreach (['LOCAL_MAIL_DOMAIN', 'LOCAL_MAIL_HOURLY_LIMIT', 'LOCAL_MAIL_ENVELOPE_MODE'] as $key) {
+          if (EnvEditor::keyExists($key)) EnvEditor::editKey($key, $data[$key]);
+          else EnvEditor::addKey($key, $data[$key]);
+        }
+        $value = 'local-php';
       } else {
-        $value = "smtp";
+        $value = $request->toggle != '' ? 'built-in' : 'smtp';
       }
       if (EnvEditor::keyExists("MAIL_MAILER")) {
         EnvEditor::editKey("MAIL_MAILER", $value);

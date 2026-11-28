@@ -244,7 +244,7 @@ Route::group([
     Route::get('/admin/config', [AdminController::class, 'showConfig'])->name('showConfig');
     Route::get('/admin/config/sections/{section}', [AdminController::class, 'showConfigSection'])->where('section', '[a-z-]+')->name('admin.config.section');
     Route::post('/admin/config', [AdminController::class, 'editConfig'])->name('editConfig');
-    Route::post('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail');
+    Route::post('/send-test-email', [AdminController::class, 'SendTestMail'])->name('SendTestMail')->middleware('throttle:6,60');
     Route::post('/auth-as/{id}', [AdminController::class, 'authAsID'])->name('authAsID');
     Route::get('/theme-updater', function () {return view('studio/theme-updater', []);});
     // Legacy views execute server updates and backup cleanup from query strings.
