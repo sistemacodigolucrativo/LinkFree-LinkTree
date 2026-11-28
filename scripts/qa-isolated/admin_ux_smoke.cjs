@@ -72,6 +72,43 @@ async function run(){
         const page=await context.newPage();
         page.setDefaultTimeout(15000);
         await login(page);
+        await check('Public report control and keyboard '+width,async()=>{
+          const response=await page.goto(base+'/@auditfree',{waitUntil:'domcontentloaded'});
+          assert.equal(response.status(),200);
+          const button=page.locator('.report-icon-container'), panel=page.locator('#lf-report-panel');
+          assert(await button.isVisible());
+          assert.equal(await button.getAttribute('aria-expanded'),'false');
+          await button.click();
+          assert.equal(await button.getAttribute('aria-expanded'),'true');
+          const link=panel.locator('a.report-text');
+          assert(await link.isVisible());
+          assert((await link.getAttribute('href')).includes('/report'));
+          await page.keyboard.press('Escape');
+          assert.equal(await button.getAttribute('aria-expanded'),'false');
+          assert(await panel.isHidden());
+        });
+        await check('Sidebar initial state before deferred scripts '+width,async()=>{
+          await page.route('**/assets/js/plugins/setting.js*', route=>route.abort());
+          await page.route('**/assets/js/hope-ui*.js*', route=>route.abort());
+          try {
+            await page.goto(base+'/admin/overview',{waitUntil:'domcontentloaded'});
+            const sidebar=page.locator('.sidebar-default');
+            const mini=await sidebar.evaluate(el=>el.classList.contains('sidebar-mini'));
+            assert.equal(mini,width<1025,'Sidebar did not start in its responsive state');
+          } finally {
+            await page.unroute('**/assets/js/plugins/setting.js*');
+            await page.unroute('**/assets/js/hope-ui*.js*');
+          }
+        });
+        if(width>=1025) await check('Collapsed desktop sidebar persists through navigation',async()=>{
+          await page.goto(base+'/admin/overview',{waitUntil:'domcontentloaded'});
+          const sidebar=page.locator('.sidebar-default'), toggle=page.locator('.main-content [data-toggle="sidebar"]').first();
+          if(!await sidebar.evaluate(el=>el.classList.contains('sidebar-mini'))) await toggle.click();
+          assert(await sidebar.evaluate(el=>el.classList.contains('sidebar-mini')));
+          await page.goto(base+'/admin/config',{waitUntil:'domcontentloaded'});
+          assert(await sidebar.evaluate(el=>el.classList.contains('sidebar-mini')),'Collapsed state was lost');
+          await page.locator('.main-content [data-toggle="sidebar"]').first().click();
+        });
         await check('Admin contextual topbar '+width,async()=>{
           for (const [url,label] of [['/admin/overview','Administration overview'],['/admin/users','Manage Users'],['/admin/site','Site Customization'],['/admin/avaliacoes','Review moderation']]) {
             const response=await page.goto(base+url,{waitUntil:'domcontentloaded'});

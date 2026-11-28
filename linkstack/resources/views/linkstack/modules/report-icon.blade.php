@@ -1,91 +1,31 @@
 @if(env('ENABLE_REPORT_ICON') == true)
 <style>
-    .report-pill-container {
-      position: fixed;
-      bottom: 60px;
-      left: 30px;
-      z-index: 5;
-    }
-
-    .report-icon {
-      font-size: 36px;
-      z-index: 5;
-      position: absolute;
-      top: 7px;
-      left: 7px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .report-expanding-pill {
-      background-color: #58595b;
-      position: absolute;
-      width: 0px;
-      height: 30px;
-      border-radius: 50px;
-      overflow: hidden;
-      padding-right: 30px;
-      /* box-shadow: 0px 0px 15px #777;   */
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-    }
-
-    .report-text {
-      opacity: 0;
-      font-size: 14px !important;
-      transition: opacity 0.3s ease-out !important;
-      color: white !important;
-      text-decoration: none;
-      font-family: "Open Sans", sans-serif, sans !important;
-      text-transform: none !important;
-    }
-
-    .report-text:hover {
-      text-decoration: underline;
-      color: white;
-    }
-
-
-    .report-show {
-      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-      width: 130px;
-    }
-
-    .report-show-text {
-      transition: opacity 3s ease-out;
-      opacity: 1;
-    }
-
-    .report-hide {
-      opacity: 0;
-      transition: opacity 0.3s ease-out;
-    }
-  </style>
-  <div class="report-pill-container">
-    <button type="button" aria-label="Denunciar abuso" aria-expanded="false" class="report-icon-container">
-      <div class="report-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" class="bi bi-info-circle" viewBox="0 0 16 16">
-  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
-</svg></div>
-    </button>
-    <div class="report-expanding-pill">
-      <a href="{{ route('report.form', ['user' => $userinfo->id]) }}" target="_blank" rel="noopener noreferrer" class="report-text" hidden>Denunciar abuso</a>
-    </div>
+  .report-pill-container { position:fixed; left:max(1rem, env(safe-area-inset-left)); bottom:max(1rem, env(safe-area-inset-bottom)); z-index:50; display:flex; align-items:center; gap:.5rem; font-family:system-ui,sans-serif; }
+  .report-icon-container { width:44px; height:44px; display:grid; place-items:center; border:1px solid rgba(255,255,255,.5); border-radius:50%; color:#fff; background:#8e263c; box-shadow:0 4px 14px rgba(0,0,0,.25); cursor:pointer; flex-shrink:0; }
+  .report-icon-container:hover { background:#711a2d; }
+  .report-icon-container:focus-visible,.report-text:focus-visible { outline:3px solid #f5b949; outline-offset:3px; }
+  .report-expanding-pill { max-width:min(260px,calc(100vw - 5rem)); padding:.7rem 1rem; border:1px solid #e6d5d9; border-radius:1rem; background:#fff; color:#29232a; box-shadow:0 6px 22px rgba(0,0,0,.18); }
+  .report-expanding-pill[hidden] { display:none; }
+  .report-text { color:#8e263c!important; font-size:.9rem!important; font-weight:700; line-height:1.35; text-decoration:underline; text-underline-offset:.15em; }
+  @media (prefers-reduced-motion:no-preference) { .report-expanding-pill:not([hidden]) { animation:lf-report-enter .16s ease-out; } @keyframes lf-report-enter { from { opacity:0; transform:translateX(-6px); } to { opacity:1; transform:translateX(0); } } }
+</style>
+<div class="report-pill-container">
+  <button type="button" aria-label="Denunciar abuso" aria-expanded="false" aria-controls="lf-report-panel" class="report-icon-container">
+    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4m0 1c5-3 8 3 14 0v10c-6 3-9-3-14 0"/></svg>
+  </button>
+  <div id="lf-report-panel" class="report-expanding-pill" hidden>
+    <a href="{{ route('report.form', ['user' => $userinfo->id]) }}" target="_blank" rel="noopener noreferrer" class="report-text">Denunciar abuso</a>
   </div>
-
-  <script>
-    let icon = document.querySelector('.report-icon-container')
-    let expandingPill = document.querySelector('.report-expanding-pill')
-    let text = document.querySelector('.report-text')
-
-    icon.addEventListener('click', function() {
-      expandingPill.classList.toggle('report-show');
-      text.classList.toggle('report-show-text');
-      text.hidden = !text.classList.contains('report-show-text');
-      icon.setAttribute('aria-expanded', String(!text.hidden));
-    });
-  </script>
+</div>
+<script>
+(function () {
+  var container = document.querySelector('.report-pill-container');
+  if (!container) return;
+  var button = container.querySelector('.report-icon-container'), panel = container.querySelector('.report-expanding-pill');
+  function setOpen(open) { panel.hidden = !open; button.setAttribute('aria-expanded', String(open)); }
+  button.addEventListener('click', function () { setOpen(panel.hidden); });
+  document.addEventListener('click', function (event) { if (!container.contains(event.target)) setOpen(false); });
+  document.addEventListener('keydown', function (event) { if (event.key === 'Escape' && !panel.hidden) { setOpen(false); button.focus(); } });
+})();
+</script>
 @endif

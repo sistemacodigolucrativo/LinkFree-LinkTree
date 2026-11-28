@@ -9,8 +9,16 @@ use Illuminate\Support\Facades\Cache;
 
 class GithubThemesController extends Controller
 {
+    private function updatesEnabled(): bool
+    {
+        return filter_var(env('ENABLE_THEME_UPDATER', true), FILTER_VALIDATE_BOOLEAN);
+    }
+
     public function index(Request $request, GithubThemes $service)
     {
+        if ($request->boolean('updates') && !$this->updatesEnabled()) {
+            return redirect()->route('githubThemes')->withErrors(['theme' => 'O atualizador de temas está desativado nas configurações.']);
+        }
         $s = $service->state();
         $category = $request->query('category', 'Free');
         $themes = []; $updates = []; $error = null;
@@ -20,10 +28,11 @@ class GithubThemesController extends Controller
             if ($request->boolean('updates')) $updates = $service->updates($s);
         }
         catch (\Throwable $e) { $error = 'Não foi possível consultar o catálogo. Confira o repositório, as permissões e o limite de acesso do GitHub.'; }
-        return view('panel.github-themes', ['repository' => $s['repository'], 'private' => $s['private'], 'hasToken' => !empty($s['token']), 'category' => $category, 'themes' => $themes, 'updates' => $updates, 'checkingUpdates' => $request->boolean('updates'), 'catalogueError' => $error]);
+        return view('panel.github-themes', ['repository' => $s['repository'], 'private' => $s['private'], 'hasToken' => !empty($s['token']), 'category' => $category, 'themes' => $themes, 'updates' => $updates, 'checkingUpdates' => $request->boolean('updates'), 'catalogueError' => $error, 'updatesEnabled' => $this->updatesEnabled()]);
     }
     public function status(GithubThemes $service)
     {
+        if (!$this->updatesEnabled()) return response()->json(['error' => 'O atualizador de temas está desativado.'], 403)->header('Cache-Control', 'private, no-store');
         try {
             $updates = $service->updates($service->state());
             return response()->json(['count' => count($updates), 'updates' => $updates])
@@ -74,6 +83,9 @@ class GithubThemesController extends Controller
             return Cache::lock('github-themes-write', 180)->block(5, function () use ($category, $name, $service, $installer) {
                 $s = $service->state();
                 $theme = $service->theme($s, $category, $name);
+                if ($theme['installed'] && !$this->updatesEnabled()) {
+                    return back()->withErrors(['theme' => 'O atualizador de temas está desativado nas configurações.']);
+                }
                 if ($theme['current']) return back()->with('success', 'O tema já está atualizado.');
                 $directory = $theme['installed']['directory'] ?? preg_replace('/[0-9.-]/', '', $name);
                 if (!$theme['installed'] && file_exists(base_path('themes/'.$directory))) throw new \RuntimeException('collision');

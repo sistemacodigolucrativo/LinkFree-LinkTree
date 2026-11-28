@@ -35,9 +35,9 @@
     </details>
 
     <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-      <a class="btn {{ $checkingUpdates && count($updates) ? 'btn-success' : 'btn-outline-primary' }}" href="{{ route('githubThemes', ['updates' => 1]) }}">
+      @if($updatesEnabled)<a class="btn {{ $checkingUpdates && count($updates) ? 'btn-success' : 'btn-outline-primary' }}" href="{{ route('githubThemes', ['updates' => 1]) }}">
         Verificar atualizações @if($checkingUpdates && count($updates)) ({{ count($updates) }}) @endif
-      </a>
+      </a>@else <span class="text-muted">Atualizador de temas desativado.</span> @endif
       <a class="btn btn-outline-secondary" href="{{ route('showThemes') }}">Voltar ao gerenciamento</a>
     </div>
 
@@ -73,13 +73,14 @@
               <h2 class="h5" style="overflow-wrap:anywhere">{{ $theme['name'] }}</h2>
               <p>
                 @if($theme['current']) Atualizado
-                @elseif($theme['update_available']) <span class="text-success fw-bold">Atualização disponível</span>
+                @elseif($theme['update_available'] && $updatesEnabled) <span class="text-success fw-bold">Atualização disponível</span>
+                @elseif($theme['installed'] && !$updatesEnabled) Atualizador desativado
                 @else Disponível para instalação
                 @endif
               </p>
               <form class="mt-auto" method="post" action="{{ route('githubThemes.install', [$category, $theme['name']]) }}">
                 @csrf
-                <button type="submit" class="btn btn-primary" @disabled($theme['current'])>{{ $theme['update_available'] ? 'Atualizar' : ($theme['current'] ? 'Instalado' : 'Instalar') }}</button>
+                <button type="submit" class="btn btn-primary" @disabled($theme['current'] || ($theme['installed'] && !$updatesEnabled))>{{ $theme['update_available'] ? 'Atualizar' : ($theme['current'] ? 'Instalado' : 'Instalar') }}</button>
               </form>
             </div>
           </article>
