@@ -119,6 +119,10 @@ async function run() {
                 assert((await page.locator('form[action$="/admin/config"]').count())>0,
                         'No existing configuration forms in '+section);
               }
+              if(section==='advanced') {
+                const ids=await page.locator('form').evaluateAll(forms=>forms.map(f=>f.id));
+                assert(ids.indexOf('MAINTENANCE_MODE-form') < ids.indexOf('JOIN_BETA-form'), 'Maintenance must precede beta');
+              }
               return await layout(page,mode);
             });
           }
@@ -150,6 +154,29 @@ async function run() {
         } finally {await verification.close();}
         return {POST:true,status:302,persistedAfterNewGET:true,disposableFixture:true};
       } finally { await context.close(); }
+    });
+    await check('Theme updater toggle blocks status and update page',async()=>{
+      const context=await makeContext(browser,1280,'light');
+      try {
+        const page=await context.newPage();
+        await login(page);
+        await show(page,'/admin/config/sections/security');
+        const toggle=page.locator('#ENABLE_THEME_UPDATER');
+        assert(await toggle.isChecked());
+        const response=page.waitForResponse(res=>new URL(res.url()).pathname==='/admin/config' && res.request().method()==='POST');
+        await toggle.uncheck();
+        assert.equal((await response).status(),302);
+        const status=await context.request.get(base+'/admin/github-themes/status',{maxRedirects:0});
+        assert.equal(status.status(),403);
+        const updates=await context.request.get(base+'/admin/github-themes?updates=1',{maxRedirects:0});
+        assert.equal(updates.status(),302);
+        await show(page,'/admin/config/sections/security');
+        const save=page.waitForResponse(res=>new URL(res.url()).pathname==='/admin/config' && res.request().method()==='POST');
+        await page.locator('#ENABLE_THEME_UPDATER').check();
+        assert.equal((await save).status(),302);
+        await show(page,'/admin/config/sections/security');
+        assert(await page.locator('#ENABLE_THEME_UPDATER').isChecked());
+      } finally {await context.close();}
     });
     await check('Guest cannot view config section',async()=>{
       const guest=await browser.newContext();

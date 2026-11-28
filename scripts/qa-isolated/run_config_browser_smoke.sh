@@ -30,9 +30,13 @@ MAIL_FROM_ADDRESS=qa@example.test
 ALLOW_REGISTRATION=true
 REGISTER_AUTH=auth
 FORCE_ROUTE_HTTPS=false
+ENABLE_THEME_UPDATER=true
 EOF
 if [ "${QA_MEMBER_NAV_ONLY:-0}" = "1" ]; then
   echo "LOCALE=pt-BR" >> "$QA_APP_ROOT/.env"
+fi
+if [ "${QA_ADMIN_UX_ONLY:-0}" = "1" ]; then
+  echo "ENABLE_REPORT_ICON=true" >> "$QA_APP_ROOT/.env"
 fi
 cd "$QA_APP_ROOT"
 php artisan migrate --force --no-interaction > /tmp/linkfree-audit/config-migrations.log

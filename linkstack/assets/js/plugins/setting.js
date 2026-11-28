@@ -137,6 +137,8 @@ Index Of Script
         sidebarTypeSetting = types;
         sidebar.classList.remove(...sidebarTypesValues);
         sidebar.classList.add(...types);
+        if (window.innerWidth < 1025 && !sidebar.classList.contains('sidebar-mini')) sidebar.classList.add('sidebar-mini', 'on-resize');
+        else if (types.includes('sidebar-mini')) sidebar.classList.remove('on-resize');
         document.querySelectorAll('[data-setting="sidebar"][data-name="sidebar-type"]').forEach(el => {
             el.classList.toggle('active', types.includes(el.getAttribute('data-value')));
         });

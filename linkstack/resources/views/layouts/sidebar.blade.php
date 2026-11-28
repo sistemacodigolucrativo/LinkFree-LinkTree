@@ -423,6 +423,17 @@ if ($isAdminPanel) {
     <!-- loader END -->
 
     <aside class="sidebar sidebar-default sidebar-white sidebar-base navs-rounded-all" aria-label="{{ $panelLabel }}" data-panel-context="{{ $isAdminPanel ? 'admin' : 'member' }}">
+      <script>
+        // Apply the saved and responsive state before the sidebar can be painted.
+        (function () {
+          var sidebar = document.currentScript.parentElement, types = [];
+          try { var saved = JSON.parse(localStorage.getItem('sidebarType') || '[]'); if (Array.isArray(saved)) types = saved; } catch (_) {}
+          if (types.includes('sidebar-hover')) sidebar.classList.add('sidebar-mini', 'sidebar-hover');
+          else if (types.includes('sidebar-boxed')) sidebar.classList.add('sidebar-boxed');
+          else if (types.includes('sidebar-mini')) sidebar.classList.add('sidebar-mini');
+          if (window.innerWidth < 1025 && !sidebar.classList.contains('sidebar-mini')) sidebar.classList.add('sidebar-mini', 'on-resize');
+        })();
+      </script>
         <div class="sidebar-header d-flex align-items-center justify-content-start">
             <a href="{{ route($isAdminPanel ? 'adminOverview' : 'panelIndex') }}" class="navbar-brand" aria-label="{{ $panelLabel }}">
 

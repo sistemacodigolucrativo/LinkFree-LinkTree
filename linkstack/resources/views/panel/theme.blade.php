@@ -14,7 +14,7 @@
 <p class="small text-muted">Instale temas Free e Premium/VIP ou consulte novas versões pelo repositório configurado.</p>
 <div class="d-flex flex-wrap gap-2">
 <a class="btn btn-primary" href="{{ route('githubThemes') }}">Selecionar temas GitHub</a>
-<a id="github-theme-updates" class="btn btn-outline-primary" href="{{ route('githubThemes', ['updates' => 1]) }}">Verificar atualizações</a>
+@if(filter_var(env('ENABLE_THEME_UPDATER', true), FILTER_VALIDATE_BOOLEAN))<a id="github-theme-updates" class="btn btn-outline-primary" href="{{ route('githubThemes', ['updates' => 1]) }}">Verificar atualizações</a>@else<span class="text-muted">Atualizador de temas desativado.</span>@endif
 </div><p id="github-theme-status" class="small mt-2 mb-0" aria-live="polite"></p>
 </section></div>
 <div class="col-12 col-lg-6"><section class="border rounded p-3 h-100" aria-label="Enviar temas">
