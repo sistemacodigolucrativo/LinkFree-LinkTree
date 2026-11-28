@@ -1,0 +1,34 @@
+name: Local mail setup on disposable Ubuntu
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/setup-local-mail.sh'
+      - '.github/workflows/local-mail-setup.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  setup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate script and preview without changing system configuration
+        run: |
+          bash -n scripts/setup-local-mail.sh
+          bash scripts/setup-local-mail.sh --plan example.test mail.example.test 192.0.2.10 dmarc@example.test
+      - name: Install only on this disposable runner and check repeatability
+        run: |
+          set -euo pipefail
+          sudo bash scripts/setup-local-mail.sh --install example.test mail.example.test 192.0.2.10 dmarc@example.test
+          selector="lf$(date -u +%Y)"
+          before=$(sudo sha256sum "/etc/opendkim/keys/example.test/$selector.private")
+          sudo bash scripts/setup-local-mail.sh --install example.test mail.example.test 192.0.2.10 dmarc@example.test
+          after=$(sudo sha256sum "/etc/opendkim/keys/example.test/$selector.private")
+          test "$before" = "$after"
+          test "$(postconf -h inet_interfaces)" = loopback-only
+          postconf -h smtpd_relay_restrictions | grep -q reject_unauth_destination
+          sudo systemctl is-active --quiet postfix opendkim

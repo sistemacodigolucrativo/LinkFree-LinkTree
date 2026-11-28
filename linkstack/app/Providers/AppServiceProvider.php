@@ -7,6 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app['mail.manager']->extend('local-php', fn (array $config) => new \App\Mail\Transport\LocalPhpMailTransport($config));
+        RateLimiter::for('local-mail-test', function ($request) {
+            return [
+                Limit::perHour(6)->by('mail-test-user:'.($request->user()?->getAuthIdentifier() ?? 'guest')),
+                Limit::perHour(20)->by('mail-test-ip:'.$request->ip()),
+            ];
+        });
         Paginator::useBootstrap();
         Validator::extend('isunique', function ($attribute, $value, $parameters, $validator) {
             $value = strtolower($value);

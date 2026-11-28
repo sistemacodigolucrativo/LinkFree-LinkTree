@@ -394,11 +394,13 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 @error('LOCAL_MAIL_DOMAIN')<div class="text-danger" role="alert">{{ $message }}</div>@enderror
 <label for="lf-local-limit" class="form-label mt-2">{{ __('local_mail.hourly_limit') }}</label>
 <input id="lf-local-limit" type="number" min="1" max="10000" class="form-control" name="LOCAL_MAIL_HOURLY_LIMIT" value="{{ old('LOCAL_MAIL_HOURLY_LIMIT', env('LOCAL_MAIL_HOURLY_LIMIT', 60)) }}">
+@error('LOCAL_MAIL_HOURLY_LIMIT')<div class="text-danger" role="alert">{{ $message }}</div>@enderror
 <label for="lf-local-envelope" class="form-label mt-2">{{ __('local_mail.envelope') }}</label>
 <select id="lf-local-envelope" name="LOCAL_MAIL_ENVELOPE_MODE" class="form-control">
   <option value="from" @selected(old('LOCAL_MAIL_ENVELOPE_MODE', env('LOCAL_MAIL_ENVELOPE_MODE', 'from')) === 'from')>{{ __('local_mail.envelope_from') }}</option>
   <option value="provider" @selected(old('LOCAL_MAIL_ENVELOPE_MODE', env('LOCAL_MAIL_ENVELOPE_MODE', 'from')) === 'provider')>{{ __('local_mail.envelope_provider') }}</option>
 </select>
+@error('LOCAL_MAIL_ENVELOPE_MODE')<div class="text-danger" role="alert">{{ $message }}</div>@enderror
 <br><h5>{{__('messages.Custom SMTP server:')}}</h5>
 <label style="margin-top:15px">{{__('messages.Host')}}</label>
 <input type="text" class="form-control form-control-lg" class="form-control form-control-lg" name="MAIL_HOST" value="{{env('MAIL_HOST')}}" />
@@ -411,7 +413,8 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
 <label style="margin-top:15px">{{__('messages.Encryption type')}}</label>
 <input type="text" class="form-control form-control-lg" class="form-control form-control-lg" name="MAIL_ENCRYPTION" value="{{env('MAIL_ENCRYPTION')}}" />
 <label style="margin-top:15px">{{__('messages.From address')}}</label>
-<input type="text" class="form-control form-control-lg" class="form-control form-control-lg" name="MAIL_FROM_ADDRESS" value="{{env('MAIL_FROM_ADDRESS')}}" />
+<input type="text" class="form-control form-control-lg" name="MAIL_FROM_ADDRESS" value="{{ old('MAIL_FROM_ADDRESS', env('MAIL_FROM_ADDRESS')) }}" />
+@error('MAIL_FROM_ADDRESS')<div class="text-danger" role="alert">{{ $message }}</div>@enderror
 <button type="submit" class="btn btn-primary mt-4">{{__('messages.Apply changes')}}</button>
 </div>
 </form>
@@ -428,7 +431,7 @@ document.getElementById("MAINTENANCE_MODE-form").addEventListener("change", func
   </div>
 @endif
 </div>
-<form method="POST" action="{{ route('SendTestMail') }}" class="d-inline">@csrf<button type="submit" class="btn btn-gray">{{__('messages.Send Test E-Mail')}}</button></form>
+<form method="POST" action="{{ route('SendTestMail') }}" class="d-inline">@csrf<input type="text" name="lf_website" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none"><button type="submit" class="btn btn-gray">{{__('messages.Send Test E-Mail')}}</button></form>
 {{-- end SMTP settings --}}
 
 

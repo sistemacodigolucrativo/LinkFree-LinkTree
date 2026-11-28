@@ -155,6 +155,9 @@ class AdminController extends Controller
   // Send test mail
   public function SendTestMail(Request $request)
   {
+    if ($request->filled('lf_website')) {
+      return redirect()->route('admin.config.section', ['section' => 'smtp'])->with('fail', __('registration.smtp_test_failed'));
+    }
     try {
       $userId = auth()->id();
       $user = User::findOrFail($userId);
