@@ -62,6 +62,7 @@ UMask 007
 Mode sv
 Canonicalization relaxed/simple
 Socket inet:8891@127.0.0.1
+PidFile /run/opendkim/opendkim.pid
 UserID opendkim
 KeyTable refile:/etc/opendkim/KeyTable
 SigningTable refile:/etc/opendkim/SigningTable

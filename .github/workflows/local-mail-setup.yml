@@ -32,3 +32,12 @@ jobs:
           test "$(postconf -h inet_interfaces)" = loopback-only
           postconf -h smtpd_relay_restrictions | grep -q reject_unauth_destination
           sudo systemctl is-active --quiet postfix opendkim
+      - name: Verify local milter signs a synthetic queued message
+        run: |
+          set -euo pipefail
+          # Keep the synthetic message on the runner: the local relay port has no listener.
+          sudo postconf -e 'relayhost = [127.0.0.1]:25252'
+          sudo systemctl reload postfix
+          printf 'From: sender@example.test\nTo: recipient@example.test\nSubject: synthetic test\n\nSynthetic message\n' | sudo /usr/sbin/sendmail -i -f sender@example.test recipient@example.test
+          queue_id=$(sudo postqueue -j | python3 -c 'import sys,json; print(json.loads(next(sys.stdin))["queue_id"])')
+          sudo postcat -q "$queue_id" | grep -q 'DKIM-Signature:'
