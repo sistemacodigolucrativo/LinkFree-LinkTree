@@ -41,7 +41,7 @@ jobs:
           printf 'From: sender@example.test\nTo: recipient@example.test\nSubject: synthetic test\n\nSynthetic message\n' | sudo /usr/sbin/sendmail -i -f sender@example.test recipient@example.test
           signed=0
           for attempt in $(seq 1 75); do
-            queue_id=$(sudo postqueue -j | python3 -c 'import sys,json; rows=list(sys.stdin); print(json.loads(rows[0])["queue_id"] if rows else "")')
+            queue_id=$(sudo postqueue -j | python3 -c 'import sys,json; rows=[json.loads(line) for line in sys.stdin]; print(next((row["queue_id"] for row in rows if any(r.get("address") == "recipient@example.test" for r in row.get("recipients", []))), ""))')
             if [ -n "$queue_id" ]; then
               sudo postcat -q "$queue_id" > /tmp/synthetic-mail.txt || true
               if grep -q 'DKIM-Signature:' /tmp/synthetic-mail.txt; then signed=1; break; fi
