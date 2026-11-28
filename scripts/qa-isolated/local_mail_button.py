@@ -45,3 +45,23 @@ assert capture.is_file(), 'Fake local MTA did not receive the test message'
 message = capture.read_text()
 assert 'auditadmin@example.test' in message and 'multipart/alternative' in message
 print('PASS: authenticated admin test button submitted multipart mail to a fake local MTA')
+
+# The fixture is disposable, but restore its original .env for the other QA jobs.
+env_file = Path('/tmp/linkfree-audit/linkstack/.env')
+original = env_file.read_bytes()
+assert b'APP_ENV=local' in original and b'MAIL_MAILER=log' in original
+try:
+    status, _, _ = request('/admin/config', {
+        '_token': token(page), 'type': 'smtp', 'entry': 'smtp', 'local_php': '1',
+        'LOCAL_MAIL_DOMAIN': 'example.test', 'MAIL_FROM_ADDRESS': 'sender@example.test',
+        'LOCAL_MAIL_HOURLY_LIMIT': '60', 'LOCAL_MAIL_ENVELOPE_MODE': 'from',
+    })
+    assert status == 302, f'Local mail settings returned {status}'
+    saved = env_file.read_text()
+    for expected in ('MAIL_MAILER=local-php', 'MAIL_FROM_ADDRESS=sender@example.test',
+                     'LOCAL_MAIL_DOMAIN=example.test', 'LOCAL_MAIL_HOURLY_LIMIT=60',
+                     'LOCAL_MAIL_ENVELOPE_MODE=from'):
+        assert expected in saved, f'Local mail setting was not saved: {expected}'
+finally:
+    env_file.write_bytes(original)
+print('PASS: admin can save the local mail settings in the isolated fixture')
