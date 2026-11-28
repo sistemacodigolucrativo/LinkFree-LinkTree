@@ -124,6 +124,26 @@ jobs:
           SHELL
           chmod 700 /tmp/linkfree-audit/fake-sendmail
           QA_APP_ROOT=/tmp/linkfree-audit/linkstack php -d 'sendmail_path=/tmp/linkfree-audit/fake-sendmail' scripts/qa-isolated/local_mail_acceptance.php
+      - name: Verify the admin mail test button with a fake local MTA
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/linkfree-audit/fake-sendmail-button <<'SHELL'
+          #!/usr/bin/env bash
+          cat > /tmp/linkfree-audit/local-mail-button.eml
+          SHELL
+          chmod 700 /tmp/linkfree-audit/fake-sendmail-button
+          cd /tmp/linkfree-audit/linkstack
+          MAIL_MAILER=local-php MAIL_FROM_ADDRESS=sender@example.test LOCAL_MAIL_DOMAIN=example.test LOCAL_MAIL_HOURLY_LIMIT=60 php -d 'sendmail_path=/tmp/linkfree-audit/fake-sendmail-button' -S 127.0.0.1:18767 server.php > /tmp/linkfree-audit/mail-button-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl --silent --output /dev/null --max-time 2 http://127.0.0.1:18767/login; then break; fi
+            if [ "$i" -eq 30 ]; then echo 'Mail button fixture failed to start'; exit 1; fi
+            sleep 1
+          done
+          cd "$GITHUB_WORKSPACE"
+          QA_EXPECTED_LOCAL_MAIL_SITE=http://127.0.0.1:18767 python3 scripts/qa-isolated/local_mail_button.py
       - name: Verify real HTTP GET/DELETE/POST and CSRF
         env:
           QA_EXPECTED_SITE: http://127.0.0.1:18765
