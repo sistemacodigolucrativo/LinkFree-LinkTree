@@ -73,7 +73,7 @@ EOF
   printf '%s._domainkey.%s %s:%s:/etc/opendkim/keys/%s/%s.private\n' "$selector" "$domain" "$domain" "$selector" "$domain" "$selector" > /etc/opendkim/KeyTable
   printf '*@%s %s._domainkey.%s\n' "$domain" "$selector" "$domain" > /etc/opendkim/SigningTable
   printf '127.0.0.1\n::1\nlocalhost\n' > /etc/opendkim/TrustedHosts
-  postconf -e "myhostname = $host" "myorigin = $domain" 'mydestination = localhost' 'inet_interfaces = loopback-only' 'mynetworks = 127.0.0.0/8 [::1]/128' 'smtpd_relay_restrictions = permit_mynetworks, reject_unauth_destination' 'smtp_tls_security_level = may' 'milter_default_action = tempfail' 'smtpd_milters = inet:127.0.0.1:8891' 'non_smtpd_milters = $smtpd_milters'
+  postconf -e "myhostname = $host" "myorigin = $domain" 'mydestination = localhost' 'inet_interfaces = loopback-only' 'mynetworks = 127.0.0.0/8 [::1]/128' 'smtpd_relay_restrictions = permit_mynetworks, reject_unauth_destination' 'default_transport = smtp' 'relay_transport = smtp' 'smtp_tls_security_level = may' 'milter_default_action = tempfail' 'smtpd_milters = inet:127.0.0.1:8891' 'non_smtpd_milters = $smtpd_milters'
   postfix check
   systemctl enable --now opendkim postfix
   systemctl restart opendkim postfix

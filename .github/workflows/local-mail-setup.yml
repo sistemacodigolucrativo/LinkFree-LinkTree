@@ -30,6 +30,7 @@ jobs:
           after=$(sudo sha256sum "/etc/opendkim/keys/example.test/$selector.private")
           test "$before" = "$after"
           test "$(postconf -h inet_interfaces)" = loopback-only
+          test "$(postconf -h default_transport)" = smtp
           postconf -h smtpd_relay_restrictions | grep -q reject_unauth_destination
           sudo systemctl is-active --quiet postfix opendkim
       - name: Verify local milter signs a synthetic queued message
